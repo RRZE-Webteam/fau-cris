@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: FAU CRIS v1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2015-02-23 10:22:21+0000\n"
+"PO-Revision-Date: 2015-02-23 14:20:07+0000\n"
 "Last-Translator: zo95zofo <barbara.bothe@fau.de>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -20,61 +20,61 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Textdomain-Support: yes"
 
-#: class_Publikationsliste.php:75
+#: class_Publikationsliste.php:76
 #@ fau-cris
 msgid "Es wurden leider keine Publikationen gefunden."
 msgstr "No publications found."
 
-#: class_Publikationsliste.php:79
+#: class_Publikationsliste.php:80
 #@ fau-cris
 msgid "Publikationen"
 msgstr "Publications"
 
-#: class_Publikationsliste.php:173
+#: class_Publikationsliste.php:165
 #, php-format
 #@ fau-cris
 msgid "Es wurden leider keine Publikationen des Typs &quot;%s&quot; gefunden."
 msgstr "No &quot;%s&quot; publications found."
 
-#: class_Publikationsliste.php:194
+#: class_Publikationsliste.php:186
 #, php-format
 #@ fau-cris
 msgid "Es wurden leider keine Publikationen aus dem Jahr %d gefunden."
 msgstr "No publications of %d found."
 
-#: class_Publikationsliste.php:211
+#: class_Publikationsliste.php:203
 #@ fau-cris
 msgid "Es wurden keine Publikationen gefunden."
 msgstr "No publications found."
 
 #: fau-cris.php:109
-#: fau-cris.php:157
-#: fau-cris.php:183
+#: fau-cris.php:167
+#: fau-cris.php:192
 #@ fau-cris
 msgid "Einstellungen"
 msgstr "Settings"
 
-#: fau-cris.php:189
+#: fau-cris.php:198
 #@ fau-cris
 msgid "CRIS-OrgNr."
 msgstr "CRIS Organisation Number"
 
-#: fau-cris.php:199
+#: fau-cris.php:208
 #@ fau-cris
 msgid "Publikationen anzeigen"
 msgstr "Show Publications"
 
-#: fau-cris.php:205
+#: fau-cris.php:214
 #@ fau-cris
 msgid "Sollen in der Personen-Detailansicht die Publikationen angezeigt werden?"
 msgstr "Show publications in people's single view."
 
-#: fau-cris.php:243
+#: fau-cris.php:263
 #@ fau-cris
 msgid "Ignoriere Jobs"
 msgstr "Ignore Jobs"
 
-#: fau-cris.php:249
+#: fau-cris.php:269
 #@ fau-cris
 msgid "Tragen Sie die Funktionen ein, die im Organigramm nicht aufgeführt werden sollen, jeweils eine Funktion pro Zeile."
 msgstr "Enter those jobs/functions you do not want to appear in the organigram, one Job per line."
@@ -101,166 +101,191 @@ msgstr "Plugin Activation Error"
 msgid "Zur&uuml;ck zur Mitarbeiterliste"
 msgstr "Back to the staff list"
 
-#: fau-cris.php:391
+#: fau-cris.php:414
 #@ fau-cris
 msgid "Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS</strong> (Currrent Research Information System) in Ihren Webauftritt ein. Das Plugin bietet <strong>Mitarbeiterlisten und -profile</strong> sowie <strong>Publikationslisten</strong> an."
 msgstr ""
 
-#: fau-cris.php:393
+#: fau-cris.php:416
 #@ fau-cris
 msgid "<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. http://cris.fau.de/converis/publicweb/Organisation/<strong><em>141517</em></strong>."
 msgstr ""
 
-#: fau-cris.php:399
+#: fau-cris.php:422
 #@ fau-cris
 msgid "Bindet eine Liste aller Mitarbeiter Ihrer Organisationseinheit ein."
 msgstr ""
 
-#: fau-cris.php:400
-#: fau-cris.php:409
+#: fau-cris.php:423
+#: fau-cris.php:432
 #@ fau-cris
 msgid "Mögliche Zusatzoptionen:"
 msgstr ""
 
-#: fau-cris.php:402
+#: fau-cris.php:425
 #@ fau-cris
 msgid "Liste hierarchisch nach Funktionen gegliedert (Voreinstellung)"
 msgstr ""
 
-#: fau-cris.php:404
+#: fau-cris.php:427
 #@ fau-cris
 msgid "Alphabetische Liste, die Funktion wird jeweils in Klammern hinter dem Namen angezeigt."
 msgstr ""
 
-#: fau-cris.php:408
+#: fau-cris.php:431
 #@ fau-cris
 msgid "Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein."
 msgstr ""
 
-#: fau-cris.php:417
+#: fau-cris.php:440
 #@ fau-cris
 msgid "Es werden nur Publikationen eines bestimmten Typs angezeigt:"
 msgstr ""
 
-#: fau-cris.php:419
+#: fau-cris.php:442
 #@ fau-cris
 msgid "Parameter"
 msgstr "Parameter"
 
-#: fau-cris.php:419
+#: fau-cris.php:442
 #@ fau-cris
 msgid "Beschreibung"
 msgstr "Description"
 
-#: fau-cris.php:420
+#: class_Publikationsliste.php:117
+#: fau-cris.php:443
 #@ fau-cris
 msgid "Bücher"
 msgstr "Books"
 
-#: fau-cris.php:421
+#: class_Publikationsliste.php:120
+#: fau-cris.php:444
 #@ fau-cris
 msgid "Zeitschriftenartikel"
 msgstr "Journal articles"
 
-#: fau-cris.php:422
+#: fau-cris.php:445
 #@ fau-cris
 msgid "Beiträge in Sammelbänden"
 msgstr ""
 
-#: fau-cris.php:423
+#: fau-cris.php:446
 #@ fau-cris
 msgid "Herausgegebene Sammelbände"
 msgstr "Editorials"
 
-#: fau-cris.php:424
+#: fau-cris.php:447
 #@ fau-cris
 msgid "Konferenzbeiträge"
 msgstr "Conference Contributions"
 
-#: fau-cris.php:425
+#: class_Publikationsliste.php:135
+#: fau-cris.php:448
 #@ fau-cris
 msgid "Übersetzungen"
 msgstr "Translations"
 
-#: fau-cris.php:426
+#: class_Publikationsliste.php:132
+#: fau-cris.php:449
 #@ fau-cris
 msgid "Abschlussarbeiten"
 msgstr "Thesis"
 
-#: fau-cris.php:427
+#: fau-cris.php:450
 #@ fau-cris
 msgid "Sonstige"
 msgstr "Other"
 
-#: fau-cris.php:415
+#: fau-cris.php:438
 #@ fau-cris
 msgid "Nur Publikationen aus einem bestimmten Jahr"
 msgstr "Only publications from one year"
 
-#: class_Publikationsliste.php:321
-#: class_Publikationsliste.php:339
-#: class_Publikationsliste.php:375
-#: class_Publikationsliste.php:393
+#: class_Publikationsliste.php:297
+#: class_Publikationsliste.php:315
+#: class_Publikationsliste.php:351
+#: class_Publikationsliste.php:369
 #@ fau-cris
 msgid "Seiten"
 msgstr "pages"
 
-#: class_Publikationsliste.php:351
-#: class_Publikationsliste.php:454
+#: class_Publikationsliste.php:327
 #@ Abkürzung für "Seite" bei Publikationen
 msgid "S."
 msgstr "p."
 
-#: class_Publikationsliste.php:423
-#: class_Publikationsliste.php:441
-#: class_Publikationsliste.php:477
-#: class_Publikationsliste.php:495
-#@ Abkürzung für "Band" bei Publikationen
-msgid "Bd."
-msgstr "vol."
-
-#: fau-cris.php:210
+#: fau-cris.php:230
 #@ fau-cris
 msgid "Personenseite"
 msgstr "Staff Page"
 
-#: fau-cris.php:216
+#: fau-cris.php:236
 #@ fau-cris
 msgid "Pfad zur Seite, auf der die Mitarbeiterliste ausgegeben wird, ohne Domain und Schrägstriche am Anfang und Ende"
 msgstr ""
 
-#: fau-cris.php:392
+#: fau-cris.php:415
 #@ fau-cris
 msgid "Für die Mitarbeiter wird jeweils eine Profilseite mit Kontaktdaten und (optional) den Publikationen des Mitarbeiters erstellt und von der Mitarbeiterliste aus verlinkt."
 msgstr ""
 
-#: fau-cris.php:393
+#: fau-cris.php:416
 #@ fau-cris
 msgid "Für die Publikationslisten lassen sich über den Shortcode verschiedene Ausgabeformen einstellen. Die Titel sind jeweils mit der Detailansicht der Publikation auf http://cris.fau.de verlinkt."
 msgstr ""
 
-#: fau-cris.php:411
+#: fau-cris.php:434
 #@ fau-cris
 msgid "Liste nach Jahren absteigend gegliedert (Voreinstellung)"
 msgstr ""
 
-#: fau-cris.php:413
+#: fau-cris.php:436
 #@ fau-cris
 msgid "Liste nach Publikationstypen gegliedert."
 msgstr ""
 
-#: fau-cris.php:434
+#: fau-cris.php:457
 #@ fau-cris
 msgid "Übersicht"
 msgstr ""
 
-#: fau-cris.php:439
+#: fau-cris.php:462
 #@ fau-cris
 msgid "Shortcodes Mitarbeiter"
 msgstr ""
 
-#: fau-cris.php:444
+#: fau-cris.php:467
 #@ fau-cris
 msgid "Shortcodes Publikationen"
+msgstr ""
+
+#: class_Publikationsliste.php:123
+#@ fau-cris
+msgid "Konferenzbeitr&auml;ge"
+msgstr ""
+
+#: class_Publikationsliste.php:126
+#@ fau-cris
+msgid "Beitr&auml;ge in Sammelb&auml;nden"
+msgstr ""
+
+#: class_Publikationsliste.php:129
+#@ fau-cris
+msgid "Herausgeberschaften"
+msgstr ""
+
+#: class_Publikationsliste.php:138
+#@ fau-cris
+msgid "Andere"
+msgstr ""
+
+#: fau-cris.php:219
+#@ fau-cris
+msgid "Reihenfolge der Publikationen"
+msgstr ""
+
+#: fau-cris.php:225
+#@ fau-cris
+msgid "Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter \"Shortcode Publikationen\". Ein Eintrag pro Zeile. "
 msgstr ""
 

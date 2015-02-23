@@ -5,12 +5,13 @@ require_once("class_Tools.php");
 class Publikationsliste {
 
 	private $pathPersonenseite;
+	private $options;
 
 	public function __construct($einheit = '', $id = '') {
-		$options = (array) get_option('_fau_cris');
-		$orgNr = $options['cris_org_nr'];
-		if (isset($options['cris_staff_page'])) {
-			$this->pathPersonenseite = "/" . $options['cris_staff_page'] . '/?id=';
+		$this->options = (array) get_option('_fau_cris');
+		$orgNr = $this->options['cris_org_nr'];
+		if (isset($this->options['cris_staff_page'])) {
+			$this->pathPersonenseite = "/" . $this->options['cris_staff_page'] . '/?id=';
 		}
 
 		if ($einheit == "person") {
@@ -106,44 +107,35 @@ class Publikationsliste {
 		}
 
 		// Publikationstypen sortieren
-		$order = array(
-			'Journal article',
-			'Article in edited volumes',
-			'Translation',
-			'Book',
-			'Editorial',
-			'Conference Contribution',
-			'Thesis',
-			'Other'
-		);
+		$order = $this->options['cris_pub_order'];
 		$pubByType = Tools::sort_key($pubByType, $order);
 
 		foreach ($pubByType as $type => $publications) {
 			echo "<h3>";
 			switch ($type) {
 				case 'Book':
-					echo "B&uuml;cher";
+					_e('Bücher', 'fau-cris');
 					break;
 				case 'Journal article':
-					echo "Zeitschriftenartikel";
+					_e('Zeitschriftenartikel', 'fau-cris');
 					break;
 				case 'Conference contribution':
-					echo "Konferenzbeitr&auml;ge";
+					_e('Konferenzbeiträge', 'fau-cris');
 					break;
 				case 'Article in Edited Volumes':
-					echo "Beitr&auml;ge in Sammelb&auml;nden";
+					_e('Beiträge in Sammelbänden', 'fau-cris');
 					break;
 				case 'Editorial':
-					echo "Herausgeberschaften";
+					_e('Herausgeberschaften', 'fau-cris');
 					break;
 				case 'Thesis':
-					echo "Abschlussarbeiten";
+					_e('Abschlussarbeiten', 'fau-cris');
 					break;
 				case 'Translation':
-					echo "&Uuml;bersetzungen";
+					_e('Übersetzungen', 'fau-cris');
 					break;
 				case 'Other':
-					echo "Andere";
+					_e('Andere', 'fau-cris');
 					break;
 				default:
 					echo $type;

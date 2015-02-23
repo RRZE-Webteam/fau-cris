@@ -5,11 +5,19 @@ require_once("class_Publikationsliste.php");
 class Personendetail {
 
 	public function __construct($id) {
+		libxml_use_internal_errors(true);
 		$this->ID = $id;
 		$suchPers = "https://cris.fau.de/ws-cached/public/infoobject/getrelated/Card/" . $this->ID . "/PERS_has_CARD";
 		$this->xmlPers = simplexml_load_file($suchPers);
 		$suchCard = "https://cris.fau.de/ws-cached/public/infoobject/get/Card/". $this->ID;
-		$this->xmlCard = simplexml_load_file($suchCard);
+
+		$this->xmlCard = @simplexml_load_file($suchCard, 'SimpleXmlElement', LIBXML_NOERROR+LIBXML_NOWARNING);
+		if (false === $this->xmlCard) {
+			print "<p>" . __('Keine Daten gefunden.', 'fau-cris') . "</p>"
+					."<p><a href=\"" . get_permalink() . "\">&rarr; " . __('Zur Mitarbeiterliste','fau-cris') . "</a></p>";
+			return;
+		}
+
 		/* Erstmal keine Awards in Webservices
 		$persID = $this->xmlPers->infoObject['id'];
 		$this->suchAwards = "https://cris.fau.de/ws-cached/public/infoobject/getrelated/Person/". $persID . "/awar_has_pers";
@@ -50,6 +58,9 @@ class Personendetail {
 	 *  Persönliche Informationen, Kontakt etc.
 	 */
 	public function detail() {
+		if (false === $this->xmlCard) {
+			return;
+		}
 		$options = (array) get_option('_fau_cris');
 
 		$vorname = strip_tags($this->cardArray['firstName']);

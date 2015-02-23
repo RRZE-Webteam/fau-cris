@@ -129,6 +129,16 @@ class FAU_CRIS {
 		$options = array(
 			'cris_org_nr'		=>	'142477',
 			'cris_publications'	=>	'0',
+			'cris_pub_order'	=>	array(
+										'Journal article',
+										'Article in edited volumes',
+										'Translation',
+										'Book',
+										'Editorial',
+										'Conference Contribution',
+										'Thesis',
+										'Other'
+									),
 			'cris_staff_page'	=>	'mitarbeiter',
 //			'cris_awards'		=>	'0',
 			'cris_cache'		=>	'18000',
@@ -155,7 +165,6 @@ class FAU_CRIS {
 		<div class="wrap">
 		<?php screen_icon(); ?>
 			<h2><?php echo __('Einstellungen', self::textdomain) . ' &rsaquo; CRIS'; ?></h2>
-
 			<form method="post" action="options.php">
 				<?php
 				settings_fields('fau_cris_options');
@@ -203,6 +212,17 @@ class FAU_CRIS {
 				array (
 					'name' => 'cris_publications',
 					'description' => __('Sollen in der Personen-Detailansicht die Publikationen angezeigt werden?', self::textdomain)
+				)
+		);
+		add_settings_field(
+				'cris_pub_order',
+				__('Reihenfolge der Publikationen', self::textdomain),
+				array(__CLASS__, 'cris_textarea_callback'),
+				'fau_cris_options',
+				'cris_section',
+				array (
+					'name' => 'cris_pub_order',
+					'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
 				)
 		);
 		add_settings_field(
@@ -267,6 +287,9 @@ class FAU_CRIS {
 		}
 		if (isset($input['cris_staff_page'])) {
 			$new_input['cris_staff_page'] = wp_filter_nohtml_kses($input['cris_staff_page']);
+		}
+		if (isset($input['cris_pub_order'])) {
+			$new_input['cris_pub_order'] = explode("\n", str_replace("\r", "",$input['cris_pub_order']));
 		}
 /*		if (isset($input['cris_cache'])) {
 			$new_input['cris_cache'] = absint($input['cris_cache']);
