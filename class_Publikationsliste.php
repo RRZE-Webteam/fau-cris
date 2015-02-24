@@ -7,7 +7,7 @@ class Publikationsliste {
 	private $pathPersonenseite;
 	private $options;
 
-	public function __construct($einheit = '', $id = '') {
+	public function __construct($einheit='', $id='') {
 		$this->options = (array) get_option('_fau_cris');
 		$orgNr = $this->options['cris_org_nr'];
 		if (isset($this->options['cris_staff_page'])) {
@@ -111,35 +111,9 @@ class Publikationsliste {
 		$pubByType = Tools::sort_key($pubByType, $order);
 
 		foreach ($pubByType as $type => $publications) {
+			$title = Tools::getPubTranslation($type);
 			echo "<h3>";
-			switch ($type) {
-				case 'Book':
-					_e('Bücher', 'fau-cris');
-					break;
-				case 'Journal article':
-					_e('Zeitschriftenartikel', 'fau-cris');
-					break;
-				case 'Conference contribution':
-					_e('Konferenzbeiträge', 'fau-cris');
-					break;
-				case 'Article in Edited Volumes':
-					_e('Beiträge in Sammelbänden', 'fau-cris');
-					break;
-				case 'Editorial':
-					_e('Herausgeberschaften', 'fau-cris');
-					break;
-				case 'Thesis':
-					_e('Abschlussarbeiten', 'fau-cris');
-					break;
-				case 'Translation':
-					_e('Übersetzungen', 'fau-cris');
-					break;
-				case 'Other':
-					_e('Andere', 'fau-cris');
-					break;
-				default:
-					echo $type;
-			}
+			echo $title;
 			echo "</h3>";
 			$this->make_list($publications);
 		}
@@ -152,9 +126,15 @@ class Publikationsliste {
 	public function publikationstypen($typ) {
 
 		$publications = array();
+		$pubTyp = Tools::getPubName($typ, "en");
+		$pubTyp_de = Tools::getPubName($typ, "de");
+		if (!isset($pubTyp) && !isset($pubTyp_de)) {
+			echo "<p>Falscher Parameter</p>";
+			return;
+		}
 
 		foreach($this->pubArray as $id => $book) {
-			if($book['Publication type'] == $typ){
+			if($book['Publication type'] == $pubTyp){
 				$publications[$id] = $book;
 			}
 		}
@@ -162,7 +142,7 @@ class Publikationsliste {
 		if (!empty($publications)) {
 			$this->make_list($publications);
 		} else {
-			echo '<p>' . sprintf(__('Es wurden leider keine Publikationen des Typs &quot;%s&quot; gefunden.','fau-cris'), $typ) . '</p>';
+			echo '<p>' . sprintf(__('Es wurden leider keine Publikationen des Typs &quot;%s&quot; gefunden.','fau-cris'), $pubTyp_de) . '</p>';
 		}
 	}
 
@@ -250,10 +230,6 @@ class Publikationsliste {
 				'origLanguage' => (array_key_exists('Language', $publication) ? strip_tags($publication['Language']) : 'O.A.')
 			);
 
-/*			print "<pre>";
-			print_r($publications);
-			print "</pre>";
-*/
 			echo "<li style='margin-bottom: 15px; line-height: 150%;'>";
 
 			foreach ($pubDetails['authorsArray'] as $author) {
