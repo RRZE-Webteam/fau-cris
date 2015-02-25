@@ -1,43 +1,25 @@
 <?php
+require_once("class_Dicts.php");
 
 class Tools {
 
-	/*
-	 * Begriffe
-	 */
-	private static $pubNames = array(
-		'zeitschriftenartikel' => array (
-			'de' => 'Zeitschriftenartikel',
-			'en' => 'Journal article'),
-		'sammelbandbeitraege' => array (
-			'de' => 'Beiträge in Sammelbänden',
-			'en' => 'Article in Edited Volumes'),
-		'uebersetzungen' => array (
-			'de' => 'Übersetzungen',
-			'en' => 'Translation'),
-		'buecher' => array (
-			'de' => "Bücher",
-			'en' => 'Book'),
-		'herausgeberschaften' => array (
-			'de' => 'Herausgeberschaften',
-			'en' => 'Editorial'),
-		'konferenzbeitraege' => array (
-			'de' => 'Konferenzbeiträge',
-			'en' => 'Conference Contribution'),
-		'abschlussarbeiten' => array (
-			'de' => 'Abschlussarbeiten',
-			'en' => 'Thesis'),
-		'andere' => array (
-			'de' => 'Sonstige',
-			'en' => 'Other')
-	);
+	public static function getAcronym($acadTitle) {
+		$acronym = '';
+		foreach (explode(' ', $acadTitle) as $actitle) {
+			if (Dicts::$acronyms[$actitle] != '') {
+				$acronym .= " " . Dicts::$acronyms[$actitle];
+			}
+			$acronym = trim($acronym);
+		}
+		return $acronym;
+	}
 
 	public static function getPubName($pub, $lang) {
-		return self::$pubNames[$pub][$lang];
+		return Dicts::$pubNames[$pub][$lang];
 	}
 
 	public static function getPubTranslation($pub) {
-		foreach (self::$pubNames as $pubindex) {
+		foreach (Dicts::$pubNames as $pubindex) {
 			//print $pub;
 			//print_r($pubindex['en']);
 			//print_r($pubindex['de']);
@@ -54,7 +36,7 @@ class Tools {
 	}
 
 	/*
-	 * Array sortieren (strings)
+	 * Array sortieren
 	 */
 
 	public static function record_sortByName($results) {

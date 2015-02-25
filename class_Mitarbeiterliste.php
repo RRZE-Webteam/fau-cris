@@ -1,5 +1,6 @@
 <?php
 
+require_once("class_Dicts.php");
 require_once("class_Tools.php");
 
 class Mitarbeiterliste {
@@ -77,25 +78,7 @@ class Mitarbeiterliste {
 		}
 
 		// Mitarbeiter-Array nach Hierarchie sortieren
-		$hierarchie = array(
-			'Lehrstuhlinhaber/in',
-			'Professurinhaber/in',
-			'Juniorprofessor/in',
-			'apl. Professor/in',
-			'Privatdozent/in',
-			'Honorarprofessor/in',
-			'Emeritus / Emerita',
-			'Professor/in im Ruhestand',
-			'Gastprofessoren (h.b.) an einer Univ.',
-			'Wissenschaftler/in',
-			'Doktorand/in',
-			'HiWi',
-			'Verwaltungsmitarbeiter/in',
-			'technische/r Mitarbeiter/in',
-			'FoDa-Administrator/in',
-			'Andere'
-		);
-		$organigramm = Tools::sort_key($organigramm, $hierarchie);
+		$organigramm = Tools::sort_key($organigramm, Dicts::$jobOrder);
 
 		// Organigramm ausgeben
 		foreach ($organigramm as $i=>$funktion) {

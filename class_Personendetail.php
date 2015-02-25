@@ -75,7 +75,10 @@ class Personendetail {
 		$jobTitle = explode('&#32;-&#32;',substr(strip_tags($this->cardArray['allFunctions']), 0, -11));
 		$jobTitle = $jobTitle[count($jobTitle)-1];
 
-		echo "<h2>" . $academicTitle . " " . $vorname . " " . $nachname . "</h2>";
+		echo "<h2>"
+			. ($academicTitle ? '<acronym title="' . Tools::getAcronym($academicTitle) . '">' . $academicTitle . "</acronym> " : '')
+			. $vorname . " " . $nachname
+			. "</h2>";
 		echo ($jobTitle !='' ? "<p><strong>" . $jobTitle . "</strong><p>" : '');
 		echo "<p>";
 		echo ($email !='' ? "E-Mail: <a href=\"mailto:" . $email ."\">" . $email . '</a>' : '');
