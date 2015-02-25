@@ -5,6 +5,7 @@ class Dicts {
 	public static $acronyms = array(
 		"Dr."   =>  "Doktor",
 		"Prof." =>  "Professor",
+		"Dr.-Ing." => "Doktor-Ingenieur",
 		"Dipl." =>  "Diplom",
 		"Inf."  =>  "Informatik",
 		"Wi."   =>  "Wirtschaftsinformatik",

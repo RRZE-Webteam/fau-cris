@@ -6,7 +6,7 @@ class Tools {
 	public static function getAcronym($acadTitle) {
 		$acronym = '';
 		foreach (explode(' ', $acadTitle) as $actitle) {
-			if (Dicts::$acronyms[$actitle] != '') {
+			if (array_key_exists($actitle, Dicts::$acronyms) && Dicts::$acronyms[$actitle] != '') {
 				$acronym .= " " . Dicts::$acronyms[$actitle];
 			}
 			$acronym = trim($acronym);
