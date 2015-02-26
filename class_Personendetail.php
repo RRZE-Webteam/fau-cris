@@ -8,7 +8,7 @@ class Personendetail {
 		libxml_use_internal_errors(true);
 		$this->ID = $id;
 		$suchPers = "https://cris.fau.de/ws-cached/public/infoobject/getrelated/Card/" . $this->ID . "/PERS_has_CARD";
-		$this->xmlPers = simplexml_load_file($suchPers);
+		$this->xmlPers = @simplexml_load_file($suchPers, 'SimpleXmlElement', LIBXML_NOERROR+LIBXML_NOWARNING);
 		$suchCard = "https://cris.fau.de/ws-cached/public/infoobject/get/Card/". $this->ID;
 
 		$this->xmlCard = @simplexml_load_file($suchCard, 'SimpleXmlElement', LIBXML_NOERROR+LIBXML_NOWARNING);
@@ -71,9 +71,10 @@ class Personendetail {
 		$phone = strip_tags($this->cardArray['phone']);
 		$fax = strip_tags($this->cardArray['fax']);
 		$website = strip_tags($this->cardArray['cfURI']);
-		//$jobTitle = $this->cardArray['jobTitle'];
-		$jobTitle = explode('&#32;-&#32;',substr(strip_tags($this->cardArray['allFunctions']), 0, -11));
-		$jobTitle = $jobTitle[count($jobTitle)-1];
+		$jobTitle = $this->cardArray['allFunctions'];
+		//Wenn in allFunctions tatsächlich alle Funktionen stehen:
+		//$jobTitle = explode('&#32;-&#32;',substr(strip_tags($this->cardArray['allFunctions']), 0, -11));
+		//$jobTitle = $jobTitle[count($jobTitle)-1];
 
 		echo "<h2>"
 			. ($academicTitle ? '<acronym title="' . Tools::getAcronym($academicTitle) . '">' . $academicTitle . "</acronym> " : '')

@@ -23,7 +23,7 @@ class Publikationsliste {
 			$this->suchstring = "https://cris.fau.de/ws-cached/public/infoobject/getautorelated/Organisation/" . $orgNr . "/ORGA_2_PUBL_1"; //141440
 		}
 
-		$this->xml = simplexml_load_file($this->suchstring);
+		$this->xml = @simplexml_load_file($this->suchstring, 'SimpleXmlElement', LIBXML_NOERROR+LIBXML_NOWARNING);
 		$this->publications = $this->xml->infoObject;
 
 		// XML -> Array
@@ -234,21 +234,15 @@ class Publikationsliste {
 
 			foreach ($pubDetails['authorsArray'] as $author) {
 				foreach ($author as $authorID => $authorName) {
-//					$link_pre = "<a href=\"" . $this->pathPersonenseite . "/" . substr($authorID, 0, -2) . "\">";
-//					$link_post = "</a>";
+					$authorList = array();
+					$link_pre = "<a href=\"" . $this->pathPersonenseite . "/" . $authorID . "\">";
+					$link_post = "</a>";
 					$span_pre = "<span class=\"author\">";
 					$span_post = "</span>";
-
-					if ($authorID && $authorID != 'external') {
-							echo "<a href='" . $this->pathPersonenseite . substr($authorID, 0, -2) . "'>";
-					}
-					echo $span_pre . $authorName . $span_post;
-					if ($authorID && $authorID != 'external') {
-							echo "</a>";
-					}
-					echo ", ";
+					$authorList[] = ($authorID && $authorID != 'invisible' ? $link_pre : '') . $span_pre . $authorName . $span_post . ($authorID && $authorID != 'invisible' ? $link_post : '');
 				}
 			}
+			print implode(", ", $authorList);
 			echo ($pubDetails['pubType'] == 'Editorial' ? ' (Hrsg.):' : ':');
 
 			echo "<br /><span class=\"title\"><b>"

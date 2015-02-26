@@ -10,7 +10,7 @@ class Mitarbeiterliste {
 		$this->orgNr = $options['cris_org_nr'];
 		$this->ignore = $options['cris_ignore'];
 		$this->suchstring = 'https://cris.fau.de/ws-cached/public/infoobject/getrelated/Organisation/' . $this->orgNr . '/CARD_has_ORGA';
-		$this->mitarbeiter = simplexml_load_file($this->suchstring);
+		$this->mitarbeiter = @simplexml_load_file($this->suchstring, 'SimpleXmlElement', LIBXML_NOERROR+LIBXML_NOWARNING);
 
 		// XML -> Array
 		$this->maArray = array();
