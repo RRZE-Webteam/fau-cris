@@ -45,6 +45,14 @@ class Personendetail {
 			} else {
 				$cardDetail = (string)$attribut->data;
 			}
+			if($attribut['name'] == "allFunctions") {
+				if (strstr($attribut->data, ' (')) {
+					$functions = strstr($attribut->data, ' (', true);
+				} else {
+					$functions = $attribut->data;
+				}
+				$cardDetail = explode(' - ', $functions);
+			}
 			$this->cardArray[$cardAttribut] = $cardDetail;
 		}
 	}
@@ -65,8 +73,10 @@ class Personendetail {
 		$phone = strip_tags($this->cardArray['phone']);
 		$fax = strip_tags($this->cardArray['fax']);
 		$website = strip_tags($this->cardArray['cfURI']);
-		$jobTitle = $this->cardArray['allFunctions'];
-
+		if (!empty($this->cardArray['allFunctions'])) {
+			$jobTitle = implode(', ', $this->cardArray['allFunctions']);
+		}
+		
 		echo "<h2>"
 			. ($academicTitle ? '<acronym title="' . Tools::getAcronym($academicTitle) . '">' . $academicTitle . "</acronym> " : '')
 			. $vorname . " " . $nachname
