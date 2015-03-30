@@ -54,24 +54,33 @@ class Dicts {
 	);
 
 	public static $jobOrder = array(
-			"Lehrstuhlinhaber/in",
-			"Professurinhaber/in",
-			"Juniorprofessor/in",
-			"apl. Professor/in",
-			"Privatdozent/in",
-			"Emeritus / Emerita",
-			"Professor/in im Ruhestand",
-			"Wissenschaftler/in",
-			"Gastprofessoren (h.b.) an einer Univ.",
-			"Honorarprofessor/in",
-			"Doktorand/in",
-			"HiWi",
-			"Verwaltungsmitarbeiter/in",
-			"technische/r Mitarbeiter/in",
-			"FoDa-Administrator/in",
-			"Andere"
-		);
+		"Lehrstuhlinhaber/in",
+		"Professurinhaber/in",
+		"Juniorprofessor/in",
+		"apl. Professor/in",
+		"Privatdozent/in",
+		"Emeritus / Emerita",
+		"Professor/in im Ruhestand",
+		"Wissenschaftler/in",
+		"Gastprofessoren (h.b.) an einer Univ.",
+		"Honorarprofessor/in",
+		"Doktorand/in",
+		"HiWi",
+		"Verwaltungsmitarbeiter/in",
+		"technische/r Mitarbeiter/in",
+		"FoDa-Administrator/in",
+		"Andere"
+	);
 
-	}
+	public static $pubOrder = array(
+		"Journal article",
+		"Article in edited volumes",
+		"Translation",
+		"Book",
+		"Editorial",
+		"Conference Contribution",
+		"Thesis",
+		"Other"
+	);
 
-?>
+}

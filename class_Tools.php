@@ -35,6 +35,30 @@ class Tools {
 		}
 	}
 
+	public static function XML2obj($xml_url) {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $xml_url);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$xml = curl_exec($ch);
+		curl_close($ch);
+
+		libxml_use_internal_errors(true);
+		try {
+			$xmlTree = new SimpleXMLElement($xml);
+
+		} catch (Exception $e) {
+			// Something went wrong.
+			$error_message = 'Fehler beim Einlesen der Daten.';
+			foreach(libxml_get_errors() as $error_line) {
+				$error_message .= "\t" . $error_line->message;
+			}
+			trigger_error($error_message);
+			return false;
+		}
+		return $xmlTree;
+	}
+
 	/*
 	 * Array sortieren
 	 */

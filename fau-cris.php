@@ -139,6 +139,24 @@ class FAU_CRIS {
 										'Thesis',
 										'Other'
 									),
+			'cris_job_order'	=>	array(
+										'Lehrstuhlinhaber/in',
+										'Professurinhaber/in',
+										'Juniorprofessor/in',
+										'apl. Professor/in',
+										'Privatdozent/in',
+										'Emeritus / Emerita',
+										'Professor/in im Ruhestand',
+										'Wissenschaftler/in',
+										'Gastprofessoren (h.b.) an einer Univ.',
+										'Honorarprofessor/in',
+										'Doktorand/in',
+										'HiWi',
+										'Verwaltungsmitarbeiter/in',
+										'technische/r Mitarbeiter/in',
+										'FoDa-Administrator/in',
+										'Andere'
+									),
 			'cris_staff_page'	=>	'mitarbeiter',
 //			'cris_awards'		=>	'0',
 			'cris_cache'		=>	'18000',
@@ -226,6 +244,17 @@ class FAU_CRIS {
 				)
 		);
 		add_settings_field(
+				'cris_job_order',
+				__('Reihenfolge der Funktionen im Organigramm', self::textdomain),
+				array(__CLASS__, 'cris_textarea_callback'),
+				'fau_cris_options',
+				'cris_section',
+				array (
+					'name' => 'cris_job_order',
+					'description' => __('Geben Sie an, in welcher Reihenfolge die Funktionen im Organigramm aufgelistet werden, jeweils eine Funktion pro Zeile.', self::textdomain)
+				)
+		);
+		add_settings_field(
 				'cris_staff_page',
 				__('Personenseite', self::textdomain),
 				array(__CLASS__, 'cris_textbox_callback'),
@@ -269,6 +298,10 @@ class FAU_CRIS {
 					'description' => __('Tragen Sie die Funktionen ein, die im Organigramm nicht aufgeführt werden sollen, jeweils eine Funktion pro Zeile.', self::textdomain)
 				)
 		);
+/*global $options;
+print "<pre>";
+print_r($options);
+print "</pre>";*/
 	}
 
 	/**
@@ -290,6 +323,9 @@ class FAU_CRIS {
 		}
 		if (isset($input['cris_pub_order'])) {
 			$new_input['cris_pub_order'] = explode("\n", str_replace("\r", "",$input['cris_pub_order']));
+		}
+		if (isset($input['cris_job_order'])) {
+			$new_input['cris_job_order'] = explode("\n", str_replace("\r", "",$input['cris_job_order']));
 		}
 /*		if (isset($input['cris_cache'])) {
 			$new_input['cris_cache'] = absint($input['cris_cache']);

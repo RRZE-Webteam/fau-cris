@@ -23,8 +23,8 @@ class Publikationsliste {
 			$this->suchstring = "https://cris.fau.de/ws-cached/public/infoobject/getautorelated/Organisation/" . $orgNr . "/ORGA_2_PUBL_1"; //141440
 		}
 
-		$this->xml = @simplexml_load_file($this->suchstring, 'SimpleXmlElement', LIBXML_NOERROR+LIBXML_NOWARNING);
-		$this->publications = $this->xml->infoObject;
+		$xml = Tools::XML2obj($this->suchstring);
+		$this->publications = $xml->infoObject;
 
 		// XML -> Array
 
@@ -108,8 +108,11 @@ class Publikationsliste {
 
 		// Publikationstypen sortieren
 		$order = $this->options['cris_pub_order'];
-		$pubByType = Tools::sort_key($pubByType, $order);
-
+		if ($order[0] != '') {
+			$pubByType = Tools::sort_key($pubByType, $order);
+		} else {
+			$pubByType = Tools::sort_key($pubByType, Dicts::$jobOrder);
+		}
 		foreach ($pubByType as $type => $publications) {
 			$title = Tools::getPubTranslation($type);
 			echo "<h3>";
