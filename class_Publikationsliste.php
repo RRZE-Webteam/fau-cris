@@ -205,7 +205,7 @@ class Publikationsliste {
 			$authorIDs = explode(",", $publication['relAuthorsId']);
 			$authorsArray = array();
 			foreach ($authorIDs as $i => $key) {
-				$authorsArray[] = array($key => $authors[$i]);
+				$authorsArray[] = array('id' => $key, 'name' => $authors[$i]);
 			}
 
 			$pubDetails = array(
@@ -236,14 +236,11 @@ class Publikationsliste {
 			echo "<li style='margin-bottom: 15px; line-height: 150%;'>";
 
 			foreach ($pubDetails['authorsArray'] as $author) {
-				foreach ($author as $authorID => $authorName) {
-					$authorList = array();
-					$link_pre = "<a href=\"" . $this->pathPersonenseite . "/" . $authorID . "\">";
-					$link_post = "</a>";
-					$span_pre = "<span class=\"author\">";
-					$span_post = "</span>";
-					$authorList[] = ($authorID && $authorID != 'invisible' ? $link_pre : '') . $span_pre . $authorName . $span_post . ($authorID && $authorID != 'invisible' ? $link_post : '');
-				}
+				$link_pre = "<a href=\"" . $this->pathPersonenseite . "/" . $author['id'] . "\">";
+				$link_post = "</a>";
+				$span_pre = "<span class=\"author\">";
+				$span_post = "</span>";
+				$authorList[] = ($author['id'] && $author['id'] != 'invisible' ? $link_pre : '') . $span_pre . $author['name'] . $span_post . ($author['id'] && $author['id'] != 'invisible' ? $link_post : '');
 			}
 			print implode(", ", $authorList);
 			echo ($pubDetails['pubType'] == 'Editorial' ? ' (Hrsg.):' : ':');
