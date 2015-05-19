@@ -235,12 +235,17 @@ class Publikationsliste {
 
 			echo "<li style='margin-bottom: 15px; line-height: 150%;'>";
 
+			$authorList = array();
 			foreach ($pubDetails['authorsArray'] as $author) {
 				$link_pre = "<a href=\"" . $this->pathPersonenseite . "/" . $author['id'] . "\">";
 				$link_post = "</a>";
 				$span_pre = "<span class=\"author\">";
 				$span_post = "</span>";
-				$authorList[] = ($author['id'] && $author['id'] != 'invisible' ? $link_pre : '') . $span_pre . $author['name'] . $span_post . ($author['id'] && $author['id'] != 'invisible' ? $link_post : '');
+				$authordata = $span_pre . $author['name'] . $span_post;
+				if ($author['id'] && !in_array($author['id'], array('invisible', 'external'))) {
+					$authordata = $link_pre . $authordata . $link_post;
+				}
+				$authorList[] = $authordata;
 			}
 			print implode(", ", $authorList);
 			echo ($pubDetails['pubType'] == 'Editorial' ? ' (Hrsg.):' : ':');
