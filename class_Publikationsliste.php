@@ -171,6 +171,35 @@ class Publikationsliste {
 	}
 
 	/*
+	 * Ausgabe Publikationen ab einem bestimmten Jahr
+	 */
+
+	public function publikationsjahrestart($year) {
+
+		$pubByYear = array();
+
+		foreach($this->pubArray as $i=>$element) {
+			if($element['publYear'] >= $year){
+				$publications[$i] = $element;
+				foreach($element as $j=>$sub_element) {
+					if (($j == 'publYear') ) {
+						$pubByYear[$sub_element][$i]= $element;
+					}
+				}
+			}
+		}
+		if (!empty($pubByYear)) {
+			echo '<h3>Publikationen</h3>';
+			foreach ($pubByYear as $year => $publications) {
+				echo '<h4>' . $year . '</h4>';
+				$this->make_list($publications);
+			}
+		} else {
+			echo '<p>' . sprintf(__('Es wurden leider keine Publikationen nach %d gefunden.','fau-cris'), $year) . '</p>';
+		}
+	}
+
+	/*
 	 * Liste aller Publikationen in CRIS-Reihenfolge
 	 */
 

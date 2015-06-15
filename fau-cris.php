@@ -384,16 +384,19 @@ print "</pre>";*/
 			// Attributes
 			extract(shortcode_atts(
 				array(
-					"show" => '',
-					"orderby" => '',
-					"pubtype" => '',
+					'show' => '',
+					'orderby' => '',
+					'pubtype' => '',
 					'year' => '',
+					'start' => '',
+
 				),
 				$atts));
 			$show = sanitize_text_field($show);
 			$orderby = sanitize_text_field($orderby);
 			$pubtype = sanitize_text_field($pubtype);
 			$year = sanitize_text_field($year);
+			$start = sanitize_text_field($start);
 
 			switch ($show) {
 				case 'mitarbeiter':
@@ -421,6 +424,8 @@ print "</pre>";*/
 						$output = $liste->publikationstypen($pubtype);
  					} elseif (isset($year) && $year != '') {
 						$output = $liste->publikationsjahre($year);
+					} elseif (isset($start) && $start != '') {
+						$output = $liste->publikationsjahrestart($start);
 					} else {
 						if (isset($orderby) && $orderby == 'pubtype') {
 							$output = $liste->pubNachTyp();
@@ -469,21 +474,23 @@ print "</pre>";*/
 			. '<br /><b>orderby="year"</b>: '
 			. __('Liste nach Jahren absteigend gegliedert (Voreinstellung)', self::textdomain)
 			. '<br /><b>orderby="pubtype"</b>: '
-			. __('Liste nach Publikationstypen gegliedert.', self::textdomain)
+			. __('Liste nach Publikationstypen gegliedert', self::textdomain)
 			. '<br /><b>year="2015"</b>: '
 			. __('Nur Publikationen aus einem bestimmten Jahr', self::textdomain)
+			. '<br /><b>start="2000"</b>: '
+			. __('Nur Publikationen ab einem bestimmten Jahr', self::textdomain)
 			. '<br /><b>pubtype="Book"</b>: '
 			. __('Es werden nur Publikationen eines bestimmten Typs angezeigt:', self::textdomain) . '</p>'
 			. '<table style="font-size: 13px; line-height: 1.5; margin-left: 2em;">'
-			. '<tr><th style="text-align: left";>' . __('Parameter', self::textdomain) . '</th><th style="text-align: left";>' . __('Beschreibung', self::textdomain) . '</th></tr>'
-			. '<tr><td>Book</<td><td>' . __('Bücher', self::textdomain) . '</td></tr>'
-			. '<tr><td>Journal article</td><td>' . __('Zeitschriftenartikel', self::textdomain) . '</td></tr>'
-			. '<tr><td>Article in Edited Volumes</td><td>' . __('Beiträge in Sammelbänden', self::textdomain) . '</td></tr>'
-			. '<tr><td>Editorial</td><td>' . __('Herausgegebene Sammelbände', self::textdomain) . '</td></tr>'
-			. '<tr><td>Conference contribution</td><td>' . __('Konferenzbeiträge', self::textdomain) . '</td></tr>'
-			. '<tr><td>Translation</td><td>' . __('Übersetzungen', self::textdomain) . '</td></tr>'
-			. '<tr><td>Thesis</td><td>' . __('Abschlussarbeiten', self::textdomain) . '</td></tr>'
-			. '<tr><td>Other</td><td>' . __('Sonstige', self::textdomain) . '</td></tr>'
+			. '<tr><th style="text-align: left";>' . __('pubtype=', self::textdomain) . '</th><th style="text-align: left";>' . __('Beschreibung', self::textdomain) . '</th></tr>'
+			. '<tr><td>"Book"</<td><td>' . __('Bücher', self::textdomain) . '</td></tr>'
+			. '<tr><td>"Journal article"</td><td>' . __('Zeitschriftenartikel', self::textdomain) . '</td></tr>'
+			. '<tr><td>"Article in Edited Volumes"</td><td>' . __('Beiträge in Sammelbänden', self::textdomain) . '</td></tr>'
+			. '<tr><td>"Editorial"</td><td>' . __('Herausgegebene Sammelbände', self::textdomain) . '</td></tr>'
+			. '<tr><td>"Conference contribution"</td><td>' . __('Konferenzbeiträge', self::textdomain) . '</td></tr>'
+			. '<tr><td>"Translation"</td><td>' . __('Übersetzungen', self::textdomain) . '</td></tr>'
+			. '<tr><td>"Thesis"</td><td>' . __('Abschlussarbeiten', self::textdomain) . '</td></tr>'
+			. '<tr><td>"Other"</td><td>' . __('Sonstige', self::textdomain) . '</td></tr>'
 			. '</table>'
 		);
 
