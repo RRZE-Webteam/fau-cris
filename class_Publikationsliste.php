@@ -17,10 +17,10 @@ class Publikationsliste {
 		if ($einheit == "person") {
 			$this->ID = $id;
 			//Publikationsliste nach Card (für Personendetailseite)
-			$this->suchstring = 'https://cris.fau.de/ws-cached/public/infoobject/getrelated/Card/' . $this->ID . '/Publ_has_CARD';
+			$this->suchstring = 'https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Card/' . $this->ID . '/Publ_has_CARD';
 		} else {
 			// keine Einheit angegeben -> OrgNr verwenden
-			$this->suchstring = "https://cris.fau.de/ws-cached/public/infoobject/getautorelated/Organisation/" . $orgNr . "/ORGA_2_PUBL_1"; //141440
+			$this->suchstring = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getautorelated/Organisation/" . $orgNr . "/ORGA_2_PUBL_1"; //141440
 		}
 
 		$xml = Tools::XML2obj($this->suchstring);
