@@ -1,6 +1,6 @@
 <?php
 
-class Dicts {
+class CRIS_Dicts {
 
 	public static $acronyms = array(
 		"Dr."   =>  "Doktor",

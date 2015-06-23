@@ -6,8 +6,8 @@ class Tools {
 	public static function getAcronym($acadTitle) {
 		$acronym = '';
 		foreach (explode(' ', $acadTitle) as $actitle) {
-			if (array_key_exists($actitle, Dicts::$acronyms) && Dicts::$acronyms[$actitle] != '') {
-				$acronym .= " " . Dicts::$acronyms[$actitle];
+			if (array_key_exists($actitle, CRIS_Dicts::$acronyms) && Dicts::$acronyms[$actitle] != '') {
+				$acronym .= " " . CRIS_Dicts::$acronyms[$actitle];
 			}
 			$acronym = trim($acronym);
 		}
@@ -15,11 +15,11 @@ class Tools {
 	}
 
 	public static function getPubName($pub, $lang) {
-		return Dicts::$pubNames[$pub][$lang];
+		return CRIS_Dicts::$pubNames[$pub][$lang];
 	}
 
 	public static function getPubTranslation($pub) {
-		foreach (Dicts::$pubNames as $pubindex) {
+		foreach (CRIS_Dicts::$pubNames as $pubindex) {
 			//print $pub;
 			//print_r($pubindex['en']);
 			//print_r($pubindex['de']);
@@ -95,6 +95,28 @@ class Tools {
 			}
 		}
 		return $sort_array;
+	}
+
+	public static function person_exists($firstname, $lastname) {
+		global $wpdb;
+
+		$person = $wpdb->esc_like( $firstname ). '%' . $wpdb->esc_like( $lastname );
+		$sql = "SELECT COUNT(*) FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person'";
+		$sql = $wpdb->prepare( $sql, $person );
+		$person_count = $wpdb->get_var( $sql );
+
+		return $person_count;
+	}
+
+	public static function person_slug($firstname, $lastname) {
+		global $wpdb;
+
+		$person = $wpdb->esc_like( $firstname ). '%' . $wpdb->esc_like( $lastname );
+		$sql = "SELECT post_name FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person'";
+		$sql = $wpdb->prepare( $sql, $person );
+		$person_slug = $wpdb->get_var( $sql );
+
+		return $person_slug;
 	}
 
 }
