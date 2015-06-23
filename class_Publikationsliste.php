@@ -10,7 +10,7 @@ class Publikationsliste {
 	public function __construct($einheit='', $id='') {
 		$this->options = (array) get_option('_fau_cris');
 		$orgNr = $this->options['cris_org_nr'];
-	
+
 		if ($einheit == "person") {
 			$this->ID = $id;
 			//Publikationsliste nach Card (für Personendetailseite)
@@ -278,6 +278,9 @@ class Publikationsliste {
 
 			$authorList = array();
 			foreach ($pubDetails['authorsArray'] as $author) {
+				$span_pre = "<span class=\"author\">";
+				$span_post = "</span>";
+				$authordata = $span_pre . $author['name'] . $span_post;
 				$author_firstname = explode(" ", $author['name'])[1];
 				$author_lastname = explode(" ", $author['name'])[0];
 				if ($author['id']
@@ -285,11 +288,7 @@ class Publikationsliste {
 						&& Tools::person_slug($author_firstname, $author_lastname) != "") {
 					$link_pre = "<a href=\"/person/" . Tools::person_slug($author_firstname, $author_lastname) . "\">";
 					$link_post = "</a>";
-					$authordata = $link_pre . $author['name'] . $link_post;
-				} else {
-					$span_pre = "<span class=\"author\">";
-					$span_post = "</span>";
-					$authordata = $span_pre . $author['name'] . $span_post;
+					$authordata = $link_pre . $authordata . $link_post;
 				}
 				$authorList[] = $authordata;
 			}
