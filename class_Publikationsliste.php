@@ -285,6 +285,8 @@ class Publikationsliste {
 				$author_lastname = explode(" ", $author['name'])[0];
 				if ($author['id']
 						&& !in_array($author['id'], array('invisible', 'external'))
+						&& isset($this->options['cris_univis'])
+						&& $this->options['cris_univis'] == 1
 						&& Tools::person_slug($author_firstname, $author_lastname) != "") {
 					$link_pre = "<a href=\"/person/" . Tools::person_slug($author_firstname, $author_lastname) . "\">";
 					$link_post = "</a>";
