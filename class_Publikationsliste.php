@@ -75,9 +75,8 @@ class Publikationsliste {
 			}
 		} else {
 			if (!empty($pubByYear)) {
-				$output .= '<h3>' . __('Publikationen','fau-cris') . '</h3>';
 				foreach ($pubByYear as $year => $publications) {
-					$output .= '<h4>' . $year . '</h4>';
+					$output .= '<h3>' . $year . '</h3>';
 					$output .= $this->make_list($publications);
 				}
 			}
@@ -90,10 +89,8 @@ class Publikationsliste {
 	 */
 
 	public function pubNachTyp() {
-
 		$output = '';
 		$pubByType = array();
-
 
 		if (empty($this->publications)) {
 			$output .= "<p>Es wurden leider keine Publikationen gefunden.</p>";
@@ -109,10 +106,14 @@ class Publikationsliste {
 
 		// Publikationstypen sortieren
 		$order = $this->options['cris_pub_order'];
-		if ($order[0] != '') {
+		if ($order[0] != ''  && in_array($order[0],CRIS_Dicts::$pubNames)) {
+			foreach ($order as $key => $value) {
+				$order[$key] = Tools::getPubName($value, "en");
+			}
 			$pubByType = Tools::sort_key($pubByType, $order);
+
 		} else {
-			$pubByType = Tools::sort_key($pubByType, Dicts::$jobOrder);
+			$pubByType = Tools::sort_key($pubByType, CRIS_Dicts::$pubOrder);
 		}
 		foreach ($pubByType as $type => $publications) {
 			$title = Tools::getPubTranslation($type);
@@ -196,7 +197,6 @@ class Publikationsliste {
 			}
 		}
 		if (!empty($pubByYear)) {
-			$output .= '<h3>Publikationen</h3>';
 			foreach ($pubByYear as $year => $publications) {
 				$output .= '<h4>' . $year . '</h4>';
 				$output .= $this->make_list($publications);

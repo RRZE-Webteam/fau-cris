@@ -126,16 +126,16 @@ class FAU_CRIS {
 	 */
 	private static function default_options() {
 		$options = array(
-			'cris_org_nr'		=>	'142477',
+			'cris_org_nr'		=>	'',
 			'cris_pub_order'	=>	array(
-										'Journal article',
-										'Article in edited volumes',
-										'Translation',
-										'Book',
-										'Editorial',
-										'Conference Contribution',
-										'Thesis',
-										'Other'
+										'zeitschriftenartikel',
+										'sammelbandbeitraege',
+										'uebersetzungen',
+										'buecher',
+										'herausgeberschaften',
+										'konferenzbeitraege',
+										'abschlussarbeiten',
+										'andere'
 									),
 			'cris_cache'		=>	'18000',
 			'cris_univis'		=> 0,
@@ -150,7 +150,7 @@ class FAU_CRIS {
 		self::$cris_option_page = add_options_page(
 				'CRIS: Einstellungen', 'CRIS', 'manage_options', 'options-fau-cris', array(__CLASS__, 'options_fau_cris')
 		);
-		add_action('load-' . self::$cris_option_page, array(__CLASS__, 'fs7_help_menu'));
+		add_action('load-' . self::$cris_option_page, array(__CLASS__, 'cris_help_menu'));
 	}
 
 	/**
@@ -301,48 +301,28 @@ class FAU_CRIS {
 		$year = sanitize_text_field($year);
 		$start = sanitize_text_field($start);
 
-		switch ($show) {
-			case 'mitarbeiter':
-				if (empty($_REQUEST)) {
-					require_once('class_Mitarbeiterliste.php');
-					$liste = new Mitarbeiterliste();
-					if ($orderby == 'name') {
-						$output = $liste->liste();
-					} else {
-						$output = $liste->organigramm();
-					}
-				} else {
-					require_once("class_Personendetail.php");
-					$detail = new Personendetail($_REQUEST['id']);
-					$output = $detail->detail();
-				}
-				break;
-			case 'person':
-				require_once('class_Personendetail');
-				break;
-			case 'publikationen':
-				require_once('class_Publikationsliste.php');
-				$liste = new Publikationsliste();
-				if (isset($pubtype) && $pubtype != '') {
-					$output = $liste->publikationstypen($pubtype);
-				} elseif (isset($year) && $year != '') {
-					$output = $liste->publikationsjahre($year);
-				} elseif (isset($start) && $start != '') {
-					$output = $liste->publikationsjahrestart($start);
-				} else {
-					if (isset($orderby) && $orderby == 'pubtype') {
-						$output = $liste->pubNachTyp();
-					} elseif (isset($orderby) && $orderby == 'year') {
-						$output = $liste->pubNachJahr();
-					} else {
+		if ($show = 'publikationen') {
+			require_once('class_Publikationsliste.php');
+			$liste = new Publikationsliste();
+			if (isset($pubtype) && $pubtype != '') {
+				$output = $liste->publikationstypen($pubtype);
+			} elseif (isset($year) && $year != '') {
+				$output = $liste->publikationsjahre($year);
+			} elseif (isset($start) && $start != '') {
+				$output = $liste->publikationsjahrestart($start);
+			} else {
+				if (isset($orderby) && $orderby == 'pubtype') {
+					$output = $liste->pubNachTyp();
+				} elseif (isset($orderby) && $orderby == 'year') {
 					$output = $liste->pubNachJahr();
-					}
+				} else {
+				$output = $liste->pubNachJahr();
 				}
-				break;
-			default:
-				$output = 'Parameter fehlt';
-				break;
+			}
+		} else {
+			$output = 'Falscher oder fehlender Parameter "show".';
 		}
+
 		return $output;
 
 	}
@@ -350,7 +330,7 @@ class FAU_CRIS {
 	/*
 	 * Hilfe-Panel über der Theme-Options-Seite
 	 */
-	public static function fs7_help_menu() {
+	public static function cris_help_menu() {
 
 		$content_cris = array(
 			'<p>' . __('Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS (Currrent Research Information System)</strong> in Ihren Webauftritt ein. Das Plugin ermöglicht außerdem die Integration mit dem FAU-Person-Plugin.', self::textdomain) . '</p>',
