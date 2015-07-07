@@ -7,13 +7,7 @@ Einbinden von Daten aus der FAU-Forschungsdatenbank <strong>CRIS</strong> in Wor
 
 Für die <strong>Publikationslisten</strong> lassen sich über den Shortcode verschiedene Ausgabeformen einstellen. Die Titel sind jeweils mit der Detailansicht der Publikation auf http://cris.fau.de verlinkt.
 
-## Integration FAU-Plugin:
-
-Wenn Sie das <b>FAU-Person</b>-Plugin verwenden, können Autoren mit ihrer FAU-Person-Kontaktseite verlinkt werden.
-
-Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.
-
-##Shortcode:
+##Shortcode
 
 ###[cris show="publikationen"]
 Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein.
@@ -32,7 +26,7 @@ Mögliche Zusatzoptionen:
     - abschlussarbeiten
     - andere
 
-##Integration "FAU Person:"
+##Integration "FAU Person"
 
 Wenn Sie das <a href="https://github.com/RRZE-Webteam/fau-person">FAU-Person-Plugin</a> verwenden, können Autoren aus der Publikationsliste mit ihrer FAU-Person-Kontaktseite verlinkt werden.
 
