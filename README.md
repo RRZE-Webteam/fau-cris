@@ -13,7 +13,7 @@ Für die <strong>Publikationslisten</strong> lassen sich über den Shortcode ver
 Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein.
 Mögliche Zusatzoptionen:
 - <b>orderby="year"</b>: Liste nach Jahren absteigend gegliedert (Voreinstellung)
-- <b>orderby="pubtype"</b>: Liste nach Publikationstypen gegliedert.
+- <b>orderby="pubtype"</b>: Liste nach Publikationstypen gegliedert. Die Reihenfolge der Publikationstypen kann in den Einstellungen nach Belieben festgelegt werden.
 - <b>year="2015"</b>: Nur Publikationen aus einem bestimmten Jahr
 - <b>start="2000"</b>: Nur Publikationen ab einem bestimmten Jahr
 - <b>pubtype="buecher"</b>: Es werden nur Publikationen eines bestimmten Typs angezeigt:
