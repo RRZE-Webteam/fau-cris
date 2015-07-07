@@ -21,6 +21,7 @@ Mögliche Zusatzoptionen:
 - <b>orderby="year"</b>: Liste nach Jahren absteigend gegliedert (Voreinstellung)
 - <b>orderby="pubtype"</b>: Liste nach Publikationstypen gegliedert.
 - <b>year="2015"</b>: Nur Publikationen aus einem bestimmten Jahr
+- <b>start="2000"</b>: Nur Publikationen ab einem bestimmten Jahr
 - <b>pubtype="buecher"</b>: Es werden nur Publikationen eines bestimmten Typs angezeigt:
 	- buecher
     - zeitschriftenartikel
@@ -30,3 +31,9 @@ Mögliche Zusatzoptionen:
     - uebersetzungen
     - abschlussarbeiten
     - andere
+
+##Integration "FAU Person:"
+
+Wenn Sie das <a href="https://github.com/RRZE-Webteam/fau-person">FAU-Person-Plugin</a> verwenden, können Autoren aus der Publikationsliste mit ihrer FAU-Person-Kontaktseite verlinkt werden.
+
+Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.
