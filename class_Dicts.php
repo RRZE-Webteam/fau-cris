@@ -20,7 +20,7 @@ class CRIS_Dicts {
 			'en' => 'Editorial'),
 		'konferenzbeitraege' => array (
 			'de' => 'Konferenzbeiträge',
-			'en' => 'Conference Contribution'),
+			'en' => 'Conference contribution'),
 		'abschlussarbeiten' => array (
 			'de' => 'Abschlussarbeiten',
 			'en' => 'Thesis'),

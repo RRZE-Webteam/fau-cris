@@ -49,9 +49,9 @@ class Tools {
 
 		} catch (Exception $e) {
 			// Something went wrong.
-			$error_message = 'Fehler beim Einlesen der Daten.';
+			$error_message = 'Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.';
 			foreach(libxml_get_errors() as $error_line) {
-				$error_message .= "\t" . $error_line->message;
+				$error_message .= "<br>" . $error_line->message;
 			}
 			trigger_error($error_message);
 			return false;
@@ -96,6 +96,50 @@ class Tools {
 		}
 		return $sort_array;
 	}
+
+	/*
+	 * Publikationen-Array filtern
+	 */
+
+	public static function filter_publications($publications, $filter, $value) {
+
+		$publications_filtered = array();
+
+		switch ($filter){
+			case 'year':
+				foreach($publications as $id => $book) {
+					if($book['publYear'] == $value){
+						$publications_filtered[$id] = $book;
+					}
+				}
+				break;
+			case 'start':
+				foreach($publications as $id => $book) {
+					if($book['publYear'] >= $value){
+						$publications_filtered[$id] = $book;
+					}
+				}
+				break;
+			case 'pubtype':
+				$pubTyp = Tools::getPubName($value, "en");
+				$pubTyp_de = Tools::getPubName($value, "de");
+				if (!isset($pubTyp) && !isset($pubTyp_de)) {
+					return "<p>Falscher Parameter</p>";
+				}
+				foreach($publications as $id => $book) {
+					if($book['Publication type'] == $pubTyp){
+						$publications_filtered[$id] = $book;
+					}
+				}
+				break;
+		}
+
+		return $publications_filtered;
+	}
+
+	/*
+	 * Anbindung FAU-Person-Plugin
+	 */
 
 	public static function person_exists($firstname, $lastname) {
 		global $wpdb;

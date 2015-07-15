@@ -292,7 +292,8 @@ class FAU_CRIS {
 				'pubtype' => '',
 				'year' => '',
 				'start' => '',
-
+				'orgid' => '',
+				'persid' => '',
 			),
 			$atts));
 		$show = sanitize_text_field($show);
@@ -300,27 +301,42 @@ class FAU_CRIS {
 		$pubtype = sanitize_text_field($pubtype);
 		$year = sanitize_text_field($year);
 		$start = sanitize_text_field($start);
+		$orgid = sanitize_text_field($orgid);
+		$persid = sanitize_text_field($persid);
 
-		if ($show = 'publikationen') {
-			require_once('class_Publikationsliste.php');
-			$liste = new Publikationsliste();
-			if (isset($pubtype) && $pubtype != '') {
-				$output = $liste->publikationstypen($pubtype);
-			} elseif (isset($year) && $year != '') {
-				$output = $liste->publikationsjahre($year);
-			} elseif (isset($start) && $start != '') {
-				$output = $liste->publikationsjahrestart($start);
-			} else {
-				if (isset($orderby) && $orderby == 'pubtype') {
-					$output = $liste->pubNachTyp();
-				} elseif (isset($orderby) && $orderby == 'year') {
-					$output = $liste->pubNachJahr();
-				} else {
-				$output = $liste->pubNachJahr();
-				}
-			}
+		if (isset($orgid) && $orgid !='') {
+			$param1 = 'orga';
+			$param2 = $orgid;
+		} elseif (isset($persid) && $persid !='') {
+			$param1 = 'person';
+			$param2 = $persid;
 		} else {
-			$output = 'Falscher oder fehlender Parameter "show".';
+			$param1 = '';
+			$param2 = '';
+		}
+		if (isset($year) && $year !='') {
+			$filter = 'year';
+			$value = $year;
+		} elseif (isset($start) && $start !='') {
+			$filter = 'start';
+			$value = $start;
+		} elseif (isset($pubtype) && $pubtype !='') {
+			$filter = 'pubtype';
+			$value = $pubtype;
+		} else {
+			$filter = '';
+			$value = '';
+		}
+
+		require_once('class_Publikationsliste.php');
+		$liste = new Publikationsliste($param1, $param2);
+
+		if (isset($orderby) && $orderby == 'pubtype') {
+			$output = $liste->pubNachTyp($filter, $value);
+		} elseif (isset($orderby) && $orderby == 'year') {
+			$output = $liste->pubNachJahr($filter, $value);
+		} else {
+			$output = $liste->pubNachJahr($filter, $value);
 		}
 
 		return $output;

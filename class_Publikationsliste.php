@@ -12,15 +12,18 @@ class Publikationsliste {
 		$orgNr = $this->options['cris_org_nr'];
 
 		if ($einheit == "person") {
-			$this->ID = $id;
-			//Publikationsliste nach Card (für Personendetailseite)
-			$this->suchstring = 'https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Card/' . $this->ID . '/Publ_has_CARD';
+			// Publikationsliste für einzelne Person
+			$this->suchstring = 'https://cris.fau.de/ws-cached/1.0/public/infoobject/getautorelated/Person/' . $id . '/PERS_2_PUBL_1';
+		} elseif ($einheit == "orga") {
+			// Publikationsliste für Organisationseinheit (überschreibt Orgeinheit aus Einstellungen!!!)
+			$this->suchstring = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getautorelated/Organisation/" . $id . "/ORGA_2_PUBL_1"; //142408
 		} else {
-			// keine Einheit angegeben -> OrgNr verwenden
-			$this->suchstring = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getautorelated/Organisation/" . $orgNr . "/ORGA_2_PUBL_1"; //141440
+			// keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
+			$this->suchstring = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getautorelated/Organisation/" . $orgNr . "/ORGA_2_PUBL_1"; //142408
 		}
 
 		$xml = Tools::XML2obj($this->suchstring);
+
 		$this->publications = $xml->infoObject;
 
 		// XML -> Array
@@ -52,34 +55,37 @@ class Publikationsliste {
 	 * Ausgabe aller Publikationen nach Jahren gegliedert
 	 */
 
-	public function pubNachJahr($display='') {
+	public function pubNachJahr($filter = '', $value = '') {
+		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
 
 		$pubByYear = array();
 		$output = '';
 
-		foreach ($this->pubArray as $i => $element) {
+		// Publikationen filtern
+		if ($filter !='' && $value !='') {
+			$publications = Tools::filter_publications($this->pubArray, $filter, $value);
+		} else {
+			$publications = $this->pubArray;
+		}
+
+		if (empty($publications)) {
+			$output .= '<p>' . __('Es wurden leider keine Publikationen gefunden.','fau-cris') . '</p>';
+			return $output;
+		}
+
+		// Publikationen gliedern
+		foreach ($publications as $i => $element) {
 			foreach ($element as $j => $sub_element) {
 				if (($j == 'publYear')) {
 					$pubByYear[$sub_element][$i] = $element;
 				}
 			}
 		}
-		if($display != 'klein') {
-			if (!empty($pubByYear)) {
-				foreach ($pubByYear as $year => $publications) {
-					$output .= '<h3>' . $year . '</h3>';
-					$output .= $this->make_list($publications);
-				}
-			} else {
-				$output .= '<p>' . __('Es wurden leider keine Publikationen gefunden.','fau-cris') . '</p>';
+		foreach ($pubByYear as $year => $publications) {
+			if ($filter != 'year') {
+				$output .= '<h3>' . $year . '</h3>';
 			}
-		} else {
-			if (!empty($pubByYear)) {
-				foreach ($pubByYear as $year => $publications) {
-					$output .= '<h3>' . $year . '</h3>';
-					$output .= $this->make_list($publications);
-				}
-			}
+			$output .= $this->make_list($publications);
 		}
 		return $output;
 	}
@@ -88,30 +94,39 @@ class Publikationsliste {
 	 * Ausgabe aller Publikationen nach Publikationstypen gegliedert
 	 */
 
-	public function pubNachTyp() {
-		$output = '';
-		$pubByType = array();
+	public function pubNachTyp($filter = '', $value = '') {
+		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
 
-		if (empty($this->publications)) {
-			$output .= "<p>Es wurden leider keine Publikationen gefunden.</p>";
+		$pubByType = array();
+		$output = '';
+
+		// Publikationen filtern
+		if ($filter !='' && $value !='') {
+			$publications = Tools::filter_publications($this->pubArray, $filter, $value);
+		} else {
+			$publications = $this->pubArray;
 		}
 
-		foreach ($this->pubArray as $i => $element) {
+		if (empty($publications)) {
+			$output .= '<p>' . __('Es wurden leider keine Publikationen gefunden.','fau-cris') . '</p>';
+			return $output;
+		}
+
+		// Publikationen gliedern
+		foreach ($publications as $i => $element) {
 			foreach ($element as $j => $sub_element) {
 				if (($j == 'Publication type')) {
 					$pubByType[$sub_element][$i] = $element;
 				}
 			}
 		}
-
 		// Publikationstypen sortieren
 		$order = $this->options['cris_pub_order'];
-		if ($order[0] != ''  && in_array($order[0],CRIS_Dicts::$pubNames)) {
+		if ($order[0] != ''  && array_key_exists($order[0],CRIS_Dicts::$pubNames)) {
 			foreach ($order as $key => $value) {
 				$order[$key] = Tools::getPubName($value, "en");
 			}
 			$pubByType = Tools::sort_key($pubByType, $order);
-
 		} else {
 			$pubByType = Tools::sort_key($pubByType, CRIS_Dicts::$pubOrder);
 		}
@@ -125,108 +140,6 @@ class Publikationsliste {
 		return $output;
 	} // Ende pubNachTyp()
 
-	/*
-	 * Ausgabe einzelner Publikationstypen
-	 */
-
-	public function publikationstypen($typ) {
-
-		$output = '';
-		$publications = array();
-		$pubTyp = Tools::getPubName($typ, "en");
-		$pubTyp_de = Tools::getPubName($typ, "de");
-		if (!isset($pubTyp) && !isset($pubTyp_de)) {
-			$output .= "<p>Falscher Parameter</p>";
-			return;
-		}
-
-		foreach($this->pubArray as $id => $book) {
-			if($book['Publication type'] == $pubTyp){
-				$publications[$id] = $book;
-			}
-		}
-
-		if (!empty($publications)) {
-			$output .= $this->make_list($publications);
-		} else {
-			$output .= '<p>' . sprintf(__('Es wurden leider keine Publikationen des Typs &quot;%s&quot; gefunden.','fau-cris'), $pubTyp_de) . '</p>';
-		}
-		return $output;
-	}
-
-	/*
-	 * Ausgabe Publikationen einzelner Jahre
-	 */
-
-	public function publikationsjahre($year) {
-
-		$output = '';
-		$publications = array();
-
-		foreach($this->pubArray as $id => $book) {
-			if($book['publYear'] == $year){
-				$publications[$id] = $book;
-			}
-		}
-
-		if (!empty($publications)) {
-			$output .= $this->make_list($publications);
-		} else {
-			$output .= '<p>' . sprintf(__('Es wurden leider keine Publikationen aus dem Jahr %d gefunden.','fau-cris'), $year) . '</p>';
-		}
-		return $output;
-	}
-
-	/*
-	 * Ausgabe Publikationen ab einem bestimmten Jahr
-	 */
-
-	public function publikationsjahrestart($year) {
-
-		$pubByYear = array();
-		$output = '';
-
-		foreach($this->pubArray as $i=>$element) {
-			if($element['publYear'] >= $year){
-				$publications[$i] = $element;
-				foreach($element as $j=>$sub_element) {
-					if (($j == 'publYear') ) {
-						$pubByYear[$sub_element][$i]= $element;
-					}
-				}
-			}
-		}
-		if (!empty($pubByYear)) {
-			foreach ($pubByYear as $year => $publications) {
-				$output .= '<h4>' . $year . '</h4>';
-				$output .= $this->make_list($publications);
-			}
-		} else {
-			$output .= '<p>' . sprintf(__('Es wurden leider keine Publikationen nach %d gefunden.','fau-cris'), $year) . '</p>';
-		}
-
-		return $output;
-	}
-
-	/*
-	 * Liste aller Publikationen in CRIS-Reihenfolge
-	 */
-
-	public function liste($titel) {
-
-		$output = '';
-
-		if ($titel) {
-			$output .= $this->titeltext;
-		}
-
-		if (!empty($this->pubArray)) {
-			$output .= $this->make_list($this->pubArray);
-		} else {
-			$output .= '<p>' . __('Es wurden keine Publikationen gefunden.','fau-cris') . '</p>';
-		}
-		return $output;
-	}
 
 	/* =========================================================================
 	 * Private Functions
