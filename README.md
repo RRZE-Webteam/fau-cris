@@ -1,7 +1,7 @@
 CRIS-Plugin für Wordpress
 =========================
 
-Version 1.4
+Version 1.5
 
 Einbinden von Daten aus der FAU-Forschungsdatenbank <strong>CRIS</strong> in Wordpress-Instanzen
 
@@ -30,6 +30,7 @@ Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein.<br>
     - uebersetzungen
     - abschlussarbeiten
     - andere
+- <b>publication="12345678"</b>: Nur eine einzelne Publikation (hier die CRIS-ID der Publikation angeben)
 
 ##### ID überschreiben
 Die in den Einstellungen festgelegte CRIS-ID kann überschrieben werden, entweder durch die ID einer anderen Organisationseinheit, oder durch die ID einer einzelnen Person:
