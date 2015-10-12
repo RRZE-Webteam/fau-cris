@@ -84,6 +84,11 @@ class Publikationsliste {
 				}
 			}
 		}
+		// Publikationen sortieren
+		$keys = array_keys($pubByYear);
+		rsort($keys);
+		$pubByYear = Tools::sort_key($pubByYear, $keys);
+
 		foreach ($pubByYear as $year => $publications) {
 			if ($filter != 'year') {
 				$output .= '<h3>' . $year . '</h3>';
