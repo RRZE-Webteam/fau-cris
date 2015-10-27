@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 1.51
+ * Version: 1.6
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -322,32 +322,19 @@ class FAU_CRIS {
 			$param2 = '';
 		}
 
-		if (isset($year) && $year !='') {
-			$filter = 'year';
-			$value = $year;
-		} elseif (isset($start) && $start !='') {
-			$filter = 'start';
-			$value = $start;
-		} elseif (isset($pubtype) && $pubtype !='') {
-			$filter = 'pubtype';
-			$value = $pubtype;
-		} else {
-			$filter = '';
-			$value = '';
-		}
-
 		require_once('class_Publikationsliste.php');
 		$liste = new Publikationsliste($param1, $param2);
 
-		if (isset($orderby) && $orderby == 'pubtype') {
-			$output = $liste->pubNachTyp($filter, $value);
+		if (isset($orderby) && $orderby == 'type') {
+			$output = $liste->pubNachTyp($year, $start, $pubtype);
 		} elseif (isset($orderby) && $orderby == 'year') {
-			$output = $liste->pubNachJahr($filter, $value);
+			$output = $liste->pubNachJahr($year, $start, $pubtype);
 		} elseif (isset($publication) && $publication != '') {
 			$output = $liste->singlePub();
 		} else {
-			$output = $liste->pubNachJahr($filter, $value);
+			$output = $liste->pubNachJahr($year, $start, $pubtype);
 		}
+
 
 		return $output;
 

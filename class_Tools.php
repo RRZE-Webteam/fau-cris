@@ -98,42 +98,57 @@ class Tools {
 	}
 
 	/*
+	 * Mehrdimensionales Array nach value sortieren
+	 * Quelle: http://php.net/manual/de/function.array-multisort.php#91638
+	 */
+	public static function array_msort($array, $cols) {
+		$colarr = array();
+		foreach ($cols as $col => $order) {
+			$colarr[$col] = array();
+			foreach ($array as $k => $row) { $colarr[$col]['_'.$k] = strtolower($row[$col]); }
+		}
+		$eval = 'array_multisort(';
+		foreach ($cols as $col => $order) {
+			$eval .= '$colarr[\''.$col.'\'],'.$order.',';
+		}
+		$eval = substr($eval,0,-1).');';
+		eval($eval);
+		$ret = array();
+		foreach ($colarr as $col => $arr) {
+			foreach ($arr as $k => $v) {
+				$k = substr($k,1);
+				if (!isset($ret[$k])) $ret[$k] = $array[$k];
+				$ret[$k][$col] = $array[$k][$col];
+			}
+		}
+		return $ret;
+
+	}
+
+	/*
 	 * Publikationen-Array filtern
 	 */
 
-	public static function filter_publications($publications, $filter, $value) {
+	public static function filter_publications($publications, $year = '', $start = '', $type = '') {
 
 		$publications_filtered = array();
-
-		switch ($filter){
-			case 'year':
-				foreach($publications as $id => $book) {
-					if($book['publYear'] == $value){
-						$publications_filtered[$id] = $book;
-					}
-				}
-				break;
-			case 'start':
-				foreach($publications as $id => $book) {
-					if($book['publYear'] >= $value){
-						$publications_filtered[$id] = $book;
-					}
-				}
-				break;
-			case 'pubtype':
-				$pubTyp = Tools::getPubName($value, "en");
-				$pubTyp_de = Tools::getPubName($value, "de");
-				if (!isset($pubTyp) && !isset($pubTyp_de)) {
-					return "<p>Falscher Parameter</p>";
-				}
-				foreach($publications as $id => $book) {
-					if($book['Publication type'] == $pubTyp){
-						$publications_filtered[$id] = $book;
-					}
-				}
-				break;
+		if (!empty($type)) {
+			$pubTyp = Tools::getPubName($type, "en");
+			$pubTyp_de = Tools::getPubName($type, "de");
+		}
+		if (!empty($type) && !isset($pubTyp_de)) {
+			return "<p>Falscher Parameter</p>";
 		}
 
+		foreach($publications as $id => $book) {
+			if(
+				(empty($year) || $book['publYear'] == $year) &&
+				(empty($start) || $book['publYear'] >= $start) &&
+				(empty($type) || $book['Publication type'] == $pubTyp)
+			){
+				$publications_filtered[$id] = $book;
+			}
+		}
 		return $publications_filtered;
 	}
 
