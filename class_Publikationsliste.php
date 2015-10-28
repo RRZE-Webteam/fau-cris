@@ -98,6 +98,8 @@ class Publikationsliste {
 			if (empty($year)) {
 				$output .= '<h3>' . $array_year . '</h3>';
 			}
+			// innerhalb des Publikationstyps alphabetisch nach Erstautor sortieren
+			$publications = Tools::array_msort($publications, array('relAuthors' => SORT_ASC));
 			$output .= $this->make_list($publications);
 		}
 		return $output;
