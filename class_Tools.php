@@ -3,6 +3,8 @@ require_once("class_Dicts.php");
 
 class Tools {
 
+	const textdomain = FAU_CRIS::textdomain;
+
 	public static function getAcronym($acadTitle) {
 		$acronym = '';
 		foreach (explode(' ', $acadTitle) as $actitle) {
@@ -49,11 +51,17 @@ class Tools {
 
 		} catch (Exception $e) {
 			// Something went wrong.
-			$error_message = 'Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.';
-			foreach(libxml_get_errors() as $error_line) {
-				$error_message .= "<br>" . $error_line->message;
+			print '<p>';
+			$error_message = '<strong>' . __('Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.', self::textdomain) . '</strong>';
+			if (defined('WP_DEBUG') && true === WP_DEBUG) {
+				foreach(libxml_get_errors() as $error_line) {
+					$error_message .= "<br>" . $error_line->message;
+				}
+				trigger_error($error_message);
+			} else {
+				print $error_message;
 			}
-			trigger_error($error_message);
+			print '</p>';
 			return false;
 		}
 		return $xmlTree;

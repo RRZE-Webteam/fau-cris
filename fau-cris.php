@@ -287,7 +287,7 @@ class FAU_CRIS {
 		// Attributes
 		extract(shortcode_atts(
 			array(
-				'show' => '',
+				'show' => 'publications',
 				'orderby' => '',
 				'pubtype' => '',
 				'year' => '',
@@ -308,15 +308,15 @@ class FAU_CRIS {
 		$persid = sanitize_text_field($persid);
 		$publication =  sanitize_text_field($publication);
 
-		if (isset($orgid) && $orgid !='') {
-			$param1 = 'orga';
-			$param2 = $orgid;
+		if (isset($publication) && $publication !='') {
+			$param1 = 'publication';
+			$param2 = $publication;
 		} elseif (isset($persid) && $persid !='') {
 			$param1 = 'person';
 			$param2 = $persid;
-		} elseif (isset($publication) && $publication !='') {
-			$param1 = 'publication';
-			$param2 = $publication;
+		} elseif (isset($orgid) && $orgid !='') {
+			$param1 = 'orga';
+			$param2 = $orgid;
 		} else {
 			$param1 = '';
 			$param2 = '';
@@ -325,19 +325,17 @@ class FAU_CRIS {
 		require_once('class_Publikationsliste.php');
 		$liste = new Publikationsliste($param1, $param2);
 
-		if (isset($orderby) && $orderby == 'type') {
+		if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
 			$output = $liste->pubNachTyp($year, $start, $pubtype);
-		} elseif (isset($orderby) && $orderby == 'year') {
+		} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
 			$output = $liste->pubNachJahr($year, $start, $pubtype);
 		} elseif (isset($publication) && $publication != '') {
 			$output = $liste->singlePub();
 		} else {
 			$output = $liste->pubNachJahr($year, $start, $pubtype);
 		}
-
-
+		
 		return $output;
-
 	}
 
 	/*

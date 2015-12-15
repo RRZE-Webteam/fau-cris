@@ -27,6 +27,10 @@ class Publikationsliste {
 
 		$xml = Tools::XML2obj($this->suchstring);
 
+		if (!$xml) {
+			return;
+		}
+
 		$this->publications = $xml->infoObject;
 
 		// XML -> Array
@@ -53,10 +57,6 @@ class Publikationsliste {
 		//$this->pubArray = Tools::record_sortByYear($this->pubArray);
 
 	}
-
-	/*
-	 * Ausgabe aller Publikationen nach Jahren gegliedert
-	 */
 
 	/*
 	 * Ausgabe aller Publikationen nach Jahren gegliedert
@@ -158,9 +158,6 @@ class Publikationsliste {
 
 			// innerhalb des Publikationstyps nach Jahr abwärts sortieren
 			$publications = Tools::array_msort($publications, array('publYear' => SORT_DESC));
-			/*print '<pre>';
-			print_r($publications);
-			print '<pre>';*/
 
 			$output .= $this->make_list($publications);
 		}
@@ -185,11 +182,6 @@ class Publikationsliste {
 			}
 			$this->pubArray[$this->pubID][$pubAttribut] = $pubDetail;
 		}
-
-		/*echo "<pre>";
-		//var_dump($pubObject['id']);
-		var_dump($this->pubArray);
-		echo "</pre>";*/
 
 		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
 		$output = $this->make_list($this->pubArray);
@@ -267,7 +259,7 @@ class Publikationsliste {
 			$publist .= ($pubDetails['pubType'] == 'Editorial' ? ' (Hrsg.):' : ':');
 
 			$publist .= "<br /><span class=\"title\"><b>"
-			. "<a href=\"http://cris.fau.de/converis/publicweb/Publication/" . $id
+			. "<a href=\"https://cris.fau.de/converis/publicweb/Publication/" . $id
 			. "\" target=\"blank\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
 			. $pubDetails['title']
 			. "</a>"
