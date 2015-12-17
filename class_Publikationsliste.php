@@ -11,6 +11,10 @@ class Publikationsliste {
 		$this->options = (array) get_option('_fau_cris');
 		$orgNr = $this->options['cris_org_nr'];
 		$this->crisURL = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+        
+        if(!$orgNr) {
+            return;
+        }
 
 		if ($einheit == "person") {
 			// Publikationsliste für einzelne Person

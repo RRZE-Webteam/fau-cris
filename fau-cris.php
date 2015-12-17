@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 1.61
+ * Version: 1.6.3
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -33,7 +33,7 @@ class FAU_CRIS {
 	/**
 	 * Get Started
 	 */
-	const version = '1.1';
+	const version = '1.6.3';
 	const option_name = '_fau_cris';
 	const version_option_name = '_fau_cris_version';
 	const textdomain = 'fau-cris';
@@ -226,17 +226,12 @@ class FAU_CRIS {
 	/**
 	 * Sanitize each setting field as needed
 	 */
-	public function sanitize($input) {
+	public static function sanitize($input) {
 		$new_input = array();
-		if (isset($input['cris_org_nr'])) {
-			$new_input['cris_org_nr'] = absint($input['cris_org_nr']);
-		}
-		if (isset($input['cris_pub_order'])) {
-			$new_input['cris_pub_order'] = explode("\n", str_replace("\r", "",$input['cris_pub_order']));
-		}
-		if (isset($input['cris_univis'])) {
-			$new_input['cris_univis'] = ( $input['cris_univis'] == 1 ? 1 : 0 );
-		}
+        $default_options = self::default_options();
+        $new_input['cris_org_nr'] = isset($input['cris_org_nr']) ? absint($input['cris_org_nr']) : 0;
+        $new_input['cris_pub_order'] = isset($input['cris_pub_order']) && is_array($input['cris_pub_order']) ? explode("\n", str_replace("\r", "",$input['cris_pub_order'])) : $default_options['cris_pub_order'];
+        $new_input['cris_univis'] = isset($input['cris_univis']) ? 1 : 0;
 		return $new_input;
 	}
 
