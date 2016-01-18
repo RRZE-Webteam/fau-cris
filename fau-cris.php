@@ -33,7 +33,7 @@ class FAU_CRIS {
 	/**
 	 * Get Started
 	 */
-	const version = '1.6.3';
+	const version = '1.7';
 	const option_name = '_fau_cris';
 	const version_option_name = '_fau_cris_version';
 	const textdomain = 'fau-cris';
@@ -58,6 +58,8 @@ class FAU_CRIS {
 		add_action('admin_init', array(__CLASS__, 'admin_init'));
 		add_action('admin_menu', array(__CLASS__, 'add_options_page'));
 		add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(__CLASS__, 'add_action_links') );
+
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'cris_enqueue_styles' ) );
 
 		add_shortcode('cris', array(__CLASS__, 'cris_shortcode'));
 
@@ -139,6 +141,13 @@ class FAU_CRIS {
 									),
 			'cris_cache'		=>	'18000',
 			'cris_univis'		=> 0,
+			'cris_award_order'	=>	array(
+										'Preis / Ehrung',
+										'Stipendium / Grant',
+										'Akademie-Mitgliedschaft',
+										'Weitere Preise'
+									),
+
 		);
 		return $options;
 	}
@@ -221,6 +230,17 @@ class FAU_CRIS {
 					'description' => __('Sollen die Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinkt werden?', self::textdomain)
 				)
 		);
+		add_settings_field(
+				'cris_award_order',
+				__('Reihenfolge der Auszeichnungen', self::textdomain),
+				array(__CLASS__, 'cris_textarea_callback'),
+				'fau_cris_options',
+				'cris_section',
+				array (
+					'name' => 'cris_award_order',
+					'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen.', self::textdomain)
+				)
+		);
 	}
 
 	/**
@@ -230,9 +250,10 @@ class FAU_CRIS {
 		$new_input = array();
         $default_options = self::default_options();
         $new_input['cris_org_nr'] = isset($input['cris_org_nr']) ? absint($input['cris_org_nr']) : 0;
-        $new_input['cris_pub_order'] = isset($input['cris_pub_order']) && is_array($input['cris_pub_order']) ? explode("\n", str_replace("\r", "",$input['cris_pub_order'])) : $default_options['cris_pub_order'];
+        $new_input['cris_pub_order'] = isset($input['cris_pub_order']) ? explode("\n", str_replace("\r", "",$input['cris_pub_order'])) : $default_options['cris_pub_order'];
         $new_input['cris_univis'] = isset($input['cris_univis']) ? 1 : 0;
-		return $new_input;
+		$new_input['cris_award_order'] = isset($input['cris_award_order']) ? explode("\n", str_replace("\r", "",$input['cris_award_order'])) : $default_options['cris_award_order'];
+        return $new_input;
 	}
 
 	/**
@@ -284,12 +305,17 @@ class FAU_CRIS {
 			array(
 				'show' => 'publications',
 				'orderby' => '',
-				'pubtype' => '',
 				'year' => '',
 				'start' => '',
 				'orgid' => '',
 				'persid' => '',
 				'publication' => '',
+				'pubtype' => '',
+				'award' => '',
+				'type' => '',
+				'showname' => 1,
+				'showyear' => 1,
+				'display' => 'list',
 			),
 			$atts));
 
@@ -297,15 +323,25 @@ class FAU_CRIS {
 		$show = sanitize_text_field($show);
 		$orderby = sanitize_text_field($orderby);
 		$pubtype = sanitize_text_field($pubtype);
+		$type = sanitize_text_field($type);
 		$year = sanitize_text_field($year);
 		$start = sanitize_text_field($start);
 		$orgid = sanitize_text_field($orgid);
 		$persid = sanitize_text_field($persid);
 		$publication =  sanitize_text_field($publication);
+		$award =  sanitize_text_field($award);
+		$showname = sanitize_text_field($showname);
+		$showyear = sanitize_text_field($showyear);
+		$display = sanitize_text_field($display);
+
+		$output='';
 
 		if (isset($publication) && $publication !='') {
 			$param1 = 'publication';
 			$param2 = $publication;
+		} elseif (isset($award) && $award !='') {
+			$param1 = 'award';
+			$param2 = $award;
 		} elseif (isset($persid) && $persid !='') {
 			$param1 = 'person';
 			$param2 = $persid;
@@ -317,20 +353,43 @@ class FAU_CRIS {
 			$param2 = '';
 		}
 
-		require_once('class_Publikationsliste.php');
-		$liste = new Publikationsliste($param1, $param2);
+		if (isset($show) && $show == 'awards') {
+		// Awards
+			require_once('class_Auszeichnungen.php');
+			$liste = new Auszeichnungen($param1, $param2, $display);
 
-		if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
-			$output = $liste->pubNachTyp($year, $start, $pubtype);
-		} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
-			$output = $liste->pubNachJahr($year, $start, $pubtype);
-		} elseif (isset($publication) && $publication != '') {
-			$output = $liste->singlePub();
+			if (isset($orderby) && ($orderby == 'type') && $award == '') {
+				$output = $liste->awardsNachTyp($year, $start, $type, $showname, $showyear, $display);
+			} elseif (isset($orderby) && $orderby == 'year' && $award == '') {
+				$output = $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
+			} elseif (isset($award) && $award != '') {
+				$output = $liste->singleAward($showname, $showyear, $display);
+			} else {
+				$output = $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
+			}
+
 		} else {
-			$output = $liste->pubNachJahr($year, $start, $pubtype);
+		// Publications
+			require_once('class_Publikationen.php');
+			$liste = new Publikationen($param1, $param2);
+
+			if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
+				$output = $liste->pubNachTyp($year, $start, $pubtype);
+			} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
+				$output = $liste->pubNachJahr($year, $start, $pubtype);
+			} elseif (isset($publication) && $publication != '') {
+				$output = $liste->singlePub();
+			} else {
+				$output = $liste->pubNachJahr($year, $start, $pubtype);
+			}
 		}
-		
+		//print_r($atts);
 		return $output;
+	}
+
+	public static function cris_enqueue_styles() {
+		$plugin_url = plugin_dir_url( __FILE__ );
+		wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
 	}
 
 	/*
@@ -423,4 +482,5 @@ class FAU_CRIS {
 		}
 		//$screen->set_help_sidebar($help_sidebar);
 	}
+
 }

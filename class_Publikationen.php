@@ -2,7 +2,7 @@
 
 require_once("class_Tools.php");
 
-class Publikationsliste {
+class Publikationen {
 
 	private $options;
 	public $output;
@@ -11,9 +11,11 @@ class Publikationsliste {
 		$this->options = (array) get_option('_fau_cris');
 		$orgNr = $this->options['cris_org_nr'];
 		$this->crisURL = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
-        
-        if(!$orgNr) {
-            return;
+		$this->suchstring = '';
+
+        if((!$orgNr||$orgNr==0) && $id=='') {
+            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.','fau-cris') . '</strong></p>';
+			return;
         }
 
 		if ($einheit == "person") {
@@ -169,7 +171,6 @@ class Publikationsliste {
 	} // Ende pubNachTyp()
 
 	public function singlePub() {
-		//print $id;
 		$pubObject = Tools::XML2obj($this->suchstring);
 		$this->publications = $pubObject->attribute;
 		foreach ($this->publications as $attribut) {
