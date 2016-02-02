@@ -1,30 +1,6 @@
 <?php
 
-class Dicts {
-
-	public static $acronyms = array(
-		"Dr."   =>  "Doktor",
-		"Prof." =>  "Professor",
-		"Dr.-Ing." => "Doktor-Ingenieur",
-		"Dipl." =>  "Diplom",
-		"Inf."  =>  "Informatik",
-		"Wi."   =>  "Wirtschaftsinformatik",
-		"Ma."   =>  "Mathematik",
-		"Ing."  =>  "Ingenieurwissenschaft",
-		"B.A."  =>  "Bakkalaureus",
-		"M.A."  =>  "Magister Artium",
-		"phil." =>  "Geisteswissenschaft",
-		"pol." =>  "Politikwissenschaft",
-		"nat." =>  "Naturwissenschaft",
-		"soc."  =>  "Sozialwissenschaft",
-		"techn."    =>  "technische Wissenschaften",
-		"vet.med." =>  "Tiermedizin",
-		"med.dent."    =>  "Zahnmedizin",
-		"h.c."  =>  "ehrenhalber",
-		"med."  =>  "Medizin",
-		"jur."  =>  "Recht",
-		"rer."  =>  ""
-	);
+class CRIS_Dicts {
 
 	public static $pubNames = array(
 		'zeitschriftenartikel' => array (
@@ -44,7 +20,7 @@ class Dicts {
 			'en' => 'Editorial'),
 		'konferenzbeitraege' => array (
 			'de' => 'Konferenzbeiträge',
-			'en' => 'Conference Contribution'),
+			'en' => 'Conference contribution'),
 		'abschlussarbeiten' => array (
 			'de' => 'Abschlussarbeiten',
 			'en' => 'Thesis'),
@@ -53,34 +29,15 @@ class Dicts {
 			'en' => 'Other')
 	);
 
-	public static $jobOrder = array(
-		"Lehrstuhlinhaber/in",
-		"Professurinhaber/in",
-		"Juniorprofessor/in",
-		"apl. Professor/in",
-		"Privatdozent/in",
-		"Emeritus / Emerita",
-		"Professor/in im Ruhestand",
-		"Wissenschaftler/in",
-		"Gastprofessoren (h.b.) an einer Univ.",
-		"Honorarprofessor/in",
-		"Doktorand/in",
-		"HiWi",
-		"Verwaltungsmitarbeiter/in",
-		"technische/r Mitarbeiter/in",
-		"FoDa-Administrator/in",
-		"Andere"
-	);
-
 	public static $pubOrder = array(
-		"Journal article",
-		"Article in edited volumes",
-		"Translation",
-		"Book",
-		"Editorial",
-		"Conference Contribution",
-		"Thesis",
-		"Other"
+		"sammelbandbeitraege",
+		"zeitschriftenartikel",
+		"uebersetzungen",
+		"buecher",
+		"herausgeberschaften",
+		"konferenzbeitraege",
+		"abschlussarbeiten",
+		"andere"
 	);
 
 }

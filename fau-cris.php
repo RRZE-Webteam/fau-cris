@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 1.2.0
+ * Version: 1.6.3
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -33,7 +33,7 @@ class FAU_CRIS {
 	/**
 	 * Get Started
 	 */
-	const version = '1.1';
+	const version = '1.6.3';
 	const option_name = '_fau_cris';
 	const version_option_name = '_fau_cris_version';
 	const textdomain = 'fau-cris';
@@ -41,26 +41,25 @@ class FAU_CRIS {
 	const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
 
 	protected static $instance = null;
-	private static $fs7_option_page = null;
+	private static $cris_option_page = null;
 
 	public static function instance() {
 
 		if (null == self::$instance) {
 			self::$instance = new self;
-			self::$instance->init();
 		}
 
 		return self::$instance;
 	}
 
-	private function init() {
+	private function __construct() {
 		load_plugin_textdomain('fau-cris', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
 		add_action('admin_init', array(__CLASS__, 'admin_init'));
 		add_action('admin_menu', array(__CLASS__, 'add_options_page'));
 		add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(__CLASS__, 'add_action_links') );
 
-		self::cris_shortcode();
+		add_shortcode('cris', array(__CLASS__, 'cris_shortcode'));
 
 	}
 
@@ -127,40 +126,19 @@ class FAU_CRIS {
 	 */
 	private static function default_options() {
 		$options = array(
-			'cris_org_nr'		=>	'142477',
-			'cris_publications'	=>	'0',
+			'cris_org_nr'		=>	'',
 			'cris_pub_order'	=>	array(
-										'Journal article',
-										'Article in edited volumes',
-										'Translation',
-										'Book',
-										'Editorial',
-										'Conference Contribution',
-										'Thesis',
-										'Other'
+										'zeitschriftenartikel',
+										'sammelbandbeitraege',
+										'uebersetzungen',
+										'buecher',
+										'herausgeberschaften',
+										'konferenzbeitraege',
+										'abschlussarbeiten',
+										'andere'
 									),
-			'cris_job_order'	=>	array(
-										'Lehrstuhlinhaber/in',
-										'Professurinhaber/in',
-										'Juniorprofessor/in',
-										'apl. Professor/in',
-										'Privatdozent/in',
-										'Emeritus / Emerita',
-										'Professor/in im Ruhestand',
-										'Wissenschaftler/in',
-										'Gastprofessoren (h.b.) an einer Univ.',
-										'Honorarprofessor/in',
-										'Doktorand/in',
-										'HiWi',
-										'Verwaltungsmitarbeiter/in',
-										'technische/r Mitarbeiter/in',
-										'FoDa-Administrator/in',
-										'Andere'
-									),
-			'cris_staff_page'	=>	'mitarbeiter',
-//			'cris_awards'		=>	'0',
 			'cris_cache'		=>	'18000',
-			'cris_ignore'		=>	array( 'FoDa-Administrator/in', 'Andere' )
+			'cris_univis'		=> 0,
 		);
 		return $options;
 	}
@@ -169,10 +147,10 @@ class FAU_CRIS {
 	 * Add options page
 	 */
 	public static function add_options_page() {
-		self::$fs7_option_page = add_options_page(
+		self::$cris_option_page = add_options_page(
 				'CRIS: Einstellungen', 'CRIS', 'manage_options', 'options-fau-cris', array(__CLASS__, 'options_fau_cris')
 		);
-		add_action('load-' . self::$fs7_option_page, array(__CLASS__, 'fs7_help_menu'));
+		add_action('load-' . self::$cris_option_page, array(__CLASS__, 'cris_help_menu'));
 	}
 
 	/**
@@ -222,17 +200,6 @@ class FAU_CRIS {
 				)
 		);
 		add_settings_field(
-				'cris_publications',
-				__('Publikationen anzeigen', self::textdomain),
-				array(__CLASS__, 'cris_check_callback'),
-				'fau_cris_options',
-				'cris_section',
-				array (
-					'name' => 'cris_publications',
-					'description' => __('Sollen in der Personen-Detailansicht die Publikationen angezeigt werden?', self::textdomain)
-				)
-		);
-		add_settings_field(
 				'cris_pub_order',
 				__('Reihenfolge der Publikationen', self::textdomain),
 				array(__CLASS__, 'cris_textarea_callback'),
@@ -244,95 +211,27 @@ class FAU_CRIS {
 				)
 		);
 		add_settings_field(
-				'cris_job_order',
-				__('Reihenfolge der Funktionen im Organigramm', self::textdomain),
-				array(__CLASS__, 'cris_textarea_callback'),
-				'fau_cris_options',
-				'cris_section',
-				array (
-					'name' => 'cris_job_order',
-					'description' => __('Geben Sie an, in welcher Reihenfolge die Funktionen im Organigramm aufgelistet werden, jeweils eine Funktion pro Zeile.', self::textdomain)
-				)
-		);
-		add_settings_field(
-				'cris_staff_page',
-				__('Personenseite', self::textdomain),
-				array(__CLASS__, 'cris_textbox_callback'),
-				'fau_cris_options',
-				'cris_section',
-				array (
-					'name' => 'cris_staff_page',
-					'description' => __('Pfad zur Seite, auf der die Mitarbeiterliste ausgegeben wird, ohne Domain und Schrägstriche am Anfang und Ende', self::textdomain)
-				)
-		);
-/*		add_settings_field(
-				'cris_awards',
-				__('Auszeichnungen anzeigen', self::textdomain),
+				'cris_univis',
+				__('Autoren verlinken', self::textdomain),
 				array(__CLASS__, 'cris_check_callback'),
 				'fau_cris_options',
 				'cris_section',
 				array (
-					'name' => 'cris_awards',
-					'description' => __('Sollen in der Personen-Detailansicht die Auszeichnungen angezeigt werden?', self::textdomain)
+					'name' => 'cris_univis',
+					'description' => __('Sollen die Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinkt werden?', self::textdomain)
 				)
 		);
-		add_settings_field(
-				'cris_cache',
-				__('Cache-Zeit', self::textdomain),
-				array(__CLASS__, 'cris_textbox_callback'),
-				'fau_cris_options',
-				'cris_section',
-				array (
-					'name' => 'cris_cache',
-					'description' => __('Wie lange sollen Daten zwischengespeichert werden? Angabe in Sekunden.', self::textdomain)
-				)
-		);
-*/		add_settings_field(
-				'cris_ignore',
-				__('Ignoriere Jobs', self::textdomain),
-				array(__CLASS__, 'cris_textarea_callback'),
-				'fau_cris_options',
-				'cris_section',
-				array (
-					'name' => 'cris_ignore',
-					'description' => __('Tragen Sie die Funktionen ein, die im Organigramm nicht aufgeführt werden sollen, jeweils eine Funktion pro Zeile.', self::textdomain)
-				)
-		);
-/*global $options;
-print "<pre>";
-print_r($options);
-print "</pre>";*/
 	}
 
 	/**
 	 * Sanitize each setting field as needed
 	 */
-	public function sanitize($input) {
+	public static function sanitize($input) {
 		$new_input = array();
-		if (isset($input['cris_publications'])) {
-			$new_input['cris_publications'] = ( $input['cris_publications'] == 1 ? 1 : 0 );
-		}
-/*		if (isset($input['cris_awards'])) {
-			$new_input['cris_awards'] = ( $input['cris_awards'] == 1 ? 1 : 0 );
-		}
-*/		if (isset($input['cris_org_nr'])) {
-			$new_input['cris_org_nr'] = absint($input['cris_org_nr']);
-		}
-		if (isset($input['cris_staff_page'])) {
-			$new_input['cris_staff_page'] = wp_filter_nohtml_kses($input['cris_staff_page']);
-		}
-		if (isset($input['cris_pub_order'])) {
-			$new_input['cris_pub_order'] = explode("\n", str_replace("\r", "",$input['cris_pub_order']));
-		}
-		if (isset($input['cris_job_order'])) {
-			$new_input['cris_job_order'] = explode("\n", str_replace("\r", "",$input['cris_job_order']));
-		}
-/*		if (isset($input['cris_cache'])) {
-			$new_input['cris_cache'] = absint($input['cris_cache']);
-		}
-*/		if (isset($input['cris_ignore'])) {
-			$new_input['cris_ignore'] = explode("\n", str_replace("\r", "",$input['cris_ignore']));
-		}
+        $default_options = self::default_options();
+        $new_input['cris_org_nr'] = isset($input['cris_org_nr']) ? absint($input['cris_org_nr']) : 0;
+        $new_input['cris_pub_order'] = isset($input['cris_pub_order']) && is_array($input['cris_pub_order']) ? explode("\n", str_replace("\r", "",$input['cris_pub_order'])) : $default_options['cris_pub_order'];
+        $new_input['cris_univis'] = isset($input['cris_univis']) ? 1 : 0;
 		return $new_input;
 	}
 
@@ -378,114 +277,124 @@ print "</pre>";*/
 	/**
 	 * Add Shortcode
 	 */
-	private static function cris_shortcode() {
+	public static function cris_shortcode($atts, $content = null) {
 
-		function my_shortcode( $atts ) {
-			// Attributes
-			extract(shortcode_atts(
-				array(
-					"show" => '',
-					"orderby" => '',
-					"pubtype" => '',
-					'year' => '',
-				),
-				$atts));
-			$show = sanitize_text_field($show);
-			$orderby = sanitize_text_field($orderby);
-			$pubtype = sanitize_text_field($pubtype);
-			$year = sanitize_text_field($year);
+		// Attributes
+		extract(shortcode_atts(
+			array(
+				'show' => 'publications',
+				'orderby' => '',
+				'pubtype' => '',
+				'year' => '',
+				'start' => '',
+				'orgid' => '',
+				'persid' => '',
+				'publication' => '',
+			),
+			$atts));
 
-			switch ($show) {
-				case 'mitarbeiter':
-					if (empty($_REQUEST)) {
-						require_once('class_Mitarbeiterliste.php');
-						$liste = new Mitarbeiterliste();
-						if ($orderby == 'name') {
-							$output = $liste->liste();
-						} else {
-							$output = $liste->organigramm();
-						}
-					} else {
-						require_once("class_Personendetail.php");
-						$detail = new Personendetail($_REQUEST['id']);
-						$output = $detail->detail();
-					}
-					break;
-				case 'person':
-					require_once('class_Personendetail');
-					break;
-				case 'publikationen':
-					require_once('class_Publikationsliste.php');
-					$liste = new Publikationsliste();
-					if (isset($pubtype) && $pubtype != '') {
-						$output = $liste->publikationstypen($pubtype);
- 					} elseif (isset($year) && $year != '') {
-						$output = $liste->publikationsjahre($year);
-					} else {
-						if (isset($orderby) && $orderby == 'pubtype') {
-							$output = $liste->pubNachTyp();
-						} elseif (isset($orderby) && $orderby == 'year') {
-							$output = $liste->pubNachJahr();
-						} else {
-						$output = $liste->pubNachJahr();
-						}
-					}
-					break;
-				default:
-					$output = 'Parameter fehlt';
-					break;
-			}
-			return $output;
+		//var_dump($atts);
+		$show = sanitize_text_field($show);
+		$orderby = sanitize_text_field($orderby);
+		$pubtype = sanitize_text_field($pubtype);
+		$year = sanitize_text_field($year);
+		$start = sanitize_text_field($start);
+		$orgid = sanitize_text_field($orgid);
+		$persid = sanitize_text_field($persid);
+		$publication =  sanitize_text_field($publication);
+
+		if (isset($publication) && $publication !='') {
+			$param1 = 'publication';
+			$param2 = $publication;
+		} elseif (isset($persid) && $persid !='') {
+			$param1 = 'person';
+			$param2 = $persid;
+		} elseif (isset($orgid) && $orgid !='') {
+			$param1 = 'orga';
+			$param2 = $orgid;
+		} else {
+			$param1 = '';
+			$param2 = '';
 		}
 
-		add_shortcode('cris', 'my_shortcode');
+		require_once('class_Publikationsliste.php');
+		$liste = new Publikationsliste($param1, $param2);
+
+		if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
+			$output = $liste->pubNachTyp($year, $start, $pubtype);
+		} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
+			$output = $liste->pubNachJahr($year, $start, $pubtype);
+		} elseif (isset($publication) && $publication != '') {
+			$output = $liste->singlePub();
+		} else {
+			$output = $liste->pubNachJahr($year, $start, $pubtype);
+		}
+		
+		return $output;
 	}
 
 	/*
 	 * Hilfe-Panel über der Theme-Options-Seite
 	 */
-	public static function fs7_help_menu() {
+	public static function cris_help_menu() {
 
 		$content_cris = array(
-			'<p>' . __('Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS</strong> (Currrent Research Information System) in Ihren Webauftritt ein. Das Plugin bietet <strong>Mitarbeiterlisten und -profile</strong> sowie <strong>Publikationslisten</strong> an.', self::textdomain) . '</p>',
-			'<p>' . __('Für die Mitarbeiter wird jeweils eine Profilseite mit Kontaktdaten und (optional) den Publikationen des Mitarbeiters erstellt und von der Mitarbeiterliste aus verlinkt.', self::textdomain) . '</p>',
+			'<p>' . __('Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS (Currrent Research Information System)</strong> in Ihren Webauftritt ein. Das Plugin ermöglicht außerdem die Integration mit dem FAU-Person-Plugin.', self::textdomain) . '</p>',
 			'<p>' . __('Für die Publikationslisten lassen sich über den Shortcode verschiedene Ausgabeformen einstellen. Die Titel sind jeweils mit der Detailansicht der Publikation auf http://cris.fau.de verlinkt.', self::textdomain) . '</p>','<p>' . __('<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. http://cris.fau.de/converis/publicweb/Organisation/<strong><em>141517</em></strong>.', self::textdomain) . '</p>'
 			);
 
-		$content_shortcode_mitarbeiter = array(
-
-			'<h3>[cris show="mitarbeiter"]</h3>'
-			. '<p>' . __('Bindet eine Liste aller Mitarbeiter Ihrer Organisationseinheit ein.', self::textdomain) . '</p>'
-			. '<p>' . __('Mögliche Zusatzoptionen:', self::textdomain)
-			. '<br /><b>orderby="job"</b>: '
-			. __('Liste hierarchisch nach Funktionen gegliedert (Voreinstellung)', self::textdomain)
-			. '<br /><b>orderby="name"</b>: '
-			. __('Alphabetische Liste, die Funktion wird jeweils in Klammern hinter dem Namen angezeigt.', self::textdomain) . '</p>');
-
 		$content_shortcode_publikationen = array(
-			'<h3>[cris show="publikationen"]</h3>'
-			. '<p>' . __('Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein.', self::textdomain) . '</p>'
-			. '<p>' . __('Mögliche Zusatzoptionen:', self::textdomain)
-			. '<br /><b>orderby="year"</b>: '
-			. __('Liste nach Jahren absteigend gegliedert (Voreinstellung)', self::textdomain)
-			. '<br /><b>orderby="pubtype"</b>: '
-			. __('Liste nach Publikationstypen gegliedert.', self::textdomain)
-			. '<br /><b>year="2015"</b>: '
-			. __('Nur Publikationen aus einem bestimmten Jahr', self::textdomain)
-			. '<br /><b>pubtype="Book"</b>: '
-			. __('Es werden nur Publikationen eines bestimmten Typs angezeigt:', self::textdomain) . '</p>'
-			. '<table style="font-size: 13px; line-height: 1.5; margin-left: 2em;">'
-			. '<tr><th style="text-align: left";>' . __('Parameter', self::textdomain) . '</th><th style="text-align: left";>' . __('Beschreibung', self::textdomain) . '</th></tr>'
-			. '<tr><td>Book</<td><td>' . __('Bücher', self::textdomain) . '</td></tr>'
-			. '<tr><td>Journal article</td><td>' . __('Zeitschriftenartikel', self::textdomain) . '</td></tr>'
-			. '<tr><td>Article in Edited Volumes</td><td>' . __('Beiträge in Sammelbänden', self::textdomain) . '</td></tr>'
-			. '<tr><td>Editorial</td><td>' . __('Herausgegebene Sammelbände', self::textdomain) . '</td></tr>'
-			. '<tr><td>Conference contribution</td><td>' . __('Konferenzbeiträge', self::textdomain) . '</td></tr>'
-			. '<tr><td>Translation</td><td>' . __('Übersetzungen', self::textdomain) . '</td></tr>'
-			. '<tr><td>Thesis</td><td>' . __('Abschlussarbeiten', self::textdomain) . '</td></tr>'
-			. '<tr><td>Other</td><td>' . __('Sonstige', self::textdomain) . '</td></tr>'
-			. '</table>'
+			'<h2>[cris]</h2>'
+			. '<p>' . __('Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein. Mögliche Zusatzoptionen:', self::textdomain) . '</p>'
+			. '<h3>' . __('Gliederung', self::textdomain) . '</h3>'
+			. '<ul><li><b>orderby="year"</b>: '
+			. __('Liste nach Jahren absteigend gegliedert (Voreinstellung)', self::textdomain) . '</li>'
+			. '<li><b>orderby="pubtype"</b>: '
+			. __('Liste nach Publikationstypen gegliedert', self::textdomain) . '</li>'
+			. '</ul>'
+			. '<h3>' . __('Filter', self::textdomain) . '</h3>'
+			. '<ul>'
+			. '<li><b>year="2015"</b>: '
+			. __('Nur Publikationen aus einem bestimmten Jahr', self::textdomain) . '</li>'
+			. '<li><b>start="2000"</b>: '
+			. __('Nur Publikationen ab einem bestimmten Jahr', self::textdomain) . '</li>'
+			. '<li><b>pubtype="buecher"</b>: '
+			. __('Es werden nur Publikationen eines bestimmten Typs angezeigt:', self::textdomain)
+			. '<ul style="list-style-type: circle;">'
+				. '<li style="margin-bottom: 0;">buecher</li>'
+				. '<li style="margin-bottom: 0;">zeitschriftenartikel</li>'
+				. '<li style="margin-bottom: 0;">sammelbandbeitraege</li>'
+				. '<li style="margin-bottom: 0;">herausgeberschaften</li>'
+				. '<li style="margin-bottom: 0;">konferenzbeitraege</li>'
+				. '<li style="margin-bottom: 0;">uebersetzungen</li>'
+				. '<li style="margin-bottom: 0;">abschlussarbeiten</li>'
+				. '<li style="margin-bottom: 0;">andere</li>'
+				. '</ul>'
+			. '</li>'
+			. '<li><b>publication="12345678"</b>: '
+			. __('Nur eine einzelne Publikation (hier die CRIS-ID der Publikation angeben)', self::textdomain)
+			. '</ul>'
+			. '<h3>' . __('ID überschreiben', self::textdomain) . '</h3>'
+			. '<p>Die in den Einstellungen festgelegte CRIS-ID kann überschrieben werden, entweder durch die ID einer anderen Organisationseinheit, oder durch die ID einer einzelnen Person:</p>'
+			. '<ul>'
+			. '<li><b>orgID="123456"</b> '
+			. __('für eine von den Einstellungen abweichende Organisations-ID', self::textdomain) . '</li>'
+			. '<li><b>persID="123456"</b> '
+			. __('für die Publikationsliste einer konkreten Person', self::textdomain) . '</li>'
+			. '</ul>'
+			. '<h3>' .__('Beispiele', self::textdomain) . '</h3>'
+			. '<ul>'
+			. '<li><code>[cris pubtype="buecher"]</code> => '. __('Alle Bücher', self::textdomain) . '</li>'
+			. '<li><code>[cris year="2015"]</code> => '. __('Alle Publikationen aus dem Jahr 2015', self::textdomain) . '</li>'
+			. '<li><code>[cris persID="123456" year="2000" orderby="pubtype"]</code> => '. __('Alle Publikationen der Person mit der CRIS-ID 123456 aus dem Jahr 2000, nach Publikationstypen gegliedert', self::textdomain) . '</li>'
+
 		);
+
+		$content_fauperson = array(
+			'<p>' . __('Wenn Sie das <strong>FAU-Person</strong>-Plugin verwenden, können Autoren mit ihrer FAU-Person-Kontaktseite verlinkt werden.', self::textdomain) . '</p>',
+			'<p>' . __('Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.', self::textdomain) . '</p>',
+			'<p>' . __('', self::textdomain) . '</p>'
+			);
 
 		$helptexts = array(
 			array(
@@ -494,19 +403,19 @@ print "</pre>";*/
 				'content' => implode(PHP_EOL, $content_cris),
 			),
 			array(
-				'id' => 'mitarbeiter',
-				'title' => __('Shortcodes Mitarbeiter', self::textdomain),
-				'content' => implode(PHP_EOL, $content_shortcode_mitarbeiter),
+				'id' => 'publikationen',
+				'title' => __('Shortcodes', self::textdomain),
+				'content' => implode(PHP_EOL, $content_shortcode_publikationen),
 			),
 			array(
-				'id' => 'publikationen',
-				'title' => __('Shortcodes Publikationen', self::textdomain),
-				'content' => implode(PHP_EOL, $content_shortcode_publikationen),
+				'id' => 'person',
+				'title' => __('Integration "FAU Person"', self::textdomain),
+				'content' => implode(PHP_EOL, $content_fauperson),
 			)
 		);
 
 		$screen = get_current_screen();
-		if ($screen->id != self::$fs7_option_page) {
+		if ($screen->id != self::$cris_option_page) {
 			return;
 		}
 		foreach ($helptexts as $helptext) {

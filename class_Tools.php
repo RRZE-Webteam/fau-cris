@@ -3,11 +3,13 @@ require_once("class_Dicts.php");
 
 class Tools {
 
+	const textdomain = FAU_CRIS::textdomain;
+
 	public static function getAcronym($acadTitle) {
 		$acronym = '';
 		foreach (explode(' ', $acadTitle) as $actitle) {
-			if (array_key_exists($actitle, Dicts::$acronyms) && Dicts::$acronyms[$actitle] != '') {
-				$acronym .= " " . Dicts::$acronyms[$actitle];
+			if (array_key_exists($actitle, CRIS_Dicts::$acronyms) && Dicts::$acronyms[$actitle] != '') {
+				$acronym .= " " . CRIS_Dicts::$acronyms[$actitle];
 			}
 			$acronym = trim($acronym);
 		}
@@ -15,11 +17,11 @@ class Tools {
 	}
 
 	public static function getPubName($pub, $lang) {
-		return Dicts::$pubNames[$pub][$lang];
+		return CRIS_Dicts::$pubNames[$pub][$lang];
 	}
 
 	public static function getPubTranslation($pub) {
-		foreach (Dicts::$pubNames as $pubindex) {
+		foreach (CRIS_Dicts::$pubNames as $pubindex) {
 			//print $pub;
 			//print_r($pubindex['en']);
 			//print_r($pubindex['de']);
@@ -49,11 +51,17 @@ class Tools {
 
 		} catch (Exception $e) {
 			// Something went wrong.
-			$error_message = 'Fehler beim Einlesen der Daten.';
-			foreach(libxml_get_errors() as $error_line) {
-				$error_message .= "\t" . $error_line->message;
+			print '<p>';
+			$error_message = '<strong>' . __('Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.', self::textdomain) . '</strong>';
+			if (defined('WP_DEBUG') && true === WP_DEBUG) {
+				foreach(libxml_get_errors() as $error_line) {
+					$error_message .= "<br>" . $error_line->message;
+				}
+				trigger_error($error_message);
+			} else {
+				print $error_message;
 			}
-			trigger_error($error_message);
+			print '</p>';
 			return false;
 		}
 		return $xmlTree;
@@ -95,6 +103,87 @@ class Tools {
 			}
 		}
 		return $sort_array;
+	}
+
+	/*
+	 * Mehrdimensionales Array nach value sortieren
+	 * Quelle: http://php.net/manual/de/function.array-multisort.php#91638
+	 */
+	public static function array_msort($array, $cols) {
+		$colarr = array();
+		foreach ($cols as $col => $order) {
+			$colarr[$col] = array();
+			foreach ($array as $k => $row) { $colarr[$col]['_'.$k] = strtolower($row[$col]); }
+		}
+		$eval = 'array_multisort(';
+		foreach ($cols as $col => $order) {
+			$eval .= '$colarr[\''.$col.'\'],'.$order.',';
+		}
+		$eval = substr($eval,0,-1).');';
+		eval($eval);
+		$ret = array();
+		foreach ($colarr as $col => $arr) {
+			foreach ($arr as $k => $v) {
+				$k = substr($k,1);
+				if (!isset($ret[$k])) $ret[$k] = $array[$k];
+				$ret[$k][$col] = $array[$k][$col];
+			}
+		}
+		return $ret;
+
+	}
+
+	/*
+	 * Publikationen-Array filtern
+	 */
+
+	public static function filter_publications($publications, $year = '', $start = '', $type = '') {
+
+		$publications_filtered = array();
+		if (!empty($type)) {
+			$pubTyp = Tools::getPubName($type, "en");
+			$pubTyp_de = Tools::getPubName($type, "de");
+		}
+		if (!empty($type) && !isset($pubTyp_de)) {
+			return "<p>Falscher Parameter</p>";
+		}
+
+		foreach($publications as $id => $book) {
+			if(
+				(empty($year) || $book['publYear'] == $year) &&
+				(empty($start) || $book['publYear'] >= $start) &&
+				(empty($type) || $book['Publication type'] == $pubTyp)
+			){
+				$publications_filtered[$id] = $book;
+			}
+		}
+		return $publications_filtered;
+	}
+
+	/*
+	 * Anbindung FAU-Person-Plugin
+	 */
+
+	public static function person_exists($firstname, $lastname) {
+		global $wpdb;
+
+		$person = $wpdb->esc_like( $firstname ). '%' . $wpdb->esc_like( $lastname );
+		$sql = "SELECT COUNT(*) FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person'";
+		$sql = $wpdb->prepare( $sql, $person );
+		$person_count = $wpdb->get_var( $sql );
+
+		return $person_count;
+	}
+
+	public static function person_slug($firstname, $lastname) {
+		global $wpdb;
+
+		$person = $wpdb->esc_like( $firstname ). '%' . $wpdb->esc_like( $lastname );
+		$sql = "SELECT post_name FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person'";
+		$sql = $wpdb->prepare( $sql, $person );
+		$person_slug = $wpdb->get_var( $sql );
+
+		return $person_slug;
 	}
 
 }
