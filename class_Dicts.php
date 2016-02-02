@@ -2,6 +2,22 @@
 
 class CRIS_Dicts {
 
+	public static $defaults = array(
+		'show' => 'publications',
+		'orderby' => '',
+		'year' => '',
+		'start' => '',
+		'orgid' => '',
+		'persid' => '',
+		'publication' => '',
+		'pubtype' => '',
+		'award' => '',
+		'type' => '',
+		'showname' => 1,
+		'showyear' => 1,
+		'display' => 'list'
+	);
+
 	public static $pubNames = array(
 		'zeitschriftenartikel' => array (
 			'de' => 'Zeitschriftenartikel',
@@ -40,4 +56,29 @@ class CRIS_Dicts {
 		"andere"
 	);
 
+	public static $awardOrder = array(
+		"Preis / Ehrung",
+		"Stipendium / Grant",
+		"Akademie-Mitgliedschaft",
+		"Weitere Preise"
+	);
+
+	public static $awardNames = array(
+		'preise'	=> array(
+			'de' => 'Preis / Ehrung',
+			'en' => 'Preis / Ehrung',
+		),
+		'stipendien'	=> array(
+			'de' => 'Stipendium / Grant',
+			'en' => 'Stipendium / Grant',
+		),
+		'mitgliedschaften'	=> array(
+			'de' => 'Akademie-Mitgliedschaft',
+			'en' => 'Akademie-Mitgliedschaft',
+		),
+		'andere'	=> array(
+			'de' => 'Weitere Preise',
+			'en' => 'Weitere Preise',
+		)
+	);
 }
