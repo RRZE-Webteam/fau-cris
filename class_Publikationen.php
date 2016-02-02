@@ -68,7 +68,7 @@ class Publikationen {
 	 * Ausgabe aller Publikationen nach Jahren gegliedert
 	 */
 
-	public function pubNachJahr($year = '', $start = '', $type = '') {
+	public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '') {
 		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
 
 		$pubByYear = array();
@@ -106,7 +106,11 @@ class Publikationen {
 			}
 			// innerhalb des Publikationstyps alphabetisch nach Erstautor sortieren
 			$publications = Tools::array_msort($publications, array('relAuthors' => SORT_ASC));
-			$output .= $this->make_list($publications);
+			if ($quotation == 'apa' || $quotation == 'mla') {
+				$output .= $this->make_quotation_list($publications, $quotation);
+			} else {
+				$output .= $this->make_list($publications);
+			}
 		}
 		return $output;
 	}
@@ -115,7 +119,7 @@ class Publikationen {
 	 * Ausgabe aller Publikationen nach Publikationstypen gegliedert
 	 */
 
-	public function pubNachTyp($year = '', $start = '', $type = '') {
+	public function pubNachTyp($year = '', $start = '', $type = '', $quotation = '') {
 		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
 
 		$pubByType = array();
@@ -165,12 +169,16 @@ class Publikationen {
 			// innerhalb des Publikationstyps nach Jahr abwärts sortieren
 			$publications = Tools::array_msort($publications, array('publYear' => SORT_DESC));
 
-			$output .= $this->make_list($publications);
+			if ($quotation == 'apa' || $quotation == 'mla') {
+				$output .= $this->make_quotation_list($publications, $quotation);
+			} else {
+				$output .= $this->make_list($publications);
+			}
 		}
 		return $output;
 	} // Ende pubNachTyp()
 
-	public function singlePub() {
+	public function singlePub($quotation = '') {
 		$pubObject = Tools::XML2obj($this->suchstring);
 		$this->publications = $pubObject->attribute;
 		foreach ($this->publications as $attribut) {
@@ -189,7 +197,13 @@ class Publikationen {
 		}
 
 		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
-		$output = $this->make_list($this->pubArray);
+
+		if ($quotation == 'apa' || $quotation == 'mla') {
+			$output = $this->make_quotation_list($this->pubArray, $quotation);
+		} else {
+			$output = $this->make_list($this->pubArray);
+		}
+
 		return $output;
 	}
 
@@ -197,6 +211,27 @@ class Publikationen {
 	/* =========================================================================
 	 * Private Functions
 	  ======================================================================== */
+
+	/*
+	 * Ausgabe der Publikationsdetails in Zitierweise (MLA/APA)
+	 */
+
+	private function make_quotation_list($publications, $quotation) {
+
+		$quotation = strtoupper($quotation);
+		$publist = "<ul class=\"cris-publications\">";
+
+		foreach ($publications as $publication) {
+			$publist .= "<li>";
+			$publist .= $publication['quotation' . $quotation];
+			$publist .= "</li>";
+		}
+
+		$publist .= "</ul>";
+
+		return $publist;
+	}
+
 
 	/*
 	 * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
@@ -240,7 +275,7 @@ class Publikationen {
 				'origLanguage' => (array_key_exists('Language', $publication) ? strip_tags($publication['Language']) : 'O.A.')
 			);
 
-			$publist .= "<li style='margin-bottom: 15px; line-height: 150%;'>";
+			$publist .= "<li>";
 
 			$authorList = array();
 			foreach ($pubDetails['authorsArray'] as $author) {

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 1.6.3
+ * Version: 1.7
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -311,6 +311,7 @@ class FAU_CRIS {
 				'persid' => '',
 				'publication' => '',
 				'pubtype' => '',
+				'quotation' => '',
 				'award' => '',
 				'type' => '',
 				'showname' => 1,
@@ -328,7 +329,8 @@ class FAU_CRIS {
 		$start = sanitize_text_field($start);
 		$orgid = sanitize_text_field($orgid);
 		$persid = sanitize_text_field($persid);
-		$publication =  sanitize_text_field($publication);
+		$publication = sanitize_text_field($publication);
+		$quotation =  sanitize_text_field($quotation);
 		$award =  sanitize_text_field($award);
 		$showname = sanitize_text_field($showname);
 		$showyear = sanitize_text_field($showyear);
@@ -374,13 +376,13 @@ class FAU_CRIS {
 			$liste = new Publikationen($param1, $param2);
 
 			if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
-				$output = $liste->pubNachTyp($year, $start, $pubtype);
+				$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
 			} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
-				$output = $liste->pubNachJahr($year, $start, $pubtype);
+				$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 			} elseif (isset($publication) && $publication != '') {
-				$output = $liste->singlePub();
+				$output = $liste->singlePub($quotation);
 			} else {
-				$output = $liste->pubNachJahr($year, $start, $pubtype);
+				$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 			}
 		}
 		//print_r($atts);
