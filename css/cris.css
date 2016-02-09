@@ -1,6 +1,7 @@
 ul.cris-publications li {
 	margin-bottom: 15px;
 	line-height: 150%;
+	list-style-type: none;
 }
 
 ul.cris-gallery {
