@@ -299,6 +299,7 @@ class FAU_CRIS {
 	 * Add Shortcode
 	 */
 	public static function cris_shortcode($atts, $content = null) {
+		$options = self::get_options();
 
 		// Attributes
 		extract(shortcode_atts(
@@ -307,7 +308,7 @@ class FAU_CRIS {
 				'orderby' => '',
 				'year' => '',
 				'start' => '',
-				'orgid' => '',
+				'orgid' => $options['cris_org_nr'] > 0 ? $options['cris_org_nr'] : '',
 				'persid' => '',
 				'publication' => '',
 				'pubtype' => '',
@@ -320,7 +321,6 @@ class FAU_CRIS {
 			),
 			$atts));
 
-		//var_dump($atts);
 		$show = sanitize_text_field($show);
 		$orderby = sanitize_text_field($orderby);
 		$pubtype = sanitize_text_field($pubtype);
@@ -355,37 +355,58 @@ class FAU_CRIS {
 			$param2 = '';
 		}
 
-		if (isset($show) && $show == 'awards') {
-		// Awards
-			require_once('class_Auszeichnungen.php');
-			$liste = new Auszeichnungen($param1, $param2, $display);
+		// IDs mit zu groüen Abfragemengen ausschließen
+		$excluded = array(
+			'143134', // FAU
+			'141815', // MedFak
+			'142105', // NatFak
+			'141354', // PhilFak
+			'141678', // ReWi
+			'142351'  // Techfak
+		);
 
-			if (isset($orderby) && ($orderby == 'type') && $award == '') {
-				$output = $liste->awardsNachTyp($year, $start, $type, $showname, $showyear, $display);
-			} elseif (isset($orderby) && $orderby == 'year' && $award == '') {
-				$output = $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
-			} elseif (isset($award) && $award != '') {
-				$output = $liste->singleAward($showname, $showyear, $display);
+		if ((!$orgid||$orgid==0) && $persid == '' && $publication == '' && $award =='') {
+			// Fehlende ID oder ID=0 abfangen
+            $output = __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation/Auszeichnung an.','fau-cris') . '</strong></p>';
+		} elseif (in_array($orgid, $excluded)
+			&&  $persid == ''
+			&& (($show == 'awards' && $award == '') || ($show == 'publications' && $publication == ''))
+			&& ($year == '' && $type == '')
+			) {
+			// IDs mit zu vielen Ergebnissen ausschließen
+			$output = __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
+        } else {
+			if (isset($show) && $show == 'awards') {
+				require_once('class_Auszeichnungen.php');
+				$liste = new Auszeichnungen($param1, $param2, $display);
+
+				if (isset($orderby) && ($orderby == 'type') && $award == '') {
+					$output = $liste->awardsNachTyp($year, $start, $type, $showname, $showyear, $display);
+				} elseif (isset($orderby) && $orderby == 'year' && $award == '') {
+					$output = $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
+				} elseif (isset($award) && $award != '') {
+					$output = $liste->singleAward($showname, $showyear, $display);
+				} else {
+					$output = $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
+				}
 			} else {
-				$output = $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
-			}
+			// Publications
+				require_once('class_Publikationen.php');
+				$liste = new Publikationen($param1, $param2);
 
-		} else {
-		// Publications
-			require_once('class_Publikationen.php');
-			$liste = new Publikationen($param1, $param2);
-
-			if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
-				$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
-			} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
-				$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
-			} elseif (isset($publication) && $publication != '') {
-				$output = $liste->singlePub($quotation);
-			} else {
-				$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
+				if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
+					$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
+				} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
+					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
+				} elseif (isset($publication) && $publication != '') {
+					$output = $liste->singlePub($quotation);
+				} else {
+					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
+				}
 			}
 		}
 		//print_r($atts);
+
 		return $output;
 	}
 

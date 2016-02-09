@@ -249,13 +249,18 @@ class Auszeichnungen {
 			if ($display == 'gallery') {
 				$picString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Award/" . $awardID . "/awar_has_pict";
 				$picXml = Tools::XML2obj($picString);
-				foreach ($picXml->infoObject->attribute as $picAttribut) {
-					if ($picAttribut['name'] == 'Content') {
-						$pic = $picAttribut->data;
+				
+				if ($picXml['size'] == 0) {
+					$awardArray[$awardID]['pic'] = '';
+				} else {
+					foreach ($picXml->infoObject->attribute as $picAttribut) {
+						if ($picAttribut['name'] == 'Content') {
+							$pic = $picAttribut->data;
+						}
 					}
+					//print '<img src="data:image/JPEG;base64,' . $pic . '">';
+					$awardArray[$awardID]['pic'] = 'data:image/JPEG;base64,' . $pic;
 				}
-				//print '<img src="data:image/JPEG;base64,' . $pic . '">';
-				$awardArray[$awardID]['pic'] = 'data:image/JPEG;base64,' . $pic;
 			}
 
 		}
@@ -285,15 +290,36 @@ class Auszeichnungen {
 		$awardlist = "<ul class=\"cris-awards\">";
 
 		foreach ($awards as $award) {
+
+			$award_preistraeger = $award['award_preistraeger'];
+			if(!empty($award['award_name'])) {
+				$award_name = $award['award_name'];
+			} elseif (!empty($award['award_name_manual'])) {
+				$award_name = $award['award_name_manual'];
+			}
+			if(!empty($award['award_organisation'])) {
+				$organisation = $award['award_organisation'];
+			} elseif (!empty($award['award_organisation_manual'])) {
+				$organisation = $award['award_organisation_manual'];
+			}
+			$award_year = $award['Year award'];
+
 			$awardlist .= "<li>";
 			if ($year == 1 && $name == 1) {
-				$awardlist .= $award['award_preistraeger'] . ": <strong>" . $award['award_name'] . "</strong> (". $award['award_organisation'] . ") &ndash; " . $award['Year award'];
+				$awardlist .= (!empty($award_preistraeger) ? $award_preistraeger . ": " : "")
+					. "<strong>" . $award_name . "</strong> "
+					. (isset($organisation) ? " (". $organisation . ")" : "")
+					. " &ndash; " . $award_year;
 			} elseif ($year == 1 && $name == 0) {
-				$awardlist .= $award['Year award'] . ": <strong>" . $award['award_name'] . "</strong> (". $award['award_organisation'] . ")";
+				$awardlist .= (!empty($award_year) ? $award_year . ": " : "")
+					. "<strong>" . $award_name . "</strong>"
+					. (isset($organisation) ? " (". $organisation . ")" : "");
 			} elseif ($year == 0 && $name == 1) {
-				$awardlist .= $award['award_preistraeger'] . ": <strong>" . $award['award_name'] . "</strong> (". $award['award_organisation'] . ")";
+				$awardlist .= (!empty($award_preistraeger) ? $award_preistraeger . ": " : "")
+					. "<strong>" . $award_name . "</strong>"
+					. (isset($organisation) ? " (". $organisation . ")" : "");
 			} else {
-				$awardlist .= "<strong>" . $award['award_name'] . "</strong>";
+				$awardlist .= "<strong>" . $award_name . "</strong>" . (isset($organisation) ? " (". $organisation . ")" : "");
 			}
 			$awardlist .= "</li>";
 		}
@@ -306,12 +332,25 @@ class Auszeichnungen {
 		$awardlist = "<ul class=\"cris-awards cris-gallery clear\">";
 
 		foreach ($awards as $award) {
+			$award_preistraeger = $award['award_preistraeger'];
+			if(!empty($award['award_name'])) {
+				$award_name = $award['award_name'];
+			} elseif (!empty($award['award_name_manual'])) {
+				$award_name = $award['award_name_manual'];
+			}
+			if(!empty($award['award_organisation'])) {
+				$organisation = $award['award_organisation'];
+			} elseif (!empty($award['award_organisation_manual'])) {
+				$organisation = $award['award_organisation_manual'];
+			}
+			$award_year = $award['Year award'];
+
 			$awardlist .= "<li>";
-			$awardlist .= $award['pic'] != '' ? "<img src=\"" . $award['pic'] . "\" alt=\"Portrait " . $award['award_preistraeger'] . "\" />" : "<div class=\"noimage\">&nbsp</div>";
-			$awardlist .= $name == 1 ? $award['award_preistraeger'] . "<br />" : '';
-			$awardlist .= $awardname == 1 ? "<strong>" . $award['award_name'] . "</strong><br />"
-				. $award['award_organisation'] . "<br />" :'';
-			$awardlist .= $year == 1 ? $award['Year award'] : '';
+			$awardlist .= strlen($award['pic']) > 50 ? "<img src=\"" . $award['pic'] . "\" alt=\"Portrait " . $award_preistraeger . "\" />" : "<div class=\"noimage\">&nbsp</div>";
+			$awardlist .= $name == 1 ? $award_preistraeger . "<br />" : '';
+			$awardlist .= $awardname == 1 ? "<strong>" . $award_name . "</strong> "
+				. (isset($organisation) ? " (". $organisation . ")" : "") . "<br />" :'';
+			$awardlist .= $year == 1 ? $award_year : '';
 
 			$awardlist .= "</li>";
 		}
