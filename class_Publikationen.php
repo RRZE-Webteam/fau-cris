@@ -2,7 +2,7 @@
 
 require_once("class_Tools.php");
 
-class Publikationsliste {
+class Publikationen {
 
 	private $options;
 	public $output;
@@ -11,9 +11,11 @@ class Publikationsliste {
 		$this->options = (array) get_option('_fau_cris');
 		$orgNr = $this->options['cris_org_nr'];
 		$this->crisURL = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
-        
-        if(!$orgNr) {
-            return;
+		$this->suchstring = '';
+
+        if((!$orgNr||$orgNr==0) && $id=='') {
+            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.','fau-cris') . '</strong></p>';
+			return;
         }
 
 		if ($einheit == "person") {
@@ -66,7 +68,7 @@ class Publikationsliste {
 	 * Ausgabe aller Publikationen nach Jahren gegliedert
 	 */
 
-	public function pubNachJahr($year = '', $start = '', $type = '') {
+	public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '') {
 		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
 
 		$pubByYear = array();
@@ -104,7 +106,11 @@ class Publikationsliste {
 			}
 			// innerhalb des Publikationstyps alphabetisch nach Erstautor sortieren
 			$publications = Tools::array_msort($publications, array('relAuthors' => SORT_ASC));
-			$output .= $this->make_list($publications);
+			if ($quotation == 'apa' || $quotation == 'mla') {
+				$output .= $this->make_quotation_list($publications, $quotation);
+			} else {
+				$output .= $this->make_list($publications);
+			}
 		}
 		return $output;
 	}
@@ -113,7 +119,7 @@ class Publikationsliste {
 	 * Ausgabe aller Publikationen nach Publikationstypen gegliedert
 	 */
 
-	public function pubNachTyp($year = '', $start = '', $type = '') {
+	public function pubNachTyp($year = '', $start = '', $type = '', $quotation = '') {
 		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
 
 		$pubByType = array();
@@ -163,13 +169,16 @@ class Publikationsliste {
 			// innerhalb des Publikationstyps nach Jahr abwärts sortieren
 			$publications = Tools::array_msort($publications, array('publYear' => SORT_DESC));
 
-			$output .= $this->make_list($publications);
+			if ($quotation == 'apa' || $quotation == 'mla') {
+				$output .= $this->make_quotation_list($publications, $quotation);
+			} else {
+				$output .= $this->make_list($publications);
+			}
 		}
 		return $output;
 	} // Ende pubNachTyp()
 
-	public function singlePub() {
-		//print $id;
+	public function singlePub($quotation = '') {
 		$pubObject = Tools::XML2obj($this->suchstring);
 		$this->publications = $pubObject->attribute;
 		foreach ($this->publications as $attribut) {
@@ -188,7 +197,13 @@ class Publikationsliste {
 		}
 
 		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
-		$output = $this->make_list($this->pubArray);
+
+		if ($quotation == 'apa' || $quotation == 'mla') {
+			$output = $this->make_quotation_list($this->pubArray, $quotation);
+		} else {
+			$output = $this->make_list($this->pubArray);
+		}
+
 		return $output;
 	}
 
@@ -196,6 +211,27 @@ class Publikationsliste {
 	/* =========================================================================
 	 * Private Functions
 	  ======================================================================== */
+
+	/*
+	 * Ausgabe der Publikationsdetails in Zitierweise (MLA/APA)
+	 */
+
+	private function make_quotation_list($publications, $quotation) {
+
+		$quotation = strtoupper($quotation);
+		$publist = "<ul class=\"cris-publications\">";
+
+		foreach ($publications as $publication) {
+			$publist .= "<li>";
+			$publist .= $publication['quotation' . $quotation];
+			$publist .= "</li>";
+		}
+
+		$publist .= "</ul>";
+
+		return $publist;
+	}
+
 
 	/*
 	 * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
@@ -239,7 +275,7 @@ class Publikationsliste {
 				'origLanguage' => (array_key_exists('Language', $publication) ? strip_tags($publication['Language']) : 'O.A.')
 			);
 
-			$publist .= "<li style='margin-bottom: 15px; line-height: 150%;'>";
+			$publist .= "<li>";
 
 			$authorList = array();
 			foreach ($pubDetails['authorsArray'] as $author) {

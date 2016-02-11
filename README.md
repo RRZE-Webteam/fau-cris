@@ -1,48 +1,68 @@
 CRIS-Plugin für Wordpress
 =========================
 
-Version 1.61
+Version 1.71 (Stand 02.02.2016)
 
-Einbinden von Daten aus der FAU-Forschungsdatenbank <strong>CRIS</strong> in Wordpress-Instanzen
+Einbinden von Daten aus dem FAU-Forschungsinformationssystem <b>CRIS</b> in Webseiten
 
-Für die <strong>Publikationslisten</strong> lassen sich über den Shortcode verschiedene Ausgabeformen einstellen. Die Titel sind jeweils mit der Detailansicht der Publikation auf http://cris.fau.de verlinkt.
+Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
+- Publikationen
+- Auszeichnungen
+Über den Shortcode lassen sich jeweils verschiedene Ausgabeformate einstellen.
 
 ##Shortcodes
+- Publikationsliste (automatisch nach Jahren gegliedert):<br />
+  <b>[cris show="publications"]</b>
+- Auszeichnungen (automatisch nach Jahren sortiert):<br />
+  <b>[cris show="awards"]</b>
 
-###[cris]
-Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein.<br>
+## Mögliche Zusatzoptionen:
 
-#### Mögliche Zusatzoptionen:
-
-##### Gliederung
+### Gliederung
 - <b>orderby="year"</b>: Liste nach Jahren absteigend gegliedert (Voreinstellung)
-- <b>orderby="pubtype"</b>: Liste nach Publikationstypen gegliedert. Die Reihenfolge der Publikationstypen kann in den Einstellungen nach Belieben festgelegt werden.
+- <b>orderby="type"</b>: Liste nach Publikations- bzw. Auszeichnungstypen gegliedert. Die Reihenfolge der kann in den Einstellungen nach Belieben festgelegt werden.
 
-##### Filter
-- <b>year="2015"</b>: Nur Publikationen aus einem bestimmten Jahr
-- <b>start="2000"</b>: Nur Publikationen ab einem bestimmten Jahr
-- <b>pubtype="buecher"</b>: Es werden nur Publikationen eines bestimmten Typs angezeigt:
-	- buecher
-    - zeitschriftenartikel
-    - sammelbandbeitraege
-    - herausgeberschaften
-    - konferenzbeitraege
-    - uebersetzungen
-    - abschlussarbeiten
-    - andere
+### Filter
+- <b>year="2015"</b>: Nur Einträge aus einem bestimmten Jahr
+- <b>start="2000"</b>: Nur Einträge ab einem bestimmten Jahr
+- <b>type=XXX</b>: Es werden nur Einträge eines bestimmten Typs angezeigt:
+	- Publikationen:
+		- buecher
+		- zeitschriftenartikel
+		- sammelbandbeitraege
+		- herausgeberschaften
+		- konferenzbeitraege
+		- uebersetzungen
+		- abschlussarbeiten
+		- andere
+	- Auszeichnungen:
+		- preise
+		- stipendien
+		- mitgliedschaften
+		- andere
 - <b>publication="12345678"</b>: Nur eine einzelne Publikation (hier die CRIS-ID der Publikation angeben)
-- Filter lassen sich auch kombinieren: z.B. <b>year="2014" type="buecher"</b> (= alle Bücher aus 2014)
+- <b>award="12345678"</b>: Nur eine einzelne Auszeichnung (hier die CRIS-ID der Auszeichnung angeben)
+- Filter lassen sich auch kombinieren: z.B. <b>year="2014" type="buecher"</b> (= alle Bücher aus dem Jahr 2014)
 
-##### ID überschreiben
+### Darstellung
+
+#### Publikationen
+- <b>quotation="apa"</b> bzw. <b>quotation="mla"</b>: Ausgabe im Zitationsstil APA bzw. MLA
+
+#### Auszeichnungen
+- <b>display="gallery"</b>: Bildergalerie mit Bild des Preisträgers und Angaben zum Preis
+- <b>showname=0</b> oder <b>showyear=0</b>: Name des Preisträgers bzw. Jahreszahl wird nicht angezeigt. Das kann z.B. bei Darstellungen auf einer Personenprofilseite bzw. in der nach Jahren gegliederten Ansicht sinnvoll sein.
+
+### ID überschreiben
 Die in den Einstellungen festgelegte CRIS-ID kann überschrieben werden, entweder durch die ID einer anderen Organisationseinheit, oder durch die ID einer einzelnen Person:
 - <b>orgID="123456"</b> für eine von den Einstellungen abweichende Organisations-ID
-- <b>persID="123456"</b> für die Publikationsliste einer konkreten Person
+- <b>persID="123456"</b> für die Einträge zu einer konkreten Person
 
-#### Beispiele
+## Beispiele
 Die Daten lassen sich gliedern und/oder filtern:<br>
-<code>[cris pubtype="buecher"]</code> => Alle Bücher<br>
-<code>[cris year="2015"]</code> => Alle Publikationen aus dem Jahr 2015<br>
-<code>[cris persID="123456" year="2000" orderby="pubtype"]</code> => Alle Publikationen der Person mit der CRIS-ID 123456 aus dem Jahr 2000, nach Publikationstypen gegliedert
+<code>[cris show="publications" pubtype="buecher"]</code> => Alle Bücher<br>
+<code>[cris show="publications" year="2015"]</code> => Alle Publikationen aus dem Jahr 2015<br>
+<code>[cris show="publications" persID="123456" year="2000" orderby="pubtype"]</code> => Alle Publikationen der Person mit der CRIS-ID 123456 aus dem Jahr 2000, nach Publikationstypen gegliedert
 
 ##Integration "FAU Person"
 

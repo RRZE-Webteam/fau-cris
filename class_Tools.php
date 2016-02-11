@@ -161,6 +161,25 @@ class Tools {
 	}
 
 	/*
+	 * Awards-Array filtern
+	 */
+
+	public static function filter_awards($awards, $year = '', $start = '', $type = '') {
+
+		$awards_filtered = array();
+		foreach($awards as $id => $award) {
+			if(
+				(empty($year) || $award['Year award'] == $year) &&
+				(empty($start) || $award['Year award'] >= $start) &&
+				(empty($type) || $award['Type of award'] == $type)
+			){
+				$awards_filtered[$id] = $award;
+			}
+		}
+		return $awards_filtered;
+	}
+
+	/*
 	 * Anbindung FAU-Person-Plugin
 	 */
 
