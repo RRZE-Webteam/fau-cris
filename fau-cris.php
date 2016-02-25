@@ -336,8 +336,6 @@ class FAU_CRIS {
 		$showyear = sanitize_text_field($showyear);
 		$display = sanitize_text_field($display);
 
-		$output='';
-
 		if (isset($publication) && $publication !='') {
 			$param1 = 'publication';
 			$param2 = $publication;
@@ -360,33 +358,31 @@ class FAU_CRIS {
 			require_once('class_Auszeichnungen.php');
 			$liste = new Auszeichnungen($param1, $param2, $display);
 
-			if (isset($orderby) && ($orderby == 'type') && $award == '') {
-				$output = $liste->awardsNachTyp($year, $start, $type, $showname, $showyear, $display);
-			} elseif (isset($orderby) && $orderby == 'year' && $award == '') {
-				$output = $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
-			} elseif (isset($award) && $award != '') {
-				$output = $liste->singleAward($showname, $showyear, $display);
-			} else {
-				$output = $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
+			if ($award != '') {
+				return $liste->singleAward($showname, $showyear, $display);
 			}
-
+			if ($orderby == 'type') {
+				return $liste->awardsNachTyp($year, $start, $type, $showname, $showyear, $display);
+			}
+			if ($orderby == 'year') {
+				return $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
+			}
+			return $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
 		} else {
 		// Publications
 			require_once('class_Publikationen.php');
 			$liste = new Publikationen($param1, $param2);
 
-			if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
-				$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
-			} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
-				$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
-			} elseif (isset($publication) && $publication != '') {
-				$output = $liste->singlePub($quotation);
-			} else {
-				$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
+			if ($publication != '') {
+				return $liste->singlePub($quotation);
 			}
+			if ($orderby == 'type' || $orderby == 'pubtype') {
+				return $liste->pubNachTyp($year, $start, $pubtype, $quotation);
+			}
+			return $output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 		}
-		//print_r($atts);
-		return $output;
+		// nothing
+		return '';
 	}
 
 	public static function cris_enqueue_styles() {
