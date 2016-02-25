@@ -71,8 +71,8 @@ class Auszeichnungen {
 					$pic = '';
 				} else {
 					foreach ($picXml->infoObject->attribute as $picAttribut) {
-						if ($picAttribut['name'] == 'Content') {
-							$pic = 'data:image/JPEG;base64,' . $picAttribut->data;
+						if ($picAttribut['name'] == 'png180') {
+							$pic = 'data:image/PNG;base64,' . $picAttribut->data;
 						}
 					}
 				}
@@ -250,12 +250,12 @@ class Auszeichnungen {
 				$picString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Award/" . $awardID . "/awar_has_pict";
 				$picXml = Tools::XML2obj($picString);
 				foreach ($picXml->infoObject->attribute as $picAttribut) {
-					if ($picAttribut['name'] == 'Content') {
+					if ($picAttribut['name'] == 'png180') {
 						$pic = $picAttribut->data;
 					}
 				}
 				//print '<img src="data:image/JPEG;base64,' . $pic . '">';
-				$awardArray[$awardID]['pic'] = 'data:image/JPEG;base64,' . $pic;
+				$awardArray[$awardID]['pic'] = 'data:image/PNG;base64,' . $pic;
 			}
 
 		}
