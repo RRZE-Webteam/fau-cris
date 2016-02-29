@@ -394,9 +394,9 @@ class FAU_CRIS {
 				require_once('class_Publikationen.php');
 				$liste = new Publikationen($param1, $param2);
 
-				if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && !isset($publication)) {
+				if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && $publication == '') {
 					$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
-				} elseif (isset($orderby) && $orderby == 'year' && !isset($publication)) {
+				} elseif (isset($orderby) && $orderby == 'year' && $publication == '') {
 					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 				} elseif (isset($publication) && $publication != '') {
 					$output = $liste->singlePub($quotation);
