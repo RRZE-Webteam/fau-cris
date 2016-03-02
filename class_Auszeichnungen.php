@@ -249,12 +249,13 @@ class Auszeichnungen {
 			if ($display == 'gallery') {
 				$picString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Award/" . $awardID . "/awar_has_pict";
 				$picXml = Tools::XML2obj($picString);
-				
+
 				if ($picXml['size'] == 0) {
 					$awardArray[$awardID]['pic'] = '';
 				} else {
 					foreach ($picXml->infoObject->attribute as $picAttribut) {
-						if ($picAttribut['name'] == 'Content') {
+						$pic = '';
+						if ($picAttribut['name'] == 'png180') {
 							$pic = $picAttribut->data;
 						}
 					}
