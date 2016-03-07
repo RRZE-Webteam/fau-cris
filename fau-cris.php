@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 1.7
+ * Version: 1.72
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -33,7 +33,7 @@ class FAU_CRIS {
 	/**
 	 * Get Started
 	 */
-	const version = '1.7';
+	const version = '1.72';
 	const option_name = '_fau_cris';
 	const version_option_name = '_fau_cris_version';
 	const textdomain = 'fau-cris';
@@ -314,6 +314,7 @@ class FAU_CRIS {
 				'pubtype' => '',
 				'quotation' => '',
 				'award' => '',
+				'awardnameid' => '',
 				'type' => '',
 				'showname' => 1,
 				'showyear' => 1,
@@ -332,6 +333,7 @@ class FAU_CRIS {
 		$publication = sanitize_text_field($publication);
 		$quotation =  sanitize_text_field($quotation);
 		$award =  sanitize_text_field($award);
+		$awardnameid = sanitize_text_field($awardnameid);
 		$showname = sanitize_text_field($showname);
 		$showyear = sanitize_text_field($showyear);
 		$display = sanitize_text_field($display);
@@ -344,6 +346,9 @@ class FAU_CRIS {
 		} elseif (isset($award) && $award !='') {
 			$param1 = 'award';
 			$param2 = $award;
+		} elseif (isset($awardnameid) && $awardnameid !='') {
+			$param1 = 'awardnameid';
+			$param2 = $awardnameid;
 		} elseif (isset($persid) && $persid !='') {
 			$param1 = 'person';
 			$param2 = $persid;
@@ -386,6 +391,8 @@ class FAU_CRIS {
 					$output = $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
 				} elseif (isset($award) && $award != '') {
 					$output = $liste->singleAward($showname, $showyear, $display);
+				} elseif (isset($awardnameid) && $awardnameid != '') {
+					$output = $liste->awardsListe($year, $start, $type, $showname, $showyear, $display, $awardnameid);
 				} else {
 					$output = $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
 				}
