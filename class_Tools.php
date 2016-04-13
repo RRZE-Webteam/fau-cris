@@ -20,21 +20,8 @@ class Tools {
 		return CRIS_Dicts::$pubNames[$pub][$lang];
 	}
 
-	public static function getPubTranslation($pub) {
-		foreach (CRIS_Dicts::$pubNames as $pubindex) {
-			//print $pub;
-			//print_r($pubindex['en']);
-			//print_r($pubindex['de']);
-			if ($pubindex['de'] == $pub) {
-				echo "de";
-				return $pubindex['en'];
-			} elseif ($pubindex['en'] == $pub) {
-				/*echo "en";
-				print $pubindex['de'];
-				print_r(self::$pubNames[$pubindex]);*/
-				return $pubindex['de'];
-			}
-		}
+	public static function getpubTitle($pub, $lang) {
+		return CRIS_Dicts::$pubTitles[$pub][$lang];
 	}
 
 	public static function XML2obj($xml_url) {
@@ -74,7 +61,9 @@ class Tools {
 	public static function record_sortByName($results) {
 
 		// Define the custom sort function
-		function custom_sort ($a, $b) { return (strcasecmp ($a['lastName'],$b['lastName']));}
+		function custom_sort ($a, $b) {
+			return (strcasecmp ($a['lastName'],$b['lastName']));
+		}
 		// Sort the multidimensional array
 		uasort($results, "custom_sort");
 		return $results;
@@ -88,6 +77,17 @@ class Tools {
 		}
 		// Sort the multidimensional array
 		uasort($results, "custom_sort_year");
+		return $results;
+	}
+
+	public static function record_sortByVirtualdate($results) {
+
+		// Define the custom sort function
+		function custom_sort_virtualdate($a, $b) {
+			return $a['virtualdate'] < $b['virtualdate'];
+		}
+		// Sort the multidimensional array
+		uasort($results, "custom_sort_virtualdate");
 		return $results;
 	}
 

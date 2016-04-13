@@ -63,24 +63,6 @@ class Auszeichnungen {
 
 			}
 			//print $this->awardID . '<br />';
-
-			// Bild suchen
-			if ($einheit != "award" && $display == 'gallery') {
-				$picString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Award/" . $this->awardID . "/awar_has_pict";
-				$picXml = Tools::XML2obj($picString);
-				//var_dump($picXml['size']);
-				if($picXml['size']== 0) {
-					$pic = '';
-				} else {
-					foreach ($picXml->infoObject->attribute as $picAttribut) {
-						if ($picAttribut['name'] == 'Content') {
-							$pic = 'data:image/JPEG;base64,' . $picAttribut->data;
-						}
-					}
-				}
-				$this->awardArray[$this->awardID]['pic'] = $pic;
-			}
-
 		}
 	}
 
