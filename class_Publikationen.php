@@ -61,14 +61,14 @@ class Publikationen {
 			}
 		}
 		//$this->pubArray = Tools::record_sortByYear($this->pubArray);
-
+		//$this->pubArray = Tools::record_sortByVirtualdate($this->pubArray);
 	}
 
 	/*
 	 * Ausgabe aller Publikationen nach Jahren gegliedert
 	 */
 
-	public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '') {
+	public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '', $items = '') {
 		if (!isset($this->pubArray) || !is_array($this->pubArray)) return;
 
 		$pubByYear = array();
@@ -79,6 +79,15 @@ class Publikationen {
 			$publications = Tools::filter_publications($this->pubArray, $year, $start, $type);
 		} else {
 			$publications = $this->pubArray;
+		}
+
+		if ($items != '') {
+			print $items;
+			$first = (integer) explode('-', $items)[0];	// 1
+			$last = (integer) explode('-', $items)[1];	// 10
+			$offset = $first - 1;	// 0
+			$length = $last - $offset;	//10
+			$publications = array_slice($publications, $offset, $length, true);
 		}
 
 		if (empty($publications)) {
@@ -105,7 +114,9 @@ class Publikationen {
 				$output .= '<h3>' . $array_year . '</h3>';
 			}
 			// innerhalb des Publikationstyps alphabetisch nach Erstautor sortieren
-			$publications = Tools::array_msort($publications, array('relAuthors' => SORT_ASC));
+			//$publications = Tools::record_sortByVirtualdate($publications);
+			$publications = Tools::array_msort($publications, array('virtualdate' => SORT_DESC));
+			//$publications = Tools::array_msort($publications, array('relAuthors' => SORT_ASC));
 			if ($quotation == 'apa' || $quotation == 'mla') {
 				$output .= $this->make_quotation_list($publications, $quotation);
 			} else {
@@ -157,7 +168,8 @@ class Publikationen {
 			$pubByType = Tools::sort_key($pubByType, CRIS_Dicts::$pubOrder);
 		}
 		foreach ($pubByType as $array_type => $publications) {
-			$title = Tools::getPubTranslation($array_type);
+
+			$title = Tools::getpubTitle($array_type, get_locale());
 
 			// Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
 			if (empty($type)) {
@@ -257,6 +269,7 @@ class Publikationen {
 				'city' => (array_key_exists('cfCityTown', $publication) ? strip_tags($publication['cfCityTown']) : 'O.O.'),
 				'publisher' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : 'O.A.'),
 				'year' => (array_key_exists('publYear', $publication) ? strip_tags($publication['publYear']) : 'O.J.'),
+				'virtualdate' => (array_key_exists('virtualdate', $publication) ? strip_tags($publication['virtualdate']) : 'X'),
 				'pubType' => (array_key_exists('Publication type', $publication) ? strip_tags($publication['Publication type']) : 'O.A.'),
 				'pagesTotal' => (array_key_exists('cfTotalPages', $publication) ? strip_tags($publication['cfTotalPages']) : ''),
 				'pagesRange' => (array_key_exists('pagesRange', $publication) ? strip_tags($publication['pagesRange']) : ''),
@@ -295,6 +308,7 @@ class Publikationen {
 				}
 				$authorList[] = $authordata;
 			}
+			$publist .= $pubDetails['virtualdate'] . "<br />";
 			$publist .= implode(", ", $authorList);
 			$publist .= ($pubDetails['pubType'] == 'Editorial' ? ' (Hrsg.):' : ':');
 

@@ -313,6 +313,7 @@ class FAU_CRIS {
 				'publication' => '',
 				'pubtype' => '',
 				'quotation' => '',
+				'items' => '',
 				'award' => '',
 				'awardnameid' => '',
 				'type' => '',
@@ -332,6 +333,7 @@ class FAU_CRIS {
 		$persid = sanitize_text_field($persid);
 		$publication = sanitize_text_field($publication);
 		$quotation =  sanitize_text_field($quotation);
+		$items = sanitize_text_field($items);
 		$award =  sanitize_text_field($award);
 		$awardnameid = sanitize_text_field($awardnameid);
 		$showname = sanitize_text_field($showname);
@@ -402,18 +404,17 @@ class FAU_CRIS {
 				$liste = new Publikationen($param1, $param2);
 
 				if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && $publication == '') {
-					$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
+					$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation, $items);
 				} elseif (isset($orderby) && $orderby == 'year' && $publication == '') {
-					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
+					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation, $items);
 				} elseif (isset($publication) && $publication != '') {
 					$output = $liste->singlePub($quotation);
 				} else {
-					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
+					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation, $items);
 				}
 			}
 		}
-		//print_r($atts);
-
+		print_r($atts);
 		return $output;
 	}
 

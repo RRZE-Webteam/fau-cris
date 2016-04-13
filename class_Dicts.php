@@ -18,6 +18,41 @@ class CRIS_Dicts {
 		'display' => 'list'
 	);
 
+	public static $pubTitles = array(
+		'Journal article' => array (
+			'de_DE' => 'Zeitschriftenartikel',
+			'en_US' => 'Journal articles',
+			'en_UK' => 'Journal articles'),
+		'Conference contribution' => array (
+			'de_DE' => 'Konferenzbeiträge',
+			'en_US' => 'Conference contributions',
+			'en_UK' => 'Conference contributions'),
+		'Translation' => array (
+			'de_DE' => 'Übersetzungen',
+			'en_US' => 'Translations',
+			'en_UK' => 'Translations'),
+		'Book' => array (
+			'de_DE' => 'Bücher',
+			'en_US' => 'Books',
+			'en_UK' => 'Books'),
+		'Editorial' => array (
+			'de_DE' => 'Herausgeberschaften',
+			'en_US' => 'Editorials',
+			'en_UK' => 'Editorials'),
+		'Conference contribution' => array (
+			'de_DE' => 'Konferenzbeiträge',
+			'en_US' => 'Conference contributions',
+			'en_UK' => 'Conference contributions'),
+		'Thesis' => array (
+			'de_DE' => 'Abschlussarbeiten',
+			'en_US' => 'Thesis',
+			'en_UK' => 'Thesis'),
+		'Other' => array (
+			'de_DE' => 'Sonstige',
+			'en_US' => 'Other',
+			'en_UK' => 'Other')
+	);
+
 	public static $pubNames = array(
 		'zeitschriftenartikel' => array (
 			'de' => 'Zeitschriftenartikel',
@@ -42,7 +77,7 @@ class CRIS_Dicts {
 			'en' => 'Thesis'),
 		'andere' => array (
 			'de' => 'Sonstige',
-			'en' => 'Other')
+			'en' => 'Other'),
 	);
 
 	public static $pubOrder = array(
@@ -66,19 +101,19 @@ class CRIS_Dicts {
 	public static $awardNames = array(
 		'preise'	=> array(
 			'de' => 'Preis / Ehrung',
-			'en' => 'Preis / Ehrung',
+			'en' => 'Award / Honour',
 		),
 		'stipendien'	=> array(
 			'de' => 'Stipendium / Grant',
-			'en' => 'Stipendium / Grant',
+			'en' => 'Scholarship / Grant',
 		),
 		'mitgliedschaften'	=> array(
 			'de' => 'Akademie-Mitgliedschaft',
-			'en' => 'Akademie-Mitgliedschaft',
+			'en' => 'Academy Member',
 		),
 		'andere'	=> array(
-			'de' => 'Weitere Preise',
-			'en' => 'Weitere Preise',
+			'de' => 'Weiterer Preis / Auszeichnung',
+			'en' => 'Other Award',
 		)
 	);
 }
