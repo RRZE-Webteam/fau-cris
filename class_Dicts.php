@@ -39,10 +39,6 @@ class CRIS_Dicts {
 			'de_DE' => 'Herausgeberschaften',
 			'en_US' => 'Editorials',
 			'en_UK' => 'Editorials'),
-		'Conference contribution' => array (
-			'de_DE' => 'Konferenzbeiträge',
-			'en_US' => 'Conference contributions',
-			'en_UK' => 'Conference contributions'),
 		'Thesis' => array (
 			'de_DE' => 'Abschlussarbeiten',
 			'en_US' => 'Thesis',
@@ -50,7 +46,11 @@ class CRIS_Dicts {
 		'Other' => array (
 			'de_DE' => 'Sonstige',
 			'en_US' => 'Other',
-			'en_UK' => 'Other')
+			'en_UK' => 'Other'),
+		'Article in Edited Volumes' => array (
+			'de_DE' => 'Sammelbandbeiträge',
+			'en_US' => 'Article in Edited Volumes',
+			'en_UK' => 'Article in Edited Volumes')
 	);
 
 	public static $pubNames = array(
