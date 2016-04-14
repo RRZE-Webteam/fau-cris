@@ -414,7 +414,7 @@ class FAU_CRIS {
 				}
 			}
 		}
-		print_r($atts);
+		//print_r($atts);
 		return $output;
 	}
 

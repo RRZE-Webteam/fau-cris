@@ -82,7 +82,7 @@ class Publikationen {
 		}
 
 		if ($items != '') {
-			print $items;
+			//print $items;
 			$first = (integer) explode('-', $items)[0];	// 1
 			$last = (integer) explode('-', $items)[1];	// 10
 			$offset = $first - 1;	// 0
@@ -308,9 +308,9 @@ class Publikationen {
 				}
 				$authorList[] = $authordata;
 			}
-			$publist .= $pubDetails['virtualdate'] . "<br />";
+			//$publist .= $pubDetails['virtualdate'] . "<br />";
 			$publist .= implode(", ", $authorList);
-			$publist .= ($pubDetails['pubType'] == 'Editorial' ? ' (Hrsg.):' : ':');
+			$publist .= ($pubDetails['pubType'] == 'Editorial' ? '(' . __('Hrsg.','fau-cris') . '):' : ':');
 
 			$publist .= "<br /><span class=\"title\"><b>"
 			. "<a href=\"https://cris.fau.de/converis/publicweb/Publication/" . $id
@@ -340,7 +340,7 @@ class Publikationen {
 
 				case "Article in Edited Volumes":
 					$publist .= ((($pubDetails['editiors'] != '') || ($pubDetails['booktitle'] != '')) ? "<br />" : '');
-					$publist .= ($pubDetails['editiors'] != '' ? "In: <strong>" . $pubDetails['editiors'] . '</strong> (Hrsg.):' : '');
+					$publist .= ($pubDetails['editiors'] != '' ? "In: <strong>" . $pubDetails['editiors'] . ' ('.__('Hrsg.','fau-cris').'): </strong>' : '');
 					$publist .= ($pubDetails['booktitle'] != '' ? " <strong><em>" . $pubDetails['booktitle'] . '</em></strong>' : '');
 					$publist .= ((($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '');
 					$publist .= ($pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '');
