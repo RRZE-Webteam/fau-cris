@@ -33,7 +33,7 @@ class FAU_CRIS {
 	/**
 	 * Get Started
 	 */
-	const version = '1.72';
+	const version = '1.74';
 	const option_name = '_fau_cris';
 	const version_option_name = '_fau_cris_version';
 	const textdomain = 'fau-cris';
@@ -372,7 +372,7 @@ class FAU_CRIS {
 			'142351'  // Techfak
 		);
 
-		if ((!$orgid||$orgid==0) && $persid == '' && $publication == '' && $award =='') {
+		if ((!$orgid||$orgid==0) && $persid == '' && $publication == '' && $award =='' && $awardnameid == '') {
 			// Fehlende ID oder ID=0 abfangen
             $output = __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation/Auszeichnung an.','fau-cris') . '</strong></p>';
 		} elseif (in_array($orgid, $excluded)
