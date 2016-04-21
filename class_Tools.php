@@ -17,11 +17,17 @@ class Tools {
 	}
 
 	public static function getPubName($pub, $lang) {
-		return CRIS_Dicts::$pubNames[$pub][$lang];
+		if (array_key_exists($lang, CRIS_Dicts::$pubNames[$pub])){
+			return CRIS_Dicts::$pubNames[$pub][$lang];
+		}
+		return CRIS_Dicts::$pubNames[$pub]['en'];
 	}
 
 	public static function getpubTitle($pub, $lang) {
-		return CRIS_Dicts::$pubTitles[$pub][$lang];
+		if (array_key_exists($lang, CRIS_Dicts::$pubTitles[$pub])){
+			return CRIS_Dicts::$pubTitles[$pub][$lang];
+		}
+		return CRIS_Dicts::$pubTitles[$pub]['en_US'];
 	}
 
 	public static function XML2obj($xml_url) {
