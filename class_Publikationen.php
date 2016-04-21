@@ -170,7 +170,6 @@ class Publikationen {
 		foreach ($pubByType as $array_type => $publications) {
 
 			$title = Tools::getpubTitle($array_type, get_locale());
-
 			// Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
 			if (empty($type)) {
 				$output .= "<h3>";
