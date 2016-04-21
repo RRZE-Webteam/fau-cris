@@ -32,8 +32,8 @@ class CRIS_Dicts {
 			'en_GB' => 'Conference contributions',
 			'en_UK' => 'Conference contributions'),
 		'Translation' => array (
-			'de_DE' => 'Konferenzbeiträge',
-			'de_DE_formal' => 'Konferenzbeiträge',
+			'de_DE' => 'Übersetzungen',
+			'de_DE_formal' => 'Übersetzungen',
 			'en_US' => 'Translations',
 			'en_GB' => 'Translations',
 			'en_UK' => 'Translations'),
