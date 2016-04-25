@@ -188,12 +188,11 @@ class Auszeichnungen {
 		}
 
 		// Awards sortieren
-		$orderRaw = $this->options['cris_award_order'];
-		foreach ($orderRaw as $awardType) {
-			$order[] = CRIS_Dicts::$awardNames[$awardType]['de'];
-		}
-
-		if ($order[0] != '') {
+		$order = $this->options['cris_award_order'];
+		if ($order[0] != ''  && array_key_exists($order[0],CRIS_Dicts::$awardNames)) {
+			foreach ($order as $awardType) {
+				$order[] = CRIS_Dicts::$awardNames[$awardType]['de'];
+			}
 			$awardsByType = Tools::sort_key($awardsByType, $order);
 		} else {
 			$awardsByType = Tools::sort_key($awardsByType, CRIS_Dicts::$awardOrder);
