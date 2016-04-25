@@ -202,7 +202,8 @@ class Auszeichnungen {
 		// Ausgabe
 		foreach ($awardsByType as $array_type => $awards) {
 			if (empty($year)) {
-				$output .= '<h3 class="clearfix clear">' . $array_type . '</h3>';
+				$title = Tools::getawardTitle($array_type, get_locale());
+				$output .= '<h3 class="clearfix clear">' . $title . '</h3>';
 			}
 			// innerhalb des Awardtyps nach Jahr abwärts sortieren
 			$awards = Tools::array_msort($awards, array('Year award' => SORT_DESC));
@@ -333,20 +334,17 @@ class Auszeichnungen {
 	}
 
 	private function get_pic($award) {
+		$pic = '';
+
 		$picString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Award/" . $award . "/awar_has_pict";
 		$picXml = Tools::XML2obj($picString);
 
-		if ($picXml['size'] == 0) {
-			$award['pic'] = '';
-		} else {
+		if ($picXml['size'] != 0) {
 			foreach ($picXml->infoObject->attribute as $picAttribut) {
-				$pic = '';
 				if ($picAttribut['name'] == 'png180') {
-					$pic = $picAttribut->data;
+					$pic = 'data:image/PNG;base64,' . $picAttribut->data;
 				}
 			}
-			//print '<img src="data:image/JPEG;base64,' . $pic . '">';
-			$pic = 'data:image/PNG;base64,' . $pic;
 		}
 		return $pic;
 	}
