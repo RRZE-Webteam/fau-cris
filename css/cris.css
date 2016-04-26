@@ -11,9 +11,14 @@ ul.cris-gallery li {
 	float: left;
 	width: 200px;
 	margin: 0 10px 10px 0;
-	font-size: .9em;
+	font-size: 1em;
 	list-style-type: none;
+	min-height: 245px;
 }
+ul.cris-gallery li p {
+	font-size: 1em;
+}
+
 ul.cris-gallery li img {
 	display: block;
 	margin: 0 auto 10px;

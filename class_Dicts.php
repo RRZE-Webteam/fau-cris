@@ -114,6 +114,33 @@ class CRIS_Dicts {
 		"Weitere Preise"
 	);
 
+	public static $awardTitles = array(
+		'Akademie-Mitgliedschaft' => array (
+			'de_DE' => 'Akademie-Mitgliedschaften',
+			'de_DE_formal' => 'Akademie-Mitgliedschaften',
+			'en_US' => 'Academy Memberships',
+			'en_GB' => 'Academy Memberships',
+			'en_UK' => 'Academy Memberships'),
+		'Preis / Ehrung' => array (
+			'de_DE' => 'Preise / Ehrungen',
+			'de_DE_formal' => 'Preise / Ehrungen',
+			'en_US' => 'Awards / Honours',
+			'en_GB' => 'Awards / Honours',
+			'en_UK' => 'Awards / Honours'),
+		'Stipendium / Grant' => array(
+			'de_DE' => 'Stipendien / Grants',
+			'de_DE_formal' => 'Stipendien / Grants',
+			'en_US' => 'Scholarships / Grants',
+			'en_GB' => 'Scholarships / Grants',
+			'en_UK' => 'Scholarships / Grants'),
+		'Weiterer Preis / Auszeichnung' => array(
+			'de_DE' => 'Weitere Preise / Auszeichnungen',
+			'de_DE_formal' => 'Weitere Preise / Auszeichnungen',
+			'en_US' => 'Other Awards',
+			'en_GB' => 'Other Awards',
+			'en_UK' => 'Other Awards')
+	);
+
 	public static $awardNames = array(
 		'preise'	=> array(
 			'de' => 'Preis / Ehrung',

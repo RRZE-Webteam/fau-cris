@@ -27,7 +27,20 @@ class Tools {
 		if (array_key_exists($lang, CRIS_Dicts::$pubTitles[$pub])){
 			return CRIS_Dicts::$pubTitles[$pub][$lang];
 		}
+		if (strpos($lang, 'de_') === 0) {
+			return CRIS_Dicts::$pubTitles[$pub]['de_DE'];
+		}
 		return CRIS_Dicts::$pubTitles[$pub]['en_US'];
+	}
+
+	public static function getawardTitle($award, $lang) {
+		if (array_key_exists($lang, CRIS_Dicts::$awardTitles[$award])){
+			return CRIS_Dicts::$awardTitles[$award][$lang];
+		}
+		if (strpos($lang, 'de_') === 0) {
+			return CRIS_Dicts::$awardTitles[$award]['de_DE'];
+		}
+		return CRIS_Dicts::$awardTitles[$award]['en_US'];
 	}
 
 	public static function XML2obj($xml_url) {
@@ -38,23 +51,25 @@ class Tools {
 		$xml = curl_exec($ch);
 		curl_close($ch);
 
+		$xmlTree = '';
+
 		libxml_use_internal_errors(true);
 		try {
 			$xmlTree = new SimpleXMLElement($xml);
-
 		} catch (Exception $e) {
 			// Something went wrong.
-			print '<p>';
+
 			$error_message = '<strong>' . __('Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.', self::textdomain) . '</strong>';
 			if (defined('WP_DEBUG') && true === WP_DEBUG) {
+				print '<p>';
 				foreach(libxml_get_errors() as $error_line) {
 					$error_message .= "<br>" . $error_line->message;
 				}
 				trigger_error($error_message);
+				print '</p>';
 			} else {
-				print $error_message;
+				//print $error_message;
 			}
-			print '</p>';
 			return false;
 		}
 		return $xmlTree;
