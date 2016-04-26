@@ -1,5 +1,5 @@
 <?php
-require_once("class_Dicts.php");
+require_once("class_Dicts.php"); 
 
 class Tools {
 
