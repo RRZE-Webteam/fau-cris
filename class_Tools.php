@@ -28,7 +28,7 @@ class Tools {
 			return CRIS_Dicts::$pubTitles[$pub][$lang];
 		}
 		if (strpos($lang, 'de_') === 0) {
-			return CRIS_Dicts::$pubTitles[$award]['de_DE'];
+			return CRIS_Dicts::$pubTitles[$pub]['de_DE'];
 		}
 		return CRIS_Dicts::$pubTitles[$pub]['en_US'];
 	}
