@@ -400,8 +400,8 @@ class FAU_CRIS {
 				}
 			} else {
 			// Publications
-				require_once('class_Publikationen.php');
-				$liste = new Publikationen($param1, $param2);
+				require_once('class_Publikationen_neu.php');
+				$liste = new Publikationen_neu($param1, $param2);
 
 				if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && $publication == '') {
 					$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation, $items);
