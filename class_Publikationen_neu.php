@@ -1,7 +1,7 @@
 <?php
 
 require_once("class_Tools.php");
-require_once("cris-generic.php");
+require_once("class_Publications.php");
 
 class Publikationen_neu {
 
@@ -84,13 +84,13 @@ class Publikationen_neu {
             }
 //            print_r($order);
 
-            // sortiere nach Typenliste, innerhalb des Jahres nach Jahr abwärts sortieren
+            // sortiere nach Typenliste, innerhalb des Jahres nach Jahr abwÃ¤rts sortieren
             $formatter = new CRIS_formatter("publication type", array_values($order), "publyear", SORT_DESC);
             $pubList = $formatter->execute($pubArray);
 
             $output = '';
             foreach ($pubList as $array_type => $publications) {
-                // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
+                // ZwischenÃ¼berschrift (= Publikationstyp), auÃŸer wenn nur ein Typ gefiltert wurde
                 if (empty($type)) {
 					$title = Tools::getpubTitle($array_type, get_locale());
                     $output .= "<h3>";
@@ -272,7 +272,7 @@ class Publikationen_neu {
 
 				case "Article in Edited Volumes":
 					$publist .= ((($pubDetails['editiors'] != '') || ($pubDetails['booktitle'] != '')) ? "<br />" : '');
-					$publist .= ($pubDetails['editiors'] != '' ? "In: <strong>" . $pubDetails['editiors'] . ' ('.__('Hrsg.','fau-cris').'): </strong>' : '');	
+					$publist .= ($pubDetails['editiors'] != '' ? "In: <strong>" . $pubDetails['editiors'] . ' ('.__('Hrsg.','fau-cris').'): </strong>' : '');
 					$publist .= ($pubDetails['booktitle'] != '' ? " <strong><em>" . $pubDetails['booktitle'] . '</em></strong>' : '');
 					$publist .= ((($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '');
 					$publist .= ($pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '');
@@ -293,7 +293,7 @@ class Publikationen_neu {
 					$publist .= ($pubDetails['journaltitle'] != '' ? "In: <strong>" . $pubDetails['journaltitle'] . '</strong> ' : '');
 					$publist .= ($pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '');
 					$publist .= ($pubDetails['year'] != '' ? " (" . $pubDetails['year'] . ")" : '');
-					$publist .= ($pubDetails['pagesRange'] != '' ? ", " . __('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " " . $pubDetails['pagesRange'] : '');
+					$publist .= ($pubDetails['pagesRange'] != '' ? ", " . __('S.', 'AbkÃ¼rzung fÃ¼r "Seite" bei Publikationen', 'fau-cris') . " " . $pubDetails['pagesRange'] : '');
 					$publist .= ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank'>" . $pubDetails['DOI'] . "</a>" : '');
 					$publist .= ($pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank'>" . $pubDetails['URI'] . "</a>" : '');
 					break;
