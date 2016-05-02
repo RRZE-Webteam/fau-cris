@@ -32,17 +32,17 @@ class Publikationen_neu {
 	 * Ausgabe aller Publikationen nach Jahren gegliedert
 	 */
 
-	public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '') {
+	public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '', $items = '') {
             $pubArray = $this->fetch_publications($year, $start, $type);
 
-            if (!count($pubArray)) {
+			if (!count($pubArray)) {
                 $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.','fau-cris') . '</p>';
                 return $output;
             }
 
             // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
             $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
-            $pubList = $formatter->execute($pubArray);
+            $pubList = $formatter->execute($pubArray, $items);
 
             $output = '';
             foreach ($pubList as $array_year => $publications) {
@@ -62,7 +62,7 @@ class Publikationen_neu {
 	 * Ausgabe aller Publikationen nach Publikationstypen gegliedert
 	 */
 
-	public function pubNachTyp($year = '', $start = '', $type = '', $quotation = '') {
+	public function pubNachTyp($year = '', $start = '', $type = '', $quotation = '', $items = '') {
             $pubArray = $this->fetch_publications($year, $start, $type);
 
             if (!count($pubArray)) {
@@ -86,7 +86,7 @@ class Publikationen_neu {
 
             // sortiere nach Typenliste, innerhalb des Jahres nach Jahr abwärts sortieren
             $formatter = new CRIS_formatter("publication type", array_values($order), "publyear", SORT_DESC);
-            $pubList = $formatter->execute($pubArray);
+            $pubList = $formatter->execute($pubArray, $items);
 
             $output = '';
             foreach ($pubList as $array_type => $publications) {
@@ -139,7 +139,7 @@ class Publikationen_neu {
         private function fetch_publications($year = '', $start = '', $type = '') {
             $filter = Tools::publication_filter($year, $start, $type);
 
-            $ws = new CRIS_publications();
+			$ws = new CRIS_publications();
 
             try {
                 if ($this->einheit === "orga") {

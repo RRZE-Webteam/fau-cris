@@ -180,31 +180,31 @@ class Tools {
 		}
 		return $publications_filtered;
 	}
-        
-        /*
-         * Array zur Definition des Filters für Publikationen
-         */
-        public static function publication_filter($year = '', $start = '', $type = '') {
-            $filter = array();
-            if ($year !== '')
-                $filter['publyear__eq'] = $year;
-            if ($start !== '')
-                $filter['publyear__ge'] = $start;
-            if ($type !== '') {
-                $pubTyp = Tools::getPubName($type, "en");
-                if (empty($pubTyp)) {
-                    // XXX: hier fehlt eine Übersetzung
-                    $output .= '<p>Falscher Parameter für Publikationstyp</p>';
-                    return $output;
-                }
-                $filter['publication type__eq'] = $pubTyp;
-            }            
-            if (count($filter))
-                return $filter;
-            return null;
-        }
 
-        /*
+	/*
+	 * Array zur Definition des Filters für Publikationen
+	 */
+	public static function publication_filter($year = '', $start = '', $type = '') {
+		$filter = array();
+		if ($year !== '')
+			$filter['publyear__eq'] = $year;
+		if ($start !== '')
+			$filter['publyear__ge'] = $start;
+		if ($type !== '') {
+			$pubTyp = Tools::getPubName($type, "en");
+			if (empty($pubTyp)) {
+				// XXX: hier fehlt eine Übersetzung
+				$output .= '<p>Falscher Parameter für Publikationstyp</p>';
+				return $output;
+			}
+			$filter['publication type__eq'] = $pubTyp;
+		}
+		if (count($filter))
+			return $filter;
+		return null;
+	}
+
+	/*
 	 * Awards-Array filtern
 	 */
 

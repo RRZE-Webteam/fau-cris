@@ -77,8 +77,8 @@ class CRIS_publications extends CRIS_webservice {
                     $publs[$p->ID] = $p;
             }
         }
-
-        return $publs;
+		
+		return $publs;
     }
 }
 

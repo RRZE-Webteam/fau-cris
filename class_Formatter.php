@@ -33,7 +33,7 @@ class CRIS_formatter {
             $this->sort_order = $sort_order;
     }
 
-    public function execute($data) {
+    public function execute($data, $items) {
         /*
          * Perform formatting on $data.
          */
@@ -73,7 +73,24 @@ class CRIS_formatter {
                 $final[$_k] = $group;
         }
 
-        return $final;
+		# cut off if number of items given
+		if ($items == '') {
+			return $final;
+		}
+
+		$final_stripped = array();
+		$i = 1;
+
+		foreach ($final as $_y => $_p) {
+			foreach ($_p as $_k => $pub) {
+				if ($i <= $items) {
+					$final_stripped[$_y][$_k] = $pub;
+					$i++;
+				}
+			}
+		}
+
+		return $final_stripped;
     }
 
     private function compare_group($a, $b) {

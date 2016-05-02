@@ -32,6 +32,7 @@ class CRIS_filter {
             $filterlist[$_op[0]][$_op[1]] = $_v;
         }
         $this->filters = $filterlist;
+		
     }
 
     public function evaluate($data) {
