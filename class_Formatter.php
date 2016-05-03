@@ -33,63 +33,65 @@ class CRIS_formatter {
             $this->sort_order = $sort_order;
     }
 
-    public function execute($data, $items) {
+    public function execute($data, $items='') {
         /*
          * Perform formatting on $data.
          */
+
         $final = array();
-        foreach ($data as $single_dataset) {
-            if (!array_key_exists($this->group, $single_dataset->attributes))
-                throw new Exception('attribute not found: '. $this->group);
+		foreach ($data as $single_dataset) {
+			if (!array_key_exists($this->group, $single_dataset->attributes))
+				throw new Exception('attribute not found: '. $this->group);
 
-            $value = $single_dataset->attributes[$this->group];
+			$value = $single_dataset->attributes[$this->group];
 
-            if (!array_key_exists($value, $final))
-                $final[$value] = array();
+			if (!array_key_exists($value, $final))
+				$final[$value] = array();
 
-            $final[$value][] = $single_dataset;
-        }
+			$final[$value][] = $single_dataset;
+		}
 
-        # first sort main groups
-        if (is_array($this->group_order)) {
-            # user-defined array for sorting
-            $this->sortkey = $this->group;
-            $this->sortvalues = $this->group_order;
-            uksort($final, "self::compare_group");
-        } elseif ($this->group_order === SORT_ASC)
-            ksort($final);
-        elseif ($this->group_order === SORT_DESC)
-            krsort($final);
-        else
-            throw new Exception('unknown sorting');
+		# first sort main groups
+		if (is_array($this->group_order)) {
+			# user-defined array for sorting
+			$this->sortkey = $this->group;
+			$this->sortvalues = $this->group_order;
+			uksort($final, "self::compare_group");
+		} elseif ($this->group_order === SORT_ASC)
+			ksort($final);
+		elseif ($this->group_order === SORT_DESC)
+			krsort($final);
+		else
+			throw new Exception('unknown sorting');
 
-        # sort data inside groups
-        foreach ($final as $_k => $group) {
-            $this->sortkey = $this->sort;
-            uasort($group, "self::compare_attributes");
-            if ($this->sort_order === SORT_DESC)
-                $final[$_k] = array_reverse ($group, true);
-            else
-                $final[$_k] = $group;
-        }
+		# sort data inside groups
+		foreach ($final as $_k => $group) {
+			$this->sortkey = $this->sort;
+			uasort($group, "self::compare_attributes");
+			if ($this->sort_order === SORT_DESC)
+				$final[$_k] = array_reverse ($group, true);
+			else
+				$final[$_k] = $group;
+		}
 
-		# cut off if number of items given
-		if ($items == '') {
+		if (empty($items)) {
 			return $final;
 		}
 
+		/*
+		 * If limited items -> flatten array and cut off
+		 */
+
 		$final_stripped = array();
 		$i = 1;
-
-		foreach ($final as $_y => $_p) {
-			foreach ($_p as $_k => $pub) {
+		foreach ($final as $_y) {
+			foreach ($_y as $_k => $group) {
 				if ($i <= $items) {
-					$final_stripped[$_y][$_k] = $pub;
+					$final_stripped[$group->ID] = $group;
 					$i++;
 				}
 			}
 		}
-
 		return $final_stripped;
     }
 

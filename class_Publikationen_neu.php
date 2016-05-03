@@ -29,10 +29,10 @@ class Publikationen_neu {
 	}
 
 	/*
-	 * Ausgabe aller Publikationen nach Jahren gegliedert
+	 * Ausgabe aller Publikationen ohne Gliederung
 	 */
 
-	public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '', $items = '') {
+	public function pubListe($year = '', $start = '', $type = '', $quotation = '', $items = '') {
             $pubArray = $this->fetch_publications($year, $start, $type);
 
 			if (!count($pubArray)) {
@@ -45,9 +45,36 @@ class Publikationen_neu {
             $pubList = $formatter->execute($pubArray, $items);
 
             $output = '';
+
+			if ($quotation == 'apa' || $quotation == 'mla') {
+				$output .= $this->make_quotation_list($pubList, $quotation);
+			} else {
+				$output .= $this->make_list($pubList);
+			}
+
+            return $output;
+	}
+
+	/*
+	 * Ausgabe aller Publikationen nach Jahren gegliedert
+	 */
+
+	public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '') {
+            $pubArray = $this->fetch_publications($year, $start, $type);
+
+			if (!count($pubArray)) {
+                $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.','fau-cris') . '</p>';
+                return $output;
+            }
+
+            // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
+            $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
+            $pubList = $formatter->execute($pubArray);
+
+            $output = '';
             foreach ($pubList as $array_year => $publications) {
                 if (empty($year)) {
-                    $output .= '<h3>' . $array_year . '</h3>';
+					$output .= '<h3>' . $array_year . '</h3>';
                 }
                 if ($quotation == 'apa' || $quotation == 'mla') {
                     $output .= $this->make_quotation_list($publications, $quotation);
@@ -62,7 +89,7 @@ class Publikationen_neu {
 	 * Ausgabe aller Publikationen nach Publikationstypen gegliedert
 	 */
 
-	public function pubNachTyp($year = '', $start = '', $type = '', $quotation = '', $items = '') {
+	public function pubNachTyp($year = '', $start = '', $type = '', $quotation = '') {
             $pubArray = $this->fetch_publications($year, $start, $type);
 
             if (!count($pubArray)) {
@@ -86,7 +113,7 @@ class Publikationen_neu {
 
             // sortiere nach Typenliste, innerhalb des Jahres nach Jahr abwärts sortieren
             $formatter = new CRIS_formatter("publication type", array_values($order), "publyear", SORT_DESC);
-            $pubList = $formatter->execute($pubArray, $items);
+            $pubList = $formatter->execute($pubArray);
 
             $output = '';
             foreach ($pubList as $array_type => $publications) {

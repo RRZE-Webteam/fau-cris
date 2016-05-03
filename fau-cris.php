@@ -340,8 +340,6 @@ class FAU_CRIS {
 		$showyear = sanitize_text_field($showyear);
 		$display = sanitize_text_field($display);
 
-		$output='';
-
 		if (isset($publication) && $publication !='') {
 			$param1 = 'publication';
 			$param2 = $publication;
@@ -381,41 +379,43 @@ class FAU_CRIS {
 			&& ($year == '' && $type == '')
 			) {
 			// IDs mit zu vielen Ergebnissen ausschließen
-			$output = __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
+			return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
         } else {
 			if (isset($show) && $show == 'awards') {
+			// Awards
 				require_once('class_Auszeichnungen.php');
 				$liste = new Auszeichnungen($param1, $param2, $display);
 
-				if (isset($orderby) && ($orderby == 'type') && $award == '') {
-					$output = $liste->awardsNachTyp($year, $start, $type, $showname, $showyear, $display);
-				} elseif (isset($orderby) && $orderby == 'year' && $award == '') {
-					$output = $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
-				} elseif (isset($award) && $award != '') {
-					$output = $liste->singleAward($showname, $showyear, $display);
-				} elseif (isset($awardnameid) && $awardnameid != '') {
-					$output = $liste->awardsListe($year, $start, $type, $showname, $showyear, $display, $awardnameid);
-				} else {
-					$output = $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
+				if ($award != '') {
+					return $liste->singleAward($showname, $showyear, $display);
 				}
+				if ($orderby == 'type') {
+					return $liste->awardsNachTyp($year, $start, $type, $showname, $showyear, $display);
+				}
+				if ($orderby == 'year') {
+					return $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
+				}
+				return $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
+
 			} else {
 			// Publications
 				require_once('class_Publikationen_neu.php');
 				$liste = new Publikationen_neu($param1, $param2);
 
-				if (isset($orderby) && ($orderby == 'type' || $orderby == 'pubtype') && $publication == '') {
-					$output = $liste->pubNachTyp($year, $start, $pubtype, $quotation, $items);
-				} elseif (isset($orderby) && $orderby == 'year' && $publication == '') {
-					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation, $items);
-				} elseif (isset($publication) && $publication != '') {
-					$output = $liste->singlePub($quotation);
-				} else {
-					$output = $liste->pubNachJahr($year, $start, $pubtype, $quotation, $items);
+				if ($publication != '') {
+					return $liste->singlePub($quotation);
 				}
+				if (!empty($items)) {
+						return $liste->pubListe($year, $start, $pubtype, $quotation, $items);
+				}
+				if ($orderby == 'type' || $orderby == 'pubtype') {
+					return $liste->pubNachTyp($year, $start, $pubtype, $quotation);
+				}
+				return $output = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 			}
 		}
-		//print_r($atts);
-		return $output;
+		// nothing
+		return '';
 	}
 
 	public static function cris_enqueue_styles() {
