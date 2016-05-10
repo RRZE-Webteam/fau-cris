@@ -86,9 +86,11 @@ class CRIS_formatter {
 
 		foreach ($final as $_y) {
 			foreach ($_y as $_k => $group) {
-				if (isset($items) && $i <= $items) {
-					$final_flat[$group->ID] = $group;
-					$i++;
+				if (isset($items)) {
+					if ($i <= $items) {
+						$final_flat[$group->ID] = $group;
+						$i++;
+					}
 				} else {
 					$final_flat[$group->ID] = $group;
 				}
