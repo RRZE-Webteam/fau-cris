@@ -46,11 +46,11 @@ class Publikationen_neu {
 
             $output = '';
 
-			if ($quotation == 'apa' || $quotation == 'mla') {
-				$output .= $this->make_quotation_list($pubList, $quotation);
-			} else {
-				$output .= $this->make_list($pubList);
-			}
+            if ($quotation == 'apa' || $quotation == 'mla') {
+                    $output .= $this->make_quotation_list($pubList, $quotation);
+            } else {
+                    $output .= $this->make_list($pubList);
+            }
 
             return $output;
 	}

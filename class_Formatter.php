@@ -19,7 +19,10 @@ class CRIS_formatter {
          * year.
          */
 
-        $this->group = strtolower($group_attribute);
+        if ($group_attribute != null)
+            $this->group = strtolower($group_attribute);
+        else
+            $this->group = null;
         # make all lookup values lower case
         if (is_array($group_order))
             $this->group_order = array_map('strtolower', $group_order);
@@ -33,28 +36,36 @@ class CRIS_formatter {
             $this->sort_order = $sort_order;
     }
 
-    public function execute($data, $items='', $display='') {
+    public function execute($data, $limit=null) {
         /*
-         * Perform formatting on $data.
+         * Perform formatting on $data. If $limit is set, return $limit entries
+         * at max.
          */
 
         $final = array();
         foreach ($data as $single_dataset) {
+            if ($this->group != null && $limit == null) {
                 if (!array_key_exists($this->group, $single_dataset->attributes))
                         throw new Exception('attribute not found: '. $this->group);
+                $group_key = $this->group;
+            } else {
+                # no grouping requested, we assume that sort is set in this case
+                # also the case if a maximum limit is set
+                $group_key = $this->sort;
+            }
 
-                $value = $single_dataset->attributes[$this->group];
+            $value = $single_dataset->attributes[$group_key];
 
-                if (!array_key_exists($value, $final))
-                        $final[$value] = array();
+            if (!array_key_exists($value, $final))
+                $final[$value] = array();
 
-                $final[$value][] = $single_dataset;
+            $final[$value][] = $single_dataset;
         }
 
         # first sort main groups
         if (is_array($this->group_order)) {
                 # user-defined array for sorting
-                $this->sortkey = $this->group;
+                $this->sortkey = $group_key;
                 $this->sortvalues = $this->group_order;
                 uksort($final, "self::compare_group");
         } elseif ($this->group_order === SORT_ASC)
@@ -74,30 +85,12 @@ class CRIS_formatter {
                         $final[$_k] = $group;
         }
 
-        if ($display != 'list' && empty($items)) {
-                return $final;
+        if ($limit != null) {
+            $limit = intval($limit);
+            $final[$group_key] = array_slice($final[$group_key], 0, $limit);
         }
-
-        # If display=list -> flatten array
-        # If limited items -> flatten array and cut off
-
-        $final_flat = array();
-        $i = 1;
-
-        foreach ($final as $_y) {
-                foreach ($_y as $_k => $group) {
-                        if (isset($items)) {
-                                if ($i <= $items) {
-                                        $final_flat[$group->ID] = $group;
-                                        $i++;
-                                }
-                        } else {
-                                $final_flat[$group->ID] = $group;
-                        }
-                }
-        }
-
-        return $final_flat;
+        
+        return $final;
     }
 
     private function compare_group($a, $b) {

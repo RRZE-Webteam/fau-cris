@@ -39,8 +39,10 @@ class Auszeichnungen_neu {
 			return $output;
 		}
 
-		$formatter = new CRIS_formatter("year award", SORT_DESC, "award_preistraeger", SORT_ASC);
-		$awardList = $formatter->execute($awardArray, NULL, 'list');
+		$order = "year award";
+                $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+		$res = $formatter->execute($awardArray);
+                $awardList = $res[$order];
 
 		$output = '';
 
