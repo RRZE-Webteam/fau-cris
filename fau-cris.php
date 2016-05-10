@@ -140,6 +140,7 @@ class FAU_CRIS {
 				'andere'),
 			'cris_cache'		=>	'18000',
 			'cris_univis'		=> 0,
+			'cris_bibtex'		=> 0,
 			'cris_award_order'	=>	array(
 				'preise',
 				'stipendien',
@@ -217,6 +218,17 @@ class FAU_CRIS {
 				)
 		);
 		add_settings_field(
+				'cris_bibtex',
+				__('BibTeX-Link', self::textdomain),
+				array(__CLASS__, 'cris_check_callback'),
+				'fau_cris_options',
+				'cris_section',
+				array (
+					'name' => 'cris_bibtex',
+					'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', self::textdomain)
+				)
+		);
+		add_settings_field(
 				'cris_univis',
 				__('Autoren verlinken', self::textdomain),
 				array(__CLASS__, 'cris_check_callback'),
@@ -249,6 +261,7 @@ class FAU_CRIS {
         $new_input['cris_org_nr'] = isset($input['cris_org_nr']) ? absint($input['cris_org_nr']) : 0;
         $new_input['cris_pub_order'] = isset($input['cris_pub_order']) ? explode("\n", str_replace("\r", "",$input['cris_pub_order'])) : $default_options['cris_pub_order'];
         $new_input['cris_univis'] = isset($input['cris_univis']) ? 1 : 0;
+		$new_input['cris_bibtex'] = isset($input['cris_bibtex']) ? 1 : 0;
 		$new_input['cris_award_order'] = isset($input['cris_award_order']) ? explode("\n", str_replace("\r", "",$input['cris_award_order'])) : $default_options['cris_award_order'];
         return $new_input;
 	}

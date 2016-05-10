@@ -194,6 +194,10 @@ class Publikationen_neu {
 		foreach ($publications as $publication) {
 			$publist .= "<li>";
 			$publist .= $publication->attributes['quotation' . $quotation];
+			if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
+				$publist .= "<br />BibTeX: " . $publication->attributes['bibtex_link'];
+				//$publist .= "<br />BibTeX: <a href=\"http:/ /cris.fau.de/bibtex/publication/ID.bib\">http:/ /cris.fau.de/bibtex/publication/" . $pubDetails['ID'] . ".bib</a>";
+			}
 			$publist .= "</li>";
 		}
 
@@ -228,24 +232,25 @@ class Publikationen_neu {
 				'authorsArray' => $authorsArray,
 				'title' => (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : 'O.T.'),
 				'city' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : 'O.O.'),
-				'publisher' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : 'O.A.'),
+				'publisher' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
 				'year' => (array_key_exists('publyear', $publication) ? strip_tags($publication['publyear']) : 'O.J.'),
-				'pubType' => (array_key_exists('publication type', $publication) ? strip_tags($publication['publication type']) : 'O.A.'),
+				'pubType' => (array_key_exists('publication type', $publication) ? strip_tags($publication['publication type']) : __('O.A.', 'fau-cris')),
 				'pagesTotal' => (array_key_exists('cftotalpages', $publication) ? strip_tags($publication['cftotalpages']) : ''),
 				'pagesRange' => (array_key_exists('pagesrange', $publication) ? strip_tags($publication['pagesrange']) : ''),
-				'volume' => (array_key_exists('cfvol', $publication) ? strip_tags($publication['cfvol']) : 'O.A.'),
-				'series' => (array_key_exists('cfseries', $publication) ? strip_tags($publication['cfseries']) : 'O.A.'),
-				'seriesNumber' => (array_key_exists('cfnum', $publication) ? strip_tags($publication['cfnum']) : 'O.A.'),
-				'ISBN' => (array_key_exists('cfisbn', $publication) ? strip_tags($publication['cfisbn']) : 'O.A.'),
-				'ISSN' => (array_key_exists('cfissn', $publication) ? strip_tags($publication['cfissn']) : 'O.A.'),
-				'DOI' => (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : 'O.A.'),
-				'URI' => (array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : 'O.A.'),
-				'editiors' => (array_key_exists('editor', $publication) ? strip_tags($publication['editor']) : 'O.A.'),
-				'booktitle' => (array_key_exists('edited volumes', $publication) ? strip_tags($publication['edited volumes']) : 'O.A.'), // Titel des Sammelbands
-				'journaltitle' => (array_key_exists('journalname', $publication) ? strip_tags($publication['journalname']) : 'O.A.'),
+				'volume' => (array_key_exists('cfvol', $publication) ? strip_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
+				'series' => (array_key_exists('cfseries', $publication) ? strip_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
+				'seriesNumber' => (array_key_exists('cfnum', $publication) ? strip_tags($publication['cfnum']) : __('O.A.', 'fau-cris')),
+				'ISBN' => (array_key_exists('cfisbn', $publication) ? strip_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
+				'ISSN' => (array_key_exists('cfissn', $publication) ? strip_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
+				'DOI' => (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris')),
+				'URI' => (array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+				'editiors' => (array_key_exists('editor', $publication) ? strip_tags($publication['editor']) : __('O.A.', 'fau-cris')),
+				'booktitle' => (array_key_exists('edited volumes', $publication) ? strip_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
+				'journaltitle' => (array_key_exists('journalname', $publication) ? strip_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
 				'conference' => (array_key_exists('conference', $publication) ? strip_tags($publication['conference']) : 'O.A.'),
-				'origTitle' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : 'O.A.'),
-				'origLanguage' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : 'O.A.')
+				'origTitle' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
+				'origLanguage' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
+				'bibtex_link' => (array_key_exists('bibtex_link', $publication) ? $publication['bibtex_link'] : __('Nicht verfügbar', 'fau-cris'))
 			);
 
 			$publist .= "<li>";
@@ -370,6 +375,10 @@ class Publikationen_neu {
 					$publist .= ($pubDetails['origTitle'] != '' ? "<br />Originaltitel: " . $pubDetails['origTitle'] : '');
 					$publist .= ($pubDetails['origLanguage'] != '' ? "<br />Originalsprache: " . $pubDetails['origLanguage'] : '');
 					break;
+			}
+			if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
+				$publist .= "<br />BibTeX: " . $pubDetails['bibtex_link'];
+				//$publist .= "<br />BibTeX: <a href=\"http:/ /cris.fau.de/bibtex/publication/ID.bib\">http:/ /cris.fau.de/bibtex/publication/" . $pubDetails['ID'] . ".bib</a>";
 			}
 			$publist .= "</li>";
 		}
