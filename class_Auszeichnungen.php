@@ -66,7 +66,7 @@ class Auszeichnungen {
 		}
 	}
 
-	public function awardsListe($year = '', $start = '', $type = '', $showname = 1, $showyear = 1, $display = 'list', $awardnameid='') {
+	public function awardsListe($year = '', $start = '', $type = '', $awardnameid='', $showname = 1, $showyear = 1, $display = 'list', $awardnameid='') {
 		if (!isset($this->awardArray) || !is_array($this->awardArray)) return;
 
 		$output = '';
@@ -106,7 +106,7 @@ class Auszeichnungen {
 
 	}
 
-	public function awardsNachJahr($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $display = 'list') {
+	public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid='', $showname = 1, $showyear = 0, $display = 'list') {
 		if (!isset($this->awardArray) || !is_array($this->awardArray)) return;
 
 		$awardsByYear = array();
@@ -157,7 +157,7 @@ class Auszeichnungen {
 
 	}
 
-	public function awardsNachTyp($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $display = 'list') {
+	public function awardsNachTyp($year = '', $start = '', $type = '', $awardnameid='', $showname = 1, $showyear = 0, $display = 'list') {
 		if (!isset($this->awardArray) || !is_array($this->awardArray)) return;
 
 		$awardsByType = array();

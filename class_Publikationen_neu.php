@@ -213,8 +213,8 @@ class Publikationen_neu {
 
 		foreach ($publications as $publicationObject) {
 
-                    $publication = $publicationObject->attributes;
-                    $id = $publicationObject->ID;
+            $publication = $publicationObject->attributes;
+            $id = $publicationObject->ID;
 
 			$authors = explode(", ", $publication['relauthors']);
 			$authorIDs = explode(",", $publication['relauthorsid']);

@@ -33,6 +33,13 @@ class Tools {
 		return CRIS_Dicts::$pubTitles[$pub]['en_US'];
 	}
 
+	public static function getAwardName($award, $lang) {
+		if (array_key_exists($lang, CRIS_Dicts::$awardNames[$award])){
+			return CRIS_Dicts::$awardNames[$award][$lang];
+		}
+		return CRIS_Dicts::$awardNames[$award]['en'];
+	}
+
 	public static function getawardTitle($award, $lang) {
 		if (array_key_exists($lang, CRIS_Dicts::$awardTitles[$award])){
 			return CRIS_Dicts::$awardTitles[$award][$lang];
@@ -222,6 +229,24 @@ class Tools {
 		}
 		return $awards_filtered;
 	}
+
+	/*
+	 * Array zur Definition des Filters für Awards
+	 */
+	public static function award_filter($year = '', $start = '', $type = '') {
+		$filter = array();
+		if ($year !== '')
+			$filter['year award__eq'] = $year;
+		if ($start !== '')
+			$filter['year award__ge'] = $start;
+		if ($type !== '') {
+			$filter['type of award__eq'] = $type;
+		}
+		if (count($filter))
+			return $filter;
+		return null;
+	}
+
 
 	/*
 	 * Anbindung FAU-Person-Plugin

@@ -130,24 +130,21 @@ class FAU_CRIS {
 		$options = array(
 			'cris_org_nr'		=>	'',
 			'cris_pub_order'	=>	array(
-										'zeitschriftenartikel',
-										'sammelbandbeitraege',
-										'uebersetzungen',
-										'buecher',
-										'herausgeberschaften',
-										'konferenzbeitraege',
-										'abschlussarbeiten',
-										'andere'
-									),
+				'zeitschriftenartikel',
+				'sammelbandbeitraege',
+				'uebersetzungen',
+				'buecher',
+				'herausgeberschaften',
+				'konferenzbeitraege',
+				'abschlussarbeiten',
+				'andere'),
 			'cris_cache'		=>	'18000',
 			'cris_univis'		=> 0,
 			'cris_award_order'	=>	array(
-										'Preis / Ehrung',
-										'Stipendium / Grant',
-										'Akademie-Mitgliedschaft',
-										'Weitere Preise'
-									),
-
+				'preise',
+				'stipendien',
+				'mitgliedschaften',
+				'andere')
 		);
 		return $options;
 	}
@@ -342,6 +339,10 @@ class FAU_CRIS {
 
 		if (isset($publication) && $publication !='') {
 			$param1 = 'publication';
+			if (strpos($publication, ',')) {
+				$publication = str_replace(' ', '', $publication);
+				$publication = explode(',', $publication);
+			}
 			$param2 = $publication;
 		} elseif (isset($award) && $award !='') {
 			$param1 = 'award';
@@ -351,9 +352,17 @@ class FAU_CRIS {
 			$param2 = $awardnameid;
 		} elseif (isset($persid) && $persid !='') {
 			$param1 = 'person';
+			if (strpos($persid, ',')) {
+				$persid = str_replace(' ', '', $persid);
+				$persid = explode(',', $persid);
+			}
 			$param2 = $persid;
 		} elseif (isset($orgid) && $orgid !='') {
 			$param1 = 'orga';
+			if (strpos($orgid, ',')) {
+				$orgid = str_replace(' ', '', $orgid);
+				$orgid = explode(',', $orgid);
+			}
 			$param2 = $orgid;
 		} else {
 			$param1 = '';
@@ -373,29 +382,29 @@ class FAU_CRIS {
 		if ((!$orgid||$orgid==0) && $persid == '' && $publication == '' && $award =='' && $awardnameid == '') {
 			// Fehlende ID oder ID=0 abfangen
             $output = __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation/Auszeichnung an.','fau-cris') . '</strong></p>';
-		} elseif (in_array($orgid, $excluded)
+		} /*elseif (in_array($orgid, $excluded)
 			&&  $persid == ''
 			&& (($show == 'awards' && $award == '') || ($show == 'publications' && $publication == ''))
 			&& ($year == '' && $type == '')
 			) {
 			// IDs mit zu vielen Ergebnissen ausschließen
 			return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
-        } else {
+        }*/ else {
 			if (isset($show) && $show == 'awards') {
 			// Awards
-				require_once('class_Auszeichnungen.php');
-				$liste = new Auszeichnungen($param1, $param2, $display);
+				require_once('class_Auszeichnungen_neu.php');
+				$liste = new Auszeichnungen_neu($param1, $param2, $display);
 
 				if ($award != '') {
 					return $liste->singleAward($showname, $showyear, $display);
 				}
 				if ($orderby == 'type') {
-					return $liste->awardsNachTyp($year, $start, $type, $showname, $showyear, $display);
+					return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $display);
 				}
 				if ($orderby == 'year') {
-					return $liste->awardsNachJahr($year, $start, $type, $showname, $showyear, $display);
+					return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, 0, $display);
 				}
-				return $liste->awardsListe($year, $start, $type, $showname, $showyear, $display);
+				return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $display);
 
 			} else {
 			// Publications
