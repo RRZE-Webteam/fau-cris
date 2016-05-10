@@ -441,8 +441,12 @@ class FAU_CRIS {
 	}
 
 	public static function cris_enqueue_styles() {
-		$plugin_url = plugin_dir_url( __FILE__ );
-		wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
+		global $post;
+		if( has_shortcode( $post->post_content, 'cris') ) {
+			$plugin_url = plugin_dir_url( __FILE__ );
+			wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
+		}
+		//wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
 	}
 
 	/*
