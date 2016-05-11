@@ -74,8 +74,8 @@ class CRIS_entity {
     public function __construct($data) {
         $this->ID = (string) $data['id'];
         $this->attributes = array();
-        $this->attributes["createdon"] = $data['createdOn'];
-        $this->attributes["updatedon"] = $data['updatedOn'];
+        $this->attributes["createdon"] = (string) $data['createdOn'];
+        $this->attributes["updatedon"] = (string) $data['updatedOn'];
 
         foreach ($data->attribute as $_a) {
             if ($_a['language'] == 1) {
