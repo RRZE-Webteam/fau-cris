@@ -82,29 +82,13 @@ class CRIS_publications extends CRIS_webservice {
     }
 }
 
-class CRIS_publication {
+class CRIS_publication extends CRIS_Entity {
     /*
      * object for single publication
      */
 
     public function __construct($data) {
-        $this->ID = (string) $data['id'];
-        $this->attributes = array();
-
-        foreach ($data->attribute as $_a) {
-            if ($_a['language'] == 1) {
-                    $attr_name = (string) $_a['name'] . '_en';
-            } else {
-                    $attr_name = (string) $_a['name'];
-            }
-            if ((string) $_a['disposition'] == 'choicegroup') {
-                    $attr_value = (string) $_a->additionalInfo;
-            } else {
-                    $attr_value = (string) $_a->data;
-            }
-            // any attribute name is forced to lower case
-            $this->attributes[strtolower($attr_name)] = $attr_value;
-        }
+        parent::__construct($data);
     }
 
     public function insert_quotation_links() {

@@ -66,3 +66,28 @@ class CRIS_webservice {
         return $xmlobj->infoObject;
     }
 }
+
+class CRIS_entity {
+    /*
+     * basic object for all CRIS webservice objects
+     */
+    public function __construct($data) {
+        $this->ID = (string) $data['id'];
+        $this->attributes = array();
+
+        foreach ($data->attribute as $_a) {
+            if ($_a['language'] == 1) {
+                $attr_name = (string) $_a['name'] . '_en';
+            } else {
+                $attr_name = (string) $_a['name'];
+            }
+            if ((string) $_a['disposition'] == 'choicegroup') {
+                $attr_value = (string) $_a->additionalInfo;
+            } else {
+                $attr_value = (string) $_a->data;
+            }
+            // any attribute name is forced to lower case
+            $this->attributes[strtolower($attr_name)] = $attr_value;
+        }
+    }
+}
