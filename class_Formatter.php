@@ -54,7 +54,10 @@ class CRIS_formatter {
                 $group_key = $this->sort;
             }
 
-            $value = $single_dataset->attributes[$group_key];
+            if ($this->group === null)
+                $value = $group_key;
+            else
+                $value = $single_dataset->attributes[$group_key];
 
             if (!array_key_exists($value, $final))
                 $final[$value] = array();
@@ -72,7 +75,7 @@ class CRIS_formatter {
                 ksort($final);
         elseif ($this->group_order === SORT_DESC)
                 krsort($final);
-        else
+        elseif ($this->group_order !== NULL)
                 throw new Exception('unknown sorting');
 
         # sort data inside groups
