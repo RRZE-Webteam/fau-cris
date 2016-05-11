@@ -40,9 +40,14 @@ class Publikationen_neu {
                 return $output;
             }
 
-            // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
-            $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
-            $pubList = $formatter->execute($pubArray, $items);
+            // sortiere nach Erscheinungsdatum
+            $order = "virtualdate";
+            $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+            $res = $formatter->execute($pubArray);
+            if ($items != '')
+                $pubList = array_slice($res[$order], 0, $items);
+            else
+                $pubList = $res[$order];
 
             $output = '';
 

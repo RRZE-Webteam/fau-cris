@@ -36,7 +36,7 @@ class CRIS_formatter {
             $this->sort_order = $sort_order;
     }
 
-    public function execute($data, $limit=null) {
+    public function execute($data) {
         /*
          * Perform formatting on $data. If $limit is set, return $limit entries
          * at max.
@@ -44,7 +44,7 @@ class CRIS_formatter {
 
         $final = array();
         foreach ($data as $single_dataset) {
-            if ($this->group != null && $limit == null) {
+            if ($this->group != null) {
                 if (!array_key_exists($this->group, $single_dataset->attributes))
                         throw new Exception('attribute not found: '. $this->group);
                 $group_key = $this->group;
@@ -85,11 +85,6 @@ class CRIS_formatter {
                         $final[$_k] = $group;
         }
 
-        if ($limit != null) {
-            $limit = intval($limit);
-            $final[$group_key] = array_slice($final[$group_key], 0, $limit);
-        }
-        
         return $final;
     }
 
