@@ -134,3 +134,15 @@ class CRIS_publication extends CRIS_Entity {
         $this->attributes["quotationmlalink"] = $mlalink;
     }
 }
+
+# tests possible if called on command-line
+if (!debug_backtrace()) {
+    $p = new CRIS_Publications();
+    $publs = $p->by_orga_id("141908");
+    $order = "virtualdate";
+    $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+    $res = $formatter->execute($publs);
+    foreach ($res[$order] as $key => $value) {
+        echo sprintf("%s: %s\n", $key, $value->attributes[$order]);
+    }
+}
