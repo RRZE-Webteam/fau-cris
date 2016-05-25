@@ -442,7 +442,7 @@ class FAU_CRIS {
 
 	public static function cris_enqueue_styles() {
 		global $post;
-		if( has_shortcode( $post->post_content, 'cris') ) {
+		if( $post && has_shortcode( $post->post_content, 'cris') ) {
 			$plugin_url = plugin_dir_url( __FILE__ );
 			wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
 		}
