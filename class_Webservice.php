@@ -36,9 +36,29 @@ class CRIS_webservice {
         /*
          * Initiate ws request and return parsed data (XML -> PHP object)
          *
-         * $filter will be used in future here after CRIS web service supports
-         * using filters directly.
+         * $filter will be fully supported in future. Currently only filter
+         * for "publyear" is enabled.
          */
+
+        if ($filter instanceof CRIS_Filter) {
+            $supported = array();
+            $remaining = array();
+            foreach ($filter->filters as $attr => $value) {
+                if (strtolower($attr) !== 'publyear') {
+                    $remaining[$attr] = $value;
+                    continue;
+                }
+                $supported = $value;
+            }
+        }
+
+        if (count($supported)) {
+            foreach ($supported as $operator => $value) {
+                $id .= sprintf("/filter/publyear__%s__%s", $operator, $value);
+            }
+            // mark "publyear" for skip on next evaluation
+            $filter->skip[] = "publyear";
+        }
 
         try {
             $rawxml = $this->fetch($this->base_uri . $id);

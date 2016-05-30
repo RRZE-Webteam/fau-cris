@@ -77,8 +77,8 @@ class CRIS_publications extends CRIS_webservice {
                     $publs[$p->ID] = $p;
             }
         }
-		
-		return $publs;
+
+        return $publs;
     }
 }
 
@@ -138,7 +138,8 @@ class CRIS_publication extends CRIS_Entity {
 # tests possible if called on command-line
 if (!debug_backtrace()) {
     $p = new CRIS_Publications();
-    $publs = $p->by_orga_id("141908");
+    $f = new CRIS_Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
+    $publs = $p->by_orga_id("142285", $f);
     $order = "virtualdate";
     $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
     $res = $formatter->execute($publs);

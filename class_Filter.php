@@ -32,14 +32,23 @@ class CRIS_filter {
             $filterlist[$_op[0]][$_op[1]] = $_v;
         }
         $this->filters = $filterlist;
-		
+        // list for attributes to be skipped once on evaluation
+        $this->skip = array();
     }
 
     public function evaluate($data) {
         /*
          * Test "AND"-combined filters against data attributes.
          */
+
+        // get and clear skip list
+        $skip = $this->skip;
+        $this->skip = array();
+
         foreach ($this->filters as $attr => $_f) {
+            // skip marked attributes
+            if (in_array($attr, $skip))
+                continue;
             if (empty($data->attributes[$attr]))
                 /*
                  * If attribute is not present, skip filter silently. This makes
