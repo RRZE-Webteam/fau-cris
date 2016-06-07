@@ -40,8 +40,8 @@ class CRIS_webservice {
          * for "publyear" is enabled.
          */
 
+        $supported = array();
         if ($filter instanceof CRIS_Filter) {
-            $supported = array();
             $remaining = array();
             foreach ($filter->filters as $attr => $value) {
                 if (strtolower($attr) !== 'publyear') {
