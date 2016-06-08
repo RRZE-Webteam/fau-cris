@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: FAU CRIS v1.72\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: Thu Apr 14 2016 10:49:22 GMT+0200 (CEST)\n"
+"PO-Revision-Date: Wed Jun 08 2016 11:45:48 GMT+0200 (CEST)\n"
 "Last-Translator: Barbara Bothe <barbara.bothe@fau.de>\n"
 "Language-Team: \n"
 "Language: English\n"
@@ -24,17 +24,47 @@ msgstr ""
 "X-Loco-Target-Locale: en_US"
 
 # @ fau-cris
-#: ../class_Publikationen.php:17
+#: ../class_Auszeichnungen.php:19 ../class_Publikationen.php:24
 msgid "Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an."
 msgstr ""
 
-#: ../class_Publikationen.php:313 ../class_Publikationen.php:343
-msgid "Hrsg."
-msgstr "Ed."
+#: ../class_Auszeichnungen.php:87
+msgid "Ohne Jahr"
+msgstr ""
+
+#: ../class_Publikationen.php:243
+msgid "O.T."
+msgstr ""
+
+#: ../class_Publikationen.php:244
+msgid "O.O."
+msgstr ""
+
+#: ../class_Publikationen.php:245 ../class_Publikationen.php:247 ..
+#: class_Publikationen.php:250 ../class_Publikationen.php:251 ..
+#: class_Publikationen.php:252 ../class_Publikationen.php:253 ..
+#: class_Publikationen.php:254 ../class_Publikationen.php:255 ..
+#: class_Publikationen.php:256 ../class_Publikationen.php:257 ..
+#: class_Publikationen.php:258 ../class_Publikationen.php:259 ..
+#: class_Publikationen.php:261 ../class_Publikationen.php:262
+msgid "O.A."
+msgstr ""
+
+#: ../class_Publikationen.php:246
+msgid "O.J."
+msgstr ""
+
+#: ../class_Publikationen.php:263
+msgid "Nicht verfügbar"
+msgstr "Not availible"
 
 # @ fau-cris
-#: ../class_Tools.php:42
+#: ../class_Tools.php:70
 msgid "Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID."
+msgstr ""
+
+#: ../class_Tools.php:214
+msgid "Falscher Parameter für Publikationstyp"
 msgstr ""
 
 #. Name of the plugin
@@ -54,7 +84,7 @@ msgid "http://blogs.fau.de/webworking"
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:219
+#: ../fau-cris.php:209
 msgid ""
 "Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, "
 "können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden."
@@ -62,37 +92,40 @@ msgid ""
 "Publikationen\". Ein Eintrag pro Zeile. "
 msgstr ""
 
+#: ../fau-cris.php:213
+msgid "BibTeX-Link"
+msgstr ""
+
+#: ../fau-cris.php:215
+msgid "Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?"
+msgstr ""
+
 # @ fau-cris
-#: ../fau-cris.php:230
+#: ../fau-cris.php:221
 msgid ""
 "Sollen die Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin "
 "verlinkt werden?"
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:235
+#: ../fau-cris.php:225
 msgid "Reihenfolge der Auszeichnungen"
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:241
+#: ../fau-cris.php:227
 msgid "Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen."
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:377
+#: ../fau-cris.php:388
 msgid ""
 "Bitte geben Sie die CRIS-ID der Organisation, Person oder "
 "Publikation/Auszeichnung an."
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:384
-msgid "Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ."
-msgstr ""
-
-# @ fau-cris
-#: ../fau-cris.php:432
+#: ../fau-cris.php:449
 msgid ""
 "Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS (Currrent "
 "Research Information System)</strong> in Ihren Webauftritt ein. Das Plugin "
@@ -100,7 +133,7 @@ msgid ""
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:433
+#: ../fau-cris.php:450
 msgid ""
 "<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die "
 "Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn "
@@ -110,26 +143,26 @@ msgid ""
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:438
+#: ../fau-cris.php:455
 msgid ""
 "Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein. "
 "Mögliche Zusatzoptionen:"
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:443
+#: ../fau-cris.php:460
 msgid "Liste nach Publikationstypen gegliedert"
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:484
+#: ../fau-cris.php:500
 msgid ""
 "Wenn Sie das <strong>FAU-Person</strong>-Plugin verwenden, können Autoren "
 "mit ihrer FAU-Person-Kontaktseite verlinkt werden."
 msgstr ""
 
 # @ fau-cris
-#: ../fau-cris.php:485
+#: ../fau-cris.php:501
 msgid ""
 "Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, "
 "überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt "
@@ -137,34 +170,34 @@ msgid ""
 msgstr ""
 
 # @ fau-cris
-#: ../class_Auszeichnungen.php:16
-msgid "Bitte geben Sie die CRIS-ID der Organisation, Person oder Auszeichnung an."
-msgstr "Please enter the organizations, persons or awards CRIS ID."
-
-# @ fau-cris
-#: ../class_Auszeichnungen.php:85 ../class_Auszeichnungen.php:126 ..
-#: class_Auszeichnungen.php:177
+#: ../class_Auszeichnungen.php:40 ../class_Auszeichnungen.php:75 ..
+#: class_Auszeichnungen.php:108 ../class_Auszeichnungen.php:148
 msgid "Es wurden leider keine Auszeichnungen gefunden."
 msgstr "No awards found."
 
 # @ fau-cris
-#: ../class_Publikationen.php:94 ../class_Publikationen.php:147
+#: ../class_Publikationen.php:45 ../class_Publikationen.php:77 ..
+#: class_Publikationen.php:107
 msgid "Es wurden leider keine Publikationen gefunden."
 msgstr "No publications found."
 
+#: ../class_Publikationen.php:286 ../class_Publikationen.php:316
+msgid "Hrsg."
+msgstr "Ed."
+
 # @ fau-cris
-#: ../class_Publikationen.php:334 ../class_Publikationen.php:352 ..
-#: class_Publikationen.php:388 ../class_Publikationen.php:406
+#: ../class_Publikationen.php:307 ../class_Publikationen.php:325 ..
+#: class_Publikationen.php:361 ../class_Publikationen.php:379
 msgid "Seiten"
 msgstr "pages"
 
 # @ Abkürzung für "Seite" bei Publikationen
-#: ../class_Publikationen.php:364
+#: ../class_Publikationen.php:337
 msgid "S."
 msgstr "p."
 
 # @ fau-cris
-#: ../fau-cris.php:80
+#: ../fau-cris.php:79
 #, php-format
 msgid ""
 "Ihre PHP-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die "
@@ -172,7 +205,7 @@ msgid ""
 msgstr "Your PHP version %s is deprecated. Please update at least to version %s."
 
 # @ fau-cris
-#: ../fau-cris.php:84
+#: ../fau-cris.php:83
 #, php-format
 msgid ""
 "Ihre Wordpress-Version %s ist veraltet. Bitte aktualisieren Sie mindestens "
@@ -182,32 +215,32 @@ msgstr ""
 "%s."
 
 # @ fau-cris
-#: ../fau-cris.php:91
+#: ../fau-cris.php:89
 msgid "Fehler bei der Aktivierung des Plugins"
 msgstr "Plugin Activation Error"
 
 # @ fau-cris
-#: ../fau-cris.php:110 ../fau-cris.php:172 ../fau-cris.php:197
+#: ../fau-cris.php:107 ../fau-cris.php:167 ../fau-cris.php:192
 msgid "Einstellungen"
 msgstr "Settings"
 
 # @ fau-cris
-#: ../fau-cris.php:203
+#: ../fau-cris.php:198
 msgid "CRIS-OrgNr."
 msgstr "CRIS Organisation Number"
 
 # @ fau-cris
-#: ../fau-cris.php:213
+#: ../fau-cris.php:207
 msgid "Reihenfolge der Publikationen"
 msgstr "Order of the publications"
 
 # @ fau-cris
-#: ../fau-cris.php:224
+#: ../fau-cris.php:219
 msgid "Autoren verlinken"
 msgstr "Link authors"
 
 # @ fau-cris
-#: ../fau-cris.php:433
+#: ../fau-cris.php:450
 msgid ""
 "Für die Publikationslisten lassen sich über den Shortcode verschiedene "
 "Ausgabeformen einstellen. Die Titel sind jeweils mit der Detailansicht der "
@@ -218,72 +251,72 @@ msgstr ""
 "fau.de."
 
 # @ fau-cris
-#: ../fau-cris.php:439
+#: ../fau-cris.php:456
 msgid "Gliederung"
 msgstr "Order"
 
 # @ fau-cris
-#: ../fau-cris.php:441
+#: ../fau-cris.php:458
 msgid "Liste nach Jahren absteigend gegliedert (Voreinstellung)"
 msgstr "List ordered by year (default)"
 
 # @ fau-cris
-#: ../fau-cris.php:445
+#: ../fau-cris.php:462
 msgid "Filter"
 msgstr "Filter"
 
 # @ fau-cris
-#: ../fau-cris.php:448
+#: ../fau-cris.php:465
 msgid "Nur Publikationen aus einem bestimmten Jahr"
 msgstr "Only publications from one year"
 
 # @ fau-cris
-#: ../fau-cris.php:450
+#: ../fau-cris.php:467
 msgid "Nur Publikationen ab einem bestimmten Jahr"
 msgstr "Only publications later than the specified year"
 
 # @ fau-cris
-#: ../fau-cris.php:452
+#: ../fau-cris.php:469
 msgid "Es werden nur Publikationen eines bestimmten Typs angezeigt:"
 msgstr "Only publications of a given type are displayed:"
 
 # @ fau-cris
-#: ../fau-cris.php:465
+#: ../fau-cris.php:482
 msgid "Nur eine einzelne Publikation (hier die CRIS-ID der Publikation angeben)"
 msgstr "Only one publication (enter the publication's CRIS ID)"
 
 # @ fau-cris
-#: ../fau-cris.php:467
+#: ../fau-cris.php:484
 msgid "ID überschreiben"
 msgstr "Overwrite ID"
 
 # @ fau-cris
-#: ../fau-cris.php:471
+#: ../fau-cris.php:488
 msgid "für eine von den Einstellungen abweichende Organisations-ID"
 msgstr "for an organization ID differing from the settings"
 
 # @ fau-cris
-#: ../fau-cris.php:473
+#: ../fau-cris.php:490
 msgid "für die Publikationsliste einer konkreten Person"
 msgstr "for one person's publication list"
 
 # @ fau-cris
-#: ../fau-cris.php:475
+#: ../fau-cris.php:492
 msgid "Beispiele"
 msgstr "Examples"
 
 # @ fau-cris
-#: ../fau-cris.php:477
+#: ../fau-cris.php:494
 msgid "Alle Bücher"
 msgstr "All books"
 
 # @ fau-cris
-#: ../fau-cris.php:478
+#: ../fau-cris.php:495
 msgid "Alle Publikationen aus dem Jahr 2015"
 msgstr "All publications from 2015"
 
 # @ fau-cris
-#: ../fau-cris.php:479
+#: ../fau-cris.php:496
 msgid ""
 "Alle Publikationen der Person mit der CRIS-ID 123456 aus dem Jahr 2000, nach "
 "Publikationstypen gegliedert"
@@ -292,16 +325,16 @@ msgstr ""
 "ordered by publication type"
 
 # @ fau-cris
-#: ../fau-cris.php:492
+#: ../fau-cris.php:508
 msgid "Übersicht"
 msgstr "Overview"
 
 # @ fau-cris
-#: ../fau-cris.php:497
+#: ../fau-cris.php:513
 msgid "Shortcodes"
 msgstr "Shortcodes"
 
 # @ fau-cris
-#: ../fau-cris.php:502
+#: ../fau-cris.php:518
 msgid "Integration \"FAU Person\""
 msgstr "\"FAU Person\" integration"

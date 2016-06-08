@@ -39,7 +39,7 @@ $param2 = 36722;
 
 $liste = new Publikationen($param1, $param2);
 $output1 = $liste->singlePub($quotation);
-$liste = new Publikationen_neu($param1, $param2);
+$liste = new Publikationen($param1, $param2);
 $output2 = $liste->singlePub($quotation);
 assert($output1 === $output2, "single publication");
 
@@ -54,7 +54,7 @@ $pubtype = '';
 
 $liste = new Publikationen($param1, $param2);
 $output1 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
-$liste = new Publikationen_neu($param1, $param2);
+$liste = new Publikationen($param1, $param2);
 $output2 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 assert($output1 === $output2, "person's list");
 
@@ -65,7 +65,7 @@ $pubtype = '';
 
 $liste = new Publikationen($param1, $param2);
 $output1 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
-$liste = new Publikationen_neu($param1, $param2);
+$liste = new Publikationen($param1, $param2);
 $output2 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 assert($output1 === $output2, "person's list for one year");
 
@@ -76,7 +76,7 @@ $pubtype = '';
 
 $liste = new Publikationen($param1, $param2);
 $output1 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
-$liste = new Publikationen_neu($param1, $param2);
+$liste = new Publikationen($param1, $param2);
 $output2 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 assert($output1 === $output2, "person's list start year");
 
@@ -87,12 +87,12 @@ $pubtype = 'zeitschriftenartikel';
 
 $liste = new Publikationen($param1, $param2);
 $output1 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
-$liste = new Publikationen_neu($param1, $param2);
+$liste = new Publikationen($param1, $param2);
 $output2 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 assert($output1 === $output2, "person's list of defined type");
 
 // organisation's list
-// note: Tests will fail if publications are additionally related to 
+// note: Tests will fail if publications are additionally related to
 //       organisation since old method doesn't fetch these.
 
 $param1 = "orga";
@@ -105,14 +105,14 @@ $pubtype = '';
 // no settings at all (fallback to config)
 $liste = new Publikationen();
 $output1 = $liste->pubNachJahr();
-$liste = new Publikationen_neu();
+$liste = new Publikationen();
 $output2 = $liste->pubNachJahr();
 assert($output1 === $output2, "configuration settings");
 
 // using settings
 $liste = new Publikationen($param1, $param2);
 $output1 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
-$liste = new Publikationen_neu($param1, $param2);
+$liste = new Publikationen($param1, $param2);
 $output2 = $liste->pubNachJahr($year, $start, $pubtype, $quotation);
 assert($output1 === $output2, "organisations's list");
 
@@ -128,7 +128,7 @@ $pubtype = '';
 
 $liste = new Publikationen($param1, $param2);
 $output1 = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
-$liste = new Publikationen_neu($param1, $param2);
+$liste = new Publikationen($param1, $param2);
 $output2 = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
 assert($output1 === $output2, "person's list by type");
 
@@ -139,7 +139,7 @@ $pubtype = 'zeitschriftenartikel';
 
 $liste = new Publikationen($param1, $param2);
 $output1 = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
-$liste = new Publikationen_neu($param1, $param2);
+$liste = new Publikationen($param1, $param2);
 $output2 = $liste->pubNachTyp($year, $start, $pubtype, $quotation);
 assert($output1 === $output2, "person's list by type, filtered by type");
 
