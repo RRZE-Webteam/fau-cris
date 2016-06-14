@@ -4,8 +4,6 @@ require_once("class_Dicts.php");
 
 class Tools {
 
-    const textdomain = FAU_CRIS::textdomain;
-
     public static function getAcronym($acadTitle) {
         $acronym = '';
         foreach (explode(' ', $acadTitle) as $actitle) {
@@ -67,7 +65,7 @@ class Tools {
         } catch (Exception $e) {
             // Something went wrong.
 
-            $error_message = '<strong>' . __('Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.', self::textdomain) . '</strong>';
+            $error_message = '<strong>' . __('Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.', 'fau-cris') . '</strong>';
             if (defined('WP_DEBUG') && true === WP_DEBUG) {
                 print '<p>';
                 foreach (libxml_get_errors() as $error_line) {
@@ -259,26 +257,33 @@ class Tools {
     }
 
     /*
-     * WP: Anbindung FAU-Person-Plugin
+     * Anbindung an UnivIS-/FAU-Person-Plugin
      */
 
     public static function person_exists($cms = '', $firstname = '', $lastname = '', $id = '', $orgNr = '') {
         if ($cms == 'wp') {
-        // WordPress
+            // WordPress
             return self::person_slug($cms, $firstname, $lastname);
         } else {
-        // Webbaukasten
-        $suchstringOrga = 'https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Organisation/' . $orgNr . '/CARD_has_ORGA';
-        $xmlOrga = Tools::XML2obj($suchstringOrga);
-        foreach ($xmlOrga as $card) {
-                $inOrga[] = (string) $card['id'];
-        }
-            return in_array($id,$inOrga);
+            // Webbaukasten
+            if (strpos($orgNr, ',')) {
+                $orgNr = str_replace(' ', '', $orgNr);
+                $orgNrArray = explode(',', $orgNr);
+            }
+            foreach ($orgNrArray as $nr) {
+                $suchstringOrga = 'https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Organisation/' . $nr . '/CARD_has_ORGA';
+                $xmlOrga = Tools::XML2obj($suchstringOrga);
+                foreach ($xmlOrga as $card) {
+                    $inOrga[] = (string) $card['id'];
+                }
+            }
+            return in_array($id, $inOrga);
         }
     }
 
     public static function person_slug($cms = '', $firstname = '', $lastname = '') {
         if ($cms == 'wp') {
+            // WordPress
             global $wpdb;
             $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
             $sql = "SELECT post_name FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person'";
@@ -286,7 +291,7 @@ class Tools {
             $person_slug = $wpdb->get_var($sql);
         } else {
             //Webbauksten
-            $person_slug = $firstname . "-" .  $lastname;
+            $person_slug = $firstname . "-" . $lastname;
         }
         return $person_slug;
     }

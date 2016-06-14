@@ -163,103 +163,106 @@ class FAU_CRIS {
     public static function options_fau_cris() {
         ?>
         <div class="wrap">
-        <?php screen_icon(); ?>
+            <?php screen_icon(); ?>
             <h2><?php echo __('Einstellungen', self::textdomain) . ' &rsaquo; CRIS'; ?></h2>
             <form method="post" action="options.php">
-            <?php
-            settings_fields('fau_cris_options');
-            do_settings_sections('fau_cris_options');
-            submit_button();
-            ?>
+                <?php
+                settings_fields('fau_cris_options');
+                do_settings_sections('fau_cris_options');
+                submit_button();
+                ?>
             </form>
         </div>
-                <?php
-            }
-
-            /**
-             * Register and add settings
-             */
-            public static function admin_init() {
-
-                register_setting(
-                        'fau_cris_options', // Option group
-                        self::option_name, // Option name
-                        array(__CLASS__, 'sanitize') // Sanitize
-                );
-                // Form Settings 1
-                add_settings_section(
-                        'cris_section', // ID
-                        __('Einstellungen', self::textdomain), // Title
-                        '__return_false', // Callback
-                        'fau_cris_options' // Page
-                );
-                add_settings_field(
-                        'cris_org_nr', // ID
-                        __('CRIS-OrgNr.', self::textdomain), // Title
-                        array(__CLASS__, 'cris_textbox_callback'), // Callback
-                        'fau_cris_options', // Page
-                        'cris_section', // Section
-                        array(
-                    'name' => 'cris_org_nr',
-                        )
-                );
-                add_settings_field(
-                        'cris_pub_order', __('Reihenfolge der Publikationen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_section', array(
-                    'name' => 'cris_pub_order',
-                    'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
-                        )
-                );
-                add_settings_field(
-                        'cris_bibtex', __('BibTeX-Link', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_section', array(
-                    'name' => 'cris_bibtex',
-                    'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', self::textdomain)
-                        )
-                );
-                add_settings_field(
-                        'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_section', array(
-                    'name' => 'cris_univis',
-                    'description' => __('Sollen die Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinkt werden?', self::textdomain)
-                        )
-                );
-                add_settings_field(
-                        'cris_award_order', __('Reihenfolge der Auszeichnungen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_section', array(
-                    'name' => 'cris_award_order',
-                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen.', self::textdomain)
-                        )
-                );
-            }
-
-            /**
-             * Sanitize each setting field as needed
-             */
-            public static function sanitize($input) {
-                $new_input = array();
-                $default_options = self::default_options();
-                $new_input['cris_org_nr'] = isset($input['cris_org_nr']) ? absint($input['cris_org_nr']) : 0;
-                $new_input['cris_pub_order'] = isset($input['cris_pub_order']) ? explode("\n", str_replace("\r", "", $input['cris_pub_order'])) : $default_options['cris_pub_order'];
-                $new_input['cris_univis'] = isset($input['cris_univis']) ? 1 : 0;
-                $new_input['cris_bibtex'] = isset($input['cris_bibtex']) ? 1 : 0;
-                $new_input['cris_award_order'] = isset($input['cris_award_order']) ? explode("\n", str_replace("\r", "", $input['cris_award_order'])) : $default_options['cris_award_order'];
-                return $new_input;
-            }
-
-            /**
-             * Get the settings option array and print its values
-             */
-            // Checkbox
-            public static function cris_check_callback($args) {
-                $options = self::get_options();
-                if (array_key_exists('name', $args))
-                    $name = esc_attr($args['name']);
-                if (array_key_exists('description', $args))
-                    $description = esc_attr($args['description']);
-                ?>
-        <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1' <?php if (array_key_exists($name, $options)) {
-            print checked($options[$name], 1, false);
-        } ?> >
-        <?php if (isset($description)) { ?>
-            <span class="description"><?php echo $description; ?></span>
         <?php
+    }
+
+    /**
+     * Register and add settings
+     */
+    public static function admin_init() {
+
+        register_setting(
+                'fau_cris_options', // Option group
+                self::option_name, // Option name
+                array(__CLASS__, 'sanitize') // Sanitize
+        );
+        // Form Settings 1
+        add_settings_section(
+                'cris_section', // ID
+                __('Einstellungen', self::textdomain), // Title
+                '__return_false', // Callback
+                'fau_cris_options' // Page
+        );
+        add_settings_field(
+                'cris_org_nr', // ID
+                __('CRIS-OrgNr.', self::textdomain), // Title
+                array(__CLASS__, 'cris_textbox_callback'), // Callback
+                'fau_cris_options', // Page
+                'cris_section', // Section
+                array(
+            'name' => 'cris_org_nr',
+            'description' => __('Sie können auch mehrere Organisationsnummern &ndash; durch Komma getrennt &ndash; eingeben.', self::textdomain)
+                )
+        );
+        add_settings_field(
+                'cris_pub_order', __('Reihenfolge der Publikationen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_section', array(
+            'name' => 'cris_pub_order',
+            'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
+                )
+        );
+        add_settings_field(
+                'cris_bibtex', __('BibTeX-Link', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_section', array(
+            'name' => 'cris_bibtex',
+            'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', self::textdomain)
+                )
+        );
+        add_settings_field(
+                'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_section', array(
+            'name' => 'cris_univis',
+            'description' => __('Sollen die Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinkt werden?', self::textdomain)
+                )
+        );
+        add_settings_field(
+                'cris_award_order', __('Reihenfolge der Auszeichnungen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_section', array(
+            'name' => 'cris_award_order',
+            'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen.', self::textdomain)
+                )
+        );
+    }
+
+    /**
+     * Sanitize each setting field as needed
+     */
+    public static function sanitize($input) {
+        $new_input = array();
+        $default_options = self::default_options();
+        $new_input['cris_org_nr'] = isset($input['cris_org_nr']) ? sanitize_text_field($input['cris_org_nr']) : 0;
+        $new_input['cris_pub_order'] = isset($input['cris_pub_order']) ? explode("\n", str_replace("\r", "", $input['cris_pub_order'])) : $default_options['cris_pub_order'];
+        $new_input['cris_univis'] = isset($input['cris_univis']) ? 1 : 0;
+        $new_input['cris_bibtex'] = isset($input['cris_bibtex']) ? 1 : 0;
+        $new_input['cris_award_order'] = isset($input['cris_award_order']) ? explode("\n", str_replace("\r", "", $input['cris_award_order'])) : $default_options['cris_award_order'];
+        return $new_input;
+    }
+
+    /**
+     * Get the settings option array and print its values
+     */
+    // Checkbox
+    public static function cris_check_callback($args) {
+        $options = self::get_options();
+        if (array_key_exists('name', $args))
+            $name = esc_attr($args['name']);
+        if (array_key_exists('description', $args))
+            $description = esc_attr($args['description']);
+        ?>
+        <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1' <?php
+        if (array_key_exists($name, $options)) {
+            print checked($options[$name], 1, false);
+        }
+        ?> >
+               <?php if (isset($description)) { ?>
+            <span class="description"><?php echo $description; ?></span>
+            <?php
         }
     }
 
@@ -271,12 +274,14 @@ class FAU_CRIS {
         if (array_key_exists('description', $args))
             $description = esc_attr($args['description']);
         ?>
-        <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='text' value="<?php if (array_key_exists($name, $options)) {
+        <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='text' value="<?php
+        if (array_key_exists($name, $options)) {
             echo $options[$name];
-        } ?>" ><br />
-        <?php if (isset($description)) { ?>
+        }
+        ?>" ><br />
+               <?php if (isset($description)) { ?>
             <span class="description"><?php echo $description; ?></span>
-        <?php
+            <?php
         }
     }
 
@@ -288,12 +293,18 @@ class FAU_CRIS {
         if (array_key_exists('description', $args))
             $description = esc_attr($args['description']);
         ?>
-        <textarea name="<?php printf('%s[' . $name . ']', self::option_name); ?>" cols="30" rows="8"><?php if (array_key_exists($name, $options)) {
-            echo implode("\n", $options[$name]);
-        } ?></textarea><br />
+        <textarea name="<?php printf('%s[' . $name . ']', self::option_name); ?>" cols="30" rows="8"><?php
+            if (array_key_exists($name, $options)) {
+                if (is_array($options[$name])) {
+                    echo implode("\n", $options[$name]);
+                } else {
+                    echo $options[$name];
+                }
+            }
+            ?></textarea><br />
         <?php if (isset($description)) { ?>
             <span class="description"><?php echo $description; ?></span>
-        <?php
+            <?php
         }
     }
 
@@ -310,7 +321,7 @@ class FAU_CRIS {
             'orderby' => '',
             'year' => '',
             'start' => '',
-            'orgid' => $options['cris_org_nr'] > 0 ? $options['cris_org_nr'] : '',
+            'orgid' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
             'persid' => '',
             'publication' => '',
             'pubtype' => '',
@@ -385,7 +396,7 @@ class FAU_CRIS {
 
         if ((!$orgid || $orgid == 0) && $persid == '' && $publication == '' && $award == '' && $awardnameid == '') {
             // Fehlende ID oder ID=0 abfangen
-            $output = __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation/Auszeichnung an.', 'fau-cris') . '</strong></p>';
+            return __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation/Auszeichnung an.', 'fau-cris') . '</strong></p>';
         } /* elseif (in_array($orgid, $excluded)
           &&  $persid == ''
           && (($show == 'awards' && $award == '') || ($show == 'publications' && $publication == ''))
