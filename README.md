@@ -1,7 +1,7 @@
 CRIS-Plugin für Wordpress
 =========================
 
-Version 1.76 (Stand 25.04.2016)
+Version 1.8 (Stand 15.06.2016)
 
 Einbinden von Daten aus dem FAU-Forschungsinformationssystem <b>CRIS</b> in Webseiten
 
@@ -44,6 +44,7 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 - <b>awardnameid="158"</b>: Nur eine einzelne Auszeichnung (hier die CRIS-ID der Auszeichnung angeben)
 - <b>award="12345678"</b>: Nur eine einzelne Preisverleihung (hier die CRIS-ID der Verleihung angeben)<br>
   Hinweis zum Unterschied zwischen awardnameid und award: <b>awardnameid</b> bedeutet die ID eines Preises, der normalerweise mehrfach vergeben wird, z.B. der "Gottfried-Wilhelm-Leibniz-Preis". <b>award</b> (bzw. dessen ID) bedeutet die konkrete, einmalige Verleihung dieses Preises an eine bestimmte Person.
+- <b>items="5"</b>: Nur die ersten 5 Publikationen anzeigen. In dem Fall werden "orderby"-Parameter ignoriert &ndash; es wird eine nicht gegliederte Liste ausgegeben.
 - Filter lassen sich auch kombinieren: z.B. <b>year="2014" type="buecher"</b> (= alle Bücher aus dem Jahr 2014)
 
 ### Darstellung
@@ -57,7 +58,7 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 
 ### ID überschreiben
 Die in den Einstellungen festgelegte CRIS-ID kann überschrieben werden, entweder durch die ID einer anderen Organisationseinheit, oder durch die ID einer einzelnen Person:
-- <b>orgID="123456"</b> für eine von den Einstellungen abweichende Organisations-ID
+- <b>orgID="123456"</b> für eine von den Einstellungen abweichende Organisations-ID. Sie können auch mehrere Organisations-IDs angeben, durch Komma getrennt: <b>orga="123456,987654"</b>
 - <b>persID="123456"</b> für die Einträge zu einer konkreten Person
 
 ## Beispiele
