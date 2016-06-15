@@ -448,6 +448,9 @@ class CRIS_publications extends CRIS_webservice {
     }
 
     private function retrieve($reqs, &$filter=null) {
+        if ($filter !== null && !$filter instanceof CRIS_filter)
+            $filter = new CRIS_filter($filter);
+
         $data = array();
         foreach ($reqs as $_i) {
             try {
@@ -458,9 +461,6 @@ class CRIS_publications extends CRIS_webservice {
                 continue;
             }
         }
-
-        if ($filter !== null && !$filter instanceof CRIS_filter)
-            $filter = new CRIS_filter($filter);
 
         $publs = array();
 
