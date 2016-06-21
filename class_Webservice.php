@@ -37,14 +37,18 @@ class CRIS_webservice {
          * Initiate ws request and return parsed data (XML -> PHP object)
          *
          * $filter will be fully supported in future. Currently only filter
-         * for "publyear" is enabled.
+         * for "publyear" is enabled for organisation requests.
          */
 
         $supported = array();
+        $id_parts = explode('/', $id);
         if ($filter instanceof CRIS_Filter) {
             $remaining = array();
             foreach ($filter->filters as $attr => $value) {
-                if (strtolower($attr) !== 'publyear') {
+                if (
+                    strtolower($attr) !== 'publyear' || 
+                    strtolower($id_parts[1]) !== 'organisation'
+                ) {
                     $remaining[$attr] = $value;
                     continue;
                 }
