@@ -170,33 +170,6 @@ class Tools {
     }
 
     /*
-     * Publikationen-Array filtern
-     */
-
-    public static function filter_publications($publications, $year = '', $start = '', $type = '') {
-
-        $publications_filtered = array();
-        if (!empty($type)) {
-            $pubTyp = Tools::getPubName($type, "en");
-            $pubTyp_de = Tools::getPubName($type, "de");
-        }
-        if (!empty($type) && !isset($pubTyp_de)) {
-            return "<p>Falscher Parameter</p>";
-        }
-
-        foreach ($publications as $id => $book) {
-            if (
-                    (empty($year) || $book['publYear'] == $year) &&
-                    (empty($start) || $book['publYear'] >= $start) &&
-                    (empty($type) || $book['Publication type'] == $pubTyp)
-            ) {
-                $publications_filtered[$id] = $book;
-            }
-        }
-        return $publications_filtered;
-    }
-
-    /*
      * Array zur Definition des Filters für Publikationen
      */
 
@@ -220,35 +193,17 @@ class Tools {
     }
 
     /*
-     * Awards-Array filtern
-     */
-
-    public static function filter_awards($awards, $year = '', $start = '', $type = '') {
-
-        $awards_filtered = array();
-        foreach ($awards as $id => $award) {
-            if (
-                    (empty($year) || $award['Year award'] == $year) &&
-                    (empty($start) || $award['Year award'] >= $start) &&
-                    (empty($type) || $award['Type of award'] == $type)
-            ) {
-                $awards_filtered[$id] = $award;
-            }
-        }
-        return $awards_filtered;
-    }
-
-    /*
      * Array zur Definition des Filters für Awards
      */
 
     public static function award_filter($year = '', $start = '', $type = '') {
         $filter = array();
-        if ($year !== '')
+        if ($year !== '' && $year !== NULL)
             $filter['year award__eq'] = $year;
-        if ($start !== '')
+        if ($start !== '' && $start !== NULL)
             $filter['year award__ge'] = $start;
-        if ($type !== '') {
+        if ($type !== '' && $type !== NULL) {
+            $type = Tools::getAwardName($type, "de");
             $filter['type of award__eq'] = $type;
         }
         if (count($filter))

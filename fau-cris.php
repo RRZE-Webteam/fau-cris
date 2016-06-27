@@ -337,8 +337,7 @@ class FAU_CRIS {
 
         $show = sanitize_text_field($show);
         $orderby = sanitize_text_field($orderby);
-        $pubtype = sanitize_text_field($pubtype);
-        $type = sanitize_text_field($type);
+        $type = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
         $year = sanitize_text_field($year);
         $start = sanitize_text_field($start);
         $orgid = sanitize_text_field($orgid);
@@ -429,12 +428,12 @@ class FAU_CRIS {
                     return $liste->singlePub($quotation);
                 }
                 if (!empty($items)) {
-                    return $liste->pubListe($year, $start, $pubtype, $quotation, $items);
+                    return $liste->pubListe($year, $start, $type, $quotation, $items);
                 }
                 if ($orderby == 'type' || $orderby == 'pubtype') {
-                    return $liste->pubNachTyp($year, $start, $pubtype, $quotation);
+                    return $liste->pubNachTyp($year, $start, $type, $quotation);
                 }
-                return $liste->pubNachJahr($year, $start, $pubtype, $quotation);
+                return $liste->pubNachJahr($year, $start, $type, $quotation);
             }
         }
         // nothing

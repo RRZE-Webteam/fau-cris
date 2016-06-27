@@ -167,8 +167,8 @@ class Auszeichnungen {
      */
 
     private function fetch_awards($year = '', $start = '', $type = '', $awardnameid = '') {
-        $filter = Tools::award_filter($year, $start, $type, $awardnameid);
-
+        $filter = Tools::award_filter($year, $start, $type);
+        
         $ws = new CRIS_awards();
         $awardArray = array();
 
@@ -185,7 +185,6 @@ class Auszeichnungen {
         } catch (Exception $ex) {
             $awardArray = array();
         }
-
         return $awardArray;
     }
 
@@ -359,8 +358,10 @@ class CRIS_awards extends CRIS_webservice {
     }
 
     private function retrieve($reqs, &$filter=null) {
-        $data = array();
+        if ($filter !== null && !$filter instanceof CRIS_filter)
+            $filter = new CRIS_filter($filter);
 
+        $data = array();
         foreach ($reqs as $_i) {
             try {
                 $data[] = $this->get($_i, $filter);
@@ -370,9 +371,6 @@ class CRIS_awards extends CRIS_webservice {
                 continue;
             }
         }
-
-        if ($filter !== null && !$filter instanceof CRIS_filter)
-            $filter = new CRIS_filter($filter);
 
         $awards = array();
 

@@ -120,7 +120,7 @@ class Publikationen {
                 $order[] = Tools::getPubName($value, "en");
             }
         }
-//            print_r($order);
+
         // sortiere nach Typenliste, innerhalb des Jahres nach Jahr abwärts sortieren
         $formatter = new CRIS_formatter("publication type", array_values($order), "publyear", SORT_DESC);
         $pubList = $formatter->execute($pubArray);
@@ -189,7 +189,7 @@ class Publikationen {
         } catch (Exception $ex) {
             $pubArray = array();
         }
-
+        
         return $pubArray;
     }
 
