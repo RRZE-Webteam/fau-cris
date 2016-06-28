@@ -33,7 +33,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen ohne Gliederung
      */
 
-    public function awardsListe($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 1, $display = 'list') {
+    public function awardsListe($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 1, $showawardname = 1, $display = 'list') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -49,9 +49,9 @@ class Auszeichnungen {
         $output = '';
 
         if ($display == 'gallery') {
-            $output .= $this->make_gallery($awardList, $showname, $showyear, $showawardname = 1);
+            $output .= $this->make_gallery($awardList, $showname, $showyear, $showawardname);
         } else {
-            $output .= $this->make_list($awardList, $showname, $showyear, $showawardname = 1);
+            $output .= $this->make_list($awardList, $showname, $showyear, $showawardname);
         }
 
         /* 		foreach ($awardList as $array_year => $awards) {
@@ -68,7 +68,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Jahren gegliedert
      */
 
-    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $display = 'list') {
+    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = 'list') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -88,9 +88,9 @@ class Auszeichnungen {
                 $output .= '</h3>';
             }
             if ($display == 'gallery') {
-                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname = 1);
+                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname);
             } else {
-                $output .= $this->make_list($awards, $showname, $showyear, $showawardname = 1);
+                $output .= $this->make_list($awards, $showname, $showyear, $showawardname);
             }
         }
 
@@ -101,7 +101,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Auszeichnungstypen gegliedert
      */
 
-    public function awardsNachTyp($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $display = '') {
+    public function awardsNachTyp($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = '') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -122,9 +122,9 @@ class Auszeichnungen {
                 $output .= "</h3>";
             }
             if ($display == 'gallery') {
-                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname = 1);
+                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname);
             } else {
-                $output .= $this->make_list($awards, $showname, $showyear, $showawardname = 1);
+                $output .= $this->make_list($awards, $showname, $showyear, $showawardname);
             }
         }
 
@@ -135,7 +135,7 @@ class Auszeichnungen {
      * Ausgabe einer einzelnen Auszeichnung
      */
 
-    public function singleAward($showname = 1, $showyear = 0, $display = 'list') {
+    public function singleAward($showname = 1, $showyear = 0, $showawardname = 1, $display = 'list') {
         $ws = new CRIS_awards();
 
         try {
@@ -150,9 +150,9 @@ class Auszeichnungen {
         }
 
         if ($display == 'gallery') {
-            $output = $this->make_gallery($awardArray, $showname, $showyear, $showawardname = 1);
+            $output = $this->make_gallery($awardArray, $showname, $showyear, $showawardname);
         } else {
-            $output = $this->make_list($awardArray, $showname, $showyear, $showawardname = 1);
+            $output = $this->make_list($awardArray, $showname, $showyear, $showawardname);
         }
 
         return $output;
@@ -168,7 +168,7 @@ class Auszeichnungen {
 
     private function fetch_awards($year = '', $start = '', $type = '', $awardnameid = '') {
         $filter = Tools::award_filter($year, $start, $type);
-        
+
         $ws = new CRIS_awards();
         $awardArray = array();
 

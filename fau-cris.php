@@ -332,6 +332,7 @@ class FAU_CRIS {
             'type' => '',
             'showname' => 1,
             'showyear' => 1,
+            'showawardname' => 1,
             'display' => 'list',
                         ), $atts));
 
@@ -349,6 +350,7 @@ class FAU_CRIS {
         $awardnameid = sanitize_text_field($awardnameid);
         $showname = sanitize_text_field($showname);
         $showyear = sanitize_text_field($showyear);
+        $showawardname = sanitize_text_field($showawardname);
         $display = sanitize_text_field($display);
 
         if (isset($publication) && $publication != '') {
@@ -410,15 +412,15 @@ class FAU_CRIS {
                 $liste = new Auszeichnungen($param1, $param2, $display);
 
                 if ($award != '') {
-                    return $liste->singleAward($showname, $showyear, $display);
+                    return $liste->singleAward($showname, $showyear, $showawardname, $display);
                 }
                 if ($orderby == 'type') {
-                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $display);
+                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
                 }
                 if ($orderby == 'year') {
-                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, 0, $display);
+                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, $showawardname, 0, $display);
                 }
-                return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $display);
+                return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
             } else {
                 // Publications
                 require_once('class_Publikationen.php');
