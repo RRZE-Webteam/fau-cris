@@ -11,11 +11,14 @@ class Auszeichnungen {
     public $output;
 
     public function __construct($einheit = '', $id = '') {
+        $this->cms = 'wp';
         $this->options = (array) get_option('_fau_cris');
-        $orgNr = $this->options['cris_org_nr'];
+        $this->orgNr = $this->options['cris_org_nr'];
+        $this->cris_award_link = isset($this->options['cris_award_link']) ? $this->options['cris_award_link'] : 0;
+        $this->pathPersonenseiteUnivis = '/person/';
         $this->suchstring = '';
 
-        if ((!$orgNr || $orgNr == 0) && $id == '') {
+        if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
             return;
         }
@@ -24,7 +27,7 @@ class Auszeichnungen {
             $this->einheit = $einheit;
         } else {
             // keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
-            $this->id = $orgNr;
+            $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
     }
@@ -204,6 +207,14 @@ class Auszeichnungen {
 
 
             $award_preistraeger = $award['award_preistraeger'];
+            $preistraeger_firstname = explode(" ", $award['award_preistraeger'])[0];
+            $preistraeger_lastname = array_pop((array_slice(explode(" ", $award['award_preistraeger']), -1)));
+            if ($this->cris_award_link == 1
+                && Tools::person_exists($this->cms, $preistraeger_firstname, $preistraeger_lastname, 0, $this->orgNr)) {
+                $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $preistraeger_firstname, $preistraeger_lastname) . "\">";
+                $link_post = "</a>";
+                $award_preistraeger = $link_pre . $award_preistraeger . $link_post;
+            }
             if (!empty($award['award_name'])) {
                 $award_name = $award['award_name'];
             } elseif (!empty($award['award_name_manual'])) {
@@ -252,6 +263,14 @@ class Auszeichnungen {
             unset($award['attributes']);
 
             $award_preistraeger = $award['award_preistraeger'];
+            $preistraeger_firstname = explode(" ", $award['award_preistraeger'])[0];
+            $preistraeger_lastname = array_pop((array_slice(explode(" ", $award['award_preistraeger']), -1)));
+            if ($this->cris_award_link == 1
+                && Tools::person_exists($this->cms, $preistraeger_firstname, $preistraeger_lastname, 0, $this->orgNr)) {
+                $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $preistraeger_firstname, $preistraeger_lastname) . "\">";
+                $link_post = "</a>";
+                $award_preistraeger = $link_pre . $award_preistraeger . $link_post;
+            }
             if (!empty($award['award_name'])) {
                 $award_name = $award['award_name'];
             } elseif (!empty($award['award_name_manual'])) {
