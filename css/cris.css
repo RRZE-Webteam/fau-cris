@@ -1,34 +1,36 @@
 ul.cris-publications li {
-	margin-bottom: 15px;
-	line-height: 150%;
+    margin-bottom: 15px;
+    line-height: 150%;
 }
 
 ul.cris-gallery {
-	list-style-type: none;
-	margin-left: 0;
+    list-style-type: none;
+    margin-left: 0;
 }
 ul.cris-gallery li {
-	float: left;
-	width: 200px;
-	margin: 0 10px 10px 0;
-	font-size: 1em;
-	list-style-type: none;
-	min-height: 245px;
+    float: left;
+    width: 200px;
+    margin: 0 10px 10px 0;
+    font-size: 1em;
+    list-style-type: none;
+    min-height: 245px;
+    background: none;
+    padding:0;
 }
 ul.cris-gallery li p {
-	font-size: 1em;
+    font-size: 1em;
 }
 
 ul.cris-gallery li img {
-	display: block;
-	margin: 0 auto 10px;
-	max-width: 180px;
-	max-height: 180px;
+    display: block;
+    margin: 0 auto 10px;
+    max-width: 180px;
+    max-height: 180px;
 }
 ul.cris-gallery li .noimage {
-	display: block;
-	margin: 0 auto 10px;
-	width: 130px;
-	height: 180px;
-	background-color: #f8f8f8;
+    display: block;
+    margin: 0 auto 10px;
+    width: 130px;
+    height: 180px;
+    background-color: #f8f8f8;
 }
