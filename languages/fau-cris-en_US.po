@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: FAU CRIS v1.8\n"
+"Project-Id-Version: FAU CRIS v1.81\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: Tue Jun 28 2016 13:54:33 GMT+0200 (CEST)\n"
+"PO-Revision-Date: Tue Jun 28 2016 14:29:18 GMT+0200 (CEST)\n"
 "Last-Translator: Barbara Bothe <barbara.bothe@fau.de>\n"
 "Language-Team: \n"
 "Language: English\n"
@@ -22,31 +22,6 @@ msgstr ""
 "X-Textdomain-Support: yes\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Loco-Target-Locale: en_US"
-
-#. ID
-#: ../fau-cris.php:193
-msgid "Allgemein"
-msgstr "General Settings"
-
-#. ID
-#: ../fau-cris.php:210
-msgid "Publikationen"
-msgstr "Publications"
-
-#. ID
-#: ../fau-cris.php:234
-msgid "Auszeichnungen"
-msgstr "Awards"
-
-#: ../fau-cris.php:245
-msgid "Preisträger verlinken"
-msgstr "Set link to awardee"
-
-#: ../fau-cris.php:247
-msgid ""
-"Sollen die Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin "
-"verlinkt werden?"
-msgstr "Link awardees to their profile page (FAU-Person plugin required)?"
 
 # @ fau-cris
 #: ../class_Auszeichnungen.php:22 ../class_Publikationen.php:24
@@ -165,6 +140,11 @@ msgstr "Plugin Activation Error"
 msgid "Einstellungen"
 msgstr "Settings"
 
+#. ID
+#: ../fau-cris.php:193
+msgid "Allgemein"
+msgstr "General Settings"
+
 # @ fau-cris
 #: ../fau-cris.php:199
 msgid "CRIS-OrgNr."
@@ -175,6 +155,11 @@ msgid ""
 "Sie können auch mehrere Organisationsnummern &ndash; durch Komma getrennt "
 "&ndash; eingeben."
 msgstr "You may enter multiple organisation ids, separated by comma."
+
+#. ID
+#: ../fau-cris.php:210
+msgid "Publikationen"
+msgstr "Publications"
 
 # @ fau-cris
 #: ../fau-cris.php:215
@@ -212,6 +197,11 @@ msgid ""
 "verlinkt werden?"
 msgstr "Link authors to their profile page (FAU-Person plugin required)?"
 
+#. ID
+#: ../fau-cris.php:234
+msgid "Auszeichnungen"
+msgstr "Awards"
+
 # @ fau-cris
 #: ../fau-cris.php:239
 msgid "Reihenfolge der Auszeichnungen"
@@ -221,6 +211,16 @@ msgstr "Awards order"
 #: ../fau-cris.php:241
 msgid "Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen."
 msgstr "Equivalent to the publication order."
+
+#: ../fau-cris.php:245
+msgid "Preisträger verlinken"
+msgstr "Set link to awardee"
+
+#: ../fau-cris.php:247
+msgid ""
+"Sollen die Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin "
+"verlinkt werden?"
+msgstr "Link awardees to their profile page (FAU-Person plugin required)?"
 
 # @ fau-cris
 #: ../fau-cris.php:420

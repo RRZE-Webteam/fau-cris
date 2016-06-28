@@ -2,10 +2,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: FAU CRIS v1.8\n"
+"Project-Id-Version: FAU CRIS v1.81\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"POT-Revision-Date: Tue Jun 28 2016 13:52:12 GMT+0200 (CEST)\n"
+"POT-Revision-Date: Tue Jun 28 2016 14:28:55 GMT+0200 (CEST)\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: zo95zofo <barbara.bothe@fau.de>\n"
 "Language-Team: \n"
@@ -32,7 +32,7 @@ msgstr ""
 
 # @ fau-cris
 #: ../class_Auszeichnungen.php:43 ../class_Auszeichnungen.php:78 ..
-#: /class_Auszeichnungen.php:111 ../class_Auszeichnungen.php:151
+#: class_Auszeichnungen.php:111 ../class_Auszeichnungen.php:151
 msgid "Es wurden leider keine Auszeichnungen gefunden."
 msgstr ""
 
@@ -42,7 +42,7 @@ msgstr ""
 
 # @ fau-cris
 #: ../class_Publikationen.php:45 ../class_Publikationen.php:77 ..
-#: /class_Publikationen.php:107
+#: class_Publikationen.php:107
 msgid "Es wurden leider keine Publikationen gefunden."
 msgstr ""
 
@@ -55,12 +55,12 @@ msgid "O.O."
 msgstr ""
 
 #: ../class_Publikationen.php:245 ../class_Publikationen.php:247 ..
-#: /class_Publikationen.php:250 ../class_Publikationen.php:251 ..
-#: /class_Publikationen.php:252 ../class_Publikationen.php:253 ..
-#: /class_Publikationen.php:254 ../class_Publikationen.php:255 ..
-#: /class_Publikationen.php:256 ../class_Publikationen.php:257 ..
-#: /class_Publikationen.php:258 ../class_Publikationen.php:259 ..
-#: /class_Publikationen.php:261 ../class_Publikationen.php:262
+#: class_Publikationen.php:250 ../class_Publikationen.php:251 ..
+#: class_Publikationen.php:252 ../class_Publikationen.php:253 ..
+#: class_Publikationen.php:254 ../class_Publikationen.php:255 ..
+#: class_Publikationen.php:256 ../class_Publikationen.php:257 ..
+#: class_Publikationen.php:258 ../class_Publikationen.php:259 ..
+#: class_Publikationen.php:261 ../class_Publikationen.php:262
 msgid "O.A."
 msgstr ""
 
@@ -78,7 +78,7 @@ msgstr ""
 
 # @ fau-cris
 #: ../class_Publikationen.php:307 ../class_Publikationen.php:325 ..
-#: /class_Publikationen.php:361 ../class_Publikationen.php:379
+#: class_Publikationen.php:361 ../class_Publikationen.php:379
 msgid "Seiten"
 msgstr ""
 
