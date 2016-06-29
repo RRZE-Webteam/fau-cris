@@ -253,7 +253,7 @@ class Auszeichnungen {
     }
 
     private function make_gallery($awards, $name = 1, $year = 1, $awardname = 1) {
-        $awardlist = "<ul class=\"cris-awards cris-gallery clear\">";
+        $awardlist = "<ul class=\"cris-awards cris-gallery clear clearfix\">";
 
         foreach ($awards as $award) {
             $award = (array) $award;
@@ -282,10 +282,10 @@ class Auszeichnungen {
                 $organisation = $award['award_organisation_manual'];
             }
             $award_year = $award['year award'];
-            $award_pic = self::get_pic($award['id_awar']);
+            $award_pic = self::get_pic($award['ID']);
 
             $awardlist .= "<li>";
-            $awardlist .= strlen($award_pic) > 50 ? "<img src=\"" . $award_pic . "\" alt=\"Portrait " . $award_preistraeger . "\" />" : "<div class=\"noimage\">&nbsp</div>";
+            $awardlist .= strlen($award_pic) > 50 ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
             $awardlist .= $name == 1 ? $award_preistraeger . "<br />" : '';
             $awardlist .= $awardname == 1 ? "<strong>" . $award_name . "</strong> "
                     . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") . "<br />" : '';
