@@ -11,11 +11,14 @@ class Auszeichnungen {
     public $output;
 
     public function __construct($einheit = '', $id = '') {
+        $this->cms = 'wp';
         $this->options = (array) get_option('_fau_cris');
-        $orgNr = $this->options['cris_org_nr'];
+        $this->orgNr = $this->options['cris_org_nr'];
+        $this->cris_award_link = isset($this->options['cris_award_link']) ? $this->options['cris_award_link'] : 0;
+        $this->pathPersonenseiteUnivis = '/person/';
         $this->suchstring = '';
 
-        if ((!$orgNr || $orgNr == 0) && $id == '') {
+        if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
             return;
         }
@@ -24,7 +27,7 @@ class Auszeichnungen {
             $this->einheit = $einheit;
         } else {
             // keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
-            $this->id = $orgNr;
+            $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
     }
@@ -33,7 +36,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen ohne Gliederung
      */
 
-    public function awardsListe($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 1, $display = 'list') {
+    public function awardsListe($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 1, $showawardname = 1, $display = 'list') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -49,9 +52,9 @@ class Auszeichnungen {
         $output = '';
 
         if ($display == 'gallery') {
-            $output .= $this->make_gallery($awardList, $showname, $showyear, $showawardname = 1);
+            $output .= $this->make_gallery($awardList, $showname, $showyear, $showawardname);
         } else {
-            $output .= $this->make_list($awardList, $showname, $showyear, $showawardname = 1);
+            $output .= $this->make_list($awardList, $showname, $showyear, $showawardname);
         }
 
         /* 		foreach ($awardList as $array_year => $awards) {
@@ -68,7 +71,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Jahren gegliedert
      */
 
-    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $display = 'list') {
+    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = 'list') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -88,9 +91,9 @@ class Auszeichnungen {
                 $output .= '</h3>';
             }
             if ($display == 'gallery') {
-                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname = 1);
+                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname);
             } else {
-                $output .= $this->make_list($awards, $showname, $showyear, $showawardname = 1);
+                $output .= $this->make_list($awards, $showname, $showyear, $showawardname);
             }
         }
 
@@ -101,7 +104,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Auszeichnungstypen gegliedert
      */
 
-    public function awardsNachTyp($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $display = '') {
+    public function awardsNachTyp($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = '') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -122,9 +125,9 @@ class Auszeichnungen {
                 $output .= "</h3>";
             }
             if ($display == 'gallery') {
-                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname = 1);
+                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname);
             } else {
-                $output .= $this->make_list($awards, $showname, $showyear, $showawardname = 1);
+                $output .= $this->make_list($awards, $showname, $showyear, $showawardname);
             }
         }
 
@@ -135,7 +138,7 @@ class Auszeichnungen {
      * Ausgabe einer einzelnen Auszeichnung
      */
 
-    public function singleAward($showname = 1, $showyear = 0, $display = 'list') {
+    public function singleAward($showname = 1, $showyear = 0, $showawardname = 1, $display = 'list') {
         $ws = new CRIS_awards();
 
         try {
@@ -150,9 +153,9 @@ class Auszeichnungen {
         }
 
         if ($display == 'gallery') {
-            $output = $this->make_gallery($awardArray, $showname, $showyear, $showawardname = 1);
+            $output = $this->make_gallery($awardArray, $showname, $showyear, $showawardname);
         } else {
-            $output = $this->make_list($awardArray, $showname, $showyear, $showawardname = 1);
+            $output = $this->make_list($awardArray, $showname, $showyear, $showawardname);
         }
 
         return $output;
@@ -167,7 +170,7 @@ class Auszeichnungen {
      */
 
     private function fetch_awards($year = '', $start = '', $type = '', $awardnameid = '') {
-        $filter = Tools::award_filter($year, $start, $type, $awardnameid);
+        $filter = Tools::award_filter($year, $start, $type);
 
         $ws = new CRIS_awards();
         $awardArray = array();
@@ -185,7 +188,6 @@ class Auszeichnungen {
         } catch (Exception $ex) {
             $awardArray = array();
         }
-
         return $awardArray;
     }
 
@@ -205,6 +207,14 @@ class Auszeichnungen {
 
 
             $award_preistraeger = $award['award_preistraeger'];
+            $preistraeger_firstname = explode(" ", $award['award_preistraeger'])[0];
+            $preistraeger_lastname = array_pop((array_slice(explode(" ", $award['award_preistraeger']), -1)));
+            if ($this->cris_award_link == 1
+                && Tools::person_exists($this->cms, $preistraeger_firstname, $preistraeger_lastname, 0, $this->orgNr)) {
+                $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $preistraeger_firstname, $preistraeger_lastname) . "\">";
+                $link_post = "</a>";
+                $award_preistraeger = $link_pre . $award_preistraeger . $link_post;
+            }
             if (!empty($award['award_name'])) {
                 $award_name = $award['award_name'];
             } elseif (!empty($award['award_name_manual'])) {
@@ -243,7 +253,7 @@ class Auszeichnungen {
     }
 
     private function make_gallery($awards, $name = 1, $year = 1, $awardname = 1) {
-        $awardlist = "<ul class=\"cris-awards cris-gallery clear\">";
+        $awardlist = "<ul class=\"cris-awards cris-gallery clear clearfix\">";
 
         foreach ($awards as $award) {
             $award = (array) $award;
@@ -253,6 +263,14 @@ class Auszeichnungen {
             unset($award['attributes']);
 
             $award_preistraeger = $award['award_preistraeger'];
+            $preistraeger_firstname = explode(" ", $award['award_preistraeger'])[0];
+            $preistraeger_lastname = array_pop((array_slice(explode(" ", $award['award_preistraeger']), -1)));
+            if ($this->cris_award_link == 1
+                && Tools::person_exists($this->cms, $preistraeger_firstname, $preistraeger_lastname, 0, $this->orgNr)) {
+                $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $preistraeger_firstname, $preistraeger_lastname) . "\">";
+                $link_post = "</a>";
+                $award_preistraeger = $link_pre . $award_preistraeger . $link_post;
+            }
             if (!empty($award['award_name'])) {
                 $award_name = $award['award_name'];
             } elseif (!empty($award['award_name_manual'])) {
@@ -264,10 +282,10 @@ class Auszeichnungen {
                 $organisation = $award['award_organisation_manual'];
             }
             $award_year = $award['year award'];
-            $award_pic = self::get_pic($award['id_awar']);
+            $award_pic = self::get_pic($award['ID']);
 
             $awardlist .= "<li>";
-            $awardlist .= strlen($award_pic) > 50 ? "<img src=\"" . $award_pic . "\" alt=\"Portrait " . $award_preistraeger . "\" />" : "<div class=\"noimage\">&nbsp</div>";
+            $awardlist .= strlen($award_pic) > 50 ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
             $awardlist .= $name == 1 ? $award_preistraeger . "<br />" : '';
             $awardlist .= $awardname == 1 ? "<strong>" . $award_name . "</strong> "
                     . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") . "<br />" : '';
@@ -359,8 +377,10 @@ class CRIS_awards extends CRIS_webservice {
     }
 
     private function retrieve($reqs, &$filter=null) {
-        $data = array();
+        if ($filter !== null && !$filter instanceof CRIS_filter)
+            $filter = new CRIS_filter($filter);
 
+        $data = array();
         foreach ($reqs as $_i) {
             try {
                 $data[] = $this->get($_i, $filter);
@@ -370,9 +390,6 @@ class CRIS_awards extends CRIS_webservice {
                 continue;
             }
         }
-
-        if ($filter !== null && !$filter instanceof CRIS_filter)
-            $filter = new CRIS_filter($filter);
 
         $awards = array();
 

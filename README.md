@@ -1,7 +1,7 @@
 CRIS-Plugin für Wordpress
 =========================
 
-Version 1.8 (Stand 15.06.2016)
+Version 1.81 (Stand 28.06.2016)
 
 Einbinden von Daten aus dem FAU-Forschungsinformationssystem <b>CRIS</b> in Webseiten
 
@@ -41,7 +41,7 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 		- mitgliedschaften
 		- andere
 - <b>publication="12345678"</b>: Nur eine einzelne Publikation (hier die CRIS-ID der Publikation angeben)
-- <b>awardnameid="158"</b>: Nur eine einzelne Auszeichnung (hier die CRIS-ID der Auszeichnung angeben)
+- <b>awardnameid="123"</b>: Nur eine einzelne Auszeichnung (hier die CRIS-ID der Auszeichnung angeben)
 - <b>award="12345678"</b>: Nur eine einzelne Preisverleihung (hier die CRIS-ID der Verleihung angeben)<br>
   Hinweis zum Unterschied zwischen awardnameid und award: <b>awardnameid</b> bedeutet die ID eines Preises, der normalerweise mehrfach vergeben wird, z.B. der "Gottfried-Wilhelm-Leibniz-Preis". <b>award</b> (bzw. dessen ID) bedeutet die konkrete, einmalige Verleihung dieses Preises an eine bestimmte Person.
 - <b>items="5"</b>: Nur die ersten 5 Publikationen anzeigen. In dem Fall werden "orderby"-Parameter ignoriert &ndash; es wird eine nicht gegliederte Liste ausgegeben.
@@ -54,7 +54,9 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 
 #### Auszeichnungen
 - <b>display="gallery"</b>: Bildergalerie mit Bild des Preisträgers und Angaben zum Preis
-- <b>showname=0</b> oder <b>showyear=0</b>: Name des Preisträgers bzw. Jahreszahl wird nicht angezeigt. Das kann z.B. bei Darstellungen auf einer Personenprofilseite bzw. in der nach Jahren gegliederten Ansicht sinnvoll sein.
+- <b>showname=0</b>: Der Name des Preisträgers wird nicht angezeigt. Das kann z.B. bei Darstellungen auf einer Personenprofilseite sinnvoll sein.
+- <b>showyear=0</b>: Die Jahreszahl wird nicht angezeigt (z.B. für eine nach Jahren gegliederten Ansicht).
+- <b>showawardname=0</b>: Der Name der Auszeichnung wird nicht angezeigt (z.B. bei der Ausgabe awardnameid=123).
 
 ### ID überschreiben
 Die in den Einstellungen festgelegte CRIS-ID kann überschrieben werden, entweder durch die ID einer anderen Organisationseinheit, oder durch die ID einer einzelnen Person:

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 1.8
+ * Version: 1.81
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -33,7 +33,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '1.8';
+    const version = '1.81';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -142,7 +142,8 @@ class FAU_CRIS {
                 'preise',
                 'stipendien',
                 'mitgliedschaften',
-                'andere')
+                'andere'),
+            'cris_award_link' => 0,
         );
         return $options;
     }
@@ -189,7 +190,7 @@ class FAU_CRIS {
         // Form Settings 1
         add_settings_section(
                 'cris_section', // ID
-                __('Einstellungen', self::textdomain), // Title
+                __('Allgemein', self::textdomain), // Title
                 '__return_false', // Callback
                 'fau_cris_options' // Page
         );
@@ -204,28 +205,46 @@ class FAU_CRIS {
             'description' => __('Sie können auch mehrere Organisationsnummern &ndash; durch Komma getrennt &ndash; eingeben.', self::textdomain)
                 )
         );
+        add_settings_section(
+                'cris_publications_section', // ID
+                __('Publikationen', self::textdomain), // Title
+                '__return_false', // Callback
+                'fau_cris_options' // Page
+        );
         add_settings_field(
-                'cris_pub_order', __('Reihenfolge der Publikationen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_section', array(
+                'cris_pub_order', __('Reihenfolge der Publikationen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
             'name' => 'cris_pub_order',
             'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
                 )
         );
         add_settings_field(
-                'cris_bibtex', __('BibTeX-Link', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_section', array(
+                'cris_bibtex', __('BibTeX-Link', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
             'name' => 'cris_bibtex',
             'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', self::textdomain)
                 )
         );
         add_settings_field(
-                'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_section', array(
+                'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
             'name' => 'cris_univis',
             'description' => __('Sollen die Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinkt werden?', self::textdomain)
                 )
         );
+        add_settings_section(
+                'cris_awards_section', // ID
+                __('Auszeichnungen', self::textdomain), // Title
+                '__return_false', // Callback
+                'fau_cris_options' // Page
+        );
         add_settings_field(
-                'cris_award_order', __('Reihenfolge der Auszeichnungen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_section', array(
+                'cris_award_order', __('Reihenfolge der Auszeichnungen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_awards_section', array(
             'name' => 'cris_award_order',
             'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen.', self::textdomain)
+                )
+        );
+        add_settings_field(
+                'cris_award_link', __('Preisträger verlinken', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_awards_section', array(
+            'name' => 'cris_award_link',
+            'description' => __('Sollen die Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinkt werden?', self::textdomain)
                 )
         );
     }
@@ -241,6 +260,7 @@ class FAU_CRIS {
         $new_input['cris_univis'] = isset($input['cris_univis']) ? 1 : 0;
         $new_input['cris_bibtex'] = isset($input['cris_bibtex']) ? 1 : 0;
         $new_input['cris_award_order'] = isset($input['cris_award_order']) ? explode("\n", str_replace("\r", "", $input['cris_award_order'])) : $default_options['cris_award_order'];
+        $new_input['cris_award_link'] = isset($input['cris_award_link']) ? 1 : 0;
         return $new_input;
     }
 
@@ -332,13 +352,13 @@ class FAU_CRIS {
             'type' => '',
             'showname' => 1,
             'showyear' => 1,
+            'showawardname' => 1,
             'display' => 'list',
                         ), $atts));
 
         $show = sanitize_text_field($show);
         $orderby = sanitize_text_field($orderby);
-        $pubtype = sanitize_text_field($pubtype);
-        $type = sanitize_text_field($type);
+        $type = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
         $year = sanitize_text_field($year);
         $start = sanitize_text_field($start);
         $orgid = sanitize_text_field($orgid);
@@ -350,6 +370,7 @@ class FAU_CRIS {
         $awardnameid = sanitize_text_field($awardnameid);
         $showname = sanitize_text_field($showname);
         $showyear = sanitize_text_field($showyear);
+        $showawardname = sanitize_text_field($showawardname);
         $display = sanitize_text_field($display);
 
         if (isset($publication) && $publication != '') {
@@ -411,15 +432,15 @@ class FAU_CRIS {
                 $liste = new Auszeichnungen($param1, $param2, $display);
 
                 if ($award != '') {
-                    return $liste->singleAward($showname, $showyear, $display);
+                    return $liste->singleAward($showname, $showyear, $showawardname, $display);
                 }
                 if ($orderby == 'type') {
-                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $display);
+                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
                 }
                 if ($orderby == 'year') {
-                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, 0, $display);
+                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, $showawardname, 0, $display);
                 }
-                return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $display);
+                return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
             } else {
                 // Publications
                 require_once('class_Publikationen.php');
@@ -429,12 +450,12 @@ class FAU_CRIS {
                     return $liste->singlePub($quotation);
                 }
                 if (!empty($items)) {
-                    return $liste->pubListe($year, $start, $pubtype, $quotation, $items);
+                    return $liste->pubListe($year, $start, $type, $quotation, $items);
                 }
                 if ($orderby == 'type' || $orderby == 'pubtype') {
-                    return $liste->pubNachTyp($year, $start, $pubtype, $quotation);
+                    return $liste->pubNachTyp($year, $start, $type, $quotation);
                 }
-                return $liste->pubNachJahr($year, $start, $pubtype, $quotation);
+                return $liste->pubNachJahr($year, $start, $type, $quotation);
             }
         }
         // nothing
