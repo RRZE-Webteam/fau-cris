@@ -15,6 +15,7 @@ class CRIS_Dicts {
         'type' => '',
         'showname' => 1,
         'showyear' => 1,
+        'showawardname' => 1,
         'display' => 'list',
         'quotation' => '',
         'items' => ''

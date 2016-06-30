@@ -215,26 +215,20 @@ class Tools {
      * Anbindung an UnivIS-/FAU-Person-Plugin
      */
 
-    public static function person_exists($cms = '', $firstname = '', $lastname = '', $id = '', $orgNr = '') {
+    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array()) {
         if ($cms == 'wp') {
             // WordPress
             return self::person_slug($cms, $firstname, $lastname);
         } else {
             // Webbaukasten
-            if (strpos($orgNr, ',')) {
-                $orgNr = str_replace(' ', '', $orgNr);
-                $orgNrArray = explode(',', $orgNr);
+            foreach ($univis as $_p) {
+                if (strpos($_p['firstname'], $firstname) !== false
+                 && strpos($_p['lastname'], $lastname) !== false) {
+                    return true;
             }
-            foreach ($orgNrArray as $nr) {
-                $suchstringOrga = 'https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Organisation/' . $nr . '/CARD_has_ORGA';
-                $xmlOrga = Tools::XML2obj($suchstringOrga);
-                foreach ($xmlOrga as $card) {
-                    $inOrga[] = (string) $card['id'];
                 }
             }
-            return in_array($id, $inOrga);
         }
-    }
 
     public static function person_slug($cms = '', $firstname = '', $lastname = '') {
         if ($cms == 'wp') {
@@ -246,9 +240,25 @@ class Tools {
             $person_slug = $wpdb->get_var($sql);
         } else {
             //Webbauksten
-            $person_slug = $firstname . "-" . $lastname;
+            $person_slug = strtolower($firstname) . "-" . strtolower($lastname).".shtml";
         }
         return $person_slug;
     }
 
+    public static function get_univis_id() {
+        $fpath = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/tools/univis/univis.conf';
+        $fpath_alternative = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/univis.conf';
+        if(file_exists($fpath_alternative)){ $fpath = $fpath_alternative; }
+        $fh = fopen($fpath, 'r') or die('Cannot open file!');
+	while(!feof($fh)) {
+            $line = fgets($fh);
+            $line = trim($line);
+            if ((substr($line, 0, 11) == 'UnivISOrgNr')) {
+                $arr_opts = preg_split('/\t/', $line);
+                $univisID = $arr_opts[1];
+}
+        }
+	fclose($fh);
+        return $univisID;
+    }
 }
