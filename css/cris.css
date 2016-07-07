@@ -6,6 +6,10 @@ ul.cris-publications li {
 ul.cris-gallery {
     list-style-type: none;
     margin-left: 0;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 ul.cris-gallery li {
     float: left;
@@ -32,5 +36,5 @@ ul.cris-gallery li .noimage {
     margin: 0 auto 10px;
     width: 130px;
     height: 180px;
-    background-color: #f8f8f8;
+    background-color: #eee;
 }
