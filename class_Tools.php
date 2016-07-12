@@ -222,25 +222,24 @@ class Tools {
         } else {
             // Webbaukasten
             foreach ($univis as $_p) {
-                if (strpos($_p['firstname'], $firstname) !== false
-                 && strpos($_p['lastname'], $lastname) !== false) {
+                if (strpos($_p['firstname'], $firstname) !== false && strpos($_p['lastname'], $lastname) !== false) {
                     return true;
-            }
                 }
             }
         }
+    }
 
     public static function person_slug($cms = '', $firstname = '', $lastname = '') {
         if ($cms == 'wp') {
             // WordPress
             global $wpdb;
             $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
-            $sql = "SELECT post_name FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person'";
+            $sql = "SELECT post_name FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
             $person_slug = $wpdb->get_var($sql);
         } else {
             //Webbauksten
-            $person_slug = strtolower($firstname) . "-" . strtolower($lastname).".shtml";
+            $person_slug = strtolower($firstname) . "-" . strtolower($lastname) . ".shtml";
         }
         return $person_slug;
     }
@@ -248,17 +247,20 @@ class Tools {
     public static function get_univis_id() {
         $fpath = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/tools/univis/univis.conf';
         $fpath_alternative = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/univis.conf';
-        if(file_exists($fpath_alternative)){ $fpath = $fpath_alternative; }
+        if (file_exists($fpath_alternative)) {
+            $fpath = $fpath_alternative;
+        }
         $fh = fopen($fpath, 'r') or die('Cannot open file!');
-	while(!feof($fh)) {
+        while (!feof($fh)) {
             $line = fgets($fh);
             $line = trim($line);
             if ((substr($line, 0, 11) == 'UnivISOrgNr')) {
                 $arr_opts = preg_split('/\t/', $line);
                 $univisID = $arr_opts[1];
-}
+            }
         }
-	fclose($fh);
+        fclose($fh);
         return $univisID;
     }
+
 }

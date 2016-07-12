@@ -11,6 +11,7 @@ class Auszeichnungen {
     public $output;
 
     public function __construct($einheit = '', $id = '') {
+
         $this->cms = 'wp';
         $this->options = (array) get_option('_fau_cris');
         $this->orgNr = $this->options['cris_org_nr'];
@@ -32,13 +33,20 @@ class Auszeichnungen {
             $this->einheit = "orga";
         }
 
-        $univis = 0;
         if ($this->cms == 'wbk' && $this->cris_award_link == 1) {
+        $univis = NULL;
             $this->univisID = Tools::get_univis_id();
-            $url = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $this->univisID . "&show=xml";
-            $daten = Tools::XML2obj($url);
+            // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
+            // Mitarbeiter der Institution zugeordnet wurden...)?
+            $url1 = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $this->univisID . "&show=xml";
+            $daten1 = Tools::XML2obj($url1);
+            $num1 = count($daten1->Person);
+            $url2 = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $this->univisID . "&show=xml";
+            $daten2 = Tools::XML2obj($url2);
+            $num2 = count($daten2->Person);
+            $daten = $num1 > $num2 ? $daten1 : $daten2;
+
             foreach ($daten->Person as $person) {
-                //var_dump($person->firstname);
                 $univis[] = array ('firstname' => (string) $person->firstname,
                                    'lastname' => (string) $person->lastname);
             }
@@ -286,7 +294,7 @@ class Auszeichnungen {
             $preistraeger_firstname = explode(" ", $award['award_preistraeger'])[0];
             $preistraeger_lastname = array_pop((array_slice(explode(" ", $award['award_preistraeger']), -1)));
             if ($this->cris_award_link == 1
-                && Tools::person_exists($this->cms, $preistraeger_firstname, $preistraeger_lastname, 0, $this->orgNr)) {
+                    && Tools::person_exists($this->cms, $preistraeger_firstname, $preistraeger_lastname, $this->univis)) {
                 $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $preistraeger_firstname, $preistraeger_lastname) . "\">";
                 $link_post = "</a>";
                 $award_preistraeger = $link_pre . $award_preistraeger . $link_post;

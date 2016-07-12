@@ -275,13 +275,13 @@ class FAU_CRIS {
         if (array_key_exists('description', $args))
             $description = esc_attr($args['description']);
         ?>
-        <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1' <?php
+        <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1' <?php
         if (array_key_exists($name, $options)) {
             print checked($options[$name], 1, false);
         }
         ?> >
                <?php if (isset($description)) { ?>
-            <span class="description"><?php echo $description; ?></span>
+            <span class="description"><?php echo $description; ?></span></label>
             <?php
         }
     }
@@ -479,53 +479,24 @@ class FAU_CRIS {
 
         $content_cris = array(
             '<p>' . __('Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS (Currrent Research Information System)</strong> in Ihren Webauftritt ein. Das Plugin ermöglicht außerdem die Integration mit dem FAU-Person-Plugin.', self::textdomain) . '</p>',
-            '<p>' . __('Für die Publikationslisten lassen sich über den Shortcode verschiedene Ausgabeformen einstellen. Die Titel sind jeweils mit der Detailansicht der Publikation auf http://cris.fau.de verlinkt.', self::textdomain) . '</p>', '<p>' . __('<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. http://cris.fau.de/converis/publicweb/Organisation/<strong><em>141517</em></strong>.', self::textdomain) . '</p>'
+            '<p>' . __('Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:', self::textdomain) . '</p>'
+            . '<ul>'
+            . '<li>' . __('Publikationen', self::textdomain) . '</li>'
+            . '<li>' . __('Auszeichnungen', self::textdomain) . '</li>'
+            . '</ul>'
+            . '<p>' . __('Über den Shortcode lassen sich jeweils verschiedene Ausgabeformate einstellen.', self::textdomain) . '</p>'
+            . '<p>' . __('<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. http://cris.fau.de/converis/publicweb/Organisation/<strong><em>141517</em></strong>.', self::textdomain) . '</p>'
         );
 
         $content_shortcode_publikationen = array(
-            '<h2>[cris]</h2>'
-            . '<p>' . __('Bindet eine Liste aller Publikationen Ihrer Organisationseinheit ein. Mögliche Zusatzoptionen:', self::textdomain) . '</p>'
-            . '<h3>' . __('Gliederung', self::textdomain) . '</h3>'
-            . '<ul><li><b>orderby="year"</b>: '
-            . __('Liste nach Jahren absteigend gegliedert (Voreinstellung)', self::textdomain) . '</li>'
-            . '<li><b>orderby="pubtype"</b>: '
-            . __('Liste nach Publikationstypen gegliedert', self::textdomain) . '</li>'
-            . '</ul>'
-            . '<h3>' . __('Filter', self::textdomain) . '</h3>'
+            '<h1>Shortcodes</h1>'
             . '<ul>'
-            . '<li><b>year="2015"</b>: '
-            . __('Nur Publikationen aus einem bestimmten Jahr', self::textdomain) . '</li>'
-            . '<li><b>start="2000"</b>: '
-            . __('Nur Publikationen ab einem bestimmten Jahr', self::textdomain) . '</li>'
-            . '<li><b>pubtype="buecher"</b>: '
-            . __('Es werden nur Publikationen eines bestimmten Typs angezeigt:', self::textdomain)
-            . '<ul style="list-style-type: circle;">'
-            . '<li style="margin-bottom: 0;">buecher</li>'
-            . '<li style="margin-bottom: 0;">zeitschriftenartikel</li>'
-            . '<li style="margin-bottom: 0;">sammelbandbeitraege</li>'
-            . '<li style="margin-bottom: 0;">herausgeberschaften</li>'
-            . '<li style="margin-bottom: 0;">konferenzbeitraege</li>'
-            . '<li style="margin-bottom: 0;">uebersetzungen</li>'
-            . '<li style="margin-bottom: 0;">abschlussarbeiten</li>'
-            . '<li style="margin-bottom: 0;">andere</li>'
+            . '<li><code>[cris show="publications"]</code>: ' . __('Publikationsliste (automatisch nach Jahren gegliedert)') . '</li>'
+            . '<li><code>[cris show="awards"]</code>: ' . __('Auszeichnungen (automatisch nach Jahren sortiert)') . '</li>'
             . '</ul>'
-            . '</li>'
-            . '<li><b>publication="12345678"</b>: '
-            . __('Nur eine einzelne Publikation (hier die CRIS-ID der Publikation angeben)', self::textdomain)
-            . '</ul>'
-            . '<h3>' . __('ID überschreiben', self::textdomain) . '</h3>'
-            . '<p>Die in den Einstellungen festgelegte CRIS-ID kann überschrieben werden, entweder durch die ID einer anderen Organisationseinheit, oder durch die ID einer einzelnen Person:</p>'
-            . '<ul>'
-            . '<li><b>orgID="123456"</b> '
-            . __('für eine von den Einstellungen abweichende Organisations-ID', self::textdomain) . '</li>'
-            . '<li><b>persID="123456"</b> '
-            . __('für die Publikationsliste einer konkreten Person', self::textdomain) . '</li>'
-            . '</ul>'
-            . '<h3>' . __('Beispiele', self::textdomain) . '</h3>'
-            . '<ul>'
-            . '<li><code>[cris pubtype="buecher"]</code> => ' . __('Alle Bücher', self::textdomain) . '</li>'
-            . '<li><code>[cris year="2015"]</code> => ' . __('Alle Publikationen aus dem Jahr 2015', self::textdomain) . '</li>'
-            . '<li><code>[cris persID="123456" year="2000" orderby="pubtype"]</code> => ' . __('Alle Publikationen der Person mit der CRIS-ID 123456 aus dem Jahr 2000, nach Publikationstypen gegliedert', self::textdomain) . '</li>'
+            . '<h2>' . __('Mögliche Zusatzoptionen', self::textdomain) . '</h2>'
+            . '<p>' . __('Ausgabe lässt sich beliebig anpassen. Eine Übersicht der verschiedenen Shortcode-Parameter zum Filtern, Sortieren und Ändern der Darstellung finden Sie unter: ') . '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/ target="_blank">https://www.wordpress.rrze.fau.de/plugins/fau-cris/</a>'
+
         );
 
         $content_fauperson = array(

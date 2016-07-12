@@ -34,17 +34,24 @@ class Publikationen {
         }
 
         if ($this->cms == 'wbk' && $this->univisLink == 1) {
+        $univis = NULL;
             $this->univisID = Tools::get_univis_id();
-            $url = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $this->univisID . "&show=xml";
-            $daten = Tools::XML2obj($url);
+            // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
+            // Mitarbeiter der Institution zugeordnet wurden...)?
+            $url1 = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $this->univisID . "&show=xml";
+            $daten1 = Tools::XML2obj($url1);
+            $num1 = count($daten1->Person);
+            $url2 = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $this->univisID . "&show=xml";
+            $daten2 = Tools::XML2obj($url2);
+            $num2 = count($daten2->Person);
+            $daten = $num1 > $num2 ? $daten1 : $daten2;
+
             foreach ($daten->Person as $person) {
-                //var_dump($person->firstname);
                 $univis[] = array ('firstname' => (string) $person->firstname,
                                    'lastname' => (string) $person->lastname);
-    }
-        //print_r($univis);
-            $this->univis = $univis;
+            }
         }
+        $this->univis = $univis;
     }
 
     /*
@@ -408,12 +415,12 @@ class Publikationen {
 
 }
 
-
 class CRIS_publications extends CRIS_webservice {
     /*
      * publication requests, supports multiple organisation ids given as array.
      */
-    public function by_orga_id($orgaID=null, &$filter=null) {
+
+    public function by_orga_id($orgaID = null, &$filter = null) {
         if ($orgaID === null || $orgaID === "0")
             throw new Exception('Please supply valid organisation ID');
 
@@ -430,7 +437,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID=null, &$filter=null) {
+    public function by_pers_id($persID = null, &$filter = null) {
         if ($persID === null || $persID === "0")
             throw new Exception('Please supply valid person ID');
 
@@ -444,7 +451,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($publID=null) {
+    public function by_id($publID = null) {
         if ($publID === null || $publID === "0")
             throw new Exception('Please supply valid publication ID');
 
@@ -458,7 +465,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter=null) {
+    private function retrieve($reqs, &$filter = null) {
         if ($filter !== null && !$filter instanceof CRIS_filter)
             $filter = new CRIS_filter($filter);
 
@@ -485,6 +492,7 @@ class CRIS_publications extends CRIS_webservice {
 
         return $publs;
     }
+
 }
 
 class CRIS_publication extends CRIS_Entity {
@@ -511,15 +519,13 @@ class CRIS_publication extends CRIS_Entity {
         $mla = $this->attributes["quotationmla"];
 
         $matches = array();
-        $splitapa = preg_match("/^(.+)(". $title .")(.+)(". $doilink .".+)?$/Uu",
-                $apa, $matches);
+        $splitapa = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
 
         if ($splitapa === 1) {
             $apalink = $matches[1] . \
                     sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
             if (isset($matches[4]))
-                $apalink .= sprintf('<a href="%s" target="_blank">%s</a>',
-                        $matches[4], $matches[4]);
+                $apalink .= sprintf('<a href="%s" target="_blank">%s</a>', $matches[4], $matches[4]);
         } else {
             $apalink = $apa;
         }
@@ -527,7 +533,7 @@ class CRIS_publication extends CRIS_Entity {
         $this->attributes["quotationapalink"] = $apalink;
 
         $matches = array();
-        $splitmla = preg_match("/^(.+)(". $title .")(.+)$/", $mla, $matches);
+        $splitmla = preg_match("/^(.+)(" . $title . ")(.+)$/", $mla, $matches);
 
         if ($splitmla === 1) {
             $mlalink = $matches[1] . \
@@ -538,6 +544,7 @@ class CRIS_publication extends CRIS_Entity {
 
         $this->attributes["quotationmlalink"] = $mlalink;
     }
+
 }
 
 # tests possible if called on command-line
