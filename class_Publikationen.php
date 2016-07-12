@@ -33,8 +33,8 @@ class Publikationen {
             $this->einheit = "orga";
         }
 
-        if ($this->cms == 'wbk' && $this->univisLink == 1) {
         $univis = NULL;
+        if ($this->cms == 'wbk' && $this->univisLink == 1) {
             $this->univisID = Tools::get_univis_id();
             // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
             // Mitarbeiter der Institution zugeordnet wurden...)?

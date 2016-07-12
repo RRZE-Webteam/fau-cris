@@ -33,8 +33,8 @@ class Auszeichnungen {
             $this->einheit = "orga";
         }
 
-        if ($this->cms == 'wbk' && $this->cris_award_link == 1) {
         $univis = NULL;
+        if ($this->cms == 'wbk' && $this->cris_award_link == 1) {
             $this->univisID = Tools::get_univis_id();
             // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
             // Mitarbeiter der Institution zugeordnet wurden...)?
