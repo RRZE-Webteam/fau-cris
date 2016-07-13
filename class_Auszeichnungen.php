@@ -318,7 +318,7 @@ class Auszeichnungen {
             $awardlist .= $awardname == 1 ? "<br /><strong>" . $award_name . "</strong> " : '';
             $awardlist .= (isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "";
             $awardlist .= ($year == 1 && !empty($award_year)) ? "<br />" . $award_year : '';
-            $awardlist .= isset($award_pic['desc']) ? "<br /><span class=\"imgsrc\">(" . $award_pic['desc'] . ")</span>" : "";
+            $awardlist .= isset($award_pic['desc']) ? "<br /><span class=\"imgsrc\">(" . _x('Bild:','Wird bei Galerien vor die Bildquelle geschrieben.' , 'fau-cris') . " ". $award_pic['desc'] . ")</span>" : "";
             $awardlist .= "</li>";
         }
 
