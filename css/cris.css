@@ -24,16 +24,18 @@ ul.cris-gallery li {
 ul.cris-gallery li p {
     font-size: 1em;
 }
-
 ul.cris-gallery li img {
     display: block;
-    margin: 0 auto 10px;
+    margin: 0 0 10px;
     max-width: 180px;
     max-height: 180px;
 }
+ul.cris-gallery li .imgsrc {
+    font-size: .9em;
+}
 ul.cris-gallery li .noimage {
     display: block;
-    margin: 0 auto 10px;
+    margin: 0 0 10px;
     width: 130px;
     height: 180px;
     background-color: #eee;
