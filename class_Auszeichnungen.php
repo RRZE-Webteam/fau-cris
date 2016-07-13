@@ -313,12 +313,12 @@ class Auszeichnungen {
             $award_pic = self::get_pic($award['ID']);
 
             $awardlist .= "<li>";
-            $awardlist .= strlen($award_pic) > 50 ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
-            $awardlist .= $name == 1 ? $award_preistraeger . "<br />" : '';
-            $awardlist .= $awardname == 1 ? "<strong>" . $award_name . "</strong> "
-                    . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") . "<br />" : '';
-            $awardlist .= ($year == 1 && !empty($award_year)) ? $award_year : '';
-
+            $awardlist .= !empty($award_pic) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic['png'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
+            $awardlist .= $name == 1 ? $award_preistraeger : '';
+            $awardlist .= $awardname == 1 ? "<br /><strong>" . $award_name . "</strong> " : '';
+            $awardlist .= (isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "";
+            $awardlist .= ($year == 1 && !empty($award_year)) ? "<br />" . $award_year : '';
+            $awardlist .= isset($award_pic['desc']) ? "<br /><span class=\"imgsrc\">(" . $award_pic['desc'] . ")</span>" : "";
             $awardlist .= "</li>";
         }
 
@@ -336,7 +336,12 @@ class Auszeichnungen {
         if ($picXml['size'] != 0) {
             foreach ($picXml->infoObject->attribute as $picAttribut) {
                 if ($picAttribut['name'] == 'png180') {
-                    $pic = 'data:image/PNG;base64,' . $picAttribut->data;
+                    $pic['png'] = 'data:image/PNG;base64,' . $picAttribut->data;
+                }
+            }
+            foreach ($picXml->infoObject->relation->attribute as $picRelAttribut) {
+                if ($picRelAttribut['name'] == 'description') {
+                    $pic['desc'] = (string) $picRelAttribut->data;
                 }
             }
         }
