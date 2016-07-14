@@ -313,12 +313,12 @@ class Auszeichnungen {
             $award_pic = self::get_pic($award['ID']);
 
             $awardlist .= "<li>";
-            $awardlist .= !empty($award_pic) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic['png'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
+            $awardlist .= (isset($award_pic['png']) && strlen($award_pic['png']) > 30) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic['png'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
             $awardlist .= $name == 1 ? $award_preistraeger : '';
             $awardlist .= $awardname == 1 ? "<br /><strong>" . $award_name . "</strong> " : '';
             $awardlist .= (isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "";
             $awardlist .= ($year == 1 && !empty($award_year)) ? "<br />" . $award_year : '';
-            $awardlist .= isset($award_pic['desc']) ? "<br /><span class=\"imgsrc\">(" . _x('Bild:','Wird bei Galerien vor die Bildquelle geschrieben.' , 'fau-cris') . " ". $award_pic['desc'] . ")</span>" : "";
+            $awardlist .= (isset($award_pic['desc']) && strlen($award_pic['desc']) > 0) ? "<br /><span class=\"imgsrc\">(" . _x('Bild:','Wird bei Galerien vor die Bildquelle geschrieben.' , 'fau-cris') . " ". $award_pic['desc'] . ")</span>" : "";
             $awardlist .= "</li>";
         }
 
@@ -328,25 +328,32 @@ class Auszeichnungen {
     }
 
     private function get_pic($award) {
-        $pic = '';
 
+        $pic = array();
         $picString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Award/" . $award . "/awar_has_pict";
         $picXml = Tools::XML2obj($picString);
 
         if ($picXml['size'] != 0) {
             foreach ($picXml->infoObject->attribute as $picAttribut) {
                 if ($picAttribut['name'] == 'png180') {
-                    $pic['png'] = 'data:image/PNG;base64,' . $picAttribut->data;
+                    if (!empty($picAttribut->data)) {
+                        $pic['png'] = 'data:image/PNG;base64,' . $picAttribut->data;
+                    } else {
+                        // Wenn es kein Bild gibt, braucht er auch die Quelle nicht auslesen
+                        return $pic;
+                    }
                 }
             }
             foreach ($picXml->infoObject->relation->attribute as $picRelAttribut) {
                 if ($picRelAttribut['name'] == 'description') {
-                    $pic['desc'] = (string) $picRelAttribut->data;
+                    if (!empty($picRelAttribut->data)) {
+                        $pic['desc'] = (string) $picRelAttribut->data;
+                    }
                 }
             }
         }
         return $pic;
-    }
+        }
 
 }
 
