@@ -11,11 +11,12 @@ class Publikationen {
     public $output;
 
     public function __construct($einheit = '', $id = '') {
+
         $this->cms = 'wp';
         $this->options = (array) get_option('_fau_cris');
         $this->orgNr = $this->options['cris_org_nr'];
         $this->order = $this->options['cris_pub_order'];
-        $this->univisLink = isset($this->options['cris_univis']) ? $this->options['cris_univis'] : 0;
+        $this->univisLink = isset($this->options['cris_univis']) ? $this->options['cris_univis'] : 'none';
         $this->pathPersonenseiteUnivis = '/person/';
         $this->bibtex = $this->options['cris_bibtex'];
         $this->suchstring = '';
@@ -34,7 +35,7 @@ class Publikationen {
         }
 
         $univis = NULL;
-        if ($this->cms == 'wbk' && $this->univisLink == 1) {
+        if ($this->cms == 'wbk' && $this->cris_award_link == 'person') {
             $this->univisID = Tools::get_univis_id();
             // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
             // Mitarbeiter der Institution zugeordnet wurden...)?
@@ -227,7 +228,6 @@ class Publikationen {
             $publist .= $publication->attributes['quotation' . $quotation];
             if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
                 $publist .= "<br />BibTeX: " . $publication->attributes['bibtex_link'];
-                //$publist .= "<br />BibTeX: <a href=\"http:/ /cris.fau.de/bibtex/publication/ID.bib\">http:/ /cris.fau.de/bibtex/publication/" . $pubDetails['ID'] . ".bib</a>";
             }
             $publist .= "</li>";
         }
@@ -251,7 +251,7 @@ class Publikationen {
             $id = $publicationObject->ID;
 
             $authors = explode(", ", $publication['relauthors']);
-            $authorIDs = explode(",", $publication['relauthorsid']);
+            $authorIDs = explode(",", $publication['relpersid']);
             $authorsArray = array();
             foreach ($authorIDs as $i => $key) {
                 $authorsArray[] = array('id' => $key, 'name' => $authors[$i]);
@@ -292,11 +292,23 @@ class Publikationen {
                 $authordata = $span_pre . $author['name'] . $span_post;
                 $author_firstname = explode(" ", $author['name'])[1];
                 $author_lastname = explode(" ", $author['name'])[0];
-                if ($this->univisLink == 1
-                        && Tools::person_exists($this->cms, $author_firstname, $author_lastname, $this->univis)) {
-                    $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $author_firstname, $author_lastname) . "\">";
-                    $link_post = "</a>";
-                    $authordata = $link_pre . $authordata . $link_post;
+
+                switch ($this->univisLink) {
+                    case 'cris' :
+                        if (is_numeric($author['id'])) {
+                            $link_pre = "<a href=\"https://cris.fau.de/converis/publicweb/Person/" . $author['id'] . "\" class=\"extern\">";
+                            $link_post = "</a>";
+                            $authordata = $link_pre . $authordata . $link_post;
+                        }
+                        break;
+                    case 'person':
+                        if (Tools::person_exists($this->cms, $author_firstname, $author_lastname, $this->univis)) {
+                            $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $author_firstname, $author_lastname) . "\">";
+                            $link_post = "</a>";
+                            $authordata = $link_pre . $authordata . $link_post;
+                        }
+                        break;
+                    default:
                 }
                 $authorList[] = $authordata;
             }

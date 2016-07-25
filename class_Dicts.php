@@ -107,10 +107,10 @@ class CRIS_Dicts {
         "andere"
     );
     public static $awardOrder = array(
-        "Preis / Ehrung",
-        "Stipendium / Grant",
-        "Akademie-Mitgliedschaft",
-        "Weitere Preise"
+        'preise',
+        'stipendien',
+        'mitgliedschaften',
+        'andere'
     );
     public static $awardTitles = array(
         'Akademie-Mitgliedschaft' => array(

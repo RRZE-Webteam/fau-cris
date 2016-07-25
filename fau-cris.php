@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 1.83
+ * Version: 1.9
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -33,7 +33,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '1.83';
+    const version = '1.9';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -136,14 +136,14 @@ class FAU_CRIS {
                 'abschlussarbeiten',
                 'andere'),
             'cris_cache' => '18000',
-            'cris_univis' => 0,
+            'cris_univis' => 'none',
             'cris_bibtex' => 0,
             'cris_award_order' => array(
                 'preise',
                 'stipendien',
                 'mitgliedschaften',
                 'andere'),
-            'cris_award_link' => 0,
+            'cris_award_link' => 'none',
         );
         return $options;
     }
@@ -224,10 +224,13 @@ class FAU_CRIS {
                 )
         );
         add_settings_field(
-                'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
+            'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_publications_section', array(
             'name' => 'cris_univis',
-            'description' => __('Sollen die Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinkt werden?', self::textdomain)
-                )
+            'options' => array(
+                'person' => __('Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                'none' => __('keinen Link setzen', self::textdomain))
+            )
         );
         add_settings_section(
                 'cris_awards_section', // ID
@@ -242,9 +245,24 @@ class FAU_CRIS {
                 )
         );
         add_settings_field(
-                'cris_award_link', __('Preisträger verlinken', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_awards_section', array(
+            'cris_award_link', __('Preisträger verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_awards_section', array(
             'name' => 'cris_award_link',
-            'description' => __('Sollen die Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinkt werden?', self::textdomain)
+            'options' => array(
+                'person' => __('Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                'none' => __('keinen Link setzen', self::textdomain))
+            )
+        );
+        add_settings_section(
+                'cris_projects_section', // ID
+                __('Forschungsprojekte', self::textdomain), // Title
+                '__return_false', // Callback
+                'fau_cris_options' // Page
+        );
+        add_settings_field(
+                'cris_project_order', __('Reihenfolge der Forschungsprojekte', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_projects_section', array(
+            'name' => 'cris_project_order',
+            'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
                 )
         );
     }
@@ -257,10 +275,11 @@ class FAU_CRIS {
         $default_options = self::default_options();
         $new_input['cris_org_nr'] = isset($input['cris_org_nr']) ? sanitize_text_field($input['cris_org_nr']) : 0;
         $new_input['cris_pub_order'] = isset($input['cris_pub_order']) ? explode("\n", str_replace("\r", "", $input['cris_pub_order'])) : $default_options['cris_pub_order'];
-        $new_input['cris_univis'] = isset($input['cris_univis']) ? 1 : 0;
+        $new_input['cris_univis'] = in_array($input['cris_univis'], array('person', 'cris', 'none')) ? $input['cris_univis'] : $default_options['cris_univis'];
         $new_input['cris_bibtex'] = isset($input['cris_bibtex']) ? 1 : 0;
         $new_input['cris_award_order'] = isset($input['cris_award_order']) ? explode("\n", str_replace("\r", "", $input['cris_award_order'])) : $default_options['cris_award_order'];
-        $new_input['cris_award_link'] = isset($input['cris_award_link']) ? 1 : 0;
+        $new_input['cris_award_link'] = in_array($input['cris_award_link'], array('person', 'cris', 'none')) ? $input['cris_award_link'] : $default_options['cris_award_link'];
+        $new_input['cris_project_order'] = isset($input['cris_project_order']) ? explode("\n", str_replace("\r", "", $input['cris_project_order'])) : $default_options['cris_project_order'];
         return $new_input;
     }
 
@@ -284,6 +303,34 @@ class FAU_CRIS {
             <span class="description"><?php echo $description; ?></span></label>
             <?php
         }
+    }
+
+    // Radio Button
+    public static function cris_radio_callback($args) {
+        $options = self::get_options();
+        if (array_key_exists('name', $args))
+            $name = esc_attr($args['name']);
+        if (array_key_exists('description', $args))
+            $description = esc_attr($args['description']);
+        if (array_key_exists('options', $args))
+            $radios = $args['options'];
+        foreach ($radios as $_k => $_v) { ?>
+            <label>
+                <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>"
+                   type='radio'
+                   value='<?php print $_k; ?>'
+                   <?php
+                    if (array_key_exists($name, $options)) {
+                       checked($options[$name], $_k);
+                    } ?>
+                >
+                <?php print $_v; ?>
+            </label><br />
+        <?php }
+
+        if (isset($description)) { ?>
+            <p class="description"><?php echo $description; ?></p>
+        <?php }
     }
 
     // Textbox
