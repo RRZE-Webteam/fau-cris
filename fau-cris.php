@@ -253,7 +253,7 @@ class FAU_CRIS {
                 'none' => __('keinen Link setzen', self::textdomain))
             )
         );
-        add_settings_section(
+       /* add_settings_section(
                 'cris_projects_section', // ID
                 __('Forschungsprojekte', self::textdomain), // Title
                 '__return_false', // Callback
@@ -264,7 +264,7 @@ class FAU_CRIS {
             'name' => 'cris_project_order',
             'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
                 )
-        );
+        );*/
     }
 
     /**
