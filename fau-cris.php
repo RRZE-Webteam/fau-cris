@@ -264,6 +264,7 @@ class FAU_CRIS {
             'name' => 'cris_project_order',
             'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
                 )
+        );*/
     }
 
     /**
