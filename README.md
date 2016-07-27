@@ -1,7 +1,7 @@
 CRIS-Plugin für Wordpress
 =========================
 
-Version 1.84 (Stand 14.07.2016)
+Version 1.91 (Stand 26.07.2016)
 
 Einbinden von Daten aus dem FAU-Forschungsinformationssystem <b>CRIS</b> in Webseiten
 
@@ -62,6 +62,11 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 Die in den Einstellungen festgelegte CRIS-ID kann überschrieben werden, entweder durch die ID einer anderen Organisationseinheit, oder durch die ID einer einzelnen Person:
 - <b>orgID="123456"</b> für eine von den Einstellungen abweichende Organisations-ID. Sie können auch mehrere Organisations-IDs angeben, durch Komma getrennt: <b>orga="123456,987654"</b>
 - <b>persID="123456"</b> für die Einträge zu einer konkreten Person
+
+### Sortierung
+Publikationslisten können nach dem Zeitstempel der Erstellung oder der letzten Bearbeitung des Datensatzes sortiert werden. In dem Fall wird eine nicht gegliederte Liste ausgegeben.
+- <b>sortby=created</b>
+- <b>sortby=updated</b>
 
 ## Beispiele
 Die Daten lassen sich gliedern und/oder filtern:<br>

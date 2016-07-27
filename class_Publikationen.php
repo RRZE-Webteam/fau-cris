@@ -59,7 +59,7 @@ class Publikationen {
      * Ausgabe aller Publikationen ohne Gliederung
      */
 
-    public function pubListe($year = '', $start = '', $type = '', $quotation = '', $items = '') {
+    public function pubListe($year = '', $start = '', $type = '', $quotation = '', $items = '', $sortby = 'virtualdate') {
         $pubArray = $this->fetch_publications($year, $start, $type);
 
         if (!count($pubArray)) {
@@ -67,8 +67,16 @@ class Publikationen {
             return $output;
         }
 
-        // sortiere nach Erscheinungsdatum
-        $order = "virtualdate";
+        switch ($sortby) {
+            case 'created':
+                $order = 'createdon';
+                break;
+            case 'updated':
+                $order = 'updatedon';
+                break;
+            default:
+                $order = 'virtualdate';
+        }
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($pubArray);
         if ($items != '')
@@ -313,7 +321,7 @@ class Publikationen {
                 $authorList[] = $authordata;
             }
             $publist .= implode(", ", $authorList);
-            $publist .= ($pubDetails['pubType'] == 'Editorial' ? '(' . __('Hrsg.', 'fau-cris') . '):' : ':');
+            $publist .= ($pubDetails['pubType'] == 'Editorial' ? ' (' . __('Hrsg.', 'fau-cris') . '):' : ':');
 
             $publist .= "<br /><span class=\"title\"><b>"
                     . "<a href=\"https://cris.fau.de/converis/publicweb/Publication/" . $id
