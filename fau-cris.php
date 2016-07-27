@@ -393,6 +393,7 @@ class FAU_CRIS {
             'pubtype' => '',
             'quotation' => '',
             'items' => '',
+            'sortby' => '',
             'award' => '',
             'awardnameid' => '',
             'type' => '',
@@ -412,6 +413,7 @@ class FAU_CRIS {
         $publication = sanitize_text_field($publication);
         $quotation = sanitize_text_field($quotation);
         $items = sanitize_text_field($items);
+        if (in_array($sortby, array('created', 'updated'))) $sortby = sanitize_text_field($sortby);
         $award = sanitize_text_field($award);
         $awardnameid = sanitize_text_field($awardnameid);
         $showname = sanitize_text_field($showname);
@@ -497,8 +499,8 @@ class FAU_CRIS {
                 if ($publication != '') {
                     return $liste->singlePub($quotation);
                 }
-                if (!empty($items)) {
-                    return $liste->pubListe($year, $start, $type, $quotation, $items);
+                if (!empty($items) || !empty($sortby)) {
+                    return $liste->pubListe($year, $start, $type, $quotation, $items, $sortby);
                 }
                 if ($orderby == 'type' || $orderby == 'pubtype') {
                     return $liste->pubNachTyp($year, $start, $type, $quotation);
