@@ -476,8 +476,6 @@ class FAU_CRIS {
           return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
           } */ else {
             if (isset($show) && $show == 'awards') {
-                return $liste->projListe($year, $start, $type, $items);
-            } elseif (isset($show) && $show == 'awards') {
                 // Awards
                 require_once('class_Auszeichnungen.php');
                 $liste = new Auszeichnungen($param1, $param2, $display);
