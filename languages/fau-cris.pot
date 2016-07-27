@@ -2,7 +2,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: FAU CRIS v1.9\n"
+"Project-Id-Version: FAU CRIS v1.91\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
 "POT-Revision-Date: Tue Jul 19 2016 11:00:12 GMT+0200 (CEST)\n"

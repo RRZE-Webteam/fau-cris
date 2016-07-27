@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 1.9
+ * Version: 1.91
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -264,7 +264,6 @@ class FAU_CRIS {
             'name' => 'cris_project_order',
             'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
                 )
-        );*/
     }
 
     /**
@@ -474,6 +473,8 @@ class FAU_CRIS {
           return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
           } */ else {
             if (isset($show) && $show == 'awards') {
+                return $liste->projListe($year, $start, $type, $items);
+            } elseif (isset($show) && $show == 'awards') {
                 // Awards
                 require_once('class_Auszeichnungen.php');
                 $liste = new Auszeichnungen($param1, $param2, $display);
