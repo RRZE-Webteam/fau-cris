@@ -271,9 +271,6 @@ class FAU_CRIS {
             'name' => 'cris_project_order',
             'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
                 )
-<<<<<<< Updated upstream
-        );*/
-=======
         );
         add_settings_field(
             'cris_project_link', __('Projektbeteiligte verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_projects_section', array(
@@ -284,7 +281,6 @@ class FAU_CRIS {
                 'none' => __('keinen Link setzen', self::textdomain))
             )
         );
->>>>>>> Stashed changes
     }
 
     /**
@@ -501,9 +497,6 @@ class FAU_CRIS {
           // IDs mit zu vielen Ergebnissen ausschließen
           return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
           } */ else {
-<<<<<<< Updated upstream
-            if (isset($show) && $show == 'awards') {
-=======
             if (isset($show) && $show == 'projects') {
                 // Projekte
                 require_once('class_Projekte.php');
@@ -523,7 +516,6 @@ class FAU_CRIS {
                 }
                 return $liste->projListe($year, $start, $type, $items);
             } elseif (isset($show) && $show == 'awards') {
->>>>>>> Stashed changes
                 // Awards
                 require_once('class_Auszeichnungen.php');
                 $liste = new Auszeichnungen($param1, $param2, $display);
