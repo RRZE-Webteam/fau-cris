@@ -59,7 +59,7 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($year = '', $start = '', $type = '', $items = '') {
+    public function projListe($year = '', $start = '', $type = '', $items = '', $hide = '') {
         $projArray = $this->fetch_projects($year, $start, $type);
 
         if (!count($projArray)) {
@@ -78,7 +78,7 @@ class Projekte {
 
         $output = '';
 
-        $output .= $this->make_list($projList);
+        $output .= $this->make_list($projList, $hide);
 
         return $output;
     }
@@ -87,7 +87,7 @@ class Projekte {
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
 
-    public function projNachJahr($year = '', $start = '', $type = '') {
+    public function projNachJahr($year = '', $start = '', $type = '', $hide = '') {
         $projArray = $this->fetch_projects($year, $start, $type);
 
         if (!count($projArray)) {
@@ -105,7 +105,7 @@ class Projekte {
                 $output .= '<h3>' . $array_year . '</h3>';
                 //$output .= '<h3>' . substr($array_year, 0, 4) . '</h3>';
             }
-            $output .= $this->make_list($projects);
+            $output .= $this->make_list($projects, $hide);
         }
         return $output;
     }
@@ -114,7 +114,7 @@ class Projekte {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function projNachTyp($year = '', $start = '', $type = '') {
+    public function projNachTyp($year = '', $start = '', $type = '', $hide = '') {
         $projArray = $this->fetch_projects($year, $start, $type);
 
         if (!count($projArray)) {
@@ -148,7 +148,7 @@ class Projekte {
                 $output .= $title;
                 $output .= "</h3>";
             }
-            $output .= $this->make_list($projects,0);
+            $output .= $this->make_list($projects, $hide, 0);
         }
         return $output;
     }
@@ -157,7 +157,7 @@ class Projekte {
      * Ausgabe eines einzelnen Projektes
      */
 
-    public function singleProj() {
+    public function singleProj($hide = '') {
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -170,7 +170,7 @@ class Projekte {
             return $output;
         }
 
-        $output = $this->make_single($projArray);
+        $output = $this->make_single($projArray, $hide);
 
         return $output;
     }
@@ -206,7 +206,7 @@ class Projekte {
      * Ausgabe der Awards
      */
 
-    private function make_single($projects) {
+    private function make_single($projects, $hide = '') {
 
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $projlist = '';
@@ -222,68 +222,72 @@ class Projekte {
             $id = $project['ID'];
             $title = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
             $type = Tools::getprojTranslation($project['project type'], get_locale());
-            $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $description = strip_tags($description, '<br><br/><a>');
-            setlocale(LC_TIME, get_locale());
-            $start = !empty($project['virtualstartdate']) ? $project['virtualstartdate'] : $project['cfstartdate'];
-            $start = strftime('%x', strtotime($start));
-            $end = !empty($project['virtualenddate']) ? $project['virtualenddate'] : $project['cfenddate'];
-            $end = strftime('%x', strtotime($end));
-            $url = $project['cfuri'];
-            $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
-            //$acronym = $project['cfacro'];
-            $funding = $this->get_project_funding($id);
-            $leaderIDs = explode(",", $project['relpersidlead']);
-            $collIDs = explode(",", $project['relpersidcoll']);
-            $persons = $this->get_project_persons($id, $leaderIDs, $collIDs);
-            $leaders = array();
-            foreach ($persons['leaders'] as $l_id => $l_names) {
-                $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-            }
-            $members = array();
-            foreach ($persons['members'] as $m_id => $m_names) {
-                $members[] = Tools::get_person_link($m_id, $m_names['firstname'], $m_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-            }
-            $publications = $this->get_project_publications($id, $quotation = '');
-
             $projlist .= "<h3>" . $title . "</h3>";
 
             if (!empty($type))
                 $projlist .= "<p class=\"project-type\">(" . $type . ")</p>";
 
-            $projlist .= "<p class=\"project-details\">";
-            if (!empty($parentprojecttitle))
-                $projlist .=  "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
-            if (!empty($leaders)) {
-                $projlist .= "<br /><b>" . __('Projektleitung', 'fau-cris') . ': </b>';
-                $projlist .= implode(', ', $leaders);
-            }
-            if (!empty($members)) {
-                $projlist .= "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ': </b>';
-                $projlist .= implode(', ', $members);
-            }
-            if (!empty($start))
-                $projlist .= "<br /><b>" . __('Projektstart', 'fau-cris') . ': </b>' . $start;
-            if (!empty($end))
-                $projlist .= "<br /><b>" . __('Projektende', 'fau-cris') . ': </b>' . $end;
-            if (!empty($funding)) {
-                $projlist .= "<br /><b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
-                $projlist .= implode(', ', $funding);
-            }
-            if (!empty($url))
-                $projlist .= "<br /><b>" . __('URL', 'fau-cris') . ": </b><a href=\"" . $url . "\">" . $url . "</a>";
-            $projlist .= "</p>";
+            if (!in_array('details', $hide)) {
+                $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
+                $leaderIDs = explode(",", $project['relpersidlead']);
+                $collIDs = explode(",", $project['relpersidcoll']);
+                $persons = $this->get_project_persons($id, $leaderIDs, $collIDs);
+                $leaders = array();
+                foreach ($persons['leaders'] as $l_id => $l_names) {
+                    $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                }
+                $members = array();
+                foreach ($persons['members'] as $m_id => $m_names) {
+                    $members[] = Tools::get_person_link($m_id, $m_names['firstname'], $m_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                }
+                setlocale(LC_TIME, get_locale());
+                $start = !empty($project['virtualstartdate']) ? $project['virtualstartdate'] : $project['cfstartdate'];
+                $start = strftime('%x', strtotime($start));
+                $end = !empty($project['virtualenddate']) ? $project['virtualenddate'] : $project['cfenddate'];
+                $end = strftime('%x', strtotime($end));
+                $funding = $this->get_project_funding($id);
+                $url = $project['cfuri'];
+                //$acronym = $project['cfacro'];
 
-            if (!empty($description))
+                $projlist .= "<p class=\"project-details\">";
+                if (!empty($parentprojecttitle))
+                    $projlist .=  "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
+                if (!empty($leaders)) {
+                    $projlist .= "<br /><b>" . __('Projektleitung', 'fau-cris') . ': </b>';
+                    $projlist .= implode(', ', $leaders);
+                }
+                if (!empty($members)) {
+                    $projlist .= "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ': </b>';
+                    $projlist .= implode(', ', $members);
+                }
+                if (!empty($start))
+                    $projlist .= "<br /><b>" . __('Projektstart', 'fau-cris') . ': </b>' . $start;
+                if (!empty($end))
+                    $projlist .= "<br /><b>" . __('Projektende', 'fau-cris') . ': </b>' . $end;
+                if (!empty($funding)) {
+                    $projlist .= "<br /><b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
+                    $projlist .= implode(', ', $funding);
+                }
+                if (!empty($url))
+                    $projlist .= "<br /><b>" . __('URL', 'fau-cris') . ": </b><a href=\"" . $url . "\">" . $url . "</a>";
+                $projlist .= "</p>";
+            }
+
+            if (!in_array('abstract', $hide)) {
+                $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
+                $description = strip_tags($description, '<br><br/><a>');
                 $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
-            if (!empty($publications))
+            }
+            if (!in_array('publications', $hide)) {
+                $publications = $this->get_project_publications($id, $quotation = '');
                 $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+            }
         }
         $projlist .= "</div>";
         return $projlist;
     }
 
-    private function make_list($projects, $showtype = 1) {
+    private function make_list($projects, $hide, $showtype = 1) {
 
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $projlist = '';
@@ -299,43 +303,49 @@ class Projekte {
             $id = $project['ID'];
             $title = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
             $type = Tools::getprojTranslation($project['project type'], get_locale());
-            $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $description = strip_tags($description, '<br><br/><a>');
-            setlocale(LC_TIME, get_locale());
-            $start = !empty($project['virtualstartdate']) ? $project['virtualstartdate'] : $project['cfstartdate'];
-            $start = strftime('%x', strtotime($start));
-            $end = !empty($project['virtualenddate']) ? $project['virtualenddate'] : $project['cfenddate'];
-            $end = strftime('%x', strtotime($end));
-            $url = $project['cfuri'];
-            $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
-            //$acronym = $project['cfacro'];
-            $funding = $this->get_project_funding($id);
 
             $projlist .= "<li>";
             $projlist .= "<span class=\"project-title\">" . $title . "</span>";
             if (!empty($type) && $showtype == 1)
                 $projlist .= "<br />(" . $type . ")";
-            $projlist .= "<div class=\"project-details\">";
-            if (!empty($parentprojecttitle))
-                $projlist .=  "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
-            if (!empty($start) || !empty($end))
-                $projlist .= "<br /><b>" . __('Laufzeit', 'fau-cris') . ': </b>' . $start;
-            if (!empty($end))
-                $projlist .= " &ndash; " . $end;
-            if (!empty($funding)) {
-                $projlist .= "<br /><b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
-                $projlist .= implode(', ', $funding);
-            }
-            if (!empty($url))
-                $projlist .= "<br /><b>" . __('URL', 'fau-cris') . ": </b><a href=\"" . $url . "\">" . $url . "</a>";
-            $projlist .= "</div>";
 
-            if (!empty($description))
-                $projlist .= "<div>"
+            if (!in_array('details', $hide)) {
+                $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
+            //$acronym = $project['cfacro'];
+                setlocale(LC_TIME, get_locale());
+                $start = !empty($project['virtualstartdate']) ? $project['virtualstartdate'] : $project['cfstartdate'];
+                $start = strftime('%x', strtotime($start));
+                $end = !empty($project['virtualenddate']) ? $project['virtualenddate'] : $project['cfenddate'];
+                $end = strftime('%x', strtotime($end));
+                $funding = $this->get_project_funding($id);
+                $url = $project['cfuri'];
+
+                $projlist .= "<div class=\"project-details\">";
+                if (!empty($parentprojecttitle))
+                    $projlist .=  "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
+                if (!empty($start) || !empty($end))
+                    $projlist .= "<br /><b>" . __('Laufzeit', 'fau-cris') . ': </b>' . $start;
+                if (!empty($end))
+                    $projlist .= " &ndash; " . $end;
+                if (!empty($funding)) {
+                    $projlist .= "<br /><b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
+                    $projlist .= implode(', ', $funding);
+                }
+                if (!empty($url))
+                    $projlist .= "<br /><b>" . __('URL', 'fau-cris') . ": </b><a href=\"" . $url . "\">" . $url . "</a>";
+                $projlist .= "</div>";
+            }
+
+            if (!in_array('abstract', $hide) && !empty($description)) {
+                $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
+                $description = strip_tags($description, '<br><br/><a>');
+
+                    $projlist .= "<div>"
                     . "<div class=\"abstract-title\"><a title=\"" . __('Abstract anzeigen', 'fau-cris') . "\">" . __('Abstract', 'fau-cris') . "</a> </div>"
                     . "<div class=\"abstract\">" . $description . '</div>'
                     . '</div>';
-            if (!empty($id))
+            }
+            if (!in_array('link', $hide) && !empty($id))
                 $projlist .= "<div>" . "<a href=\"https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1') . "\" title=\"" . __('Zur Projektseite auf cris.fau.de wechseln', 'fau-cris') . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> &#8594; </div>";
             $projlist .= "</li>";
         }

@@ -372,6 +372,7 @@ class FAU_CRIS {
     // Textarea
     public static function cris_textarea_callback($args) {
         $options = self::get_options();
+        $default_options = self::default_options();
         if (array_key_exists('name', $args))
             $name = esc_attr($args['name']);
         if (array_key_exists('description', $args))
@@ -382,7 +383,7 @@ class FAU_CRIS {
                 if (is_array($options[$name])) {
                     echo implode("\n", $options[$name]);
                 } else {
-                    echo $options[$name];
+                    echo implode("\n", $default_options[$name]);
                 }
             }
             ?></textarea><br />
@@ -420,6 +421,7 @@ class FAU_CRIS {
             'showawardname' => 1,
             'display' => 'list',
             'project' => '',
+            'hide' => ''
                         ), $atts));
 
         $show = sanitize_text_field($show);
@@ -440,6 +442,9 @@ class FAU_CRIS {
         $showawardname = sanitize_text_field($showawardname);
         $display = sanitize_text_field($display);
         $project = sanitize_text_field($project);
+        $hide = sanitize_text_field($hide);
+        $hide = str_replace(" ", "", $hide);
+        $hide = explode(",", $hide);
 
         if (isset($publication) && $publication != '') {
             $param1 = 'publication';
@@ -503,18 +508,18 @@ class FAU_CRIS {
                 $liste = new Projekte($param1, $param2);
 
                 if ($project != '') {
-                    return $liste->singleProj();
+                    return $liste->singleProj($hide);
                 }
                 if (!empty($items)) {
-                    return $liste->projListe($year, $start, $type, $items);
+                    return $liste->projListe($year, $start, $type, $items, $hide);
                 }
                 if ($orderby == 'type') {
-                    return $liste->projNachTyp($year, $start, $type);
+                    return $liste->projNachTyp($year, $start, $type, $hide);
                 }
                 if ($orderby == 'year') {
-                    return $liste->projNachJahr($year, $start, $type);
+                    return $liste->projNachJahr($year, $start, $type, $hide);
                 }
-                return $liste->projListe($year, $start, $type, $items);
+                return $liste->projListe($year, $start, $type, $items, $hide);
             } elseif (isset($show) && $show == 'awards') {
                 // Awards
                 require_once('class_Auszeichnungen.php');
