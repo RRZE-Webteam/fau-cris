@@ -238,23 +238,7 @@ class Auszeichnungen {
             $preistraeger_firstname = explode(" ", $award['award_preistraeger'])[0];
             $preistraeger_lastname = array_pop((array_slice(explode(" ", $award['award_preistraeger']), -1)));
             $preistraeger_id = $award['relpersid'];
-            switch ($this->cris_award_link) {
-                case 'cris' :
-                    if (is_numeric($preistraeger_id)) {
-                        $link_pre = "<a href=\"https://cris.fau.de/converis/publicweb/Person/" . $preistraeger_id . "\" class=\"extern\">";
-                        $link_post = "</a>";
-                        $award_preistraeger = $link_pre . $award_preistraeger . $link_post;
-                    }
-                    break;
-                case 'person':
-                    if (Tools::person_exists($this->cms, $preistraeger_firstname, $preistraeger_lastname, $this->univis)) {
-                        $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $preistraeger_firstname, $preistraeger_lastname) . "\">";
-                        $link_post = "</a>";
-                        $award_preistraeger = $link_pre . $award_preistraeger . $link_post;
-                    }
-                    break;
-                default:
-            }
+            $award_preistraeger = Tools::get_person_link($preistraeger_id, $preistraeger_firstname, $preistraeger_lastname, $this->cris_award_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
 
             if (!empty($award['award_name'])) {
                 $award_name = $award['award_name'];

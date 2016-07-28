@@ -144,6 +144,13 @@ class FAU_CRIS {
                 'mitgliedschaften',
                 'andere'),
             'cris_award_link' => 'none',
+            'cris_project_order' => array(
+                'einzelfoerderung',
+                'teilprojekt',
+                'gesamtprojekt',
+                'graduiertenkolleg',
+                'eigenmittel'),
+            'cris_project_link' => 'none'
         );
         return $options;
     }
@@ -253,7 +260,7 @@ class FAU_CRIS {
                 'none' => __('keinen Link setzen', self::textdomain))
             )
         );
-       /* add_settings_section(
+        add_settings_section(
                 'cris_projects_section', // ID
                 __('Forschungsprojekte', self::textdomain), // Title
                 '__return_false', // Callback
@@ -264,7 +271,20 @@ class FAU_CRIS {
             'name' => 'cris_project_order',
             'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
                 )
+<<<<<<< Updated upstream
         );*/
+=======
+        );
+        add_settings_field(
+            'cris_project_link', __('Projektbeteiligte verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_projects_section', array(
+            'name' => 'cris_project_link',
+            'options' => array(
+                'person' => __('Projektleiter und -beteiligte mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                'none' => __('keinen Link setzen', self::textdomain))
+            )
+        );
+>>>>>>> Stashed changes
     }
 
     /**
@@ -280,6 +300,7 @@ class FAU_CRIS {
         $new_input['cris_award_order'] = isset($input['cris_award_order']) ? explode("\n", str_replace("\r", "", $input['cris_award_order'])) : $default_options['cris_award_order'];
         $new_input['cris_award_link'] = in_array($input['cris_award_link'], array('person', 'cris', 'none')) ? $input['cris_award_link'] : $default_options['cris_award_link'];
         $new_input['cris_project_order'] = isset($input['cris_project_order']) ? explode("\n", str_replace("\r", "", $input['cris_project_order'])) : $default_options['cris_project_order'];
+        $new_input['cris_project_link'] = in_array($input['cris_project_link'], array('person', 'cris', 'none')) ? $input['cris_project_link'] : $default_options['cris_project_link'];
         return $new_input;
     }
 
@@ -402,6 +423,7 @@ class FAU_CRIS {
             'showyear' => 1,
             'showawardname' => 1,
             'display' => 'list',
+            'project' => '',
                         ), $atts));
 
         $show = sanitize_text_field($show);
@@ -421,6 +443,7 @@ class FAU_CRIS {
         $showyear = sanitize_text_field($showyear);
         $showawardname = sanitize_text_field($showawardname);
         $display = sanitize_text_field($display);
+        $project = sanitize_text_field($project);
 
         if (isset($publication) && $publication != '') {
             $param1 = 'publication';
@@ -432,6 +455,9 @@ class FAU_CRIS {
         } elseif (isset($award) && $award != '') {
             $param1 = 'award';
             $param2 = $award;
+        } elseif (isset($project) && $project != '') {
+            $param1 = 'project';
+            $param2 = $project;
         } elseif (isset($awardnameid) && $awardnameid != '') {
             $param1 = 'awardnameid';
             $param2 = $awardnameid;
@@ -475,7 +501,29 @@ class FAU_CRIS {
           // IDs mit zu vielen Ergebnissen ausschließen
           return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
           } */ else {
+<<<<<<< Updated upstream
             if (isset($show) && $show == 'awards') {
+=======
+            if (isset($show) && $show == 'projects') {
+                // Projekte
+                require_once('class_Projekte.php');
+                $liste = new Projekte($param1, $param2);
+
+                if ($project != '') {
+                    return $liste->singleProj();
+                }
+                if (!empty($items)) {
+                    return $liste->projListe($year, $start, $type, $items);
+                }
+                if ($orderby == 'type') {
+                    return $liste->projNachTyp($year, $start, $type);
+                }
+                if ($orderby == 'year') {
+                    return $liste->projNachJahr($year, $start, $type);
+                }
+                return $liste->projListe($year, $start, $type, $items);
+            } elseif (isset($show) && $show == 'awards') {
+>>>>>>> Stashed changes
                 // Awards
                 require_once('class_Auszeichnungen.php');
                 $liste = new Auszeichnungen($param1, $param2, $display);
@@ -516,6 +564,7 @@ class FAU_CRIS {
         if ($post && has_shortcode($post->post_content, 'cris')) {
             $plugin_url = plugin_dir_url(__FILE__);
             wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
+            wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array ( 'jquery' ));
         }
         //wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
     }
