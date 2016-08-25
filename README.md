@@ -42,17 +42,17 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 		- stipendien
 		- mitgliedschaften
 		- andere
-        - Projekte:
-                - einzelfoerderung
-                - teilprojekt
-                - gesamtprojekt
-                - graduiertenkolleg
-                - eigenmittel
+	- Projekte:
+		- einzelfoerderung
+		- teilprojekt
+		- gesamtprojekt
+		- graduiertenkolleg
+		- eigenmittel
 - <b>publication="12345678"</b>: Nur eine einzelne Publikation (hier die CRIS-ID der Publikation angeben)
 - <b>awardnameid="123"</b>: Nur eine einzelne Auszeichnung (hier die CRIS-ID der Auszeichnung angeben)
 - <b>award="12345678"</b>: Nur eine einzelne Preisverleihung (hier die CRIS-ID der Verleihung angeben)<br>
   Hinweis zum Unterschied zwischen awardnameid und award: <b>awardnameid</b> bedeutet die ID eines Preises, der normalerweise mehrfach vergeben wird, z.B. der "Gottfried-Wilhelm-Leibniz-Preis". <b>award</b> (bzw. dessen ID) bedeutet die konkrete, einmalige Verleihung dieses Preises an eine bestimmte Person.
-- <b>project="123456": Nur ein einzelnes Projekt. Hier ist die Ausgabe ausführlicher, u.a. mit Nennung der Projektbeteiligen (Projektleiter und -mitarbeiter) und einer Liste der dazugehörigen Publikationen.
+- <b>project="123456"</b>: Nur ein einzelnes Projekt. Hier ist die Ausgabe ausführlicher, u.a. mit Nennung der Projektbeteiligen (Projektleiter und -mitarbeiter) und einer Liste der dazugehörigen Publikationen.
 - <b>items="5"</b>: Nur die ersten 5 Publikationen anzeigen. In dem Fall werden "orderby"-Parameter ignoriert &ndash; es wird eine nicht gegliederte Liste ausgegeben.
 - Filter lassen sich auch kombinieren: z.B. <b>year="2014" type="buecher"</b> (= alle Bücher aus dem Jahr 2014)
 
@@ -67,8 +67,8 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 - <b>showyear=0</b>: Die Jahreszahl wird nicht angezeigt (z.B. für eine nach Jahren gegliederten Ansicht).
 - <b>showawardname=0</b>: Der Name der Auszeichnung wird nicht angezeigt (z.B. bei der Ausgabe awardnameid=123).
 
-####Projekte
-- <b>hide="details, abstract, publications": Ein oder mehrere Elemente können ausgeblendet werden
+#### Projekte
+- <b>hide="details, abstract, publications"</b>: Ein oder mehrere Elemente können ausgeblendet werden.
 
 ### ID überschreiben
 Die in den Einstellungen festgelegte CRIS-ID kann überschrieben werden, entweder durch die ID einer anderen Organisationseinheit, oder durch die ID einer einzelnen Person:
