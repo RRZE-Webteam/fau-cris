@@ -96,7 +96,7 @@ class Projekte {
         }
 
         // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
-        $formatter = new CRIS_formatter("cfstartdate", SORT_DESC, "cftitle", SORT_ASC);
+        $formatter = new CRIS_formatter("startyear", SORT_DESC, "cftitle", SORT_ASC);
         $projList = $formatter->execute($projArray);
 
         $output = '';
@@ -241,9 +241,9 @@ class Projekte {
                     $members[] = Tools::get_person_link($m_id, $m_names['firstname'], $m_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                 }
                 setlocale(LC_TIME, get_locale());
-                $start = !empty($project['virtualstartdate']) ? $project['virtualstartdate'] : $project['cfstartdate'];
+                $start = $project['cfstartdate'];
                 $start = strftime('%x', strtotime($start));
-                $end = !empty($project['virtualenddate']) ? $project['virtualenddate'] : $project['cfenddate'];
+                $end = !empty($project['cfenddate']) ? $project['cfenddate'] : $project['virtualenddate'];
                 $end = strftime('%x', strtotime($end));
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
@@ -251,7 +251,7 @@ class Projekte {
 
                 $projlist .= "<p class=\"project-details\">";
                 if (!empty($parentprojecttitle))
-                    $projlist .=  "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
+                    $projlist .= "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
                 if (!empty($leaders)) {
                     $projlist .= "<br /><b>" . __('Projektleitung', 'fau-cris') . ': </b>';
                     $projlist .= implode(', ', $leaders);
@@ -311,20 +311,19 @@ class Projekte {
 
             if (!in_array('details', $hide)) {
                 $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
-            //$acronym = $project['cfacro'];
+                //$acronym = $project['cfacro'];
                 setlocale(LC_TIME, get_locale());
-                $start = !empty($project['virtualstartdate']) ? $project['virtualstartdate'] : $project['cfstartdate'];
+                $start = $project['cfstartdate'];
                 $start = strftime('%x', strtotime($start));
-                $end = !empty($project['virtualenddate']) ? $project['virtualenddate'] : $project['cfenddate'];
+                $end = !empty($project['cfenddate']) ? $project['cfenddate'] : $project['virtualenddate'];
                 $end = strftime('%x', strtotime($end));
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
 
                 $projlist .= "<div class=\"project-details\">";
                 if (!empty($parentprojecttitle))
-                    $projlist .=  "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
+                    $projlist .= "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle . '<br />';
                 if (!empty($start) || !empty($end))
-                    $projlist .= "<br /><b>" . __('Laufzeit', 'fau-cris') . ': </b>' . $start;
                 if (!empty($end))
                     $projlist .= " &ndash; " . $end;
                 if (!empty($funding)) {
@@ -340,10 +339,10 @@ class Projekte {
                 $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
                 $description = strip_tags($description, '<br><br/><a>');
 
-                    $projlist .= "<div>"
-                    . "<div class=\"abstract-title\"><a title=\"" . __('Abstract anzeigen', 'fau-cris') . "\">" . __('Abstract', 'fau-cris') . "</a> </div>"
-                    . "<div class=\"abstract\">" . $description . '</div>'
-                    . '</div>';
+                $projlist .= "<div>"
+                        . "<div class=\"abstract-title\"><a title=\"" . __('Abstract anzeigen', 'fau-cris') . "\">" . __('Abstract', 'fau-cris') . "</a> </div>"
+                        . "<div class=\"abstract\">" . $description . '</div>'
+                        . '</div>';
             }
             if (!in_array('link', $hide) && !empty($id))
                 $projlist .= "<div>" . "<a href=\"https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1') . "\" title=\"" . __('Zur Projektseite auf cris.fau.de wechseln', 'fau-cris') . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> &#8594; </div>";
