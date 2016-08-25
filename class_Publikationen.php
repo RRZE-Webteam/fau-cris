@@ -319,8 +319,9 @@ class Publikationen {
                 $span_pre = "<span class=\"author\">";
                 $span_post = "</span>";
                 $authordata = $span_pre . $author['name'] . $span_post;
-                $author_firstname = explode(" ", $author['name'])[1];
-                $author_lastname = explode(" ", $author['name'])[0];
+                $author_elements = explode(" ", $author['name']);
+                $author_firstname = array_pop($author_elements);
+                $author_lastname = implode(" ", $author_elements);
                 $authorList[] = Tools::get_person_link($author['id'], $author_firstname, $author_lastname, $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
             }
             $publist .= implode(", ", $authorList);
