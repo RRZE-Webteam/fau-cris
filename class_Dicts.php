@@ -11,6 +11,7 @@ class CRIS_Dicts {
         'persid' => '',
         'publication' => '',
         'pubtype' => '',
+        'sortby' => '',
         'award' => '',
         'type' => '',
         'showname' => 1,
@@ -18,7 +19,8 @@ class CRIS_Dicts {
         'showawardname' => 1,
         'display' => 'list',
         'quotation' => '',
-        'items' => ''
+        'items' => '',
+        'role' => 'leader'
     );
     public static $pubTitles = array(
         'Journal article' => array(

@@ -59,8 +59,8 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($year = '', $start = '', $type = '', $items = '', $hide = '') {
-        $projArray = $this->fetch_projects($year, $start, $type);
+    public function projListe($year = '', $start = '', $type = '', $items = '', $hide = '', $role = 'leader') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -183,7 +183,7 @@ class Projekte {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_projects($year = '', $start = '', $type = '') {
+    private function fetch_projects($year = '', $start = '', $type = '', $role = 'leader') {
         $filter = Tools::project_filter($year, $start, $type);
 
         $ws = new CRIS_projects();
@@ -193,9 +193,9 @@ class Projekte {
             if ($this->einheit === "orga") {
                 $awardArray = $ws->by_orga_id($this->id, $filter);
             }
-            /* if ($this->einheit === "person") {
-              $awardArray = $ws->by_pers_id($this->id, $filter);
-              }*/
+            if ($this->einheit === "person") {
+                $awardArray = $ws->by_pers_id($this->id, $filter, $role);
+            }
         } catch (Exception $ex) {
             $awardArray = array();
         }
@@ -324,6 +324,7 @@ class Projekte {
                 if (!empty($parentprojecttitle))
                     $projlist .= "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle . '<br />';
                 if (!empty($start) || !empty($end))
+                    $projlist .= "<b>" . __('Laufzeit', 'fau-cris') . ': </b>' . $start;
                 if (!empty($end))
                     $projlist .= " &ndash; " . $end;
                 if (!empty($funding)) {
@@ -448,20 +449,23 @@ class CRIS_projects extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    /*    public function by_pers_id($persID=null, &$filter=null) {
-      if ($persID === null || $persID === "0")
-      throw new Exception('Please supply valid person ID');
+    public function by_pers_id($persID = null, &$filter = null, $role = 'leader') {
+        if ($persID === null || $persID === "0")
+            throw new Exception('Please supply valid person ID');
 
-      if (!is_array($persID))
-      $persID = array($persID);
+        if (!is_array($persID))
+            $persID = array($persID);
 
-      $requests = array();
-      foreach ($persID as $_p) {
-      $requests[] = sprintf('getrelated/Person/%d/awar_has_pers', $_p);
-      }
-      return $this->retrieve($requests, $filter);
-      }
-     */
+        $requests = array();
+        foreach ($persID as $_p) {
+            if ($role == 'leader') {
+                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
+            } else {
+                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
+            }
+        }
+        return $this->retrieve($requests, $filter);
+    }
 
     public function by_id($projID = null) {
         if ($projID === null || $projID === "0")
@@ -497,6 +501,10 @@ class CRIS_projects extends CRIS_webservice {
         foreach ($data as $_d) {
             foreach ($_d as $project) {
                 $a = new CRIS_project($project);
+                if ($a->ID) {
+                    $a->attributes['startyear'] = substr($a->attributes['cfstartdate'], 0, 4);
+                    $a->attributes['endyear'] = $a->attributes['cfenddate'] != '' ? substr($a->attributes['cfenddate'], 0, 4) : substr($a->attributes['virtualenddate'], 0, 4);
+                }
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))
                     $projects[$a->ID] = $a;
             }

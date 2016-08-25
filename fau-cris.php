@@ -380,7 +380,7 @@ class FAU_CRIS {
         ?>
         <textarea name="<?php printf('%s[' . $name . ']', self::option_name); ?>" cols="30" rows="8"><?php
             if (array_key_exists($name, $options)) {
-                if (is_array($options[$name])) {
+                if (is_array($options[$name]) && count($options[$name])>0 && $options[$name][0] !='') {
                     echo implode("\n", $options[$name]);
                 } else {
                     echo implode("\n", $default_options[$name]);
@@ -421,7 +421,8 @@ class FAU_CRIS {
             'showawardname' => 1,
             'display' => 'list',
             'project' => '',
-            'hide' => ''
+            'hide' => '',
+            'role' => 'leader'
                         ), $atts));
 
         $show = sanitize_text_field($show);
@@ -445,6 +446,7 @@ class FAU_CRIS {
         $hide = sanitize_text_field($hide);
         $hide = str_replace(" ", "", $hide);
         $hide = explode(",", $hide);
+        $role = sanitize_text_field($role);
 
         if (isset($publication) && $publication != '') {
             $param1 = 'publication';
@@ -511,15 +513,15 @@ class FAU_CRIS {
                     return $liste->singleProj($hide);
                 }
                 if (!empty($items)) {
-                    return $liste->projListe($year, $start, $type, $items, $hide);
+                    return $liste->projListe($year, $start, $type, $items, $hide, $role);
                 }
                 if ($orderby == 'type') {
-                    return $liste->projNachTyp($year, $start, $type, $hide);
+                    return $liste->projNachTyp($year, $start, $type, $hide, $role);
                 }
                 if ($orderby == 'year') {
-                    return $liste->projNachJahr($year, $start, $type, $hide);
+                    return $liste->projNachJahr($year, $start, $type, $hide, $role);
                 }
-                return $liste->projListe($year, $start, $type, $items, $hide);
+                return $liste->projListe($year, $start, $type, $items, $hide, $role);
             } elseif (isset($show) && $show == 'awards') {
                 // Awards
                 require_once('class_Auszeichnungen.php');
