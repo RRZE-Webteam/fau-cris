@@ -11,6 +11,7 @@ class CRIS_Dicts {
         'persid' => '',
         'publication' => '',
         'pubtype' => '',
+        'sortby' => '',
         'award' => '',
         'type' => '',
         'showname' => 1,
@@ -18,7 +19,8 @@ class CRIS_Dicts {
         'showawardname' => 1,
         'display' => 'list',
         'quotation' => '',
-        'items' => ''
+        'items' => '',
+        'role' => 'leader'
     );
     public static $pubTitles = array(
         'Journal article' => array(
@@ -155,6 +157,50 @@ class CRIS_Dicts {
             'de' => 'Weiterer Preis / Auszeichnung',
             'en' => 'Other Award',
         )
+    );
+
+    public static $projOrder = array(
+        'einzelfoerderung',
+        'teilprojekt',
+        'gesamtprojekt',
+        'graduiertenkolleg',
+        'eigenmittel'
+    );
+
+    public static $projNames = array(
+        'einzelfoerderung' => array(
+            'de' => 'Drittmittelfinanzierte Einzelförderung',
+            'en' => 'Third Party Funds Single'),
+        'teilprojekt' => array(
+            'de' => 'Drittmittelfinanzierte Gruppenförderung - Teilprojekt',
+            'en' => 'Third Party Funds Group - Sub project'),
+        'gesamtprojekt' => array(
+            'de' => 'Drittmittelfinanzierte Gruppenförderung - Gesamtprojekt',
+            'en' => 'Third Party Funds Group - Overall project'),
+        'graduiertenkolleg' => array(
+            'de' => 'Promotionsprogramm / Graduiertenkolleg',
+            'en' => 'Own and Third Party Funds Doctoral Programm - Overall project'),
+        'eigenmittel' => array(
+            'de' => 'Projekt aus Eigenmitteln',
+            'en' => 'Own Funds')
+    );
+
+    public static $projTitles = array(
+        'Third Party Funds Single' => array(
+            'de_DE' => 'Drittmittelfinanzierte Einzelförderungen',
+            'en_US' => 'Third Party Funds Single'),
+        'Third Party Funds Group - Sub project' => array(
+            'de_DE' => 'Drittmittelfinanzierte Gruppenförderungen &ndash; Teilprojekte',
+            'en_US' => 'Third Party Funds Group - Sub projects'),
+        'Third Party Funds Group - Overall project' => array(
+            'de_DE' => 'Drittmittelfinanzierte Gruppenförderungen &ndash; Gesamtprojekte',
+            'en_US' => 'Third Party Funds Group - Overall projects'),
+        'Own and Third Party Funds Doctoral Programm &hdash; Overall project' => array(
+            'de_DE' => 'Graduiertenkollegs',
+            'en_US' => 'Own and Third Party Funds Doctoral Programms &ndash; Overall projects'),
+        'Own Funds' => array(
+            'de_DE' => 'Projekte aus Eigenmitteln',
+            'en_US' => 'Own Funds'),
     );
 
 }

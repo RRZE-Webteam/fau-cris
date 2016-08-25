@@ -40,3 +40,23 @@ ul.cris-gallery li .noimage {
     height: 180px;
     background-color: #eee;
 }
+ul.cris-projects .project-type,
+div.cris-projects .project-type {
+    font-style: italic;
+}
+
+ul.cris-projects .project-title {
+    font-weight: bold;
+}
+.js ul.cris-projects .abstract-title:hover {
+    cursor: pointer;
+}
+.js ul.cris-projects .abstract-title:after {
+    content: '\25BC';
+}
+.js ul.cris-projects .abstract-title.open:after {
+    content: '\25B2';
+}
+.js .cris-projects .abstract {
+    display: none;
+}

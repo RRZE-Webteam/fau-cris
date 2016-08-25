@@ -49,6 +49,33 @@ class Tools {
         return CRIS_Dicts::$awardTitles[$award]['en_US'];
     }
 
+    public static function getProjName($proj, $lang) {
+        $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
+        if (array_key_exists($lang, CRIS_Dicts::$projNames[$proj])) {
+            return CRIS_Dicts::$projNames[$proj][$lang];
+        }
+        return CRIS_Dicts::$projNames[$proj]['en'];
+    }
+
+    public static function getProjTitle($proj, $lang) {
+        if (array_key_exists($lang, CRIS_Dicts::$projTitles[$proj])) {
+            return CRIS_Dicts::$projTitles[$proj][$lang];
+        }
+        if (strpos($lang, 'de_') === 0) {
+            return CRIS_Dicts::$projTitles[$proj]['de_DE'];
+        }
+        return CRIS_Dicts::$projTitles[$proj]['en_US'];
+    }
+
+    public static function getprojTranslation($proj, $lang) {
+        $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
+        foreach (CRIS_Dicts::$projNames as $name) {
+            if ($name['de'] == $proj || $name['en'] == $proj) {
+                return $name[$lang];
+            }
+        }
+    }
+
     public static function XML2obj($xml_url) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $xml_url);
@@ -212,6 +239,29 @@ class Tools {
     }
 
     /*
+     * Array zur Definition des Filters für Publikationen
+     */
+
+    public static function project_filter($year = '', $start = '', $type = '') {
+        $filter = array();
+        if ($year !== '' && $year !== NULL)
+            $filter['startyear__eq'] = $year;
+        if ($start !== '' && $start !== NULL)
+            $filter['startyear__ge'] = $start;
+        if ($type !== '' && $type !== NULL) {
+            $projTyp = Tools::getProjName($type, "en");
+            if (empty($projTyp)) {
+                $output .= '<p>' . __('Falscher Parameter für Projekttyp', '') . '</p>';
+                return $output;
+            }
+            $filter['project type__eq'] = $projTyp;
+        }
+        if (count($filter))
+            return $filter;
+        return null;
+    }
+
+    /*
      * Anbindung an UnivIS-/FAU-Person-Plugin
      */
 
@@ -261,6 +311,36 @@ class Tools {
         }
         fclose($fh);
         return $univisID;
+    }
+
+    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0) {
+        $person = '';
+        switch ($target) {
+            case 'cris' :
+                if (is_numeric($id)) {
+                    $link_pre = "<a href=\"https://cris.fau.de/converis/publicweb/Person/" . $id . "\" class=\"extern\">";
+                    $link_post = "</a>";
+                } else {
+                    $link_pre = '';
+                    $link_post = '';
+                }
+                break;
+            case 'person':
+                if (self::person_exists($cms, $firstname, $lastname, $univis)) {
+                    $link_pre = "<a href=\"" . $path . self::person_slug($cms, $firstname, $lastname) . "\">";
+                    $link_post = "</a>";
+                } else {
+                    $link_pre = '';
+                    $link_post = '';
+                }
+                break;
+            default:
+                $link_pre = '';
+                $link_post = '';
+        }
+        $name = $inv == 0 ? $firstname . " " . $lastname : $lastname . " " . $firstname;
+        $person = $link_pre . $name . $link_post;
+        return $person;
     }
 
 }

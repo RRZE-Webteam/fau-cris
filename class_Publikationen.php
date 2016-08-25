@@ -196,6 +196,27 @@ class Publikationen {
         return $output;
     }
 
+    public function projectPub($project, $quotation = '') {
+        $ws = new CRIS_publications();
+
+        try {
+            $pubArray = $ws->by_project($project);
+        } catch (Exception $ex) {
+            return;
+        }
+
+        if (!count($pubArray))
+            return;
+
+        if ($quotation == 'apa' || $quotation == 'mla') {
+            $output = $this->make_quotation_list($pubArray, $quotation);
+        } else {
+            $output = $this->make_list($pubArray);
+        }
+
+        return $output;
+    }
+
     /* =========================================================================
      * Private Functions
       ======================================================================== */
@@ -298,27 +319,10 @@ class Publikationen {
                 $span_pre = "<span class=\"author\">";
                 $span_post = "</span>";
                 $authordata = $span_pre . $author['name'] . $span_post;
-                $author_firstname = explode(" ", $author['name'])[1];
-                $author_lastname = explode(" ", $author['name'])[0];
-
-                switch ($this->univisLink) {
-                    case 'cris' :
-                        if (is_numeric($author['id'])) {
-                            $link_pre = "<a href=\"https://cris.fau.de/converis/publicweb/Person/" . $author['id'] . "\" class=\"extern\">";
-                            $link_post = "</a>";
-                            $authordata = $link_pre . $authordata . $link_post;
-                        }
-                        break;
-                    case 'person':
-                        if (Tools::person_exists($this->cms, $author_firstname, $author_lastname, $this->univis)) {
-                            $link_pre = "<a href=\"" . $this->pathPersonenseiteUnivis . Tools::person_slug($this->cms, $author_firstname, $author_lastname) . "\">";
-                            $link_post = "</a>";
-                            $authordata = $link_pre . $authordata . $link_post;
-                        }
-                        break;
-                    default:
-                }
-                $authorList[] = $authordata;
+                $author_elements = explode(" ", $author['name']);
+                $author_firstname = array_pop($author_elements);
+                $author_lastname = implode(" ", $author_elements);
+                $authorList[] = Tools::get_person_link($author['id'], $author_firstname, $author_lastname, $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
             }
             $publist .= implode(", ", $authorList);
             $publist .= ($pubDetails['pubType'] == 'Editorial' ? ' (' . __('Hrsg.', 'fau-cris') . '):' : ':');
@@ -481,6 +485,20 @@ class CRIS_publications extends CRIS_webservice {
         $requests = array();
         foreach ($publID as $_p) {
             $requests[] = sprintf('get/Publication/%d', $_p);
+        }
+        return $this->retrieve($requests);
+    }
+
+    public function by_project($projID = null) {
+        if ($projID === null || $projID === "0")
+            throw new Exception('Please supply valid publication ID');
+
+        if (!is_array($projID))
+            $projID = array($projID);
+
+        $requests = array();
+        foreach ($projID as $_p) {
+            $requests[] = sprintf('getrelated/Project/%d/proj_has_publ', $_p);
         }
         return $this->retrieve($requests);
     }
