@@ -239,7 +239,7 @@ class Tools {
     }
 
     /*
-     * Array zur Definition des Filters für Publikationen
+     * Array zur Definition des Filters für Projekte
      */
 
     public static function project_filter($year = '', $start = '', $type = '') {
@@ -339,7 +339,7 @@ class Tools {
                 $link_post = '';
         }
         $name = $inv == 0 ? $firstname . " " . $lastname : $lastname . " " . $firstname;
-        $person = $link_pre . $name . $link_post;
+        $person = "<span class=\"author\" itemprop=\"author\">" . $link_pre . $name . $link_post . "</span>";
         return $person;
     }
 
