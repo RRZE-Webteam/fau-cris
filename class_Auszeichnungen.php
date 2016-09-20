@@ -151,9 +151,6 @@ class Auszeichnungen {
             $formatter = new CRIS_formatter("type of award", SORT_DESC, "year award", SORT_DESC);
         }
         $awardList = $formatter->execute($awardArray);
-print "<pre>";
-//var_dump($awardList);
-print "</pre>";
         $output = '';
 
         foreach ($awardList as $array_type => $awards) {
