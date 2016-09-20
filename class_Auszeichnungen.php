@@ -86,7 +86,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Jahren gegliedert
      */
 
-    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = 'list') {
+    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = 'list', $order2 = 'year') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -94,7 +94,11 @@ class Auszeichnungen {
             return $output;
         }
 
-        $formatter = new CRIS_formatter("year award", SORT_DESC, "award_preistraeger", SORT_ASC);
+        if ($order2 == 'author') {
+            $formatter = new CRIS_formatter("year award", SORT_DESC, "award_preistraeger", SORT_ASC);
+        } else {
+            $formatter = new CRIS_formatter("year award", SORT_DESC, "award_preistraeger", SORT_ASC);
+        }
         $awardList = $formatter->execute($awardArray);
 
         $output = '';
@@ -119,7 +123,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Auszeichnungstypen gegliedert
      */
 
-    public function awardsNachTyp($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = '') {
+    public function awardsNachTyp($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = '', $order2 = 'year') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -141,9 +145,15 @@ class Auszeichnungen {
         }
 
         // sortiere nach Typenliste, innerhalb des Typs nach Name aufwärts sortieren
-        $formatter = new CRIS_formatter("type of award", array_values($order), "award_preistraeger", SORT_ASC);
+        if ($order2 == 'name') {
+            $formatter = new CRIS_formatter("type of award", SORT_DESC, "award_preistraeger", SORT_ASC);
+        } else {
+            $formatter = new CRIS_formatter("type of award", SORT_DESC, "year award", SORT_DESC);
+        }
         $awardList = $formatter->execute($awardArray);
-
+print "<pre>";
+//var_dump($awardList);
+print "</pre>";
         $output = '';
 
         foreach ($awardList as $array_type => $awards) {

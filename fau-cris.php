@@ -33,7 +33,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '2.0';
+    const version = '2.1';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -466,14 +466,14 @@ class FAU_CRIS {
             $param2 = $awardnameid;
         } elseif (isset($persid) && $persid != '') {
             $param1 = 'person';
-            if (strpos($persid, ',')) {
+            if (strpos($persid, ',') !== false) {
                 $persid = str_replace(' ', '', $persid);
                 $persid = explode(',', $persid);
             }
             $param2 = $persid;
         } elseif (isset($orgid) && $orgid != '') {
             $param1 = 'orga';
-            if (strpos($orgid, ',')) {
+            if (strpos($orgid, ',') !== false) {
                 $orgid = str_replace(' ', '', $orgid);
                 $orgid = explode(',', $orgid);
             }
@@ -504,6 +504,17 @@ class FAU_CRIS {
           // IDs mit zu vielen Ergebnissen ausschließen
           return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
           } */ else {
+            $order1 = 'year';
+            $order2 = '';
+            if (strpos($orderby, ',') !== false) {
+                $orderby = str_replace(' ', '', $orderby);
+                $order1 = explode(',', $orderby)[0];
+                $order2 = explode(',', $orderby)[1];
+            } else {
+                $order1 = $orderby;
+                $order2 = '';
+            }
+
             if (isset($show) && $show == 'projects') {
                 // Projekte
                 require_once('class_Projekte.php');
@@ -515,10 +526,10 @@ class FAU_CRIS {
                 if (!empty($items)) {
                     return $liste->projListe($year, $start, $type, $items, $hide, $role);
                 }
-                if ($orderby == 'type') {
+                if (strpos($order1, 'type') !== false) {
                     return $liste->projNachTyp($year, $start, $type, $hide, $role);
                 }
-                if ($orderby == 'year') {
+                if (strpos($order1, 'year') !== false) {
                     return $liste->projNachJahr($year, $start, $type, $hide, $role);
                 }
                 return $liste->projListe($year, $start, $type, $items, $hide, $role);
@@ -530,11 +541,11 @@ class FAU_CRIS {
                 if ($award != '') {
                     return $liste->singleAward($showname, $showyear, $showawardname, $display);
                 }
-                if ($orderby == 'type') {
-                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
+                if (strpos($order1, 'type') !== false) {
+                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display, $order2);
                 }
-                if ($orderby == 'year') {
-                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, $showawardname, 0, $display);
+                if (strpos($order1, 'year') !== false) {
+                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, 0, $showawardname, $display, $order2);
                 }
                 return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
             } else {
@@ -548,10 +559,10 @@ class FAU_CRIS {
                 if (!empty($items) || !empty($sortby)) {
                     return $liste->pubListe($year, $start, $type, $quotation, $items, $sortby);
                 }
-                if ($orderby == 'type' || $orderby == 'pubtype') {
-                    return $liste->pubNachTyp($year, $start, $type, $quotation);
+                if (strpos($order1, 'type') !== false) {
+                    return $liste->pubNachTyp($year, $start, $type, $quotation, $order2);
                 }
-                return $liste->pubNachJahr($year, $start, $type, $quotation);
+                return $liste->pubNachJahr($year, $start, $type, $quotation, $order2);
             }
         }
         // nothing

@@ -99,7 +99,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '') {
+    public function pubNachJahr($year = '', $start = '', $type = '', $quotation = '', $order2 = 'author') {
         $pubArray = $this->fetch_publications($year, $start, $type);
 
         if (!count($pubArray)) {
@@ -108,7 +108,11 @@ class Publikationen {
         }
 
         // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
-        $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
+        if ($order2 == 'author') {
+            $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
+        } else {
+            $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+        }
         $pubList = $formatter->execute($pubArray);
 
         $output = '';
@@ -129,7 +133,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($year = '', $start = '', $type = '', $quotation = '') {
+    public function pubNachTyp($year = '', $start = '', $type = '', $quotation = '', $order2 = 'date') {
         $pubArray = $this->fetch_publications($year, $start, $type);
 
         if (!count($pubArray)) {
@@ -150,8 +154,12 @@ class Publikationen {
             }
         }
 
-        // sortiere nach Typenliste, innerhalb des Jahres nach Jahr abwärts sortieren
-        $formatter = new CRIS_formatter("publication type", array_values($order), "publyear", SORT_DESC);
+        // sortiere nach Typenliste, innerhalb des Typs nach $order2 sortieren
+        if ($order2 == 'author') {
+            $formatter = new CRIS_formatter("publication type", array_values($order), "relauthors", SORT_ASC);
+        } else {
+            $formatter = new CRIS_formatter("publication type", array_values($order), "virtualdate", SORT_DESC);
+        }
         $pubList = $formatter->execute($pubArray);
 
         $output = '';
