@@ -15,66 +15,100 @@ class Tools {
         return $acronym;
     }
 
-    public static function getPubName($pub, $lang) {
-        if (array_key_exists($lang, CRIS_Dicts::$pubNames[$pub])) {
-            return CRIS_Dicts::$pubNames[$pub][$lang];
+    public static function getOrder ($object) {
+        switch ($object) {
+            case 'publications':
+                $search = CRIS_Dicts::$publications;
+                break;
+            case 'awards':
+                $search = CRIS_Dicts::$awards;
+                break;
+            case 'projects':
+                $search = CRIS_Dicts::$projects;
+                break;
+            case 'patents':
+                $search = CRIS_Dicts::$patents;
+                break;
+            case 'activities':
+                $search = CRIS_Dicts::$activities;
+                break;
         }
-        return CRIS_Dicts::$pubNames[$pub]['en'];
+        foreach ($search as $k => $v) {
+            $order[$v['order']] = $k;
+        }
+        ksort($order);
+        return $order;
     }
 
-    public static function getpubTitle($pub, $lang) {
-        if (array_key_exists($lang, CRIS_Dicts::$pubTitles[$pub])) {
-            return CRIS_Dicts::$pubTitles[$pub][$lang];
+    public static function getType($object, $short) {
+        switch ($object) {
+            case 'publications':
+                $search = CRIS_Dicts::$publications;
+                break;
+            case 'awards':
+                $search = CRIS_Dicts::$awards;
+                break;
+            case 'projects':
+                $search = CRIS_Dicts::$projects;
+                break;
+            case 'patents':
+                $search = CRIS_Dicts::$patents;
+                break;
+            case 'activities':
+                $search = CRIS_Dicts::$activities;
+                break;
         }
-        if (strpos($lang, 'de_') === 0) {
-            return CRIS_Dicts::$pubTitles[$pub]['de_DE'];
+        foreach ($search as $k => $v) {
+            if($v['short'] == $short)
+                return $k;
         }
-        return CRIS_Dicts::$pubTitles[$pub]['en_US'];
+
     }
 
-    public static function getAwardName($award, $lang) {
-        if (array_key_exists($lang, CRIS_Dicts::$awardNames[$award])) {
-            return CRIS_Dicts::$awardNames[$award][$lang];
-        }
-        return CRIS_Dicts::$awardNames[$award]['en'];
-    }
-
-    public static function getawardTitle($award, $lang) {
-        if (array_key_exists($lang, CRIS_Dicts::$awardTitles[$award])) {
-            return CRIS_Dicts::$awardTitles[$award][$lang];
-        }
-        if (strpos($lang, 'de_') === 0) {
-            return CRIS_Dicts::$awardTitles[$award]['de_DE'];
-        }
-        return CRIS_Dicts::$awardTitles[$award]['en_US'];
-    }
-
-    public static function getProjName($proj, $lang) {
+    public static function getName($object, $type, $lang) {
         $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
-        if (array_key_exists($lang, CRIS_Dicts::$projNames[$proj])) {
-            return CRIS_Dicts::$projNames[$proj][$lang];
+        switch ($object) {
+            case 'publications':
+                $search = CRIS_Dicts::$publications;
+                break;
+            case 'awards':
+                $search = CRIS_Dicts::$awards;
+                break;
+            case 'projects':
+                $search = CRIS_Dicts::$projects;
+                break;
+            case 'patents':
+                $search = CRIS_Dicts::$patents;
+                break;
+            case 'activities':
+                $search = CRIS_Dicts::$activities;
+                break;
         }
-        return CRIS_Dicts::$projNames[$proj]['en'];
+        return $search[$type][$lang]['name'];
     }
 
-    public static function getProjTitle($proj, $lang) {
-        if (array_key_exists($lang, CRIS_Dicts::$projTitles[$proj])) {
-            return CRIS_Dicts::$projTitles[$proj][$lang];
-        }
-        if (strpos($lang, 'de_') === 0) {
-            return CRIS_Dicts::$projTitles[$proj]['de_DE'];
-        }
-        return CRIS_Dicts::$projTitles[$proj]['en_US'];
-    }
-
-    public static function getprojTranslation($proj, $lang) {
+    public static function getTitle($object, $name, $lang) {
         $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
-        foreach (CRIS_Dicts::$projNames as $name) {
-            if ($name['de'] == $proj || $name['en'] == $proj) {
-                return $name[$lang];
-            }
+        switch ($object) {
+            case 'publications':
+                $search = CRIS_Dicts::$publications;
+                break;
+            case 'awards':
+                $search = CRIS_Dicts::$awards;
+                break;
+            case 'projects':
+                $search = CRIS_Dicts::$projects;
+                break;
+            case 'patents':
+                $search = CRIS_Dicts::$patents;
+                break;
+            case 'activities':
+                //$search = CRIS_Dicts::$activities;
+                break;
         }
+        return $search[$name][$lang]['title'];
     }
+
 
     public static function XML2obj($xml_url) {
         $ch = curl_init();
@@ -207,7 +241,7 @@ class Tools {
         if ($start !== '' && $start !== NULL)
             $filter['publyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $pubTyp = Tools::getPubName($type, "en");
+            $pubTyp = self::getType('publications', $type);
             if (empty($pubTyp)) {
                 $output .= '<p>' . __('Falscher Parameter für Publikationstyp', '') . '</p>';
                 return $output;
@@ -230,8 +264,12 @@ class Tools {
         if ($start !== '' && $start !== NULL)
             $filter['year award__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $type = Tools::getAwardName($type, "de");
-            $filter['type of award__eq'] = $type;
+            $awardTyp = self::getType('awards', $type);
+            if (empty($awardTyp)) {
+                $output .= '<p>' . __('Falscher Parameter für Auszeichnungstyp', '') . '</p>';
+                return $output;
+            }
+            $filter['type of award__eq'] = $awardTyp;
         }
         if (count($filter))
             return $filter;
@@ -249,12 +287,35 @@ class Tools {
         if ($start !== '' && $start !== NULL)
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $projTyp = Tools::getProjName($type, "en");
+            $projTyp = self::getType('projects', $type);
             if (empty($projTyp)) {
                 $output .= '<p>' . __('Falscher Parameter für Projekttyp', '') . '</p>';
                 return $output;
             }
             $filter['project type__eq'] = $projTyp;
+        }
+        if (count($filter))
+            return $filter;
+        return null;
+    }
+
+    /*
+     * Array zur Definition des Filters für Projekte
+     */
+
+    public static function patent_filter($year = '', $start = '', $type = '') {
+        $filter = array();
+        if ($year !== '' && $year !== NULL)
+            $filter['startyear__eq'] = $year;
+        if ($start !== '' && $start !== NULL)
+            $filter['startyear__ge'] = $start;
+        if ($type !== '' && $type !== NULL) {
+            $patTyp = self::getType('patents', $type);
+            if (empty($patTyp)) {
+                $output .= '<p>' . __('Falscher Parameter für Patenttyp', '') . '</p>';
+                return $output;
+            }
+            $filter['project type__eq'] = $patTyp;
         }
         if (count($filter))
             return $filter;

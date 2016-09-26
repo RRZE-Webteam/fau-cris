@@ -15,7 +15,7 @@ class Projekte {
         $this->cms = 'wp';
         $this->options = (array) get_option('_fau_cris');
         $this->orgNr = $this->options['cris_org_nr'];
-        $this->order = isset($this->options['cris_project_order']) ? $this->options['cris_project_order'] : CRIS_Dicts::$projOrder;
+        $this->order = $this->options['cris_project_order'];
         $this->cris_project_link = isset($this->options['cris_project_link']) ? $this->options['cris_project_link'] : 0;
         $this->pathPersonenseiteUnivis = '/person/';
         $this->suchstring = '';
@@ -124,15 +124,12 @@ class Projekte {
 
         // Publikationstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_key_exists($order[0], CRIS_Dicts::$projNames)) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$projects, 'short'))) {
             foreach ($order as $key => $value) {
-                $order[$key] = Tools::getProjName($value, "en");
+                $order[$key] = Tools::getType('projects', $value);
             }
         } else {
-            $order = array();
-            foreach (CRIS_Dicts::$projOrder as $value) {
-                $order[] = Tools::getProjName($value, "en");
-            }
+            $order = Tools::getOrder('projects');
         }
 
         // sortiere nach Typenliste, innerhalb des Jahres nach Jahr abwärts sortieren
@@ -143,7 +140,7 @@ class Projekte {
         foreach ($projList as $array_type => $projects) {
             // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde
             if (empty($type)) {
-                $title = Tools::getProjTitle($array_type, get_locale());
+                $title = Tools::getTitle('projects', $array_type, get_locale());
                 $output .= "<h3>";
                 $output .= $title;
                 $output .= "</h3>";
@@ -221,7 +218,7 @@ class Projekte {
 
             $id = $project['ID'];
             $title = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
-            $type = Tools::getprojTranslation($project['project type'], get_locale());
+            $type = Tools::getName('projects', $project['project type'], get_locale());
             $projlist .= "<h3>" . $title . "</h3>";
 
             if (!empty($type))
@@ -302,7 +299,7 @@ class Projekte {
 
             $id = $project['ID'];
             $title = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
-            $type = Tools::getprojTranslation($project['project type'], get_locale());
+            $type = Tools::getName('projects', $project['project type'], get_locale());
 
             $projlist .= "<li>";
             $projlist .= "<span class=\"project-title\">" . $title . "</span>";

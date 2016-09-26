@@ -143,15 +143,12 @@ class Publikationen {
 
         // Publikationstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_key_exists($order[0], CRIS_Dicts::$pubNames)) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$publications, 'short'))) {
             foreach ($order as $key => $value) {
-                $order[$key] = Tools::getPubName($value, "en");
+                $order[$key] = Tools::getType('publications', $value);
             }
         } else {
-            $order = array();
-            foreach (CRIS_Dicts::$pubOrder as $value) {
-                $order[] = Tools::getPubName($value, "en");
-            }
+            $order = Tools::getOrder('publications');
         }
 
         // sortiere nach Typenliste, innerhalb des Typs nach $order2 sortieren
@@ -166,7 +163,7 @@ class Publikationen {
         foreach ($pubList as $array_type => $publications) {
             // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
             if (empty($type)) {
-                $title = Tools::getpubTitle($array_type, get_locale());
+                $title = Tools::getTitle('publications', $array_type, get_locale());
                 $output .= "<h3>";
                 $output .= $title;
                 $output .= "</h3>";

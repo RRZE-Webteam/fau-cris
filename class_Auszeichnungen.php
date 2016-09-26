@@ -133,15 +133,12 @@ class Auszeichnungen {
 
         // Auszeichnungstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_key_exists($order[0], CRIS_Dicts::$awardNames)) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$awards, 'short'))) {
             foreach ($order as $key => $value) {
-                $order[$key] = Tools::getAwardName($value, "de");
+                $order[$key] = Tools::getType('awards', $value);
             }
         } else {
-            $order = array();
-            foreach (CRIS_Dicts::$awardOrder as $value) {
-                $order[] = Tools::getAwardName($value, "de");
-            }
+            $order = Tools::getOrder('awards');
         }
 
         // sortiere nach Typenliste, innerhalb des Typs nach Name aufwärts sortieren
@@ -155,7 +152,7 @@ class Auszeichnungen {
 
         foreach ($awardList as $array_type => $awards) {
             if (empty($type)) {
-                $title = Tools::getawardTitle($array_type, get_locale());
+                $title = Tools::getTitle('awards', $array_type, get_locale());
                 $output .= '<h3 class="clearfix clear">';
                 $output .= $title;
                 $output .= "</h3>";
