@@ -58,7 +58,7 @@ class Aktivitaeten {
      * Ausgabe aller Patente ohne Gliederung
      */
 
-    public function patListe($year = '', $start = '', $type = '', $showname = 1, $showyear = 1, $showpatentname = 1) {
+    public function actiListe($year = '', $start = '', $type = '', $showname = 1, $showyear = 1, $showpatentname = 1) {
         $patentArray = $this->fetch_patents($year, $start, $type);
 
         if (!count($patentArray)) {
@@ -80,7 +80,7 @@ class Aktivitaeten {
      * Ausgabe aller Patente nach Jahren gegliedert
      */
 
-    public function patNachJahr($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
+    public function actiNachJahr($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
         $patentArray = $this->fetch_patents($year, $start, $type);
 
         if (!count($patentArray)) {
@@ -113,7 +113,7 @@ class Aktivitaeten {
      * Ausgabe aller Patente nach Patenttypen gegliedert
      */
 
-    public function patNachTyp($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
+    public function actiNachTyp($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
         $patentArray = $this->fetch_patents($year, $start, $type);
 
         if (!count($patentArray)) {
@@ -277,7 +277,7 @@ class Aktivitaeten {
 
 class CRIS_patents extends CRIS_webservice {
     /*
-     * patents/grants requests
+     * actients/grants requests
      */
 
     public function by_orga_id($orgaID = null, &$filter = null) {

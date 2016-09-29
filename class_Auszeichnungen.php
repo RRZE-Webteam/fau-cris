@@ -259,17 +259,17 @@ class Auszeichnungen {
             $awardlist .= "<li>";
             if ($year == 1 && $name == 1) {
                 $awardlist .= (!empty($award_preistraeger) ? $award_preistraeger : "")
-                        . ($awardname == 1 ? ": <strong>" . $award_name . "</strong> "
-                                . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" )
+                        . (($awardname == 1) ? ": <strong>" . $award_name . "</strong> "
+                            . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" )
                         . (!empty($award_year) ? " &ndash; " . $award_year : "");
             } elseif ($year == 1 && $name == 0) {
                 $awardlist .= (!empty($award_year) ? $award_year . ": " : "")
-                        . "<strong>" . $award_name . "</strong>"
-                        . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "");
+                        . (($awardname == 1) ? "<strong>" . $award_name . "</strong> "
+                            . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             } elseif ($year == 0 && $name == 1) {
                 $awardlist .= (!empty($award_preistraeger) ? $award_preistraeger . ": " : "")
-                        . "<strong>" . $award_name . "</strong>"
-                        . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "");
+                        . (($awardname == 1) ? "<strong>" . $award_name . "</strong> "
+                            . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             } else {
                 $awardlist .= "<strong>" . $award_name . "</strong>"
                         . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "");
@@ -329,8 +329,8 @@ class Auszeichnungen {
             $awardlist .= "<li>";
             $awardlist .= (isset($award_pic['png']) && strlen($award_pic['png']) > 30) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic['png'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
             $awardlist .= $name == 1 ? $award_preistraeger : '';
-            $awardlist .= $awardname == 1 ? "<br /><strong>" . $award_name . "</strong> " : '';
-            $awardlist .= (isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "";
+            $awardlist .= (($awardname == 1) ? "<strong>" . $award_name . "</strong> "
+                            . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             $awardlist .= ($year == 1 && !empty($award_year)) ? "<br />" . $award_year : '';
             $awardlist .= (isset($award_pic['desc']) && strlen($award_pic['desc']) > 0) ? "<br /><span class=\"imgsrc\">(" . _x('Bild:', 'Wird bei Galerien vor die Bildquelle geschrieben.', 'fau-cris') . " " . $award_pic['desc'] . ")</span>" : "";
             $awardlist .= "</li>";
