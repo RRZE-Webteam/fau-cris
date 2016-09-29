@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 2.1
+ * Version: 2.2
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -492,8 +492,8 @@ class FAU_CRIS {
             'project' => '',
             'hide' => '',
             'role' => 'leader',
-            'patent' => '',
-            'activity' => ''
+//            'patent' => '',
+//            'activity' => ''
                         ), $atts));
 
         $show = sanitize_text_field($show);
@@ -518,8 +518,8 @@ class FAU_CRIS {
         $hide = str_replace(" ", "", $hide);
         $hide = explode(",", $hide);
         $role = sanitize_text_field($role);
-        $patent = sanitize_text_field($patent);
-        $activity = sanitize_text_field($activity);
+//        $patent = sanitize_text_field($patent);
+//        $activity = sanitize_text_field($activity);
 
         if (isset($publication) && $publication != '') {
             $param1 = 'publication';
@@ -528,13 +528,13 @@ class FAU_CRIS {
                 $publication = explode(',', $publication);
             }
             $param2 = $publication;
-        } elseif (isset($activity) && $activity != '') {
+/*        } elseif (isset($activity) && $activity != '') {
             $param1 = 'activity';
             $param2 = $activity;
         } elseif (isset($patent) && $patent != '') {
             $param1 = 'patent';
             $param2 = $patent;
-        } elseif (isset($award) && $award != '') {
+*/        } elseif (isset($award) && $award != '') {
             $param1 = 'award';
             $param2 = $award;
         } elseif (isset($project) && $project != '') {
@@ -594,7 +594,7 @@ class FAU_CRIS {
                 $order2 = '';
             }
 
-            if (isset($show) && $show == 'activities') {
+/*            if (isset($show) && $show == 'activities') {
                 // Projekte
                 require_once('class_Aktivitaeten.php');
                 $liste = new Aktivitaeten($param1, $param2);
@@ -630,7 +630,7 @@ class FAU_CRIS {
                     return $liste->patNachJahr($year, $start, $type, $hide);
                 }
                 return $liste->patListe($year, $start, $type, $items, $hide);
-            } elseif (isset($show) && $show == 'projects') {
+            } else*/if (isset($show) && $show == 'projects') {
                 // Projekte
                 require_once('class_Projekte.php');
                 $liste = new Projekte($param1, $param2);
