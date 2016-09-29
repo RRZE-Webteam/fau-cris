@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 2.1
+ * Version: 2.2
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * License: GPLv2 or later
@@ -33,7 +33,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '2.0';
+    const version = '2.1';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -150,7 +150,30 @@ class FAU_CRIS {
                 'gesamtprojekt',
                 'graduiertenkolleg',
                 'eigenmittel'),
-            'cris_project_link' => 'none'
+            'cris_project_link' => 'none',
+            'cris_patent_order' => array(
+                'patentanmeldung',
+                'gebrauchsmuster',
+                'schutzrecht',
+                'nachanmeldung',
+                'nationalisierung',
+                'validierung'
+            ),
+            'cris_patent_link' => 'none',
+            'cris_activities_order' => array(
+                'fau-gremienmitgliedschaft',
+                'organisation_konferenz',
+                'herausgeberschaft',
+                'gutachter_zeitschrift',
+                'gutachter_organisation',
+                'gutachter_sonstige',
+                'dfg-fachkollegiat',
+                'mitglied_wissenschaftsrat',
+                'vortrag',
+                'medien',
+                'sonstige'
+            ),
+            'cris_activities_link' => 'none'
         );
         return $options;
     }
@@ -281,6 +304,48 @@ class FAU_CRIS {
                 'none' => __('keinen Link setzen', self::textdomain))
             )
         );
+        add_settings_section(
+                'cris_patents_section', // ID
+                __('Patente', self::textdomain), // Title
+                '__return_false', // Callback
+                'fau_cris_options' // Page
+        );
+        add_settings_field(
+                'cris_patent_order', __('Reihenfolge der Patente', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_patents_section', array(
+            'name' => 'cris_patent_order',
+            'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Patente.', self::textdomain)
+                )
+        );
+        add_settings_field(
+            'cris_patent_link', __('Patentinhaber verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_patents_section', array(
+            'name' => 'cris_patent_link',
+            'options' => array(
+                'person' => __('Patentinhaber mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                'none' => __('keinen Link setzen', self::textdomain))
+            )
+        );
+        add_settings_section(
+                'cris_activities_section', // ID
+                __('Aktivitäten', self::textdomain), // Title
+                '__return_false', // Callback
+                'fau_cris_options' // Page
+        );
+        add_settings_field(
+                'cris_activities_order', __('Reihenfolge der Aktivitäten', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_activities_section', array(
+            'name' => 'cris_activities_order',
+            'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Aktivitäten.', self::textdomain)
+                )
+        );
+        add_settings_field(
+            'cris_activities_link', __('Personen verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_activities_section', array(
+            'name' => 'cris_activities_link',
+            'options' => array(
+                'person' => __('Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                'none' => __('keinen Link setzen', self::textdomain))
+            )
+        );
     }
 
     /**
@@ -297,6 +362,10 @@ class FAU_CRIS {
         $new_input['cris_award_link'] = in_array($input['cris_award_link'], array('person', 'cris', 'none')) ? $input['cris_award_link'] : $default_options['cris_award_link'];
         $new_input['cris_project_order'] = isset($input['cris_project_order']) ? explode("\n", str_replace("\r", "", $input['cris_project_order'])) : $default_options['cris_project_order'];
         $new_input['cris_project_link'] = in_array($input['cris_project_link'], array('person', 'cris', 'none')) ? $input['cris_project_link'] : $default_options['cris_project_link'];
+        $new_input['cris_patent_order'] = isset($input['cris_patent_order']) ? explode("\n", str_replace("\r", "", $input['cris_patent_order'])) : $default_options['cris_patent_order'];
+        $new_input['cris_patent_link'] = in_array($input['cris_patent_link'], array('person', 'cris', 'none')) ? $input['cris_patent_link'] : $default_options['cris_patent_link'];
+        $new_input['cris_activities_order'] = isset($input['cris_activities_order']) ? explode("\n", str_replace("\r", "", $input['cris_activities_order'])) : $default_options['cris_activities_order'];
+        $new_input['cris_activities_link'] = in_array($input['cris_activities_link'], array('person', 'cris', 'none')) ? $input['cris_activities_link'] : $default_options['cris_activities_link'];
         return $new_input;
     }
 
@@ -422,7 +491,9 @@ class FAU_CRIS {
             'display' => 'list',
             'project' => '',
             'hide' => '',
-            'role' => 'leader'
+            'role' => 'leader',
+//            'patent' => '',
+//            'activity' => ''
                         ), $atts));
 
         $show = sanitize_text_field($show);
@@ -447,6 +518,8 @@ class FAU_CRIS {
         $hide = str_replace(" ", "", $hide);
         $hide = explode(",", $hide);
         $role = sanitize_text_field($role);
+//        $patent = sanitize_text_field($patent);
+//        $activity = sanitize_text_field($activity);
 
         if (isset($publication) && $publication != '') {
             $param1 = 'publication';
@@ -455,7 +528,13 @@ class FAU_CRIS {
                 $publication = explode(',', $publication);
             }
             $param2 = $publication;
-        } elseif (isset($award) && $award != '') {
+/*        } elseif (isset($activity) && $activity != '') {
+            $param1 = 'activity';
+            $param2 = $activity;
+        } elseif (isset($patent) && $patent != '') {
+            $param1 = 'patent';
+            $param2 = $patent;
+*/        } elseif (isset($award) && $award != '') {
             $param1 = 'award';
             $param2 = $award;
         } elseif (isset($project) && $project != '') {
@@ -466,14 +545,14 @@ class FAU_CRIS {
             $param2 = $awardnameid;
         } elseif (isset($persid) && $persid != '') {
             $param1 = 'person';
-            if (strpos($persid, ',')) {
+            if (strpos($persid, ',') !== false) {
                 $persid = str_replace(' ', '', $persid);
                 $persid = explode(',', $persid);
             }
             $param2 = $persid;
         } elseif (isset($orgid) && $orgid != '') {
             $param1 = 'orga';
-            if (strpos($orgid, ',')) {
+            if (strpos($orgid, ',') !== false) {
                 $orgid = str_replace(' ', '', $orgid);
                 $orgid = explode(',', $orgid);
             }
@@ -504,7 +583,54 @@ class FAU_CRIS {
           // IDs mit zu vielen Ergebnissen ausschließen
           return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
           } */ else {
-            if (isset($show) && $show == 'projects') {
+            $order1 = 'year';
+            $order2 = '';
+            if (strpos($orderby, ',') !== false) {
+                $orderby = str_replace(' ', '', $orderby);
+                $order1 = explode(',', $orderby)[0];
+                $order2 = explode(',', $orderby)[1];
+            } else {
+                $order1 = $orderby;
+                $order2 = '';
+            }
+
+/*            if (isset($show) && $show == 'activities') {
+                // Projekte
+                require_once('class_Aktivitaeten.php');
+                $liste = new Aktivitaeten($param1, $param2);
+
+                if ($activity != '') {
+                    return $liste->singleAktivitaet($hide);
+                }
+                if (!empty($items)) {
+                    return $liste->actiListe($year, $start, $type, $items, $hide);
+                }
+                if (strpos($order1, 'type') !== false) {
+                    return $liste->actiNachTyp($year, $start, $type, $hide);
+                }
+                if (strpos($order1, 'year') !== false) {
+                    return $liste->actiNachJahr($year, $start, $type, $hide);
+                }
+                return $liste->actiListe($year, $start, $type, $items, $hide);
+            } elseif (isset($show) && $show == 'patents') {
+                // Projekte
+                require_once('class_Patente.php');
+                $liste = new Patente($param1, $param2);
+
+                if ($patent != '') {
+                    return $liste->singlePatent($hide);
+                }
+                if (!empty($items)) {
+                    return $liste->patListe($year, $start, $type, $items, $hide);
+                }
+                if (strpos($order1, 'type') !== false) {
+                    return $liste->patNachTyp($year, $start, $type, $hide);
+                }
+                if (strpos($order1, 'year') !== false) {
+                    return $liste->patNachJahr($year, $start, $type, $hide);
+                }
+                return $liste->patListe($year, $start, $type, $items, $hide);
+            } else*/if (isset($show) && $show == 'projects') {
                 // Projekte
                 require_once('class_Projekte.php');
                 $liste = new Projekte($param1, $param2);
@@ -515,10 +641,10 @@ class FAU_CRIS {
                 if (!empty($items)) {
                     return $liste->projListe($year, $start, $type, $items, $hide, $role);
                 }
-                if ($orderby == 'type') {
+                if (strpos($order1, 'type') !== false) {
                     return $liste->projNachTyp($year, $start, $type, $hide, $role);
                 }
-                if ($orderby == 'year') {
+                if (strpos($order1, 'year') !== false) {
                     return $liste->projNachJahr($year, $start, $type, $hide, $role);
                 }
                 return $liste->projListe($year, $start, $type, $items, $hide, $role);
@@ -530,11 +656,11 @@ class FAU_CRIS {
                 if ($award != '') {
                     return $liste->singleAward($showname, $showyear, $showawardname, $display);
                 }
-                if ($orderby == 'type') {
-                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
+                if (strpos($order1, 'type') !== false) {
+                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display, $order2);
                 }
-                if ($orderby == 'year') {
-                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, $showawardname, 0, $display);
+                if (strpos($order1, 'year') !== false) {
+                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, 0, $showawardname, $display, $order2);
                 }
                 return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
             } else {
@@ -548,10 +674,10 @@ class FAU_CRIS {
                 if (!empty($items) || !empty($sortby)) {
                     return $liste->pubListe($year, $start, $type, $quotation, $items, $sortby);
                 }
-                if ($orderby == 'type' || $orderby == 'pubtype') {
-                    return $liste->pubNachTyp($year, $start, $type, $quotation);
+                if (strpos($order1, 'type') !== false) {
+                    return $liste->pubNachTyp($year, $start, $type, $quotation, $order2);
                 }
-                return $liste->pubNachJahr($year, $start, $type, $quotation);
+                return $liste->pubNachJahr($year, $start, $type, $quotation, $order2);
             }
         }
         // nothing

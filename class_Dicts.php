@@ -22,185 +22,367 @@ class CRIS_Dicts {
         'items' => '',
         'role' => 'leader'
     );
-    public static $pubTitles = array(
+
+    /* Sprachen, in denen die einzelnen Typbezeichnungen aus dem Webservice kommen:
+     * Publication: EN (Conference contribution)
+     * Awards:      DE (Preis / Ehrung)
+     * Projekte:    EN (Own Funds)
+     * Patente:     DE (Prioritätsbegründende Patentanmeldung)
+     * Aktivitäten: DE (Sonstige FAU-externe Aktivitäten)
+     */
+
+    public static $publications = array(
         'Journal article' => array(
-            'de_DE' => 'Zeitschriftenartikel',
-            'de_DE_formal' => 'Zeitschriftenartikel',
-            'en_US' => 'Journal articles',
-            'en_GB' => 'Journal articles',
-            'en_UK' => 'Journal articles'),
-        'Conference contribution' => array(
-            'de_DE' => 'Konferenzbeiträge',
-            'de_DE_formal' => 'Konferenzbeiträge',
-            'en_US' => 'Conference contributions',
-            'en_GB' => 'Conference contributions',
-            'en_UK' => 'Conference contributions'),
-        'Translation' => array(
-            'de_DE' => 'Übersetzungen',
-            'de_DE_formal' => 'Übersetzungen',
-            'en_US' => 'Translations',
-            'en_GB' => 'Translations',
-            'en_UK' => 'Translations'),
-        'Book' => array(
-            'de_DE' => 'Bücher',
-            'de_DE_formal' => 'Bücher',
-            'en_US' => 'Books',
-            'en_GB' => 'Books',
-            'en_UK' => 'Books'),
-        'Editorial' => array(
-            'de_DE' => 'Herausgeberschaften',
-            'de_DE_formal' => 'Herausgeberschaften',
-            'en_US' => 'Editorials',
-            'en_GB' => 'Editorials',
-            'en_UK' => 'Editorials'),
-        'Thesis' => array(
-            'de_DE' => 'Abschlussarbeiten',
-            'de_DE_formal' => 'Abschlussarbeiten',
-            'en_US' => 'Thesis',
-            'en_GB' => 'Thesis',
-            'en_UK' => 'Thesis'),
-        'Other' => array(
-            'de_DE' => 'Sonstige',
-            'de_DE_formal' => 'Sonstige',
-            'en_US' => 'Other',
-            'en_GB' => 'Other',
-            'en_UK' => 'Other'),
+            'order' => 2,
+            'short' => 'zeitschriftenartikel',
+            'de' => array(
+                'name' => 'Zeitschriftenartikel',
+                'title' => 'Zeitschriftenartikel'),
+            'en'  => array(
+                'name' => 'Journal article',
+                'title' => 'Journal Articles')
+        ),
         'Article in Edited Volumes' => array(
-            'de_DE' => 'Sammelbandbeiträge',
-            'de_DE_formal' => 'Sammelbandbeiträge',
-            'en_US' => 'Articles in Edited Volumes',
-            'en_GB' => 'Articles in Edited Volumes',
-            'en_UK' => 'Articles in Edited Volumes')
+            'order' => 3,
+            'short' => 'sammelbandbeitraege',
+            'de' => array(
+                'name' => 'Sammelbandbeitrag',
+                'title' => 'Beiträge in Sammelbänden'),
+            'en'  => array(
+                'name' => 'Book Contribution',
+                'title' => 'Book Contributions')
+        ),
+        'Book' => array(
+            'order' => 1,
+            'short' => 'buecher',
+            'de' => array(
+                'name' => 'Buch',
+                'title' => 'Bücher'),
+            'en'  => array(
+                'name' => 'Authored book',
+                'title' => 'Authored Books')
+        ),
+        'Translation' => array(
+            'order' => 6,
+            'short' => 'uebersetzungen',
+            'de' => array(
+                'name' => 'Übersetzung',
+                'title' => 'Übersetzungen'),
+            'en'  => array(
+                'name' => 'Translation',
+                'title' => 'Translations')
+        ),
+        'Thesis' => array(
+            'order' => 7,
+            'short' => 'abschlussarbeiten',
+            'de' => array(
+                'name' => 'Abschlussarbeit',
+                'title' => 'Abschlussarbeiten'),
+            'en'  => array(
+                'name' => 'Thesis',
+                'title' => 'Thesis')
+        ),
+        'Editorial' => array(
+            'order' => 4,
+            'short' => 'herausgeberschaften',
+            'de' => array(
+                'name' => 'Herausgeberschaft',
+                'title' => 'Herausgeberschaften'),
+            'en'  => array(
+                'name' => 'Edited Book',
+                'title' => 'Edited Books')
+        ),
+        'Conference contribution' => array(
+            'order' => 5,
+            'short' => 'konferenzbeitraege',
+            'de' => array(
+                'name' => 'Konferenzbeitrag',
+                'title' => 'Konferenzbeiträge'),
+            'en'  => array(
+                'name' => 'Conference contribution',
+                'title' => 'Conference Contributions')
+        ),
+        'Other' => array(
+            'order' => 8,
+            'short' => 'andere',
+            'de' => array(
+                'name' => 'Sonstige',
+                'title' => 'Sonstige'),
+            'en'  => array(
+                'name' => 'Miscellaneous',
+                'title' => 'Miscellaneous')
+        ),
     );
-    public static $pubNames = array(
-        'zeitschriftenartikel' => array(
-            'de' => 'Zeitschriftenartikel',
-            'en' => 'Journal article'),
-        'sammelbandbeitraege' => array(
-            'de' => 'Beiträge in Sammelbänden',
-            'en' => 'Article in Edited Volumes'),
-        'uebersetzungen' => array(
-            'de' => 'Übersetzungen',
-            'en' => 'Translation'),
-        'buecher' => array(
-            'de' => "Bücher",
-            'en' => 'Book'),
-        'herausgeberschaften' => array(
-            'de' => 'Herausgeberschaften',
-            'en' => 'Editorial'),
-        'konferenzbeitraege' => array(
-            'de' => 'Konferenzbeiträge',
-            'en' => 'Conference contribution'),
-        'abschlussarbeiten' => array(
-            'de' => 'Abschlussarbeiten',
-            'en' => 'Thesis'),
-        'andere' => array(
-            'de' => 'Sonstige',
-            'en' => 'Other'),
-    );
-    public static $pubOrder = array(
-        "sammelbandbeitraege",
-        "zeitschriftenartikel",
-        "uebersetzungen",
-        "buecher",
-        "herausgeberschaften",
-        "konferenzbeitraege",
-        "abschlussarbeiten",
-        "andere"
-    );
-    public static $awardOrder = array(
-        'preise',
-        'stipendien',
-        'mitgliedschaften',
-        'andere'
-    );
-    public static $awardTitles = array(
-        'Akademie-Mitgliedschaft' => array(
-            'de_DE' => 'Akademie-Mitgliedschaften',
-            'de_DE_formal' => 'Akademie-Mitgliedschaften',
-            'en_US' => 'Academy Memberships',
-            'en_GB' => 'Academy Memberships',
-            'en_UK' => 'Academy Memberships'),
+
+    public static $awards = array(
         'Preis / Ehrung' => array(
-            'de_DE' => 'Preise / Ehrungen',
-            'de_DE_formal' => 'Preise / Ehrungen',
-            'en_US' => 'Awards / Honours',
-            'en_GB' => 'Awards / Honours',
-            'en_UK' => 'Awards / Honours'),
+            'order' => 1,
+            'short' => 'preise',
+            'de' => array(
+                'name' => 'Preis / Ehrung',
+                'title' => 'Preise / Ehrungen'),
+            'en'  => array(
+                'name' => 'Award / Honour',
+                'title' => 'Awards / Honours')
+        ),
         'Stipendium / Grant' => array(
-            'de_DE' => 'Stipendien / Grants',
-            'de_DE_formal' => 'Stipendien / Grants',
-            'en_US' => 'Scholarships / Grants',
-            'en_GB' => 'Scholarships / Grants',
-            'en_UK' => 'Scholarships / Grants'),
-        'Weiterer Preis / Auszeichnung' => array(
-            'de_DE' => 'Weitere Preise / Auszeichnungen',
-            'de_DE_formal' => 'Weitere Preise / Auszeichnungen',
-            'en_US' => 'Other Awards',
-            'en_GB' => 'Other Awards',
-            'en_UK' => 'Other Awards')
-    );
-    public static $awardNames = array(
-        'preise' => array(
-            'de' => 'Preis / Ehrung',
-            'en' => 'Award / Honour',
+            'order' => 2,
+            'short' => 'stipendien',
+            'de' => array(
+                'name' => 'Stipendium / Grant',
+                'title' => 'Stipendien / Grants'),
+            'en'  => array(
+                'name' => 'Scholarship / Grant',
+                'title' => 'Scholarships / Grants')
         ),
-        'stipendien' => array(
-            'de' => 'Stipendium / Grant',
-            'en' => 'Scholarship / Grant',
+        'Akademie-Mitgliedschaft' => array(
+            'order' => 3,
+            'short' => 'mitgliedschaften',
+            'de' => array(
+                'name' => 'Akademie-Mitgliedschaft',
+                'title' => 'Akademie-Mitgliedschaften'),
+            'en'  => array(
+                'name' => 'Academy membership',
+                'title' => 'Academy Memberships')
         ),
-        'mitgliedschaften' => array(
-            'de' => 'Akademie-Mitgliedschaft',
-            'en' => 'Academy Member',
+        '' => array(
+            'order' => 4,
+            'short' => 'andere',
+            'de' => array(
+                'name' => 'Weiterer Preis / Auszeichnung',
+                'title' => 'Weiterere Preise / Auszeichnungen'),
+            'en'  => array(
+                'name' => 'Miscellaneous',
+                'title' => 'Miscellaneous')
         ),
-        'andere' => array(
-            'de' => 'Weiterer Preis / Auszeichnung',
-            'en' => 'Other Award',
-        )
     );
 
-    public static $projOrder = array(
-        'einzelfoerderung',
-        'teilprojekt',
-        'gesamtprojekt',
-        'graduiertenkolleg',
-        'eigenmittel'
-    );
-
-    public static $projNames = array(
-        'einzelfoerderung' => array(
-            'de' => 'Drittmittelfinanzierte Einzelförderung',
-            'en' => 'Third Party Funds Single'),
-        'teilprojekt' => array(
-            'de' => 'Drittmittelfinanzierte Gruppenförderung - Teilprojekt',
-            'en' => 'Third Party Funds Group - Sub project'),
-        'gesamtprojekt' => array(
-            'de' => 'Drittmittelfinanzierte Gruppenförderung - Gesamtprojekt',
-            'en' => 'Third Party Funds Group - Overall project'),
-        'graduiertenkolleg' => array(
-            'de' => 'Promotionsprogramm / Graduiertenkolleg',
-            'en' => 'Own and Third Party Funds Doctoral Programm - Overall project'),
-        'eigenmittel' => array(
-            'de' => 'Projekt aus Eigenmitteln',
-            'en' => 'Own Funds')
-    );
-
-    public static $projTitles = array(
+    public static $projects = array(
         'Third Party Funds Single' => array(
-            'de_DE' => 'Drittmittelfinanzierte Einzelförderungen',
-            'en_US' => 'Third Party Funds Single'),
+            'order' => 1,
+            'short' => 'einzelfoerderung',
+            'de' => array(
+                'name' => 'Drittmittelfinanzierte Einzelförderung',
+                'title' => 'Drittmittelfinanzierte Einzelförderungen'),
+            'en'  => array(
+                'name' => 'Third Party Funds Single',
+                'title' => 'Third Party Funds Single')
+        ),
         'Third Party Funds Group - Sub project' => array(
-            'de_DE' => 'Drittmittelfinanzierte Gruppenförderungen &ndash; Teilprojekte',
-            'en_US' => 'Third Party Funds Group - Sub projects'),
+            'order' => 2,
+            'short' => 'teilprojekt',
+            'de' => array(
+                'name' => 'Drittmittelfinanzierte Gruppenförderung &ndash; Teilprojekt',
+                'title' => 'Drittmittelfinanzierte Gruppenförderungen &ndash; Teilprojekte'),
+            'en'  => array(
+                'name' => 'Third Party Funds Group &ndash; Sub project',
+                'title' => 'Third Party Funds Group &ndash; Sub projects')
+        ),
         'Third Party Funds Group - Overall project' => array(
-            'de_DE' => 'Drittmittelfinanzierte Gruppenförderungen &ndash; Gesamtprojekte',
-            'en_US' => 'Third Party Funds Group - Overall projects'),
-        'Own and Third Party Funds Doctoral Programm &hdash; Overall project' => array(
-            'de_DE' => 'Graduiertenkollegs',
-            'en_US' => 'Own and Third Party Funds Doctoral Programms &ndash; Overall projects'),
+            'order' => 3,
+            'short' => 'gesamtprojekt',
+            'de' => array(
+                'name' => 'Drittmittelfinanzierte Gruppenförderung &ndash; Gesamtprojekt',
+                'title' => 'Drittmittelfinanzierte Gruppenförderungen &ndash; Gesamtprojekte'),
+            'en'  => array(
+                'name' => 'Third Party Funds Group &ndash; Overall project',
+                'title' => 'Third Party Funds Group &ndash; Overall projects')
+        ),
+        'Own and Third Party Funds Doctoral Programm - Overall project' => array(
+            'order' => 4,
+            'short' => 'graduiertenkolleg',
+            'de' => array(
+                'name' => 'Promotionsprogramm / Graduiertenkolleg',
+                'title' => 'Promotionsprogramme / Graduiertenkollegs'),
+            'en'  => array(
+                'name' => 'Own and Third Party Funds Doctoral Programm &ndash; Overall project',
+                'title' => 'Own and Third Party Funds Doctoral Programms &ndash; Overall projects')
+        ),
         'Own Funds' => array(
-            'de_DE' => 'Projekte aus Eigenmitteln',
-            'en_US' => 'Own Funds'),
+            'order' => 5,
+            'short' => 'eigenmittel',
+            'de' => array(
+                'name' => 'Projekt aus Eigenmitteln',
+                'title' => 'Projekte aus Eigenmitteln'),
+            'en'  => array(
+                'name' => 'Own Funds',
+                'title' => 'Own Funds')
+        ),
     );
 
+    public static $patents = array(
+        'Prioritätsbegründende Patentanmeldung' => array(
+            'order' => 1,
+            'short' => 'patentanmeldung',
+            'de' => array(
+                'name' => 'Prioritätsbegründende Patentanmeldung',
+                'title' => 'Prioritätsbegründende Patentanmeldungen'),
+            'en'  => array(
+                'name' => 'Priority Patent Application',
+                'title' => 'Priority Patent Applications')
+        ),
+        'Gebrauchsmuster' => array(
+            'order' => 2,
+            'short' => 'gebrauchsmuster',
+            'de' => array(
+                'sg' => 'Gebrauchsmuster',
+                'title' => 'Gebrauchsmuster'),
+            'en'  => array(
+                'sg' => 'Utility Model',
+                'title' => 'Utility Models')
+        ),
+        'Schutzrecht' => array(
+            'order' => 3,
+            'short' => 'schutzrecht',
+            'de' => array(
+                'sg' => 'Schutzrecht',
+                'title' => 'Schutzrechte'),
+            'en'  => array(
+                'sg' => 'Property Right',
+                'title' => 'Property Rights')
+        ),
+        'Nachanmeldung' => array(
+            'order' => 4,
+            'short' => 'nachanmeldung',
+            'de' => array(
+                'sg' => 'Nachanmeldung',
+                'title' => 'Nachanmeldungen'),
+            'en'  => array(
+                'sg' => 'Secondary Application',
+                'title' => 'Secondary Applications')
+        ),
+        'Nationalisierung' => array(
+            'order' => 5,
+            'short' => 'nationalisierung',
+            'de' => array(
+                'sg' => 'Nationalisierung',
+                'title' => 'Nationalisierungen'),
+            'en'  => array(
+                'sg' => 'Nationalisation',
+                'title' => 'Nationalisations')
+        ),
+        'Validierung' => array(
+            'order' => 6,
+            'short' => 'validierung',
+            'de' => array(
+                'sg' => 'Validierung',
+                'title' => 'Validierungen'),
+            'en'  => array(
+                'sg' => 'Validation',
+                'title' => 'Validations')
+        ),
+    );
+
+    public static $activities = array(
+        'FAU-interne Gremienmitgliedschaften / Funktionen' => array(
+            'order' => 1,
+            'short' => 'fau-gremienmitgliedschaft',
+            'de' => array(
+                'name' => 'FAU-interne Gremienmitgliedschaft / Funktion',
+                'title' => 'FAU-interne Gremienmitgliedschaften / Funktionen'),
+            'en'  => array(
+                'name' => 'Membership in representative bodies / functions (FAU-internal)',
+                'title' => 'Memberships in representative bodies / functions (FAU-internal)')
+        ),
+        'Organisation einer Tagung / Konferenz' => array(
+            'order' => 2,
+            'short' => 'organisation_konferenz',
+            'de' => array(
+                'name' => 'Organisation einer Tagung / Konferenz',
+                'title' => 'Organisation von Tagungen / Konferenzen'),
+            'en'  => array(
+                'name' => 'Organisation of a congress / conference',
+                'title' => 'Organisation of a congress / conference')
+        ),
+        'Herausgeberschaft' => array(
+            'order' => 3,
+            'short' => 'herausgeberschaft',
+            'de' => array(
+                'name' => 'Herausgeberschaft',
+                'title' => 'Herausgeberschaften'),
+            'en'  => array(
+                'name' => 'Editorship of a scientific journal',
+                'title' => 'Editorships scientific journals')
+        ),
+        'Gutachtertätigkeit für wissenschaftliche Zeitschrift' => array(
+            'order' => 4,
+            'short' => 'gutachter_zeitschrift',
+            'de' => array(
+                'name' => 'Gutachtertätigkeit für eine wissenschaftliche Zeitschrift',
+                'title' => 'Gutachtertätigkeiten für wissenschaftliche Zeitschriften'),
+            'en'  => array(
+                'name' => 'Expert for reviewing a scientific journal',
+                'title' => 'Experts for reviewing scientific journals')
+        ),
+        'Gutachtertätigkeit für Förderorganisation' => array(
+            'order' => 5,
+            'short' => 'gutachter_organisation',
+            'de' => array(
+                'name' => 'Gutachtertätigkeit für eine Förderorganisation',
+                'title' => 'Gutachtertätigkeiten für Förderorganisationen'),
+            'en'  => array(
+                'name' => 'Expert for funding organisation',
+                'title' => 'Experts for funding organisations')
+        ),
+        'Sonstige FAU-externe Gutachtertätigkeit' => array(
+            'order' => 6,
+            'short' => 'gutachter_sonstige',
+            'de' => array(
+                'name' => 'Sonstige FAU-externe Gutachtertätigkeit',
+                'title' => 'Sonstige FAU-externe Gutachtertätigkeiten'),
+            'en'  => array(
+                'name' => 'Other expert activitiy (FAU-external)',
+                'title' => 'Other expert activities (FAU-external)')
+        ),
+        'DFG-Fachkollegiat/in' => array(
+            'order' => 7,
+            'short' => 'dfg-fachkollegiat',
+            'de' => array(
+                'name' => 'DFG-Fachkollegiat/in',
+                'title' => 'DFG-Fachkollegiate'),
+            'en'  => array(
+                'name' => 'DFG-Subject field membership',
+                'title' => 'DFG-Subject field memberships')
+        ),
+        'Gremiumsmitglied Wissenschaftsrat' => array(
+            'order' => 8,
+            'short' => 'mitglied_wissenschaftsrat',
+            'de' => array(
+                'name' => 'Gremiumsmitglied im Wissenschaftsrat',
+                'title' => 'Gremiumsmitgliedschaften im Wissenschaftsrat'),
+            'en'  => array(
+                'name' => 'Member of the German Science Council',
+                'title' => 'Members of the German Science Council')
+        ),
+        'Vortrag' => array(
+            'order' => 9,
+            'short' => 'vortrag',
+            'de' => array(
+                'name' => 'Vortrag',
+                'title' => 'Vorträge'),
+            'en'  => array(
+                'name' => 'Speech / Talk',
+                'title' => 'Speeches / Talks')
+        ),
+        'Radio- / Fernsehbeitrag / Podcast' => array(
+            'order' => 10,
+            'short' => 'medien',
+            'de' => array(
+                'name' => 'Radio- / Fernsehbeitrag / Podcast',
+                'title' => 'Radio- / Fernsehbeiträge / Podcasts'),
+            'en'  => array(
+                'name' => 'Radio, Television or Podcast',
+                'title' => 'Radio / Television Broadcasts or Podcasts')
+        ),
+        'Sonstige FAU-externe Aktivitäten' => array(
+            'order' => 11,
+            'short' => 'sonstige',
+            'de' => array(
+                'name' => 'Sonstige FAU-externe Aktivität',
+                'title' => 'Sonstige FAU-externe Aktivitäten'),
+            'en'  => array(
+                'name' => 'Other activitiy (FAU-external)',
+                'title' => 'Other activities (FAU-external)')
+        ),
+    );
 }
