@@ -67,6 +67,7 @@ class Tools {
 
     public static function getName($object, $type, $lang) {
         $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
+        $search = array();
         switch ($object) {
             case 'publications':
                 $search = CRIS_Dicts::$publications;
@@ -103,7 +104,7 @@ class Tools {
                 $search = CRIS_Dicts::$patents;
                 break;
             case 'activities':
-                //$search = CRIS_Dicts::$activities;
+                $search = CRIS_Dicts::$activities;
                 break;
         }
         return $search[$name][$lang]['title'];
@@ -243,7 +244,7 @@ class Tools {
         if ($type !== '' && $type !== NULL) {
             $pubTyp = self::getType('publications', $type);
             if (empty($pubTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Publikationstyp', '') . '</p>';
+                $output = '<p>' . __('Falscher Parameter für Publikationstyp', '') . '</p>';
                 return $output;
             }
             $filter['publication type__eq'] = $pubTyp;
@@ -300,7 +301,7 @@ class Tools {
     }
 
     /*
-     * Array zur Definition des Filters für Projekte
+     * Array zur Definition des Filters für Patente
      */
 
     public static function patent_filter($year = '', $start = '', $type = '') {
@@ -315,7 +316,30 @@ class Tools {
                 $output .= '<p>' . __('Falscher Parameter für Patenttyp', '') . '</p>';
                 return $output;
             }
-            $filter['project type__eq'] = $patTyp;
+            $filter['patenttype__eq'] = $patTyp;
+        }
+        if (count($filter))
+            return $filter;
+        return null;
+    }
+
+    /*
+     * Array zur Definition des Filters für Patente
+     */
+
+    public static function activity_filter($year = '', $start = '', $type = '') {
+        $filter = array();
+        if ($year !== '' && $year !== NULL)
+            $filter['startyear__eq'] = $year;
+        if ($start !== '' && $start !== NULL)
+            $filter['startyear__ge'] = $start;
+        if ($type !== '' && $type !== NULL) {
+            $patTyp = self::getType('activities', $type);
+            if (empty($patTyp)) {
+                $output .= '<p>' . __('Falscher Parameter für Aktivitätstyp', '') . '</p>';
+                return $output;
+            }
+            $filter['type of activity__eq'] = $patTyp;
         }
         if (count($filter))
             return $filter;
