@@ -585,13 +585,16 @@ class FAU_CRIS {
           } */ else {
             $order1 = 'year';
             $order2 = '';
-            if (strpos($orderby, ',') !== false) {
-                $orderby = str_replace(' ', '', $orderby);
-                $order1 = explode(',', $orderby)[0];
-                $order2 = explode(',', $orderby)[1];
-            } else {
-                $order1 = $orderby;
-                $order2 = '';
+
+            if (!empty($orderby)) {
+                if (strpos($orderby, ',') !== false) {
+                    $orderby = str_replace(' ', '', $orderby);
+                    $order1 = explode(',', $orderby)[0];
+                    $order2 = explode(',', $orderby)[1];
+                } else {
+                    $order1 = $orderby;
+                    $order2 = '';
+                }
             }
 
             if (isset($show) && $show == 'activities') {

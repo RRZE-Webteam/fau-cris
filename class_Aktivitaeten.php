@@ -58,7 +58,7 @@ class Aktivitaeten {
      */
 
     public function actiListe($year = '', $start = '', $type = '', $items='', $hide='') {
-        $showname = 1;
+        $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 1;
         $showactivityname = 1;
 
@@ -83,7 +83,7 @@ class Aktivitaeten {
      */
 
     public function actiNachJahr($year = '', $start = '', $type = '', $hide= '') {
-        $showname = 1;
+        $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 0;
         $showactivityname = 1;
         $order2 = 'year';
@@ -120,7 +120,7 @@ class Aktivitaeten {
      */
 
     public function actiNachTyp($year = '', $start = '', $type = '', $hide ='') {
-        $showname = 1;
+        $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 0;
         $showactivityname = 1;
         $order2 = 'year';
@@ -222,11 +222,7 @@ class Aktivitaeten {
      */
 
     private function make_list($activities, $name = 1, $year = 1, $activityname = 1, $showtype = 1) {
-/*        print "<pre>";
-        var_dump($activities);
-        print "</pre>";
-        //return;
-  */      $activitylist = "<ul class=\"cris-activities\">";
+        $activitylist = "<ul class=\"cris-activities\">";
 
         foreach ($activities as $activity) {
             $activity = (array) $activity;
@@ -272,10 +268,8 @@ class Aktivitaeten {
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['mandate start'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['mandate end'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
-                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_orga'];
                     break;
@@ -285,10 +279,8 @@ class Aktivitaeten {
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['end date'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
-                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
@@ -298,10 +290,8 @@ class Aktivitaeten {
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['end date'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
-                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -311,23 +301,19 @@ class Aktivitaeten {
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['end date'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
-                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
                 case "Gutachtertätigkeit für eine Förderorganisation":
                     $activity_name = $activity['type of expert activity'];
-                    $activity_detail = '';
+                    $activity_detail = $activity['mirror_fund'];
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['end date'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
-                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -337,23 +323,19 @@ class Aktivitaeten {
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['end date'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
-                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
                 case "DFG-Fachkollegiat/in":
-                    $activity_name = $activity['description function'];
+                    $activity_name = $activity['mirror_dfgfach'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['mandate start'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['mandate end'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
-                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -363,9 +345,7 @@ class Aktivitaeten {
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['mandate start'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['mandate end'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
                     $activity_date = $activity_startdate . " - " . $activity_enddate;
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_orga'];
@@ -376,7 +356,8 @@ class Aktivitaeten {
                     $activity_nameofshow = '';
                     $activity_eventname = $activity['event name'];
                     $activity_date = $activity['date'];
-                    $activity_date = strftime('%x', strtotime($activity_date));
+                    if ($activity_date != '')
+                        $activity_date = strftime('%x', strtotime($activity_date));
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
@@ -386,7 +367,8 @@ class Aktivitaeten {
                     $activity_nameofshow = $activity['showname'];
                     $activity_eventname = '';
                     $activity_date = $activity['date'];
-                    $activity_date = strftime('%x', strtotime($activity_date));
+                    if ($activity_date != '')
+                        $activity_date = strftime('%x', strtotime($activity_date));
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -396,10 +378,8 @@ class Aktivitaeten {
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
-                    $activity_startdate = strftime('%x', strtotime($activity_startdate));
                     $activity_enddate = $activity['end date'];
-                    $activity_enddate = strftime('%x', strtotime($activity_enddate));
-                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
@@ -408,29 +388,46 @@ class Aktivitaeten {
             $activitylist .= "<li>";
 
             if ($name == 1 && !empty($names))
-                $activitylist .= "<br />" . $names_html;
+                $activitylist .= $names_html . ": ";
+            if (!empty($activity_type) & $showtype != 0)
+                $activitylist .= $activity_type;
             if (!empty($activity_name))
-                $activitylist .= "<br /><strong><a href=\"https://cris.fau.de/converis/publicweb/activity/" . $activity_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_name . "</a></strong>";
+                $activitylist .= " <strong>\"<a href=\"https://cris.fau.de/converis/publicweb/activity/" . $activity_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_name . "</a>\"</strong>";
             if (!empty($activity_detail))
                 $activitylist .= " (" . $activity_detail . ")";
-            if (!empty($activity_eventname))
-                $activitylist .= "<br />" . __('Veranstaltung', 'cris-fau') . ": " . $activity_eventname;
-            if (!empty($activity_nameofshow))
-                $activitylist .= "<br />" . __('In', 'cris-fau') . ": " . $activity_nameofshow;
-            if (!empty($activity_location))
-                $activitylist .= "<br />" . $activity_location;
             if (!empty($activity_date))
-                $activitylist .= "<br />" . $activity_date;
+                $activitylist .= " (" . $activity_date . ")";
+            if (!empty($activity_eventname))
+                $activitylist .= ", " . __('Veranstaltung', 'cris-fau') . ": " . $activity_eventname;
+            if (!empty($activity_nameofshow))
+                $activitylist .= ", " . __('In', 'cris-fau') . ": \"" . $activity_nameofshow . "\"";
+            if (!empty($activity_location))
+                $activitylist .= ", " . $activity_location;
             if (!empty($activity_url))
-                $activitylist .= "<br />URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>";
-            if (!empty($activity_type) & $showtype != 0)
-                $activitylist .= "<br />(" . $activity_type . ")";
+                $activitylist .= ", URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>";
             $activitylist .= "</li>";
         }
 
         $activitylist .= "</ul>";
 
         return $activitylist;
+    }
+
+    private function make_date ($start, $end) {
+        setlocale(LC_TIME, get_locale());
+        $date = '';
+        if ($start != '')
+            $start = strftime('%x', strtotime($start));
+        if ($end != '')
+            $end = strftime('%x', strtotime($end));
+        if ($start !='' && $end != '') {
+            $date = $start . " - " . $end;
+        } elseif ($start != '' && $end =='') {
+            $date = __('seit', 'fau-cris') . " " . $start;
+        } elseif ($start == '' && $end != '') {
+            $date = __('bis', 'fau-cris') . " " . $end;
+        }
+        return $date;
     }
 
 }
