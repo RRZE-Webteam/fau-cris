@@ -64,10 +64,10 @@ ul.cris-projects .project-title {
 ul.cris-activities {
     padding-left: 30px;
     text-indent: -30px;
-    list-style-type: none;
     margin-left: 0;
 }
 
 ul.cris-activities li {
     margin-bottom: .3em;
+    list-style-type: none;
 }
