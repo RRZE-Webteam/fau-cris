@@ -16,10 +16,9 @@ class Aktivitaeten {
         $this->options = (array) get_option('_fau_cris');
         $this->orgNr = $this->options['cris_org_nr'];
         $this->order = isset($this->options['cris_activities_order']) ? $this->options['cris_activities_order'] : Tools::getOrder('activities');
-        $this->cris_patent_link = isset($this->options['cris_acti_link']) ? $this->options['cris_acti_link'] : 0;
+        $this->cris_acti_link = isset($this->options['cris_acti_link']) ? $this->options['cris_acti_link'] : 0;
         $this->pathPersonenseiteUnivis = '/person/';
         $this->suchstring = '';
-
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris') . '</strong></p>';
             return;
@@ -34,7 +33,7 @@ class Aktivitaeten {
         }
 
         $univis = NULL;
-        if ($this->cms == 'wbk' && $this->cris_patent_link == 'person') {
+        if ($this->cms == 'wbk' && $this->cris_acti_link == 'person') {
             $this->univisID = Tools::get_univis_id();
             // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
             // Mitarbeiter der Institution zugeordnet wurden...)?
@@ -55,77 +54,89 @@ class Aktivitaeten {
     }
 
     /*
-     * Ausgabe aller Patente ohne Gliederung
+     * Ausgabe aller Aktivitäten ohne Gliederung
      */
 
-    public function actiListe($year = '', $start = '', $type = '', $showname = 1, $showyear = 1, $showpatentname = 1) {
-        $patentArray = $this->fetch_patents($year, $start, $type);
+    public function actiListe($year = '', $start = '', $type = '', $items='', $hide='') {
+        $showname = $this->einheit == 'person' ? 0 : 1;
+        $showyear = 1;
+        $showactivityname = 1;
 
-        if (!count($patentArray)) {
-            $output = '<p>' . __('Es wurden leider keine Patente gefunden.', 'fau-cris') . '</p>';
+        $activityArray = $this->fetch_activities($year, $start, $type);
+
+        if (!count($activityArray)) {
+            $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-
-        $order = "year patent";
+        $order = "sortdate";
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
-        $res = $formatter->execute($patentArray);
-        $patentList = $res[$order];
+        $res = $formatter->execute($activityArray);
+        $activityList = $res[$order];
 
-        $output = $this->make_list($patentList, $showname, $showyear, $showpatentname);
+        $output = $this->make_list($activityList, $showname, $showyear, $showactivityname);
 
         return $output;
     }
 
     /*
-     * Ausgabe aller Patente nach Jahren gegliedert
+     * Ausgabe aller Aktivitäten nach Jahren gegliedert
      */
 
-    public function actiNachJahr($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
-        $patentArray = $this->fetch_patents($year, $start, $type);
+    public function actiNachJahr($year = '', $start = '', $type = '', $hide= '') {
+        $showname = $this->einheit == 'person' ? 0 : 1;
+        $showyear = 0;
+        $showactivityname = 1;
+        $order2 = 'year';
+        $activityArray = $this->fetch_activities($year, $start, $type);
 
-        if (!count($patentArray)) {
-            $output = '<p>' . __('Es wurden leider keine Patente gefunden.', 'fau-cris') . '</p>';
+        if (!count($activityArray)) {
+            $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
 
         if ($order2 == 'author') {
-            $formatter = new CRIS_formatter("registryear", SORT_DESC, "exportinventors", SORT_ASC);
+            $formatter = new CRIS_formatter("year", SORT_DESC, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("registryear", SORT_DESC, "cfregistrdate", SORT_ASC);
+            $formatter = new CRIS_formatter("year", SORT_DESC, "date", SORT_ASC);
         }
-        $patentList = $formatter->execute($patentArray);
+        $activityList = $formatter->execute($activityArray);
 
         $output = '';
 
-        foreach ($patentList as $array_year => $patents) {
+        foreach ($activityList as $array_year => $activities) {
             if (empty($year)) {
                 $output .= '<h3 class="clearfix clear">';
                 $output .=!empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
                 $output .= '</h3>';
             }
-            $output .= $this->make_list($patents, $showname, $showyear, $showpatentname);
+            $output .= $this->make_list($activities, $showname, $showyear, $showactivityname);
         }
 
         return $output;
     }
 
     /*
-     * Ausgabe aller Patente nach Patenttypen gegliedert
+     * Ausgabe aller Aktivitäten nach Patenttypen gegliedert
      */
 
-    public function actiNachTyp($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
-        $patentArray = $this->fetch_patents($year, $start, $type);
+    public function actiNachTyp($year = '', $start = '', $type = '', $hide ='') {
+        $showname = $this->einheit == 'person' ? 0 : 1;
+        $showyear = 0;
+        $showactivityname = 1;
+        $order2 = 'year';
 
-        if (!count($patentArray)) {
-            $output = '<p>' . __('Es wurden leider keine Patente gefunden.', 'fau-cris') . '</p>';
+        $activityArray = $this->fetch_activities($year, $start, $type);
+
+        if (!count($activityArray)) {
+            $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
 
         // Patenttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$publications, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$activities, 'short'))) {
             foreach ($order as $key => $value) {
-                $order[$key] = Tools::getType('patents', $value);
+                $order[$key] = Tools::getType('activities', $value);
             }
         } else {
             $order = Tools::getOrder('activities');
@@ -133,21 +144,21 @@ class Aktivitaeten {
 
         // sortiere nach Typenliste, innerhalb des Typs nach Name aufwärts sortieren
         if ($order2 == 'name') {
-            $formatter = new CRIS_formatter("patenttype", SORT_DESC, "exportinventors", SORT_ASC);
+            $formatter = new CRIS_formatter("type of activity", $order, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("patenttype", SORT_DESC, "cfregistrdate", SORT_DESC);
+            $formatter = new CRIS_formatter("type of activity", $order, "date", SORT_DESC);
         }
-        $patentList = $formatter->execute($patentArray);
+        $activityList = $formatter->execute($activityArray);
         $output = '';
 
-        foreach ($patentList as $array_type => $patents) {
+        foreach ($activityList as $array_type => $activities) {
             if (empty($type)) {
-                $title = Tools::getTitle('patents', $array_type, get_locale());
+                $title = Tools::getTitle('activities', $array_type, get_locale());
                 $output .= '<h3 class="clearfix clear">';
                 $output .= $title;
                 $output .= "</h3>";
             }
-            $output .= $this->make_list($patents, $showname, $showyear, $showpatentname, 0);
+            $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, 0);
         }
 
         return $output;
@@ -157,21 +168,24 @@ class Aktivitaeten {
      * Ausgabe eines einzelnen Patents
      */
 
-    public function singlePatent($showname = 1, $showyear = 0, $showpatentname = 1) {
-        $ws = new CRIS_patents();
+    public function singleActivity($hide) {
+        $showname = 1;
+        $showyear = 0;
+        $showactivityname = 1;
+        $ws = new CRIS_activities();
 
         try {
-            $patentArray = $ws->by_id($this->id);
+            $activityArray = $ws->by_id($this->id);
         } catch (Exception $ex) {
             return;
         }
 
-        if (!count($patentArray)) {
-            $output = '<p>' . __('Es wurden leider keine Patente gefunden.', 'fau-cris') . '</p>';
+        if (!count($activityArray)) {
+            $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
 
-        $output = $this->make_list($patentArray, $showname, $showyear, $showpatentname);
+        $output = $this->make_list($activityArray, $showname, $showyear, $showactivityname);
 
         return $output;
     }
@@ -184,98 +198,241 @@ class Aktivitaeten {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_patents($year = '', $start = '', $type = '') {
-        $filter = Tools::patent_filter($year, $start, $type);
+    private function fetch_activities($year = '', $start = '', $type = '') {
+        $filter = Tools::activity_filter($year, $start, $type);
 
-        $ws = new CRIS_patents();
-        $patentArray = array();
+        $ws = new CRIS_activities();
+        $activityArray = array();
 
         try {
             if ($this->einheit === "orga") {
-                $patentArray = $ws->by_orga_id($this->id, $filter);
+                $activityArray = $ws->by_orga_id($this->id, $filter);
             }
             if ($this->einheit === "person") {
-                $patentArray = $ws->by_pers_id($this->id, $filter);
+                $activityArray = $ws->by_pers_id($this->id, $filter);
             }
         } catch (Exception $ex) {
-            $patentArray = array();
+            $activityArray = array();
         }
-        return $patentArray;
+        return $activityArray;
     }
 
     /*
      * Ausgabe der Patents
      */
 
-    private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1) {
-        $patentlist = "<ul class=\"cris-patents\">";
+    private function make_list($activities, $name = 1, $year = 1, $activityname = 1, $showtype = 1) {
+        $activitylist = "<ul class=\"cris-activities\">";
 
-        foreach ($patents as $patent) {
-            $patent = (array) $patent;
-            foreach ($patent['attributes'] as $attribut => $v) {
-                $patent[$attribut] = $v;
+        foreach ($activities as $activity) {
+            $activity = (array) $activity;
+            foreach ($activity['attributes'] as $attribut => $v) {
+                $activity[$attribut] = $v;
             }
-            unset($patent['attributes']);
+            unset($activity['attributes']);
 
-            $inventors = explode("|", $patent['exportinventors']);
-            $inventorIDs = explode(",", $patent['relinventorsid']);
-            $inventorsArray = array();
-            foreach ($inventorIDs as $i => $key) {
-                $inventorsArray[] = array('id' => $key, 'name' => $inventors[$i]);
+            $names = explode("|", $activity['exportnames']);
+            if (isset($activity['relnamesid'])) {
+                $nameIDs = isset($activity['relnamesid']) ? explode(",", $activity['relnamesid']) : array();
+                $namesArray = array();
+                foreach ($nameIDs as $i => $key) {
+                    $namesArray[] = array('id' => $key, 'name' => $names[$i]);
+                }
+                $namesList = array();
+                foreach ($namesArray as $pname) {
+                    $name_elements = explode(":", $pname['name']);
+                    $name_firstname = $name_elements[1];
+                    $name_lastname = $name_elements[0];
+                    $namesList[] = Tools::get_person_link($pname['id'], $name_firstname, $name_lastname, $this->cris_activity_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
+                }
+            } else {
+                $namesList = array();
+                foreach ($names as $pname) {
+                    $name_elements = explode(":", $pname);
+                    $name_firstname = $name_elements[1];
+                    $name_lastname = $name_elements[0];
+                    $namesList[] = $name_firstname . " " . $name_lastname;
+                }
             }
-            $inventorsList = array();
-            foreach ($inventorsArray as $inventor) {
-                $inventor_elements = explode(":", $inventor['name']);
-                $inventor_firstname = $inventor_elements[0];
-                $inventor_lastname = $inventor_elements[1];
-                $inventorsList[] = Tools::get_person_link($inventor['id'], $inventor_firstname, $inventor_lastname, $this->cris_patent_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
-            }
-            $inventors_html = implode(", ", $inventorsList);
+            $names_html = implode(", ", $namesList);
 
-            $patent_id = $patent['ID'];
+            $activity_id = $activity['ID'];
+            $activity_type = Tools::getName('activities', $activity['type of activity'], get_locale());
             $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
-            $patent_name = ($lang == 'de') ? $patent['cftitle'] : $patent['cftitle_en'];
-            $patent_type = Tools::getName('patents', $patent['patenttype'], get_locale());
-            $patent_abstract = $patent['cfabstr'];
-            $patent_number = $patent['cfpatentnum'];
-            $patent_link = $patent['patnrlink'];
             setlocale(LC_TIME, get_locale());
-            $patent_registered = $patent['cfregistrdate'];
-            $patent_registered = strftime('%x', strtotime($patent_registered));
-            $patent_appproved = $patent['cfapprovdate'];
-            $patent_appproved = strftime('%x', strtotime($patent_appproved));
-            $patent_expiry = $patent['patexpirydate'];
-            $patent_expiry = strftime('%x', strtotime($patent_expiry));
 
-            $patentlist .= "<li>";
-
-            if (!empty($patent_name))
-                $patentlist .= "<strong><a href=\"https://cris.fau.de/converis/publicweb/cfrespat/" . $patent_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
-            if (!empty($patent_type) || !empty($patent_number))
-                $patentlist .= " (";
-            if (!empty($patent_type) & $showtype != 0)
-                $patentlist .= $patent_type . ": ";
-            if (!empty($patent_number)) {
-                if (!empty($patent_link))
-                    $patentlist .= "<a href=\"" . $patent_link . "\ target=\"blank\" title=\"" . __('Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">";
-                $patentlist .= $patent_number;
-                if (!empty($patent_link))
-                    $patentlist .= "</a>";
+            switch ($activity_type) {
+                case "FAU-interne Gremienmitgliedschaft / Funktion":
+                    $activity_name = $activity['description function'];
+                    $activity_detail = '';
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['mandate start'];
+                    $activity_enddate = $activity['mandate end'];
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_url = $activity['url'];
+                    $activity_location = $activity['mirror_orga'];
+                    break;
+                case "Organisation einer Tagung / Konferenz":
+                    $activity_name = $activity['nameconference'];
+                    $activity_detail = '';
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['start date'];
+                    $activity_enddate = $activity['end date'];
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_url = $activity['url'];
+                    $activity_location = $activity['mirror_eorg'];
+                    break;
+                case "Herausgeberschaft":
+                    $activity_name = $activity['namejournal'];
+                    $activity_detail = $activity['role of editorship'];
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['start date'];
+                    $activity_enddate = $activity['end date'];
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_url = $activity['url'];
+                    $activity_location = '';
+                    break;
+                case "Gutachtertätigkeit für eine wissenschaftliche Zeitschrift":
+                    $activity_name = $activity['namejournal'];
+                    $activity_detail = '';
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['start date'];
+                    $activity_enddate = $activity['end date'];
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_url = $activity['url'];
+                    $activity_location = '';
+                    break;
+                case "Gutachtertätigkeit für eine Förderorganisation":
+                    $activity_name = $activity['type of expert activity'];
+                    $activity_detail = $activity['mirror_fund'];
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['start date'];
+                    $activity_enddate = $activity['end date'];
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_url = $activity['url'];
+                    $activity_location = '';
+                    break;
+                case "Sonstige FAU-externe Gutachtertätigkeit":
+                    $activity_name = $activity['type of expert activity'];
+                    $activity_detail = '';
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['start date'];
+                    $activity_enddate = $activity['end date'];
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_url = $activity['url'];
+                    $activity_location = $activity['mirror_eorg'];
+                    break;
+                case "DFG-Fachkollegiat/in":
+                    $activity_name = $activity['mirror_dfgfach'];
+                    $activity_detail = '';
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['mandate start'];
+                    $activity_enddate = $activity['mandate end'];
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_url = $activity['url'];
+                    $activity_location = '';
+                    break;
+                case "Gremiumsmitglied im Wissenschaftsrat":
+                    $activity_name = $activity['description function'];
+                    $activity_detail = $activity['memberscicouncil'];
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['mandate start'];
+                    $activity_enddate = $activity['mandate end'];
+                    $activity_date = $activity_startdate . " - " . $activity_enddate;
+                    $activity_url = $activity['url'];
+                    $activity_location = $activity['mirror_orga'];
+                    break;
+                case "Vortrag":
+                    $activity_name = $activity['name'];
+                    $activity_detail = '';
+                    $activity_nameofshow = '';
+                    $activity_eventname = $activity['event name'];
+                    $activity_date = $activity['date'];
+                    if ($activity_date != '')
+                        $activity_date = strftime('%x', strtotime($activity_date));
+                    $activity_url = $activity['url'];
+                    $activity_location = $activity['mirror_eorg'];
+                    break;
+                case "Radio- / Fernsehbeitrag / Podcast":
+                    $activity_name = $activity['name of contribution'];
+                    $activity_detail = '';
+                    $activity_nameofshow = $activity['showname'];
+                    $activity_eventname = '';
+                    $activity_date = $activity['date'];
+                    if ($activity_date != '')
+                        $activity_date = strftime('%x', strtotime($activity_date));
+                    $activity_url = $activity['url'];
+                    $activity_location = '';
+                    break;
+                case "Sonstige FAU-externe Aktivität":
+                    $activity_name = $activity['type of extern expert activity'];
+                    $activity_detail = '';
+                    $activity_nameofshow = '';
+                    $activity_eventname = '';
+                    $activity_startdate = $activity['start date'];
+                    $activity_enddate = $activity['end date'];
+                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_url = $activity['url'];
+                    $activity_location = $activity['mirror_eorg'];
+                    break;
             }
-            if (!empty($patent_type) && !empty($patent_number))
-                $patentlist .= ")";
-            if (!empty($inventors))
-                $patentlist .= "<br />" . __('Erfinder', 'fau-cris') . ": " . $inventors_html;
-           $patentlist .= "</li>";
+
+            $activitylist .= "<li>";
+
+            if ($name == 1 && !empty($names))
+                $activitylist .= $names_html . ": ";
+            if (!empty($activity_type) & $showtype != 0)
+                $activitylist .= $activity_type;
+            if (!empty($activity_name))
+                $activitylist .= " <strong>\"<a href=\"https://cris.fau.de/converis/publicweb/activity/" . $activity_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_name . "</a>\"</strong>";
+            if (!empty($activity_detail))
+                $activitylist .= " (" . $activity_detail . ")";
+            if (!empty($activity_date))
+                $activitylist .= " (" . $activity_date . ")";
+            if (!empty($activity_eventname))
+                $activitylist .= ", " . __('Veranstaltung', 'cris-fau') . ": " . $activity_eventname;
+            if (!empty($activity_nameofshow))
+                $activitylist .= ", " . __('In', 'cris-fau') . ": \"" . $activity_nameofshow . "\"";
+            if (!empty($activity_location))
+                $activitylist .= ", " . $activity_location;
+            if (!empty($activity_url))
+                $activitylist .= ", URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>";
+            $activitylist .= "</li>";
         }
 
-        $patentlist .= "</ul>";
-        return $patentlist;
+        $activitylist .= "</ul>";
+
+        return $activitylist;
+    }
+
+    private function make_date ($start, $end) {
+        setlocale(LC_TIME, get_locale());
+        $date = '';
+        if ($start != '')
+            $start = strftime('%x', strtotime($start));
+        if ($end != '')
+            $end = strftime('%x', strtotime($end));
+        if ($start !='' && $end != '') {
+            $date = $start . " - " . $end;
+        } elseif ($start != '' && $end =='') {
+            $date = __('seit', 'fau-cris') . " " . $start;
+        } elseif ($start == '' && $end != '') {
+            $date = __('bis', 'fau-cris') . " " . $end;
+        }
+        return $date;
     }
 
 }
 
-class CRIS_patents extends CRIS_webservice {
+class CRIS_activities extends CRIS_webservice {
     /*
      * actients/grants requests
      */
@@ -289,7 +446,7 @@ class CRIS_patents extends CRIS_webservice {
 
         $requests = array();
         foreach ($orgaID as $_o) {
-            $requests[] = sprintf("getautorelated/Organisation/%d/ORGA_2_PATE_1", $_o);
+            $requests[] = sprintf("getrelated/Organisation/%d/acti_has_orga", $_o);
         }
         return $this->retrieve($requests, $filter);
     }
@@ -303,21 +460,21 @@ class CRIS_patents extends CRIS_webservice {
 
         $requests = array();
         foreach ($persID as $_p) {
-            $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PATE_1', $_p);
+            $requests[] = sprintf('getrelated/Person/%d/acti_has_pers', $_p);
         }
         return $this->retrieve($requests, $filter);
     }
 
     public function by_id($awarID = null) {
         if ($awarID === null || $awarID === "0")
-            throw new Exception('Please supply valid patent ID');
+            throw new Exception('Please supply valid activity ID');
 
         if (!is_array($awarID))
             $awarID = array($awarID);
 
         $requests = array();
         foreach ($awarID as $_p) {
-            $requests[] = sprintf('get/cfrespat/%d', $_p);
+            $requests[] = sprintf('get/Activity/%d', $_p);
         }
         return $this->retrieve($requests);
     }
@@ -337,30 +494,36 @@ class CRIS_patents extends CRIS_webservice {
             }
         }
 
-        $patents = array();
+        $activities = array();
 
         foreach ($data as $_d) {
-            foreach ($_d as $patent) {
-                $a = new CRIS_patent($patent);
+            foreach ($_d as $activity) {
+                $a = new CRIS_activity($activity);
                 if ($a->ID) {
-                    $a->attributes['registryear'] = substr($a->attributes['cfregistrdate'], 0, 4);
-                    $a->attributes['approvyear'] = $a->attributes['cfapprovdate'] != '' ? substr($a->attributes['cfapprovdate'], 0, 4) : '';
-                    $a->attributes['expiryyear'] = $a->attributes['patexpirydate'] != '' ? substr($a->attributes['patexpirydate'], 0, 4) : '';
+                    if (!empty($a->attributes['date'])) {
+                        $a->attributes['year'] = substr($a->attributes['date'], 0, 4);
+                        $a->attributes['sortdate'] = $a->attributes['date'];
+                    } elseif (!empty($a->attributes['start date'])) {
+                        $a->attributes['year'] = substr($a->attributes['start date'], 0, 4);
+                        $a->attributes['sortdate'] = $a->attributes['start date'];
+                    } elseif (!empty($a->attributes['mandate start'])) {
+                        $a->attributes['year'] = substr($a->attributes['mandate start'], 0, 4);
+                        $a->attributes['sortdate'] = $a->attributes['mandate start'];
+                    }
                 }
-
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))
-                    $patents[$a->ID] = $a;
+                    $activities[$a->ID] = $a;
             }
         }
 
-        return $patents;
+        return $activities;
     }
 
 }
 
-class CRIS_patent extends CRIS_Entity {
+class CRIS_activity extends CRIS_Entity {
     /*
-     * object for single patent
+     * object for single activity
      */
 
     function __construct($data) {

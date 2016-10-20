@@ -438,6 +438,9 @@ class Publikationen {
                         $publist .= $pubDetails['year'] != '' ? ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
                         $publist .= "</div>";
                     }
+                    if (!empty($pubDetails['booktitle']) && !empty($pubDetails['eventtitle'])) {
+                        $publist .= "<br />";
+                    }
                     $publist .= $pubDetails['DOI'] != '' ? "DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a><br />" : '';
                     $publist .= $pubDetails['URI'] != '' ? "URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a><br />" : '';
 

@@ -60,3 +60,14 @@ ul.cris-projects .project-title {
 .js .cris-projects .abstract {
     display: none;
 }
+
+ul.cris-activities {
+    padding-left: 30px;
+    text-indent: -30px;
+    margin-left: 0;
+}
+
+ul.cris-activities li {
+    margin-bottom: .3em;
+    list-style-type: none;
+}
