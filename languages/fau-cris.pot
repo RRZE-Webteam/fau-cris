@@ -1,7 +1,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: FAU CRIS v2.1\n"
+"Project-Id-Version: FAU CRIS v3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-20 12:06+0000\n"
 "POT-Revision-Date: Thu Aug 25 2016 14:01:16 GMT+0200 (CEST)\n"
@@ -25,19 +25,19 @@ msgstr ""
 "X-Poedit-SearchPath-0: ."
 
 # @ fau-cris
-#: class_Auszeichnungen.php:24 class_Publikationen.php:25 class_Projekte.php:24 
+#: class_Auszeichnungen.php:24 class_Publikationen.php:25 class_Projekte.php:24
 #: class_Patente.php:24
 msgid ""
 "Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an."
 msgstr ""
 
 # @ fau-cris
-#: class_Auszeichnungen.php:65 class_Auszeichnungen.php:93 
+#: class_Auszeichnungen.php:65 class_Auszeichnungen.php:93
 #: class_Auszeichnungen.php:130 class_Auszeichnungen.php:184
 msgid "Es wurden leider keine Auszeichnungen gefunden."
 msgstr ""
 
-#: class_Auszeichnungen.php:109 class_Patente.php:103 
+#: class_Auszeichnungen.php:109 class_Patente.php:103
 #: class_Aktivitaeten.php:109
 msgid "Ohne Jahr"
 msgstr ""
@@ -48,7 +48,7 @@ msgid "Bild:"
 msgstr ""
 
 # @ fau-cris
-#: class_Publikationen.php:66 class_Publikationen.php:106 
+#: class_Publikationen.php:66 class_Publikationen.php:106
 #: class_Publikationen.php:140
 msgid "Es wurden leider keine Publikationen gefunden."
 msgstr ""
@@ -61,12 +61,12 @@ msgstr ""
 msgid "O.O."
 msgstr ""
 
-#: class_Publikationen.php:316 class_Publikationen.php:318 
-#: class_Publikationen.php:321 class_Publikationen.php:322 
-#: class_Publikationen.php:324 class_Publikationen.php:325 
-#: class_Publikationen.php:326 class_Publikationen.php:327 
-#: class_Publikationen.php:328 class_Publikationen.php:329 
-#: class_Publikationen.php:330 class_Publikationen.php:337 
+#: class_Publikationen.php:316 class_Publikationen.php:318
+#: class_Publikationen.php:321 class_Publikationen.php:322
+#: class_Publikationen.php:324 class_Publikationen.php:325
+#: class_Publikationen.php:326 class_Publikationen.php:327
+#: class_Publikationen.php:328 class_Publikationen.php:329
+#: class_Publikationen.php:330 class_Publikationen.php:337
 #: class_Publikationen.php:338
 msgid "O.A."
 msgstr ""
@@ -79,19 +79,19 @@ msgstr ""
 msgid "Nicht verfügbar"
 msgstr ""
 
-#: class_Publikationen.php:362 class_Publikationen.php:388 
+#: class_Publikationen.php:362 class_Publikationen.php:388
 #: class_Publikationen.php:464 class_Publikationen.php:498
 msgctxt "Abkürzung für \"Band\" bei Publikationen"
 msgid "Bd."
 msgstr ""
 
 # @ fau-cris
-#: class_Publikationen.php:365 class_Publikationen.php:394 
+#: class_Publikationen.php:365 class_Publikationen.php:394
 #: class_Publikationen.php:467 class_Publikationen.php:499
 msgid "Seiten"
 msgstr ""
 
-#: class_Publikationen.php:378 class_Publikationen.php:431 
+#: class_Publikationen.php:378 class_Publikationen.php:431
 #: class_Publikationen.php:450
 msgid "Hrsg."
 msgstr ""
@@ -106,7 +106,7 @@ msgstr ""
 msgid "Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID."
 msgstr ""
 
-#: class_Projekte.php:66 class_Projekte.php:94 class_Projekte.php:121 
+#: class_Projekte.php:66 class_Projekte.php:94 class_Projekte.php:121
 #: class_Projekte.php:166
 msgid "Es wurden leider keine Projekte gefunden."
 msgstr ""
@@ -171,7 +171,7 @@ msgid ""
 "Publikation/Auszeichnung an."
 msgstr ""
 
-#: class_Patente.php:65 class_Patente.php:87 class_Patente.php:120 
+#: class_Patente.php:65 class_Patente.php:87 class_Patente.php:120
 #: class_Patente.php:170
 msgid "Es wurden leider keine Patente gefunden."
 msgstr ""
@@ -194,7 +194,7 @@ msgid ""
 "Forschungsaktivität an."
 msgstr ""
 
-#: class_Aktivitaeten.php:68 class_Aktivitaeten.php:93 
+#: class_Aktivitaeten.php:68 class_Aktivitaeten.php:93
 #: class_Aktivitaeten.php:131 class_Aktivitaeten.php:184
 msgid "Es wurden leider keine Aktivitäten gefunden."
 msgstr ""
