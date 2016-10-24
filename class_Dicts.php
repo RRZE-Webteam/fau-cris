@@ -112,6 +112,16 @@ class CRIS_Dicts {
                 'name' => 'Miscellaneous',
                 'title' => 'Miscellaneous')
         ),
+        'Unpublished' => array(
+            'order' => 9,
+            'short' => 'unveroeffentlicht',
+            'de' => array(
+                'name' => 'Unveröffentlichte Publikation',
+                'title' => 'Unveröffentlichte Publikationen'),
+            'en'  => array(
+                'name' => 'Unpublished Publication',
+                'title' => 'Unpublished Publications')
+        ),
     );
 
     public static $awards = array(
