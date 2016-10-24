@@ -97,7 +97,7 @@ class Aktivitaeten {
         if ($order2 == 'author') {
             $formatter = new CRIS_formatter("year", SORT_DESC, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("year", SORT_DESC, "date", SORT_ASC);
+            $formatter = new CRIS_formatter("year", SORT_DESC, "sortdate", SORT_ASC);
         }
         $activityList = $formatter->execute($activityArray);
 
@@ -146,7 +146,7 @@ class Aktivitaeten {
         if ($order2 == 'name') {
             $formatter = new CRIS_formatter("type of activity", $order, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("type of activity", $order, "date", SORT_DESC);
+            $formatter = new CRIS_formatter("type of activity", $order, "sortdate", SORT_DESC);
         }
         $activityList = $formatter->execute($activityArray);
         $output = '';
