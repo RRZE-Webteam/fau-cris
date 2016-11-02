@@ -97,7 +97,7 @@ class Aktivitaeten {
         if ($order2 == 'author') {
             $formatter = new CRIS_formatter("year", SORT_DESC, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("year", SORT_DESC, "date", SORT_ASC);
+            $formatter = new CRIS_formatter("year", SORT_DESC, "sortdate", SORT_ASC);
         }
         $activityList = $formatter->execute($activityArray);
 
@@ -146,7 +146,7 @@ class Aktivitaeten {
         if ($order2 == 'name') {
             $formatter = new CRIS_formatter("type of activity", $order, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("type of activity", $order, "date", SORT_DESC);
+            $formatter = new CRIS_formatter("type of activity", $order, "sortdate", SORT_DESC);
         }
         $activityList = $formatter->execute($activityArray);
         $output = '';
@@ -222,7 +222,11 @@ class Aktivitaeten {
      */
 
     private function make_list($activities, $name = 1, $year = 1, $activityname = 1, $showtype = 1) {
-        $activitylist = "<ul class=\"cris-activities\">";
+        if ($this->einheit == "activity") {
+            $activitylist = "<div class=\"cris-activities\">";
+        } else {
+            $activitylist = "<ul class=\"cris-activities\">";
+        }
 
         foreach ($activities as $activity) {
             $activity = (array) $activity;
@@ -269,7 +273,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_startdate = $activity['mandate start'];
                     $activity_enddate = $activity['mandate end'];
-                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_orga'];
                     break;
@@ -280,7 +284,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
                     $activity_enddate = $activity['end date'];
-                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
@@ -291,7 +295,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
                     $activity_enddate = $activity['end date'];
-                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -302,7 +306,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
                     $activity_enddate = $activity['end date'];
-                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -313,7 +317,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
                     $activity_enddate = $activity['end date'];
-                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -324,7 +328,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
                     $activity_enddate = $activity['end date'];
-                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
@@ -335,7 +339,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_startdate = $activity['mandate start'];
                     $activity_enddate = $activity['mandate end'];
-                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -379,13 +383,14 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
                     $activity_enddate = $activity['end date'];
-                    $activity_date = $this->make_date($activity_startdate, $activity_enddate);
+                    $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
             }
 
-            $activitylist .= "<li>";
+            if ($this->einheit != "activity")
+                $activitylist .= "<li>";
 
             if ($name == 1 && !empty($names))
                 $activitylist .= $names_html . ": ";
@@ -405,29 +410,18 @@ class Aktivitaeten {
                 $activitylist .= ", " . $activity_location;
             if (!empty($activity_url))
                 $activitylist .= ", URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>";
-            $activitylist .= "</li>";
+
+            if ($this->einheit != "activity")
+                $activitylist .= "</li>";
         }
 
-        $activitylist .= "</ul>";
+        if ($this->einheit == "activity") {
+            $activitylist .= "</div>";
+        } else {
+            $activitylist .= "</ul>";
+        }
 
         return $activitylist;
-    }
-
-    private function make_date ($start, $end) {
-        setlocale(LC_TIME, get_locale());
-        $date = '';
-        if ($start != '')
-            $start = strftime('%x', strtotime($start));
-        if ($end != '')
-            $end = strftime('%x', strtotime($end));
-        if ($start !='' && $end != '') {
-            $date = $start . " - " . $end;
-        } elseif ($start != '' && $end =='') {
-            $date = __('seit', 'fau-cris') . " " . $start;
-        } elseif ($start == '' && $end != '') {
-            $date = __('bis', 'fau-cris') . " " . $end;
-        }
-        return $date;
     }
 
 }
@@ -509,6 +503,9 @@ class CRIS_activities extends CRIS_webservice {
                     } elseif (!empty($a->attributes['mandate start'])) {
                         $a->attributes['year'] = substr($a->attributes['mandate start'], 0, 4);
                         $a->attributes['sortdate'] = $a->attributes['mandate start'];
+                    }
+                    if (!empty($a->attributes['sortdate'])) {
+                        $a->attributes['year'] = substr($a->attributes['sortdate'], 0, 4);
                     }
                 }
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: FAU CRIS v3.0\n"
+"Project-Id-Version: FAU CRIS v3.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-20 12:08+0000\n"
 "PO-Revision-Date: 2016-10-20 12:09+0000\n"

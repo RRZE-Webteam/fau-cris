@@ -428,4 +428,21 @@ class Tools {
         return $person;
     }
 
+    public static function make_date ($start, $end) {
+        setlocale(LC_TIME, get_locale());
+        $date = '';
+        if ($start != '')
+            $start = strftime('%x', strtotime($start));
+        if ($end != '')
+            $end = strftime('%x', strtotime($end));
+        if ($start !='' && $end != '') {
+            $date = $start . " - " . $end;
+        } elseif ($start != '' && $end =='') {
+            $date = __('seit', 'fau-cris') . " " . $start;
+        } elseif ($start == '' && $end != '') {
+            $date = __('bis', 'fau-cris') . " " . $end;
+        }
+        return $date;
+    }
+
 }

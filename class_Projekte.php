@@ -240,7 +240,7 @@ class Projekte {
                 setlocale(LC_TIME, get_locale());
                 $start = $project['cfstartdate'];
                 $start = strftime('%x', strtotime($start));
-                $end = !empty($project['cfenddate']) ? $project['cfenddate'] : $project['virtualenddate'];
+                $end = $project['cfenddate'];
                 $end = strftime('%x', strtotime($end));
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
@@ -309,21 +309,17 @@ class Projekte {
             if (!in_array('details', $hide)) {
                 $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
                 //$acronym = $project['cfacro'];
-                setlocale(LC_TIME, get_locale());
                 $start = $project['cfstartdate'];
-                $start = strftime('%x', strtotime($start));
-                $end = !empty($project['cfenddate']) ? $project['cfenddate'] : $project['virtualenddate'];
-                $end = strftime('%x', strtotime($end));
+                $end = $project['cfenddate'];
+                $date = Tools::make_date($start, $end);
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
 
                 $projlist .= "<div class=\"project-details\">";
                 if (!empty($parentprojecttitle))
                     $projlist .= "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle . '<br />';
-                if (!empty($start) || !empty($end))
-                    $projlist .= "<b>" . __('Laufzeit', 'fau-cris') . ': </b>' . $start;
-                if (!empty($end))
-                    $projlist .= " &ndash; " . $end;
+                if (!empty($date))
+                    $projlist .= "<b>" . __('Laufzeit', 'fau-cris') . ': </b>' . $date;
                 if (!empty($funding)) {
                     $projlist .= "<br /><b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
                     $projlist .= implode(', ', $funding);

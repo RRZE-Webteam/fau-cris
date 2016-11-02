@@ -62,8 +62,13 @@ class CRIS_formatter {
             if (!array_key_exists($value, $final))
                 $final[$value] = array();
 
-            $final[$value][] = $single_dataset;
+            if (!empty($value)) {
+                $final[$value][] = $single_dataset;
+            } else {
+                $final[__('O.A.','fau-cris')][] = $single_dataset;
+            }
         }
+        unset($final[0]);
 
         # first sort main groups
         if (is_array($this->group_order)) {
