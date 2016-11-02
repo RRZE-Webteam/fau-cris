@@ -61,13 +61,11 @@ ul.cris-projects .project-title {
     display: none;
 }
 
-ul.cris-activities {
-    padding-left: 30px;
-    text-indent: -30px;
-    margin-left: 0;
+div.cris-activities {
+    margin-bottom: .3em;
 }
 
 ul.cris-activities li {
     margin-bottom: .3em;
-    list-style-type: none;
+    list-style-type: circle;
 }

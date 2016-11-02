@@ -104,9 +104,11 @@ class Auszeichnungen {
         $output = '';
 
         foreach ($awardList as $array_year => $awards) {
+            if (count($awards) < 1)
+                return $output;
             if (empty($year)) {
                 $output .= '<h3 class="clearfix clear">';
-                $output .=!empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
+                $output .= $array_year;
                 $output .= '</h3>';
             }
             if ($display == 'gallery') {

@@ -222,7 +222,11 @@ class Aktivitaeten {
      */
 
     private function make_list($activities, $name = 1, $year = 1, $activityname = 1, $showtype = 1) {
-        $activitylist = "<ul class=\"cris-activities\">";
+        if ($this->einheit == "activity") {
+            $activitylist = "<div class=\"cris-activities\">";
+        } else {
+            $activitylist = "<ul class=\"cris-activities\">";
+        }
 
         foreach ($activities as $activity) {
             $activity = (array) $activity;
@@ -385,7 +389,8 @@ class Aktivitaeten {
                     break;
             }
 
-            $activitylist .= "<li>";
+            if ($this->einheit != "activity")
+                $activitylist .= "<li>";
 
             if ($name == 1 && !empty($names))
                 $activitylist .= $names_html . ": ";
@@ -405,10 +410,16 @@ class Aktivitaeten {
                 $activitylist .= ", " . $activity_location;
             if (!empty($activity_url))
                 $activitylist .= ", URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>";
-            $activitylist .= "</li>";
+
+            if ($this->einheit != "activity")
+                $activitylist .= "</li>";
         }
 
-        $activitylist .= "</ul>";
+        if ($this->einheit == "activity") {
+            $activitylist .= "</div>";
+        } else {
+            $activitylist .= "</ul>";
+        }
 
         return $activitylist;
     }
