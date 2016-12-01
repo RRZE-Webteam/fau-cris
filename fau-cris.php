@@ -337,7 +337,7 @@ class FAU_CRIS {
             'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Aktivitäten.', self::textdomain)
                 )
         );
-/*        add_settings_field(
+        add_settings_field(
             'cris_activities_link', __('Personen verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_activities_section', array(
             'name' => 'cris_activities_link',
             'options' => array(
@@ -345,7 +345,7 @@ class FAU_CRIS {
                 'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
                 'none' => __('keinen Link setzen', self::textdomain))
             )
-        );*/
+        );
     }
 
     /**

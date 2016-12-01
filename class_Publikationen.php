@@ -11,15 +11,25 @@ class Publikationen {
     public $output;
 
     public function __construct($einheit = '', $id = '') {
-
-        $this->cms = 'wp';
-        $this->options = (array) get_option('_fau_cris');
+        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+            $this->cms = 'wbk';
+            $this->options = CRIS::ladeConf();
+            $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
+        } else {
+            $this->cms = 'wp';
+            $this->options = (array) get_option('_fau_cris');
+            $this->pathPersonenseiteUnivis = '/person/';
+        }
         $this->orgNr = $this->options['cris_org_nr'];
+        $this->suchstring = '';
+        $this->univis = NULL;
+
         $this->order = $this->options['cris_pub_order'];
         $this->univisLink = isset($this->options['cris_univis']) ? $this->options['cris_univis'] : 'none';
-        $this->pathPersonenseiteUnivis = '/person/';
         $this->bibtex = $this->options['cris_bibtex'];
-        $this->suchstring = '';
+        if ($this->cms == 'wbk' && $this->univisLink == 'person') {
+            $this->univis = Tools::get_univis();
+        }
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
@@ -34,26 +44,7 @@ class Publikationen {
             $this->einheit = "orga";
         }
 
-        $univis = NULL;
-        if ($this->cms == 'wbk' && $this->cris_award_link == 'person') {
-            $this->univisID = Tools::get_univis_id();
-            // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
-            // Mitarbeiter der Institution zugeordnet wurden...)?
-            $url1 = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $this->univisID . "&show=xml";
-            $daten1 = Tools::XML2obj($url1);
-            $num1 = count($daten1->Person);
-            $url2 = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $this->univisID . "&show=xml";
-            $daten2 = Tools::XML2obj($url2);
-            $num2 = count($daten2->Person);
-            $daten = $num1 > $num2 ? $daten1 : $daten2;
-
-            foreach ($daten->Person as $person) {
-                $univis[] = array ('firstname' => (string) $person->firstname,
-                    'lastname' => (string) $person->lastname);
             }
-        }
-        $this->univis = $univis;
-    }
 
     /*
      * Ausgabe aller Publikationen ohne Gliederung
@@ -258,8 +249,9 @@ class Publikationen {
         $publist = "<ul class=\"cris-publications\">";
 
         foreach ($publications as $publication) {
+            $publication->insert_quotation_links();
             $publist .= "<li>";
-            $publist .= $publication->attributes['quotation' . $quotation];
+            $publist .= $publication->attributes['quotation' . $quotation . 'link'];
             if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
                 $publist .= "<br />BibTeX: " . $publication->attributes['bibtex_link'];
             }
@@ -277,7 +269,7 @@ class Publikationen {
 
     private function make_list($publications) {
 
-        $publist = "<ul>";
+        $publist = "<ul class=\"cris-publications\">";
 
         foreach ($publications as $publicationObject) {
 
@@ -298,14 +290,13 @@ class Publikationen {
                 $author_lastname = implode(" ", $author_elements);
                 $authorList[] = Tools::get_person_link($author['id'], $author_firstname, $author_lastname, $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
             }
-            $authors_html = implode(", ", $authorList);
+            $authors_html = implode("., ", $authorList) . ".";
             // title
             $title = (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
-            $title_html = "<br />"
-                    . "<a href=\"https://cris.fau.de/converis/publicweb/Publication/" . $id
-                    . "\" target=\"blank\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\"><span class=\"title\" itemprop=\"name\" style=\"font-weight: bold;\">"
+            $title_html = "<span class=\"title\" itemprop=\"name\" style=\"font-weight: bold;\">"
+                    . "<a href=\"https://cris.fau.de/converis/publicweb/Publication/" . $id . "\" target=\"blank\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                     . $title
-                    . "</span></a>";
+                    . "</a></span>";
             // make array
             setlocale(LC_TIME, get_locale());
             $pubDetails = array(
@@ -346,8 +337,8 @@ class Publikationen {
                 case "Book": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ':';
-                    $publist .= $pubDetails['title'];
-                    $publist .= $publication['publication type']; //== 'Unpublished' ? Tools::getName('publications', $pubDetails['pubType'], get_locale()) : '';
+                    $publist .= "<br />" . $pubDetails['title'];
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $pubDetails['pubType'], get_locale()) . ')' : '';
                     $publist .= (($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '';
                     $publist .= $pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '';
                     if (!empty($pubDetails['publisher'])) {
@@ -368,15 +359,14 @@ class Publikationen {
                     $publist .= $pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '';
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
-                    $publist .= "<br />";
                     break;
 
                 case "Article in Edited Volumes":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ':';
-                    $publist .= $pubDetails['title'];
+                    $publist .= "<br />" . $pubDetails['title'];
                     if ($pubDetails['booktitle'] != '') {
-                        $publist .= "<div itemscope itemtype=\"http://schema.org/Book\">In: ";
+                        $publist .= "<br /><span itemscope itemtype=\"http://schema.org/Book\">In: ";
                         $publist .= $pubDetails['editiors'] != '' ? "<span itemprop=\"author\">" . $pubDetails['editiors'] . " (" . __('Hrsg.', 'fau-cris') . "): </span>" : '';
                         $publist .= "<span itemprop=\"name\" style=\"font-weight:bold;\">" . $pubDetails['booktitle'] . "</span>";
                         $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? ", <span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">" : '';
@@ -384,24 +374,23 @@ class Publikationen {
                                 . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: " : '';
                         $publist .= $pubDetails['publisher'] != '' ? "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span>" : '';
                         $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? "</span>" : '';
-                        $publist .= $pubDetails['year'] != '' ? ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
+                        $publist .= $pubDetails['year'] != '' ? ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';$publist .= $pubDetails['pagesRange'] != '' ? ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>" : '';
                         if (!empty($pubDetails['series'])) {
                             $publist .= $pubDetails['series'] != '' ? " (" . $pubDetails['series'] : '';
                             $publist .= $pubDetails['seriesNumber'] != '' ? ", " . _x('Bd.', 'Abkürzung für "Band" bei Publikationen', 'fau-cris') . $pubDetails['seriesNumber'] : '';
                             $publist .= ")";
                         }
                         $publist .= $pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '';
-                        $publist .= "</div>";
+                        $publist .= "</span>";
                     }
-                    $publist .= $pubDetails['pagesTotal'] != '' ? "<span itemprop=\"numberOfPages\">" . $pubDetails['pagesTotal'] . "</span> " . __('Seiten', 'fau-cris')  . "<br />": '';
-                    $publist .= $pubDetails['DOI'] != '' ? "DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a></span><br />" : '</span>';
-                    $publist .= $pubDetails['URI'] != '' ? "URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a><br />" : '';
+                    $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a></span>" : '';
+                    $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
 
                 case "Journal article":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ":";
-                    $publist .= $pubDetails['title'];
+                    $publist .= "<br />" . $pubDetails['title'];
                     $publist .= (($pubDetails['journaltitle'] != '') || ($pubDetails['volume'] != '') || ($pubDetails['year'] != '') || ($pubDetails['pagesRange'] != '')) ? "<br />" : '';
                     $publist .= $pubDetails['journaltitle'] != '' ? "In: <span itemscope itemtype=\"http://schema.org/Periodical\" itemid=\"#periodical_" . $pubDetails['id'] . "\"><span itemprop=\"name\" style=\"font-weight: bold;\">" . $pubDetails['journaltitle'] . "</span></span>" : '';
                     $publist .= $pubDetails['seriesNumber'] != '' ? " <span itemprop=\"isPartOf\" itemscope itemtype=\"http://schema.org/PublicationVolume\"><link itemprop=\"isPartOf\" href=\"#periodical_" . $pubDetails['id'] . "\" /><span itemprop=\"volumeNumber\">" . $pubDetails['seriesNumber'] . "</span></span> " : '';
@@ -410,16 +399,15 @@ class Publikationen {
                     $publist .= $pubDetails['ISSN'] != '' ? "<br><span itemscope itemtype=\"http://schema.org/Periodical\" itemid=\"#periodical_" . $pubDetails['id'] . "\"><span itemprop=\"issn\">ISSN: " . $pubDetails['ISSN'] . "</span></span></span>" : "</span>";
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
-                    $publist .= "<br />";
                     break;
 
                 case "Conference contribution": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ':';
-                    $publist .= $pubDetails['title'];
+                    $publist .= "<br />" . $pubDetails['title'];
                     $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $pubDetails['pubType'], get_locale()) . (!empty($pubDetails['pubStatus']) ? ', '  . strtolower($pubDetails['pubStatus']) : '') . ')': '';
                     if ($pubDetails['eventtitle'] != '') {
-                        $publist .= "<div itemscope itemtype=\"http://schema.org/Event\" style=\"font-style:italic;\">";
+                        $publist .= "<br /><span itemscope itemtype=\"http://schema.org/Event\" style=\"font-style:italic;\">";
                         $publist .= "<span itemprop=\"name\">" . $pubDetails['eventtitle'] . "</span>";
                         $publist .= ($pubDetails['eventlocation'] != '' || $pubDetails['eventstart'] != '' || $pubDetails['eventend'] != '') ? " (" : '';
                         $publist .= $pubDetails['eventlocation'] != '' ? "<span itemprop =\"location\" itemscope itemtype=\"http://schema.org/PostalAddress\">"
@@ -427,10 +415,10 @@ class Publikationen {
                         $publist .= $pubDetails['eventstart'] != '' ? ", <span itemprop=\"startDate\" content=\"" . $pubDetails['eventstart_raw'] . "\">" . $pubDetails['eventstart'] . "</span>" : "<span itemprop=\"startDate\" content=\"" . $pubDetails['eventstart_raw'] . "\"></span>";
                         $publist .= $pubDetails['eventend'] != '' ? " - <span itemprop=\"endDate\" content=\"" . $pubDetails['eventend_raw'] . "\">" . $pubDetails['eventend'] . "</span>" : '';
                         $publist .= ($pubDetails['eventlocation'] != '' || $pubDetails['eventstart'] != '' || $pubDetails['eventend'] != '') ? ")" : '';
-                        $publist .= "</div>";
+                        $publist .= "</span>";
                     }
                     if ($pubDetails['booktitle'] != '') {
-                        $publist .= "<div itemscope itemtype=\"http://schema.org/Book\">In: ";
+                        $publist .= "<span itemscope itemtype=\"http://schema.org/Book\">In: ";
                         $publist .= $pubDetails['editiors'] != '' ? "<span itemprop=\"author\">" . $pubDetails['editiors'] . " (" . __('Hrsg.', 'fau-cris') . "): </span>" : '';
                         $publist .= "<span itemprop=\"name\" style=\"font-weight:bold;\">" . $pubDetails['booktitle'] . "</span>";
                         $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? ", <span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">" : '';
@@ -439,22 +427,19 @@ class Publikationen {
                         $publist .= $pubDetails['publisher'] != '' ? "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span>" : '';
                         $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? "</span>" : '';
                         $publist .= $pubDetails['year'] != '' ? ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
-                        $publist .= "</div>";
+                        $publist .= "</span>";
                     }
-                    if (!empty($pubDetails['booktitle']) && !empty($pubDetails['eventtitle'])) {
-                        $publist .= "<br />";
-                    }
-                    $publist .= $pubDetails['DOI'] != '' ? "DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a><br />" : '';
-                    $publist .= $pubDetails['URI'] != '' ? "URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a><br />" : '';
-
+                    $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
+                    $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
+
                 case "Editorial":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
-                    $publist .= $pubDetails['title'] . "<br />";
-                    $publist .= $pubDetails['volume'] != '' ? "<span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. <br />" : '';
+                    $publist .= "<br />" . $pubDetails['title'];
+                    $publist .= $pubDetails['volume'] != '' ? "<br /><span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. <br />" : '';
                      if (!empty($pubDetails['publisher'])) {
-                        $publist .= "<span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">";
+                        $publist .= "<br /><span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">";
                         $publist .= $pubDetails['city'] != '' ? "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">"
                                 . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: " : '';
                         $publist .= "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span></span>, ";
@@ -471,16 +456,14 @@ class Publikationen {
                     $publist .= $pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '';
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
-                    $publist .= "<br />";
                     break;
                 case "Thesis":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
-                    $publist .= $pubDetails['title'];
+                    $publist .= "<br />" . $pubDetails['title'];
                     $publist .= "<br />" . __('Abschlussarbeit', '') . " <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>";
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
-                    $publist .= "<br />";
                     break;
                 case "Translation":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
@@ -506,13 +489,12 @@ class Publikationen {
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     $publist .= $pubDetails['origTitle'] != '' ? "<br />Originaltitel: " . $pubDetails['origTitle'] : '';
                     $publist .= $pubDetails['language'] != '' ? "<br />Sprache: <span itemprop=\"inLanguage\">" . $pubDetails['language'] . "</span>" : '';
-                    $publist .= "<br />";
                     break;
             }
             if ($this->bibtex == 1) {
-                $publist .= "BibTeX: " . $pubDetails['bibtex_link'];
+                $publist .= "<br />BibTeX: " . $pubDetails['bibtex_link'];
             }
-            $publist .= "</li>\r";
+            $publist .= "</li>";
         }
         $publist .= "</ul>";
 

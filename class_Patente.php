@@ -12,16 +12,27 @@ class Patente {
 
     public function __construct($einheit = '', $id = '') {
 
-        $this->cms = 'wp';
-        $this->options = (array) get_option('_fau_cris');
+        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+            $this->cms = 'wbk';
+            $this->options = CRIS::ladeConf();
+            $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
+        } else {
+            $this->cms = 'wp';
+            $this->options = (array) get_option('_fau_cris');
+            $this->pathPersonenseiteUnivis = '/person/';
+        }
         $this->orgNr = $this->options['cris_org_nr'];
-        $this->order = $this->options['cris_patent_order'];
-        $this->cris_patent_link = isset($this->options['cris_patent_link']) ? $this->options['cris_patent_link'] : 0;
-        $this->pathPersonenseiteUnivis = '/person/';
         $this->suchstring = '';
+        $this->univis = NULL;
+
+        $this->order = $this->options['cris_patent_order'];
+        $this->cris_patent_link = isset($this->options['cris_patent_link']) ? $this->options['cris_patent_link'] : 'none';
+        if ($this->cms == 'wbk' && $this->cris_patent_link == 'person') {
+            $this->univis = Tools::get_univis();
+        }
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
+            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris') . '</strong></p>';
             return;
         }
         if (in_array($einheit, array("person", "orga", "patent"))) {
@@ -33,26 +44,7 @@ class Patente {
             $this->einheit = "orga";
         }
 
-        $univis = NULL;
-        if ($this->cms == 'wbk' && $this->cris_patent_link == 'person') {
-            $this->univisID = Tools::get_univis_id();
-            // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
-            // Mitarbeiter der Institution zugeordnet wurden...)?
-            $url1 = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $this->univisID . "&show=xml";
-            $daten1 = Tools::XML2obj($url1);
-            $num1 = count($daten1->Person);
-            $url2 = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $this->univisID . "&show=xml";
-            $daten2 = Tools::XML2obj($url2);
-            $num2 = count($daten2->Person);
-            $daten = $num1 > $num2 ? $daten1 : $daten2;
-
-            foreach ($daten->Person as $person) {
-                $univis[] = array('firstname' => (string) $person->firstname,
-                    'lastname' => (string) $person->lastname);
             }
-        }
-        $this->univis = $univis;
-    }
 
     /*
      * Ausgabe aller Patente ohne Gliederung
@@ -226,9 +218,9 @@ class Patente {
             $inventorsList = array();
             foreach ($inventorsArray as $inventor) {
                 $inventor_elements = explode(":", $inventor['name']);
-                $inventor_firstname = $inventor_elements[0];
-                $inventor_lastname = $inventor_elements[1];
-                $inventorsList[] = Tools::get_person_link($inventor['id'], $inventor_firstname, $inventor_lastname, $this->cris_patent_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
+                $inventor_firstname = $inventor_elements[1];
+                $inventor_lastname = $inventor_elements[0];
+                $inventorsList[] = Tools::get_person_link($inventor['id'], $inventor_firstname, $inventor_lastname, $this->cris_patent_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
             }
             $inventors_html = implode(", ", $inventorsList);
 

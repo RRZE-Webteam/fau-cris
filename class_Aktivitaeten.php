@@ -11,14 +11,25 @@ class Aktivitaeten {
     public $output;
 
     public function __construct($einheit = '', $id = '') {
-
-        $this->cms = 'wp';
-        $this->options = (array) get_option('_fau_cris');
+        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+            $this->cms = 'wbk';
+            $this->options = CRIS::ladeConf();
+            $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
+        } else {
+            $this->cms = 'wp';
+            $this->options = (array) get_option('_fau_cris');
+            $this->pathPersonenseiteUnivis = '/person/';
+        }
         $this->orgNr = $this->options['cris_org_nr'];
-        $this->order = isset($this->options['cris_activities_order']) ? $this->options['cris_activities_order'] : Tools::getOrder('activities');
-        $this->cris_acti_link = isset($this->options['cris_acti_link']) ? $this->options['cris_acti_link'] : 0;
-        $this->pathPersonenseiteUnivis = '/person/';
         $this->suchstring = '';
+        $this->univis = NULL;
+
+        $this->order = $this->options['cris_activities_order'];
+        $this->cris_activities_link = isset($this->options['cris_activities_link']) ? $this->options['cris_activities_link'] : 'none';
+        if ($this->cms == 'wbk' && $this->univisLink == 'person') {
+            $this->univis = Tools::get_univis();
+        }
+
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris') . '</strong></p>';
             return;
@@ -32,25 +43,6 @@ class Aktivitaeten {
             $this->einheit = "orga";
         }
 
-        $univis = NULL;
-        if ($this->cms == 'wbk' && $this->cris_acti_link == 'person') {
-            $this->univisID = Tools::get_univis_id();
-            // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
-            // Mitarbeiter der Institution zugeordnet wurden...)?
-            $url1 = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $this->univisID . "&show=xml";
-            $daten1 = Tools::XML2obj($url1);
-            $num1 = count($daten1->Person);
-            $url2 = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $this->univisID . "&show=xml";
-            $daten2 = Tools::XML2obj($url2);
-            $num2 = count($daten2->Person);
-            $daten = $num1 > $num2 ? $daten1 : $daten2;
-
-            foreach ($daten->Person as $person) {
-                $univis[] = array('firstname' => (string) $person->firstname,
-                    'lastname' => (string) $person->lastname);
-            }
-        }
-        $this->univis = $univis;
     }
 
     /*
@@ -234,29 +226,17 @@ class Aktivitaeten {
                 $activity[$attribut] = $v;
             }
             unset($activity['attributes']);
-
             $names = explode("|", $activity['exportnames']);
-            if (isset($activity['relnamesid'])) {
-                $nameIDs = isset($activity['relnamesid']) ? explode(",", $activity['relnamesid']) : array();
-                $namesArray = array();
-                foreach ($nameIDs as $i => $key) {
-                    $namesArray[] = array('id' => $key, 'name' => $names[$i]);
-                }
-                $namesList = array();
-                foreach ($namesArray as $pname) {
-                    $name_elements = explode(":", $pname['name']);
-                    $name_firstname = $name_elements[1];
-                    $name_lastname = $name_elements[0];
-                    $namesList[] = Tools::get_person_link($pname['id'], $name_firstname, $name_lastname, $this->cris_activity_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
-                }
-            } else {
-                $namesList = array();
-                foreach ($names as $pname) {
-                    $name_elements = explode(":", $pname);
-                    $name_firstname = $name_elements[1];
-                    $name_lastname = $name_elements[0];
-                    $namesList[] = $name_firstname . " " . $name_lastname;
-                }
+            $nameIDs = explode(",", $activity['relpersid']);
+            foreach ($nameIDs as $i => $key) {
+                $namesArray[] = array('id' => $key, 'name' => $names[$i]);
+            }
+            $namesList = array();
+            foreach ($namesArray as $persname) {
+                $name_elements = explode(":", $persname['name']);
+                $firstname = $name_elements[1];
+                $lastname = $name_elements[0];
+                $namesList[] = Tools::get_person_link($persname['id'], $firstname, $lastname, $this->cris_activities_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
             }
             $names_html = implode(", ", $namesList);
 
@@ -286,7 +266,7 @@ class Aktivitaeten {
                     $activity_enddate = $activity['end date'];
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
-                    $activity_location = $activity['mirror_eorg'];
+                    $activity_location = $activity['city'];
                     break;
                 case "Herausgeberschaft":
                     $activity_name = $activity['namejournal'];
@@ -392,7 +372,7 @@ class Aktivitaeten {
             if ($this->einheit != "activity")
                 $activitylist .= "<li>";
 
-            if ($name == 1 && !empty($names))
+            if ($name == 1 && !empty($names_html))
                 $activitylist .= $names_html . ": ";
             if (!empty($activity_type) & $showtype != 0)
                 $activitylist .= $activity_type;
