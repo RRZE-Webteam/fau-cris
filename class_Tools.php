@@ -350,11 +350,31 @@ class Tools {
      * Anbindung an UnivIS-/FAU-Person-Plugin
      */
 
-    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array()) {
+    public static function get_univis() {
+        $univisID = self::get_univis_id();
+        // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
+        // Mitarbeiter der Institution zugeordnet wurden...)?
+        $url1 = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $univisID . "&show=xml";
+        $daten1 = self::XML2obj($url1);
+        $num1 = count($daten1->Person);
+        $url2 = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $univisID . "&show=xml";
+        $daten2 = self::XML2obj($url2);
+        $num2 = count($daten2->Person);
+        $daten = $num1 > $num2 ? $daten1 : $daten2;
+
+        foreach ($daten->Person as $person) {
+            $univis[] = array('firstname' => (string) $person->firstname,
+                               'lastname' => (string) $person->lastname);
+        }
+        return $univis;
+    }
+
+    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis) {
         if ($cms == 'wp') {
             // WordPress
             return self::person_slug($cms, $firstname, $lastname);
-        } else {
+        }
+        if ($cms == 'wbk') {
             // Webbaukasten
             foreach ($univis as $_p) {
                 if (strpos($_p['firstname'], $firstname) !== false && strpos($_p['lastname'], $lastname) !== false) {

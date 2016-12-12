@@ -2,6 +2,9 @@ ul.cris-publications li {
     margin-bottom: 15px;
     line-height: 150%;
 }
+ul.cris-publications p {
+    margin-bottom: 0;
+}
 
 ul.cris-gallery {
     list-style-type: none;
@@ -40,6 +43,12 @@ ul.cris-gallery li .noimage {
     height: 180px;
     background-color: #eee;
 }
+
+ul.cris-projects li {
+    margin-bottom: 15px;
+    line-height: 150%;
+}
+
 ul.cris-projects .project-type,
 div.cris-projects .project-type {
     font-style: italic;

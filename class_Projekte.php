@@ -12,13 +12,24 @@ class Projekte {
 
     public function __construct($einheit = '', $id = '') {
 
+        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+            $this->cms = 'wbk';
+            $this->options = CRIS::ladeConf();
+            $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
+        } else {
         $this->cms = 'wp';
         $this->options = (array) get_option('_fau_cris');
+            $this->pathPersonenseiteUnivis = '/person/';
+        }
         $this->orgNr = $this->options['cris_org_nr'];
-        $this->order = $this->options['cris_project_order'];
-        $this->cris_project_link = isset($this->options['cris_project_link']) ? $this->options['cris_project_link'] : 0;
-        $this->pathPersonenseiteUnivis = '/person/';
         $this->suchstring = '';
+        $this->univis = NULL;
+
+        $this->order = $this->options['cris_project_order'];
+        $this->cris_project_link = isset($this->options['cris_project_link']) ? $this->options['cris_project_link'] : 'none';
+        if ($this->cms == 'wbk' && $this->cris_project_link == 'person') {
+            $this->univis = Tools::get_univis();
+        }
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
@@ -33,27 +44,7 @@ class Projekte {
             $this->einheit = "orga";
         }
 
-        $univis = NULL;
-        if ($this->cms == 'wbk' && $this->cris_award_link == 1) {
-            //if ($this->cms == 'wbk' && $this->cris_award_link == 'person') {
-            $this->univisID = Tools::get_univis_id();
-            // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
-            // Mitarbeiter der Institution zugeordnet wurden...)?
-            $url1 = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $this->univisID . "&show=xml";
-            $daten1 = Tools::XML2obj($url1);
-            $num1 = count($daten1->Person);
-            $url2 = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $this->univisID . "&show=xml";
-            $daten2 = Tools::XML2obj($url2);
-            $num2 = count($daten2->Person);
-            $daten = $num1 > $num2 ? $daten1 : $daten2;
-
-            foreach ($daten->Person as $person) {
-                $univis[] = array('firstname' => (string) $person->firstname,
-                    'lastname' => (string) $person->lastname);
             }
-        }
-        $this->univis = $univis;
-    }
 
     /*
      * Ausgabe aller Projekte ohne Gliederung
