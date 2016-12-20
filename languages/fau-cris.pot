@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FAU CRIS v3.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 11:35+0000\n"
+"POT-Creation-Date: 2016-12-19 13:58+0000\n"
 "POT-Revision-Date: Thu Aug 25 2016 14:01:16 GMT+0200 (CEST)\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: zo95zofo <barbara.bothe@fau.de>\n"
@@ -48,7 +48,7 @@ msgstr ""
 
 # @ fau-cris
 #: class_Publikationen.php:57 class_Publikationen.php:97
-#: class_Publikationen.php:131
+#: class_Publikationen.php:131 class_Forschungsbereiche.php:56
 msgid "Es wurden leider keine Publikationen gefunden."
 msgstr ""
 
@@ -105,11 +105,11 @@ msgstr ""
 msgid "Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID."
 msgstr ""
 
-#: class_Tools.php:441
+#: class_Tools.php:477
 msgid "seit"
 msgstr ""
 
-#: class_Tools.php:443
+#: class_Tools.php:479
 msgid "bis"
 msgstr ""
 
@@ -118,7 +118,7 @@ msgstr ""
 msgid "Es wurden leider keine Projekte gefunden."
 msgstr ""
 
-#: class_Projekte.php:242 class_Projekte.php:311
+#: class_Projekte.php:242 class_Projekte.php:313
 msgid "Titel des Gesamtprojektes"
 msgstr ""
 
@@ -138,41 +138,45 @@ msgstr ""
 msgid "Projektende"
 msgstr ""
 
-#: class_Projekte.php:256 class_Projekte.php:315
+#: class_Projekte.php:256
+msgid "Akronym"
+msgstr ""
+
+#: class_Projekte.php:258 class_Projekte.php:317
 msgid "Mittelgeber"
 msgstr ""
 
-#: class_Projekte.php:260 class_Projekte.php:319
+#: class_Projekte.php:262 class_Projekte.php:321
 msgid "URL"
 msgstr ""
 
-#: class_Projekte.php:267 class_Projekte.php:328
+#: class_Projekte.php:269 class_Projekte.php:330
 msgid "Abstract"
 msgstr ""
 
 #. ID
-#: class_Projekte.php:271
+#: class_Projekte.php:273 class_Forschungsbereiche.php:276
 msgid "Publikationen"
 msgstr ""
 
-#: class_Projekte.php:313
+#: class_Projekte.php:315
 msgid "Laufzeit"
 msgstr ""
 
-#: class_Projekte.php:328
+#: class_Projekte.php:330
 msgid "Abstract anzeigen"
 msgstr ""
 
-#: class_Projekte.php:333
+#: class_Projekte.php:335
 msgid "Zur Projektseite auf cris.fau.de wechseln"
 msgstr ""
 
-#: class_Projekte.php:333
+#: class_Projekte.php:335 class_Projekte.php:382
 msgid "Mehr Informationen"
 msgstr ""
 
 # @ fau-cris
-#: fau-cris.php:578 fau-cris.php:800
+#: fau-cris.php:583 fau-cris.php:824
 msgid ""
 "Bitte geben Sie die CRIS-ID der Organisation, Person oder "
 "Publikation/Auszeichnung an."
@@ -217,6 +221,19 @@ msgstr ""
 
 #: class_Aktivitaeten.php:392
 msgid "Link in neuem Fenster &ouml;ffnen"
+msgstr ""
+
+#: class_Forschungsbereiche.php:34
+msgid ""
+"Bitte geben Sie die CRIS-ID der Organisation oder des Forschungsbereichs an."
+msgstr ""
+
+#: class_Forschungsbereiche.php:259
+msgid "Projekte"
+msgstr ""
+
+#: class_Forschungsbereiche.php:264
+msgid "Beteiligte Wissenschaftler"
 msgstr ""
 
 #. Name of the plugin

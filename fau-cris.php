@@ -66,7 +66,7 @@ class FAU_CRIS {
     }
 
     /**
-     * Check PHP and WP Version and if Contact Form 7 is active
+     * Check PHP and WP Version
      */
     public static function activate() {
         self::version_compare();
@@ -494,7 +494,8 @@ class FAU_CRIS {
             'hide' => '',
             'role' => 'leader',
             'patent' => '',
-            'activity' => ''
+            'activity' => '',
+            'field' => ''
                         ), $atts));
 
         $show = sanitize_text_field($show);
@@ -521,6 +522,7 @@ class FAU_CRIS {
         $role = sanitize_text_field($role);
         $patent = sanitize_text_field($patent);
         $activity = sanitize_text_field($activity);
+        $field = sanitize_text_field($field);
 
         if (isset($publication) && $publication != '') {
             $param1 = 'publication';
@@ -529,6 +531,9 @@ class FAU_CRIS {
                 $publication = explode(',', $publication);
             }
             $param2 = $publication;
+        } elseif (isset($field) && $field != '') {
+            $param1 = 'field';
+            $param2 = $field;
         } elseif (isset($activity) && $activity != '') {
             $param1 = 'activity';
             $param2 = $activity;
@@ -573,7 +578,7 @@ class FAU_CRIS {
             '142351'  // Techfak
         );
 
-        if ((!$orgid || $orgid == 0) && $persid == '' && $publication == '' && $award == '' && $awardnameid == '') {
+        if ((!$orgid || $orgid == 0) && $persid == '' && $publication == '' && $award == '' && $awardnameid == '' && $field == '') {
             // Fehlende ID oder ID=0 abfangen
             return __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation/Auszeichnung an.', 'fau-cris') . '</strong></p>';
         } /* elseif (in_array($orgid, $excluded)
@@ -598,7 +603,19 @@ class FAU_CRIS {
                 }
             }
 
-            if (isset($show) && $show == 'activities') {
+            if (isset($show) && $show == 'fields') {
+                // Forschungsbereiche
+                require_once('class_Forschungsbereiche.php');
+                $liste = new Forschungsbereiche($param1, $param2);
+
+                if ($field != '') {
+                    return $liste->singleField($hide);
+                }
+                if (!empty($items)) {
+                    return $liste->fieldListe();
+                }
+                return $liste->fieldListe();
+            } elseif (isset($show) && $show == 'activities') {
                 // Projekte
                 require_once('class_Aktivitaeten.php');
                 $liste = new Aktivitaeten($param1, $param2);

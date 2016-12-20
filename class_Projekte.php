@@ -235,7 +235,7 @@ class Projekte {
                 $end = strftime('%x', strtotime($end));
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
-                //$acronym = $project['cfacro'];
+                $acronym = $project['cfacro'];
 
                 $projlist .= "<p class=\"project-details\">";
                 if (!empty($parentprojecttitle))
@@ -252,6 +252,8 @@ class Projekte {
                     $projlist .= "<br /><b>" . __('Projektstart', 'fau-cris') . ': </b>' . $start;
                 if (!empty($end))
                     $projlist .= "<br /><b>" . __('Projektende', 'fau-cris') . ': </b>' . $end;
+                if (!empty($acronym))
+                    $projlist .= "<br /><b>" . __('Akronym', 'fau-cris') . ": </b>" . $acronym;
                 if (!empty($funding)) {
                     $projlist .= "<br /><b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
                     $projlist .= implode(', ', $funding);
@@ -275,7 +277,7 @@ class Projekte {
         return $projlist;
     }
 
-    private function make_list($projects, $hide, $showtype = 1) {
+    private function make_list($projects, $hide = array(), $showtype = 1) {
 
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $projlist = '';
@@ -299,7 +301,7 @@ class Projekte {
 
             if (!in_array('details', $hide)) {
                 $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
-                //$acronym = $project['cfacro'];
+                $acronym = $project['cfacro'];
                 $start = $project['cfstartdate'];
                 $end = $project['cfenddate'];
                 $date = Tools::make_date($start, $end);
@@ -338,7 +340,100 @@ class Projekte {
         return $projlist;
     }
 
-    private function get_project_persons($project, $leadIDs, $collIDs) {
+    private function make_accordion($projects, $hide = array(), $showtype = 1) {
+
+        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
+        $lang_key = ($lang == 'en') ? '_en' : '';
+        $projlist = '';
+        $projlist .=  '[collapsibles]';
+
+        foreach ($projects as $project) {
+            $project = (array) $project;
+            foreach ($project['attributes'] as $attribut => $v) {
+                $project[$attribut] = $v;
+            }
+            unset($project['attributes']);
+
+            $id = $project['ID'];
+            $acronym = $project['cfacro'];
+            $title = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+            $type = Tools::getName('projects', $project['project type'], get_locale());
+            $description = $project['cfabstr'.$lang_key];
+            $description = strip_tags($description, '<br><br/><a>');
+            $pos = strpos($description, ' ', 500);
+            $description = substr($description, 0, $pos) . '&hellip;';
+            if (!empty($project['kurzbeschreibung'.$lang_key])) {
+                $description = $project['kurzbeschreibung'.$lang_key];
+            }
+
+
+            $projlist .= "[collapse title=\"" . ((!empty($acronym)) ? $acronym . ": " : "") . $title . "\"]";
+            if (!in_array('abstract', $hide) && !empty($description)) {
+                $projlist .= "<p class=\"abstract\">" . $description . '</p>';
+            }
+            if (!in_array('link', $hide) && !empty($id))
+                $link = "https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1');
+                if ($this->cms == 'wp') {
+                    $page = get_page_by_title($title);
+                    if ($page && !empty($page->guid)) {
+                        $link = $page->guid;
+                    }
+                }
+                $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
+            $projlist .= "[/collapse]";
+        }
+        $projlist .= "[/collapsibles]";
+
+        return do_shortcode($projlist);
+    }
+
+    public function fieldProj($field) {
+        $ws = new CRIS_projects();
+        try {
+            $projArray = $ws->by_field($field);
+        } catch (Exception $ex) {
+            return;
+        }
+        if (!count($projArray))
+            return;
+        if ( $this->cms == 'wp' && shortcode_exists( 'collapsibles' ) ) {
+            $output = $this->make_accordion($projArray);
+        } else {
+            $output = $this->make_list($projArray);
+        }
+        return $output;
+    }
+
+    public function fieldPersons($field) {
+        $ws = new CRIS_projects();
+        try {
+            $projArray = $ws->by_field($field);
+        } catch (Exception $ex) {
+            return;
+        }
+        if (!count($projArray))
+            return;
+        foreach ($projArray as $project) {
+            $project = (array) $project;
+            foreach ($project['attributes'] as $attribut => $v) {
+                $project[$attribut] = $v;
+            }
+            unset($project['attributes']);
+            $leaderIDs = explode(",", $project['relpersidlead']);
+            $collIDs = explode(",", $project['relpersidcoll']);
+            $persons[$project['ID']] = $this->get_project_persons($project['ID'], $leaderIDs, $collIDs);
+            foreach ($persons as $project) {
+                foreach ($project as $type => $person) {
+                    foreach ($person as $id => $details) {
+                        $persList[$type][$id] = $details;
+                    }
+                }
+            }
+        }
+        return $persList;
+    }
+
+    public function get_project_persons($project, $leadIDs, $collIDs) {
         $persons = array();
         $leaders = array();
         $members = array();
@@ -461,6 +556,20 @@ class CRIS_projects extends CRIS_webservice {
         $requests = array();
         foreach ($projID as $_p) {
             $requests[] = sprintf('get/Project/%d', $_p);
+        }
+        return $this->retrieve($requests);
+    }
+
+    public function by_field($fieldID = null) {
+        if ($fieldID === null || $fieldID === "0")
+            throw new Exception('Please supply valid field of research ID');
+
+        if (!is_array($fieldID))
+            $fieldID = array($fieldID);
+
+        $requests = array();
+        foreach ($fieldID as $_f) {
+            $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_has_proj', $_f);
         }
         return $this->retrieve($requests);
     }

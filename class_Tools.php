@@ -324,7 +324,7 @@ class Tools {
     }
 
     /*
-     * Array zur Definition des Filters für Patente
+     * Array zur Definition des Filters für Aktivitäten
      */
 
     public static function activity_filter($year = '', $start = '', $type = '') {
@@ -341,6 +341,22 @@ class Tools {
             }
             $filter['type of activity__eq'] = $patTyp;
         }
+        if (count($filter))
+            return $filter;
+        return null;
+    }
+
+    /*
+     * Array zur Definition des Filters für Forschungsbereiche
+     */
+
+    public static function field_filter($year = '', $start = '') {
+        $filter = array();
+        if ($year !== '' && $year !== NULL)
+            $filter['startyear__eq'] = $year;
+        if ($start !== '' && $start !== NULL)
+            $filter['startyear__ge'] = $start;
+
         if (count($filter))
             return $filter;
         return null;
