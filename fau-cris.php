@@ -174,7 +174,8 @@ class FAU_CRIS {
                 'medien',
                 'sonstige'
             ),
-            'cris_activities_link' => 'none'
+            'cris_activities_link' => 'none',
+            'cris_sync_check' => 0
         );
         return $options;
     }
@@ -189,18 +190,61 @@ class FAU_CRIS {
         add_action('load-' . self::$cris_option_page, array(__CLASS__, 'cris_help_menu'));
     }
 
+    /*
+     * Options page tabs
+     */
+    private static function options_page_tabs() {
+        $tabs = array(
+            'general' => __('Allgemein', self::textdomain),
+            'layout' => __('Darstellung', self::textdomain),
+            'sync' => __('Synchronisierung', self::textdomain)
+        );
+        return $tabs;
+    }
+    private static function current_tab($tab) {
+        $tabs = self::options_page_tabs();
+        if (isset($tab['tab'])) {
+            $current = $tab['tab'];
+        } else {
+            reset($tabs);
+            $current = key($tabs);
+        }
+        return $current;
+    }
+
     /**
      * Options page callback
      */
     public static function options_fau_cris() {
+        $tabs = self::options_page_tabs();
+        $current = self::current_tab($_GET);
+        if (isset($_GET['action']) && $_GET['action'] == 'cris_sync') {
+            include 'class_Sync.php';
+            $sync = new Sync();
+            $result = $sync->do_sync();
+        }
+        $options = self::get_options();
         ?>
+
         <div class="wrap">
-            <?php screen_icon(); ?>
-            <h2><?php echo __('Einstellungen', self::textdomain) . ' &rsaquo; CRIS'; ?></h2>
+            <h2><?php _e('Einstellungen', self::textdomain); ?> &rsaquo; CRIS</h2>
+            <h2 class="nav-tab-wrapper">
+                <?php foreach( $tabs as $tab => $name ){
+                    $class = ( $tab == $current ) ? ' nav-tab-active' : '';
+                    echo "<a class='nav-tab$class' href='?page=options-fau-cris&tab=$tab'>$name</a>";
+                } ?>
+            </h2>
+            <?php if (isset($result)) {
+                print $result;
+            } ?>
             <form method="post" action="options.php">
                 <?php
                 settings_fields('fau_cris_options');
                 do_settings_sections('fau_cris_options');
+                if (isset($current) && $current == 'sync'
+                        && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
+                    echo '<a href="?page=options-fau-cris&tab=sync&action=cris_sync" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;" ><span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . __('Jetzt synchronisieren', self::textdomain) . '</a>';
+                }
                 submit_button();
                 ?>
             </form>
@@ -214,159 +258,204 @@ class FAU_CRIS {
     public static function admin_init() {
 
         register_setting(
-                'fau_cris_options', // Option group
-                self::option_name, // Option name
-                array(__CLASS__, 'sanitize') // Sanitize
+            'fau_cris_options', // Option group
+            self::option_name, // Option name
+            array(__CLASS__, 'sanitize') // Sanitize Callback
         );
-        // Form Settings 1
-        add_settings_section(
-                'cris_section', // ID
-                __('Allgemein', self::textdomain), // Title
-                '__return_false', // Callback
-                'fau_cris_options' // Page
-        );
-        add_settings_field(
-                'cris_org_nr', // ID
-                __('CRIS-OrgNr.', self::textdomain), // Title
-                array(__CLASS__, 'cris_textbox_callback'), // Callback
-                'fau_cris_options', // Page
-                'cris_section', // Section
-                array(
-            'name' => 'cris_org_nr',
-            'description' => __('Sie können auch mehrere Organisationsnummern &ndash; durch Komma getrennt &ndash; eingeben.', self::textdomain)
-                )
-        );
-        add_settings_section(
-                'cris_publications_section', // ID
-                __('Publikationen', self::textdomain), // Title
-                '__return_false', // Callback
-                'fau_cris_options' // Page
-        );
-        add_settings_field(
-                'cris_pub_order', __('Reihenfolge der Publikationen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
-            'name' => 'cris_pub_order',
-            'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
-                )
-        );
-        add_settings_field(
-                'cris_bibtex', __('BibTeX-Link', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
-            'name' => 'cris_bibtex',
-            'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', self::textdomain)
-                )
-        );
-        add_settings_field(
-            'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_publications_section', array(
-            'name' => 'cris_univis',
-            'options' => array(
-                'person' => __('Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                'none' => __('keinen Link setzen', self::textdomain))
-            )
-        );
-        add_settings_section(
-                'cris_awards_section', // ID
-                __('Auszeichnungen', self::textdomain), // Title
-                '__return_false', // Callback
-                'fau_cris_options' // Page
-        );
-        add_settings_field(
-                'cris_award_order', __('Reihenfolge der Auszeichnungen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_awards_section', array(
-            'name' => 'cris_award_order',
-            'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen.', self::textdomain)
-                )
-        );
-        add_settings_field(
-            'cris_award_link', __('Preisträger verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_awards_section', array(
-            'name' => 'cris_award_link',
-            'options' => array(
-                'person' => __('Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                'none' => __('keinen Link setzen', self::textdomain))
-            )
-        );
-        add_settings_section(
-                'cris_projects_section', // ID
-                __('Forschungsprojekte', self::textdomain), // Title
-                '__return_false', // Callback
-                'fau_cris_options' // Page
-        );
-        add_settings_field(
-                'cris_project_order', __('Reihenfolge der Forschungsprojekte', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_projects_section', array(
-            'name' => 'cris_project_order',
-            'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
-                )
-        );
-        add_settings_field(
-            'cris_project_link', __('Projektbeteiligte verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_projects_section', array(
-            'name' => 'cris_project_link',
-            'options' => array(
-                'person' => __('Projektleiter und -beteiligte mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                'none' => __('keinen Link setzen', self::textdomain))
-            )
-        );
-        add_settings_section(
-                'cris_patents_section', // ID
-                __('Patente', self::textdomain), // Title
-                '__return_false', // Callback
-                'fau_cris_options' // Page
-        );
-        add_settings_field(
-                'cris_patent_order', __('Reihenfolge der Patente', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_patents_section', array(
-            'name' => 'cris_patent_order',
-            'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Patente.', self::textdomain)
-                )
-        );
-        add_settings_field(
-            'cris_patent_link', __('Patentinhaber verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_patents_section', array(
-            'name' => 'cris_patent_link',
-            'options' => array(
-                'person' => __('Patentinhaber mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                'none' => __('keinen Link setzen', self::textdomain))
-            )
-        );
-        add_settings_section(
-                'cris_activities_section', // ID
-                __('Aktivitäten', self::textdomain), // Title
-                '__return_false', // Callback
-                'fau_cris_options' // Page
-        );
-        add_settings_field(
-                'cris_activities_order', __('Reihenfolge der Aktivitäten', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_activities_section', array(
-            'name' => 'cris_activities_order',
-            'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Aktivitäten.', self::textdomain)
-                )
-        );
-        add_settings_field(
-            'cris_activities_link', __('Personen verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_activities_section', array(
-            'name' => 'cris_activities_link',
-            'options' => array(
-                'person' => __('Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                'none' => __('keinen Link setzen', self::textdomain))
-            )
-        );
+
+        if (isset($_GET))
+            $tab = self::current_tab($_GET);
+        switch($tab) {
+            case 'general' :
+            default:
+                // Form Settings 1
+                add_settings_section(
+                        'cris_section', // ID
+                        '', // Title
+                        '__return_false', // Callback
+                        'fau_cris_options' // Page
+                );
+                add_settings_field(
+                        'cris_org_nr', // ID
+                        __('CRIS-OrgNr.', self::textdomain), // Title
+                        array(__CLASS__, 'cris_textbox_callback'), // Callback
+                        'fau_cris_options', // Page
+                        'cris_section', // Section
+                        array(
+                    'name' => 'cris_org_nr',
+                    'description' => __('Sie können auch mehrere Organisationsnummern &ndash; durch Komma getrennt &ndash; eingeben.', self::textdomain)
+                        )
+                );
+                break;
+            case 'layout' :
+                add_settings_section(
+                        'cris_publications_section', // ID
+                        __('Publikationen', self::textdomain), // Title
+                        '__return_false', // Callback
+                        'fau_cris_options' // Page
+                );
+                add_settings_field(
+                        'cris_pub_order', __('Reihenfolge der Publikationen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'name' => 'cris_pub_order',
+                    'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
+                        )
+                );
+                add_settings_field(
+                        'cris_bibtex', __('BibTeX-Link', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'name' => 'cris_bibtex',
+                    'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', self::textdomain)
+                        )
+                );
+                add_settings_field(
+                    'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'name' => 'cris_univis',
+                    'options' => array(
+                        'person' => __('Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                        'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                        'none' => __('keinen Link setzen', self::textdomain))
+                    )
+                );
+                add_settings_section(
+                        'cris_awards_section', // ID
+                        __('Auszeichnungen', self::textdomain), // Title
+                        '__return_false', // Callback
+                        'fau_cris_options' // Page
+                );
+                add_settings_field(
+                        'cris_award_order', __('Reihenfolge der Auszeichnungen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_awards_section', array(
+                    'name' => 'cris_award_order',
+                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen.', self::textdomain)
+                        )
+                );
+                add_settings_field(
+                    'cris_award_link', __('Preisträger verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_awards_section', array(
+                    'name' => 'cris_award_link',
+                    'options' => array(
+                        'person' => __('Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                        'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                        'none' => __('keinen Link setzen', self::textdomain))
+                    )
+                );
+                add_settings_section(
+                        'cris_projects_section', // ID
+                        __('Forschungsprojekte', self::textdomain), // Title
+                        '__return_false', // Callback
+                        'fau_cris_options' // Page
+                );
+                add_settings_field(
+                        'cris_project_order', __('Reihenfolge der Forschungsprojekte', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_projects_section', array(
+                    'name' => 'cris_project_order',
+                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
+                        )
+                );
+                add_settings_field(
+                    'cris_project_link', __('Projektbeteiligte verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_projects_section', array(
+                    'name' => 'cris_project_link',
+                    'options' => array(
+                        'person' => __('Projektleiter und -beteiligte mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                        'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                        'none' => __('keinen Link setzen', self::textdomain))
+                    )
+                );
+                add_settings_section(
+                        'cris_patents_section', // ID
+                        __('Patente', self::textdomain), // Title
+                        '__return_false', // Callback
+                        'fau_cris_options' // Page
+                );
+                add_settings_field(
+                        'cris_patent_order', __('Reihenfolge der Patente', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_patents_section', array(
+                    'name' => 'cris_patent_order',
+                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Patente.', self::textdomain)
+                        )
+                );
+                add_settings_field(
+                    'cris_patent_link', __('Patentinhaber verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_patents_section', array(
+                    'name' => 'cris_patent_link',
+                    'options' => array(
+                        'person' => __('Patentinhaber mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                        'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                        'none' => __('keinen Link setzen', self::textdomain))
+                    )
+                );
+                add_settings_section(
+                        'cris_activities_section', // ID
+                        __('Aktivitäten', self::textdomain), // Title
+                        '__return_false', // Callback
+                        'fau_cris_options' // Page
+                );
+                add_settings_field(
+                        'cris_activities_order', __('Reihenfolge der Aktivitäten', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_activities_section', array(
+                    'name' => 'cris_activities_order',
+                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Aktivitäten.', self::textdomain)
+                        )
+                );
+                add_settings_field(
+                    'cris_activities_link', __('Personen verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_activities_section', array(
+                    'name' => 'cris_activities_link',
+                    'options' => array(
+                        'person' => __('Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
+                        'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
+                        'none' => __('keinen Link setzen', self::textdomain))
+                    )
+                );
+                break;
+            case 'sync':
+                add_settings_section(
+                    'cris_sync_section', // ID
+                    '', // Title
+                    '__return_false', // Callback
+                    'fau_cris_options' // Page
+                );
+                add_settings_field(
+                        'cris_sync_check',
+                        __('Automatische Synchronisation', self::textdomain),
+                        array(__CLASS__, 'cris_check_callback'),
+                        'fau_cris_options',
+                        'cris_sync_section',
+                        array(
+                            'name' => 'cris_sync_check',
+                            'description' => __('Sollen für neue Projekte und Forschungsbereiche automatsch Seiten und Menüeinträge generiert werden?', self::textdomain)
+                        )
+                    );
+                break;
+        }
     }
 
     /**
      * Sanitize each setting field as needed
      */
-    public static function sanitize($input) {
-        $new_input = array();
+    public static function sanitize() {
+
+        $new_input = self::get_options();
         $default_options = self::default_options();
-        $new_input['cris_org_nr'] = isset($input['cris_org_nr']) ? sanitize_text_field($input['cris_org_nr']) : 0;
-        $new_input['cris_pub_order'] = isset($input['cris_pub_order']) ? explode("\n", str_replace("\r", "", $input['cris_pub_order'])) : $default_options['cris_pub_order'];
-        $new_input['cris_univis'] = in_array($input['cris_univis'], array('person', 'cris', 'none')) ? $input['cris_univis'] : $default_options['cris_univis'];
-        $new_input['cris_bibtex'] = isset($input['cris_bibtex']) ? 1 : 0;
-        $new_input['cris_award_order'] = isset($input['cris_award_order']) ? explode("\n", str_replace("\r", "", $input['cris_award_order'])) : $default_options['cris_award_order'];
-        $new_input['cris_award_link'] = in_array($input['cris_award_link'], array('person', 'cris', 'none')) ? $input['cris_award_link'] : $default_options['cris_award_link'];
-        $new_input['cris_project_order'] = isset($input['cris_project_order']) ? explode("\n", str_replace("\r", "", $input['cris_project_order'])) : $default_options['cris_project_order'];
-        $new_input['cris_project_link'] = in_array($input['cris_project_link'], array('person', 'cris', 'none')) ? $input['cris_project_link'] : $default_options['cris_project_link'];
-        $new_input['cris_patent_order'] = isset($input['cris_patent_order']) ? explode("\n", str_replace("\r", "", $input['cris_patent_order'])) : $default_options['cris_patent_order'];
-        $new_input['cris_patent_link'] = in_array($input['cris_patent_link'], array('person', 'cris', 'none')) ? $input['cris_patent_link'] : $default_options['cris_patent_link'];
-        $new_input['cris_activities_order'] = isset($input['cris_activities_order']) ? explode("\n", str_replace("\r", "", $input['cris_activities_order'])) : $default_options['cris_activities_order'];
-        $new_input['cris_activities_link'] = in_array($input['cris_activities_link'], array('person', 'cris', 'none')) ? $input['cris_activities_link'] : $default_options['cris_activities_link'];
+        $parts = parse_url($_POST['_wp_http_referer']);
+        parse_str($parts['query'], $query);
+        $tab = $query['tab'];
+
+        switch ($tab) {
+            case 'general':
+            default:
+                $new_input['cris_org_nr'] = isset($_POST[self::option_name]['cris_org_nr']) ? sanitize_text_field($_POST[self::option_name]['cris_org_nr']) : 0;
+                break;
+
+            case 'layout':
+                $new_input['cris_pub_order'] = isset($_POST[self::option_name]['cris_pub_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_order'])) : $default_options['cris_pub_order'];
+                $new_input['cris_univis'] = in_array($_POST[self::option_name]['cris_univis'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_univis'] : $default_options['cris_univis'];
+                $new_input['cris_bibtex'] = isset($_POST[self::option_name]['cris_bibtex']) ? 1 : 0;
+                $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
+                $new_input['cris_award_link'] = in_array($_POST[self::option_name]['cris_award_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_award_link'] : $default_options['cris_award_link'];
+                $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_project_order'])) : $default_options['cris_project_order'];
+                $new_input['cris_project_link'] = in_array($_POST[self::option_name]['cris_project_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_project_link'] : $default_options['cris_project_link'];
+                $new_input['cris_patent_order'] = isset($_POST[self::option_name]['cris_patent_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_patent_order'])) : $default_options['cris_patent_order'];
+                $new_input['cris_patent_link'] = in_array($_POST[self::option_name]['cris_patent_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_patent_link'] : $default_options['cris_patent_link'];
+                $new_input['cris_activities_order'] = isset($_POST[self::option_name]['cris_activities_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_activities_order'])) : $default_options['cris_activities_order'];
+                $new_input['cris_activities_link'] = in_array($_POST[self::option_name]['cris_activities_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_activities_link'] : $default_options['cris_activities_link'];
+                break;
+            case 'sync':
+                $new_input['cris_sync_check'] = isset($_POST[self::option_name]['cris_sync_check']) ? 1 : 0;
+                break;
+        }
         return $new_input;
     }
 
@@ -580,7 +669,7 @@ class FAU_CRIS {
 
         if ((!$orgid || $orgid == 0) && $persid == '' && $publication == '' && $award == '' && $awardnameid == '' && $field == '') {
             // Fehlende ID oder ID=0 abfangen
-            return __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation/Auszeichnung an.', 'fau-cris') . '</strong></p>';
+            return __('Bitte geben Sie eine CRIS-ID an.', 'fau-cris') . '</strong></p>';
         } /* elseif (in_array($orgid, $excluded)
           &&  $persid == ''
           && (($show == 'awards' && $award == '') || ($show == 'publications' && $publication == ''))

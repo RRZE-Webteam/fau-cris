@@ -54,7 +54,7 @@ class Forschungsbereiche {
         $fieldsArray = $this->fetch_fields();
 
         if (!count($fieldsArray)) {
-            $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
+            $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
         if ($this->lang == 'en')
@@ -91,6 +91,30 @@ class Forschungsbereiche {
         $output = $this->make_single($fieldsArray, $hide);
 
         return $output;
+    }
+
+    /*
+     * Array aller Forschungsbereiche für die Synchonisierung
+     */
+
+    public function fieldsArray() {
+        $sortby = 'cfname';
+        $fieldsArray = $this->fetch_fields();
+
+        if (!count($fieldsArray)) {
+            $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
+            return $output;
+        }
+        if ($this->lang == 'en')
+            $order = $sortby . '_en';
+         else
+            $order = $sortby;
+
+        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+        $res = $formatter->execute($fieldsArray);
+        $fieldList = $res[$order];
+
+        return $fieldList;
     }
 
 

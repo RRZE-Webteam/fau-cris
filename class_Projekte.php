@@ -17,8 +17,8 @@ class Projekte {
             $this->options = CRIS::ladeConf();
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
         } else {
-        $this->cms = 'wp';
-        $this->options = (array) get_option('_fau_cris');
+            $this->cms = 'wp';
+            $this->options = (array) get_option('_fau_cris');
             $this->pathPersonenseiteUnivis = '/person/';
         }
         $this->orgNr = $this->options['cris_org_nr'];
@@ -341,6 +341,7 @@ class Projekte {
     }
 
     private function make_accordion($projects, $hide = array(), $showtype = 1) {
+        global $post;
 
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $lang_key = ($lang == 'en') ? '_en' : '';
@@ -374,9 +375,20 @@ class Projekte {
             if (!in_array('link', $hide) && !empty($id))
                 $link = "https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1');
                 if ($this->cms == 'wp') {
-                    $page = get_page_by_title($title);
-                    if ($page && !empty($page->guid)) {
-                        $link = $page->guid;
+                    $proj_pages = get_pages(array('child_of' => $post->ID, 'post_status' => 'publish'));
+                    $page_proj = array();
+                    foreach ($proj_pages as $proj_page) {
+                        if ($proj_page->post_title == $title && !empty($proj_page->guid)) {
+                            $page_proj[] = $proj_page;
+                        }
+                    }
+                    if (count($page_proj)) {
+                        $link = $page_proj[0]->guid;
+                    } else {
+                        $page = get_page_by_title($title);
+                        if ($page && !empty($page->guid)) {
+                            $link = $page->guid;
+                        }
                     }
                 }
                 $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
@@ -387,7 +399,7 @@ class Projekte {
         return do_shortcode($projlist);
     }
 
-    public function fieldProj($field) {
+    public function fieldProj($field, $return = 'list') {
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_field($field);
@@ -396,6 +408,10 @@ class Projekte {
         }
         if (!count($projArray))
             return;
+
+        if ($return == 'array')
+            return $projArray;
+
         if ( $this->cms == 'wp' && shortcode_exists( 'collapsibles' ) ) {
             $output = $this->make_accordion($projArray);
         } else {
