@@ -53,18 +53,21 @@ class Sync {
             $this->portal_items = array();
             $message .= '<li>' . sprintf(__('Portalmenü "%s" neu erstellt.'), $portal_name) . '</li>';
         }
-        $menu_index = -99;
-        $pmenu_index = -99;
 
         // Forschungsbereiche und -projekte auslesen -> Array
         $_f = new Forschungsbereiche();
         $fields = $_f->fieldsArray();
+        $menu_index = -99;
         foreach ($fields as $field) {
             $_p = new Projekte();
             $projects = $_p->fieldProj($field->ID, 'array');
+            $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
+            $pages[$field->ID]['mid'] = $menu_index;
+            $menu_index ++;
             foreach ($projects as $project) {
-                $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
-                $pages[$field->ID]['projects'][$project->ID] = $project->attributes['cftitle'.$lang];
+                $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
+                $pages[$field->ID]['projects'][$project->ID]['mid'] = $menu_index;
+                $menu_index ++;
             }
         }
 
@@ -77,7 +80,7 @@ class Sync {
                 $page_research[] = $research_page;
             }
         }
-        if (!$page_research || !count($page_research)) {
+        if (!isset($page_research) || !count($page_research)) {
         // Seite Forschung existiert noch nicht -> anlegen
             $args = array(
                 'post_content' => '[cris show=fields]',
@@ -126,9 +129,8 @@ class Sync {
         // Wenn nötig Hauptmenü-Eintrag anlegen
         $research_mid = self::cris_menu_item_exists($this->menu_items, $title_research, 0, 0);
         if (!$research_mid) {
-            $research_mid = self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, $menu_index);
+            $research_mid = self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, -100);
             $num_created_m ++;
-            $menu_index ++;
         } else {
             $num_updated_m ++;
         }
@@ -141,7 +143,7 @@ class Sync {
                     $page_field[] = $field_page;
                 }
             }
-            if (!$page_field || !count($page_field)) {
+            if (!isset($page_field) || !count($page_field)) {
             // Seite Forschungsbereich existiert noch nicht -> anlegen
                 $args = array(
                     'post_content' => "[cris show=fields field=$field_id hide=title]",
@@ -168,18 +170,16 @@ class Sync {
             // Wenn nötig Hauptmenü-Eintrag anlegen
             $field_mid = self::cris_menu_item_exists($this->menu_items, $field['title'], $research_mid);
             if (!$field_mid) {
-                $field_mid = self::cris_make_menu_item($this->menu_id, $field['title'], $field_pid, $research_mid, $menu_index);
+                $field_mid = self::cris_make_menu_item($this->menu_id, $field['title'], $field_pid, $research_mid, $field['mid']);
                 $num_created_m ++;
-                $menu_index ++;
             } else {
                     $num_updated_m ++;
             }
             // Wenn nötig Portalmenü-Eintrag anlegen
             $field_mpid = self::cris_menu_item_exists($this->portal_items, $field['title'], 0);
             if (!$field_mpid) {
-                $field_mpid = self::cris_make_menu_item($this->portal_id, $field['title'], $field_pid, 0, $pmenu_index);
+                $field_mpid = self::cris_make_menu_item($this->portal_id, $field['title'], $field_pid, 0, $field['mid']);
                 $num_created_mp ++;
-                $pmenu_index ++;
             } else {
                 $num_updated_mp ++;
             }
@@ -189,15 +189,15 @@ class Sync {
             foreach ($projects as $project_id => $project) {
                 $project_pages = get_pages(array('child_of' => $field_pid, 'post_status' => 'publish'));
                 foreach ($project_pages as $project_page) {
-                    if ($project_page->post_title == $project) {
+                    if ($project_page->post_title == $project['title']) {
                         $page_project[] = $project_page;
                     }
                 }
-                if (!$page_project || !count($page_project)) {
+                if (!isset($page_project) || !count($page_project)) {
                 // Seite Forschungsprojekt existiert noch nicht -> anlegen
                     $args = array(
                         'post_content' => "[cris show=projects project=$project_id]",
-                        'post_title' => $project,
+                        'post_title' => $project['title'],
                         'post_status' => 'publish',
                         'post_type' => 'page',
                         'post_parent' => $field_pid,
@@ -206,10 +206,10 @@ class Sync {
                     );
                     $project_pid = wp_insert_post($args);
                     if($project_pid) {
-                        $message .= '<li>' . sprintf( __( 'Seite "%s" wurde erstellt.', 'fau-cris' ), $project ) . '</li>';
+                        $message .= '<li>' . sprintf( __( 'Seite "%s" wurde erstellt.', 'fau-cris' ), $project['title'] ) . '</li>';
                         $num_created_p ++;
                     } else {
-                        $message .= '<li>' . sprintf( __( 'Seite "%s" konnte nicht erstellt werden.', 'fau-cris' ), $project ) . '</li>';
+                        $message .= '<li>' . sprintf( __( 'Seite "%s" konnte nicht erstellt werden.', 'fau-cris' ), $project['title'] ) . '</li>';
                         $num_errors ++;
                     }
                 } else {
@@ -218,20 +218,18 @@ class Sync {
                     $num_updated_p ++;
                 }
                 // Wenn nötig Hauptmenü-Eintrag anlegen
-                $project_mid = self::cris_menu_item_exists($this->menu_items, $project, $field_mid);
+                $project_mid = self::cris_menu_item_exists($this->menu_items, $project['title'], $field_mid);
                 if (!$project_mid) {
-                    $project_mid = self::cris_make_menu_item($this->menu_id, $project, $project_pid, $field_mid, $menu_index);
+                    $project_mid = self::cris_make_menu_item($this->menu_id, $project['title'], $project_pid, $field_mid, $project['mid']);
                     $num_created_m ++;
-                    $menu_index ++;
                 } else {
                     $num_updated_m ++;
                 }
                 // Wenn nötig Portalmenü-Eintrag anlegen
-                $project_mpid = self::cris_menu_item_exists($this->portal_items, $project, $field_mpid);
+                $project_mpid = self::cris_menu_item_exists($this->portal_items, $project['title'], $field_mpid);
                 if (!$project_mpid) {
-                    $project_mpid = self::cris_make_menu_item($this->portal_id, $project, $project_pid, $field_mpid, $pmenu_index);
+                    $project_mpid = self::cris_make_menu_item($this->portal_id, $project['title'], $project_pid, $field_mpid, $project['mid']);
                     $num_created_mp ++;
-                    $pmenu_index ++;
                 } else {
                     $num_updated_mp ++;
                 }
