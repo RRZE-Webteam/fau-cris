@@ -183,10 +183,11 @@ class Forschungsbereiche {
                 }
                 $singlefield .= "</ul>";
             }
-            if (!in_array('publications', $hide)) {
+            // TODO
+            /* if (!in_array('publications', $hide)) {
                 $singlefield .= "<h3>" . __('Publikationen', 'fau-cris') . ": </h3>";
                 $singlefield .= "ToDo";
-            }
+            }*/
         }
         $singlefield .= "</div>";
         return $singlefield;

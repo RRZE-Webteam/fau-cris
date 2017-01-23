@@ -63,6 +63,10 @@ class FAU_CRIS {
 
         add_shortcode('cris', array(__CLASS__, 'cris_shortcode'));
         add_shortcode('cris-custom', array(__CLASS__, 'cris_custom_shortcode'));
+
+        add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2 );
+        add_action('cris_auto_update', array(__CLASS__, 'cris_auto_sync'));
+
     }
 
     /**
@@ -71,6 +75,10 @@ class FAU_CRIS {
     public static function activate() {
         self::version_compare();
         update_option(self::version_option_name, self::version);
+    }
+
+    public static function deactivate() {
+        wp_clear_scheduled_hook('cris_auto_update');
     }
 
     private static function version_compare() {
@@ -415,7 +423,7 @@ class FAU_CRIS {
                         'cris_sync_section',
                         array(
                             'name' => 'cris_sync_check',
-                            'description' => __('Sollen für neue Projekte und Forschungsbereiche automatsch Seiten und Menüeinträge generiert werden?', self::textdomain)
+                            'description' => __('Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und Menüeinträge generiert werden?', self::textdomain)
                         )
                     );
                 break;
@@ -692,7 +700,12 @@ class FAU_CRIS {
                 }
             }
 
-            if (isset($show) && $show == 'fields') {
+            if (isset($show) && $show == 'organisation') {
+                // Forschungsbereiche
+                require_once('class_Organisation.php');
+                $liste = new Organisation($param1, $param2);
+                return $liste->singleOrganisation($hide);
+            } elseif (isset($show) && $show == 'fields') {
                 // Forschungsbereiche
                 require_once('class_Forschungsbereiche.php');
                 $liste = new Forschungsbereiche($param1, $param2);
@@ -940,6 +953,47 @@ class FAU_CRIS {
             wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array ( 'jquery' ));
         }
         //wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
+    }
+
+    /*
+     * WP-Cron
+     */
+
+    public static function cris_auto_sync() {
+        include 'class_Sync.php';
+        $sync = new Sync();
+        $sync->do_sync();
+    }
+
+    public static function cris_cron() {
+        $options = get_option('_fau_cris');
+        if (isset($options['cris_sync_check'])
+                && $options['cris_sync_check'] != 1) {
+            if (wp_next_scheduled( 'cris_auto_update' ))
+                wp_clear_scheduled_hook('cris_auto_update');
+            return;
+        }
+        if (!isset($options['cris_org_nr'])
+                || $options['cris_org_nr'] == 0
+                || !isset($options['cris_sync_check'])
+                || $options['cris_sync_check'] != 1) {
+            return;
+        }
+        //Use wp_next_scheduled to check if the event is already scheduled*/
+        if( !wp_next_scheduled( 'cris_auto_update' )) {
+            //Schedule the event for right now, then to repeat daily using the hook 'cris_create_cron'
+            wp_schedule_event( strtotime('tomorrow'), 'daily', 'cris_auto_update' );
+        }
+        $timestamp = wp_next_scheduled( 'cris_auto_update' );
+        if ($timestamp) {
+            $message = __('Einstellungen gespeichert', 'fau-cris')
+                    . '<br />'
+                    . __('Nächste automatische Synchronisierung:', 'fau-cris') . ' '
+                    //. date ('d.m.Y - h:i', $timestamp)
+                    . get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), 'd.m.Y - H:i' );
+            add_settings_error('AutoSyncComplete', 'autosynccomplete', $message , 'updated' );
+            settings_errors();
+        }
     }
 
     /*

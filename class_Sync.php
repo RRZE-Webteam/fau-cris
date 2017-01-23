@@ -57,17 +57,17 @@ class Sync {
         // Forschungsbereiche und -projekte auslesen -> Array
         $_f = new Forschungsbereiche();
         $fields = $_f->fieldsArray();
-        $menu_index = -99;
+        $menu_position = -99;
         foreach ($fields as $field) {
             $_p = new Projekte();
             $projects = $_p->fieldProj($field->ID, 'array');
             $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
-            $pages[$field->ID]['mid'] = $menu_index;
-            $menu_index ++;
+            $pages[$field->ID]['position'] = $menu_position;
+            $menu_position ++;
             foreach ($projects as $project) {
                 $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
-                $pages[$field->ID]['projects'][$project->ID]['mid'] = $menu_index;
-                $menu_index ++;
+                $pages[$field->ID]['projects'][$project->ID]['position'] = $menu_position;
+                $menu_position ++;
             }
         }
 
@@ -80,10 +80,15 @@ class Sync {
                 $page_research[] = $research_page;
             }
         }
+        //$research_contacts = array();
+        require_once('class_Organisation.php');
+        $orga = new Organisation();
+        $research_contacts = $orga->researchContacts();
+
         if (!isset($page_research) || !count($page_research)) {
         // Seite Forschung existiert noch nicht -> anlegen
             $args = array(
-                'post_content' => '[cris show=fields]',
+                'post_content' => '[cris show=organisation]',
                 'post_title' => $title_research,
                 'post_status' => 'publish',
                 'post_type' => 'page',
@@ -95,7 +100,8 @@ class Sync {
                     'fauval_portalmenu_thumbnailson' => 1,
                     'fauval_portalmenu_nofallbackthumb' => 1,
                     'fauval_portalmenu_nosub' => 0,
-                    'portalmenu-slug' => $this->portal_id
+                    'portalmenu-slug' => $this->portal_id,
+                    'sidebar_personen'=> $research_contacts
                 )
             );
             $research_pid = wp_insert_post($args);
@@ -110,20 +116,29 @@ class Sync {
             $num_updated_p ++;
             // Wenn nötig Page-Template und Portalmenü einstellen
             $page_research_meta = get_post_meta($research_pid);
-            if ($page_research_meta['_wp_page_template'] != $page_template_portal) {
+            if (!isset($page_research_meta['_wp_page_template'])
+                    || $page_research_meta['_wp_page_template'] != $page_template_portal) {
                 update_post_meta( $research_pid, '_wp_page_template', $page_template_portal );
             }
-            if ($page_research_meta['fauval_portalmenu_thumbnailson'] != 1) {
+            if (!isset($page_research_meta['fauval_portalmenu_thumbnailson'])
+                    || $page_research_meta['fauval_portalmenu_thumbnailson'] != 1) {
                 update_post_meta( $research_pid, 'fauval_portalmenu_thumbnailson', 1 );
             }
-            if ($page_research_meta['fauval_portalmenu_nofallbackthumb'] != 1) {
+            if (!isset($page_research_meta['fauval_portalmenu_nofallbackthumb'])
+                    || $page_research_meta['fauval_portalmenu_nofallbackthumb'] != 1) {
                 update_post_meta( $research_pid, 'fauval_portalmenu_nofallbackthumb', 1 );
             }
-            if ($page_research_meta['fauval_portalmenu_nosub'] != 0) {
+            if (!isset($page_research_meta['fauval_portalmenu_nosub'])
+                    || $page_research_meta['fauval_portalmenu_nosub'] != 0) {
                 update_post_meta( $research_pid, 'fauval_portalmenu_nosub', 0 );
             }
-            if ($page_research_meta['portalmenu-slug'] != $this->portal_id) {
+            if (!isset($page_research_meta['portalmenu-slug'])
+                    || $page_research_meta['portalmenu-slug'] != $this->portal_id) {
                 update_post_meta( $research_pid, 'portalmenu-slug', $this->portal_id );
+            }
+            if (!isset($page_research_meta['sidebar_personen'])
+                    || $page_research_meta['sidebar_personen'] != $research_contacts) {
+                update_post_meta($research_pid, 'sidebar_personen', $research_contacts);
             }
         }
         // Wenn nötig Hauptmenü-Eintrag anlegen
@@ -151,7 +166,7 @@ class Sync {
                     'post_status' => 'publish',
                     'post_type' => 'page',
                     'post_parent' => $research_pid,
-                    'menu_order' => -99,
+                    'menu_order' => $field['position'],
                     'page_template' => $page_template_nav,
                 );
                 $field_pid = wp_insert_post($args);
@@ -170,7 +185,7 @@ class Sync {
             // Wenn nötig Hauptmenü-Eintrag anlegen
             $field_mid = self::cris_menu_item_exists($this->menu_items, $field['title'], $research_mid);
             if (!$field_mid) {
-                $field_mid = self::cris_make_menu_item($this->menu_id, $field['title'], $field_pid, $research_mid, $field['mid']);
+                $field_mid = self::cris_make_menu_item($this->menu_id, $field['title'], $field_pid, $research_mid, $field['position']);
                 $num_created_m ++;
             } else {
                     $num_updated_m ++;
@@ -178,7 +193,7 @@ class Sync {
             // Wenn nötig Portalmenü-Eintrag anlegen
             $field_mpid = self::cris_menu_item_exists($this->portal_items, $field['title'], 0);
             if (!$field_mpid) {
-                $field_mpid = self::cris_make_menu_item($this->portal_id, $field['title'], $field_pid, 0, $field['mid']);
+                $field_mpid = self::cris_make_menu_item($this->portal_id, $field['title'], $field_pid, 0, $field['position']);
                 $num_created_mp ++;
             } else {
                 $num_updated_mp ++;
@@ -201,7 +216,7 @@ class Sync {
                         'post_status' => 'publish',
                         'post_type' => 'page',
                         'post_parent' => $field_pid,
-                        'menu_order' => -99,
+                        'menu_order' => $project['position'],
                         'page_template' => $page_template_nav,
                     );
                     $project_pid = wp_insert_post($args);
@@ -220,7 +235,7 @@ class Sync {
                 // Wenn nötig Hauptmenü-Eintrag anlegen
                 $project_mid = self::cris_menu_item_exists($this->menu_items, $project['title'], $field_mid);
                 if (!$project_mid) {
-                    $project_mid = self::cris_make_menu_item($this->menu_id, $project['title'], $project_pid, $field_mid, $project['mid']);
+                    $project_mid = self::cris_make_menu_item($this->menu_id, $project['title'], $project_pid, $field_mid, $project['position']);
                     $num_created_m ++;
                 } else {
                     $num_updated_m ++;
@@ -228,7 +243,7 @@ class Sync {
                 // Wenn nötig Portalmenü-Eintrag anlegen
                 $project_mpid = self::cris_menu_item_exists($this->portal_items, $project['title'], $field_mpid);
                 if (!$project_mpid) {
-                    $project_mpid = self::cris_make_menu_item($this->portal_id, $project['title'], $project_pid, $field_mpid, $project['mid']);
+                    $project_mpid = self::cris_make_menu_item($this->portal_id, $project['title'], $project_pid, $field_mpid, $project['position']);
                     $num_created_mp ++;
                 } else {
                     $num_updated_mp ++;
@@ -250,7 +265,8 @@ class Sync {
     private function cris_menu_item_exists($menu, $title, $parent = 0) {
         foreach ($menu as $menu_item) {
             if ($menu_item->title == $title
-                    && $menu_item->menu_item_parent == $parent) {
+                    && $menu_item->menu_item_parent == $parent
+                    && !isset($menu_item->_invalid)) {
                 return $menu_item->ID;
             }
         }

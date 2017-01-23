@@ -385,10 +385,15 @@ class Tools {
         return $univis;
     }
 
-    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis) {
+    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array()) {
         if ($cms == 'wp') {
             // WordPress
-            return self::person_slug($cms, $firstname, $lastname);
+            global $wpdb;
+            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
+            $sql = $wpdb->prepare($sql, $person);
+            $person_id = $wpdb->get_var($sql);
+            return $person_id;
         }
         if ($cms == 'wbk') {
             // Webbaukasten
@@ -398,6 +403,17 @@ class Tools {
                 }
             }
         }
+    }
+
+    public static function person_id($cms = '', $firstname = '', $lastname = '') {
+        if ($cms == 'wp') {
+            global $wpdb;
+            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
+            $sql = $wpdb->prepare($sql, $person);
+            $person_id = $wpdb->get_var($sql);
+        }
+        return $person_id;
     }
 
     public static function person_slug($cms = '', $firstname = '', $lastname = '') {
