@@ -465,4 +465,40 @@ class Tools {
         return $date;
     }
 
+    public static function numeric_xml_encode($text, $double_encode=true){
+        /*
+         * Deliver numerically encoded XML representation of special characters.
+         * E.g. use &#8211; instead of &ndash;
+         * 
+         * Adopted from user-contributed notes of 
+         * http://php.net/manual/de/function.htmlentities.php
+         * 
+         * @param string $text Input text
+         * @param bool $double_encode flag for double encoding (defaults to true)
+         * 
+         * @return string $encoded Encoded text representation
+         */
+        
+        if (!$double_encode)
+            $text = html_entity_decode(stripslashes($text), ENT_QUOTES, 'UTF-8');
+
+        // array of chars (multibyte aware)
+        $mbchars = preg_split('/(?<!^)(?!$)/u', $text);
+        
+        $encoded = '';
+        foreach ($mbchars as $char){
+            $o = ord($char);
+            if ( (strlen($char) > 1) || /* multi-byte [unicode] */
+                ($o <32 || $o > 126) || /* <- control / latin weird os -> */
+                ($o >33 && $o < 40) ||/* quotes + ambersand */
+                ($o >59 && $o < 63) /* html */
+            ) {
+                // convert to numeric entity
+                $char = mb_encode_numericentity($char, 
+                                        array(0x0, 0xffff, 0, 0xffff), 'UTF-8');
+            }
+            $encoded .= $char;
+        }
+        return $encoded;
+    }
 }
