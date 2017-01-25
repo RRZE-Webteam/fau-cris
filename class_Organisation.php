@@ -71,8 +71,9 @@ class Organisation {
             unset($organisation['attributes']);
             $contacts = explode(',', $organisation['research_contact']);
             foreach ($contacts as $_c) {
-                $firstname = explode(':', $_c)[0];
-                $lastname = explode(':', $_c)[1];
+                $nameparts = explode(':', $_c);
+                $firstname = $nameparts[0];
+                $lastname = array_key_exists(1, $nameparts) ? $nameparts[1] : '';
                 $cid = Tools::person_exists($this->cms, $firstname, $lastname);
                 if ($cid) {
                     $research_contacts[] = $cid;
