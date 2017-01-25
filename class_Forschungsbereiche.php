@@ -167,21 +167,25 @@ class Forschungsbereiche {
 
             if (!in_array('projects', $hide)) {
                 $projects = $this->get_field_projects($id);
-                $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
-                $singlefield .= $projects;
+                    if ($projects) {
+                    $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
+                    $singlefield .= $projects;
+                }
             }
             if (!in_array('persons', $hide)) {
                 $persons = $this->get_field_persons($id);
-                $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
-                $singlefield .= "<ul>";
-                foreach ($persons as $type => $person) {
-                    foreach ($person as $id => $details) {
-                        $singlefield .= "<li>";
-                        $singlefield .= Tools::get_person_link($id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                        $singlefield .= "</li>";
+                if ($persons) {
+                    $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
+                    $singlefield .= "<ul>";
+                    foreach ($persons as $type => $person) {
+                        foreach ($person as $id => $details) {
+                            $singlefield .= "<li>";
+                            $singlefield .= Tools::get_person_link($id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                            $singlefield .= "</li>";
+                        }
                     }
+                    $singlefield .= "</ul>";
                 }
-                $singlefield .= "</ul>";
             }
             // TODO
             /* if (!in_array('publications', $hide)) {
