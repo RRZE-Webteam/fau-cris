@@ -56,6 +56,7 @@ class Sync {
 
         // Forschungsbereiche und -projekte auslesen -> Array
         $_f = new Forschungsbereiche();
+        $fields = array();
         $fields = $_f->fieldsArray();
         $menu_position = -99;
         foreach ($fields as $field) {
@@ -63,7 +64,10 @@ class Sync {
             $projects = $_p->fieldProj($field->ID, 'array');
             $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
             $pages[$field->ID]['position'] = $menu_position;
+            $pages[$field->ID]['projects'] = array();
             $menu_position ++;
+            if (!$projects)
+                continue;
             foreach ($projects as $project) {
                 $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
                 $pages[$field->ID]['projects'][$project->ID]['position'] = $menu_position;
@@ -153,6 +157,7 @@ class Sync {
         // Seiten Forschungsbereiche unter Forschung
         foreach ($pages as $field_id => $field) {
             $field_pages = get_pages(array('child_of' => $research_pid, 'post_status' => 'publish'));
+            $page_field = array();
             foreach ($field_pages as $field_page) {
                 if ($field_page->post_title == $field['title']) {
                     $page_field[] = $field_page;
@@ -203,6 +208,7 @@ class Sync {
             $projects = $field['projects'];
             foreach ($projects as $project_id => $project) {
                 $project_pages = get_pages(array('child_of' => $field_pid, 'post_status' => 'publish'));
+                $page_project = array();
                 foreach ($project_pages as $project_page) {
                     if ($project_page->post_title == $project['title']) {
                         $page_project[] = $project_page;
