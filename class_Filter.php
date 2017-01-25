@@ -54,7 +54,8 @@ class CRIS_filter {
                  * If attribute is not present, skip filter silently. This makes
                  * the test successful and may be therefore a bad idea.
                  */
-                continue;
+                //continue;
+                return false;
 
             foreach ($_f as $operator => $reference) {
                 if ($this->compare($data->attributes[$attr], $operator, $reference) === false)

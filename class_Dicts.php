@@ -36,8 +36,8 @@ class CRIS_Dicts {
             'order' => 2,
             'short' => 'zeitschriftenartikel',
             'de' => array(
-                'name' => 'Zeitschriftenartikel',
-                'title' => 'Zeitschriftenartikel'),
+                'name' => 'Beitrag in einer Fachzeitschrift',
+                'title' => 'Beitrag in Fachzeitschriften'),
             'en'  => array(
                 'name' => 'Journal article',
                 'title' => 'Journal Articles')
@@ -46,7 +46,7 @@ class CRIS_Dicts {
             'order' => 3,
             'short' => 'sammelbandbeitraege',
             'de' => array(
-                'name' => 'Sammelbandbeitrag',
+                'name' => 'Beitrag in einem Sammelband',
                 'title' => 'Beiträge in Sammelbänden'),
             'en'  => array(
                 'name' => 'Book Contribution',
@@ -86,18 +86,18 @@ class CRIS_Dicts {
             'order' => 4,
             'short' => 'herausgeberschaften',
             'de' => array(
-                'name' => 'Herausgeberschaft',
-                'title' => 'Herausgeberschaften'),
+                'name' => 'Herausgegebener Band',
+                'title' => 'Herausgegebene Bände'),
             'en'  => array(
-                'name' => 'Edited Book',
-                'title' => 'Edited Books')
+                'name' => 'Edited Volume',
+                'title' => 'Edited Volumes')
         ),
         'Conference contribution' => array(
             'order' => 5,
             'short' => 'konferenzbeitraege',
             'de' => array(
-                'name' => 'Konferenzbeitrag',
-                'title' => 'Konferenzbeiträge'),
+                'name' => 'Beitrag bei einer Tagung',
+                'title' => 'Beiträge bei Tagungen'),
             'en'  => array(
                 'name' => 'Conference contribution',
                 'title' => 'Conference Contributions')
@@ -116,8 +116,8 @@ class CRIS_Dicts {
             'order' => 9,
             'short' => 'unveroeffentlicht',
             'de' => array(
-                'name' => 'Unveröffentlichte Publikation',
-                'title' => 'Unveröffentlichte Publikationen'),
+                'name' => 'Unveröffentlichte Publikation / Preprint',
+                'title' => 'Unveröffentlichte Publikationen / Preprint'),
             'en'  => array(
                 'name' => 'Unpublished Publication',
                 'title' => 'Unpublished Publications')
@@ -393,6 +393,117 @@ class CRIS_Dicts {
             'en'  => array(
                 'name' => 'Other activitiy (FAU-external)',
                 'title' => 'Other activities (FAU-external)')
+        ),
+    );
+
+    public static $pubOtherSubtypes = array(
+        'Rezension' => array(
+            'order' => 1,
+            'short' => 'rezension',
+            'de' => array(
+                'name' => 'Rezension / Buchbesprechung',
+                'title' => 'Rezensionen / Buchbesprechungen'
+            ),
+            'en' => array(
+                'name' => 'Recension / Book review',
+                'title' => 'Recensions / Book Reviews'
+            )
+        ),
+        'Lexikonbeitrag' => array(
+            'order' => 2,
+            'short' => 'lexikonbeitrag',
+            'de' => array(
+                'name' => 'Lexikonbeitrag',
+                'title' => 'Lexikonbeiträge'
+            ),
+            'en' => array(
+                'name' => 'Dictionary / Encyclopedia entry',
+                'title' => 'Dictionary / Encyclopedia Entries'
+            )
+        ),
+        'Zeitungsartikel' => array(
+            'order' => 3,
+            'short' => 'zeitungsartikel',
+            'de' => array(
+                'name' => 'Zeitungsartikel',
+                'title' => 'Zeitungsartikel'
+            ),
+            'en' => array(
+                'name' => 'Newspaper article',
+                'title' => 'Newspaper Articles'
+            )
+        ),
+        'Working paper' => array(
+            'order' => 4,
+            'short' => 'workingpaper',
+            'de' => array(
+                'name' => 'Diskussionspapier / working paper',
+                'title' => 'Diskussionspapiere / working papers'
+            ),
+            'en' => array(
+                'name' => 'Working paper',
+                'title' => 'Working Papers'
+            )
+        ),
+        'online publication' => array(
+            'order' => 5,
+            'short' => 'onlinepublication',
+            'de' => array(
+                'name' => 'Online-Publikation',
+                'title' => 'Online-Publikationen'
+            ),
+            'en' => array(
+                'name' => 'Online publication',
+                'title' => 'Online Publications'
+            )
+        ),
+        'Conference report' => array(
+            'order' => 6,
+            'short' => 'conferencereport',
+            'de' => array(
+                'name' => 'Konferenzbericht',
+                'title' => 'Konferenzberichte'
+            ),
+            'en' => array(
+                'name' => 'Conference report',
+                'title' => 'Conference Reports'
+            )
+        ),
+        'Techreport' => array(
+            'order' => 7,
+            'short' => 'techreport',
+            'de' => array(
+                'name' => 'Technical Report',
+                'title' => 'Technical Reports'
+            ),
+            'en' => array(
+                'name' => 'Technical report',
+                'title' => 'Technical Reports'
+            )
+        ),
+        'Gutachten' => array(
+            'order' => 8,
+            'short' => 'gutachten',
+            'de' => array(
+                'name' => 'Gutachten',
+                'title' => 'Gutachten'
+            ),
+            'en' => array(
+                'name' => 'Expertise',
+                'title' => 'Expertises'
+            )
+        ),
+        'anderer' => array(
+            'order' => 9,
+            'short' => 'anderer',
+            'de' => array(
+                'name' => 'Anderer',
+                'title' => 'Andere'
+            ),
+            'en' => array(
+                'name' => 'Other',
+                'title' => 'Other'
+            )
         ),
     );
 }

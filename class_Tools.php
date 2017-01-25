@@ -32,11 +32,42 @@ class Tools {
             case 'activities':
                 $search = CRIS_Dicts::$activities;
                 break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
+                break;
         }
         foreach ($search as $k => $v) {
             $order[$v['order']] = $k;
         }
         ksort($order);
+        return $order;
+    }
+
+    public static function getOptionsOrder($object) {
+        switch ($object) {
+            case 'publications':
+                $search = CRIS_Dicts::$publications;
+                break;
+            case 'awards':
+                $search = CRIS_Dicts::$awards;
+                break;
+            case 'projects':
+                $search = CRIS_Dicts::$projects;
+                break;
+            case 'patents':
+                $search = CRIS_Dicts::$patents;
+                break;
+            case 'activities':
+                $search = CRIS_Dicts::$activities;
+                break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
+                break;
+        }
+        $order_raw = self::getOrder($object);
+        foreach ($order_raw as $k => $v) {
+            $order[] = $search[$v]['short'];
+        }
         return $order;
     }
 
@@ -56,6 +87,9 @@ class Tools {
                 break;
             case 'activities':
                 $search = CRIS_Dicts::$activities;
+                break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
         }
         foreach ($search as $k => $v) {
@@ -84,8 +118,12 @@ class Tools {
             case 'activities':
                 $search = CRIS_Dicts::$activities;
                 break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
+                break;
         }
-        return $search[$type][$lang]['name'];
+        if (array_key_exists($type, $search))
+            return $search[$type][$lang]['name'];
     }
 
     public static function getTitle($object, $name, $lang) {
@@ -105,6 +143,9 @@ class Tools {
                 break;
             case 'activities':
                 $search = CRIS_Dicts::$activities;
+                break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
         }
         return $search[$name][$lang]['title'];
@@ -235,7 +276,7 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $type = '') {
+    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['publyear__eq'] = $year;
@@ -248,6 +289,14 @@ class Tools {
                 return $output;
             }
             $filter['publication type__eq'] = $pubTyp;
+        }
+        if ($subtype !== '' && $subtype !== NULL) {
+            $pubSubTyp = self::getType('pubothersubtypes', $subtype);
+            if (empty($pubSubTyp)) {
+                $output = '<p>' . __('Falscher Parameter für Publikationssubtyp', '') . '</p>';
+                return $output;
+            }
+            $filter['type other subtype__eq'] = $pubSubTyp;
         }
         if (count($filter))
             return $filter;

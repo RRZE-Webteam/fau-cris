@@ -29,7 +29,6 @@ register_activation_hook(__FILE__, array('FAU_CRIS', 'activate'));
 register_deactivation_hook(__FILE__, array('FAU_CRIS', 'deactivate'));
 
 class FAU_CRIS {
-
     /**
      * Get Started
      */
@@ -133,55 +132,21 @@ class FAU_CRIS {
      * Set default options
      */
     private static function default_options() {
+        require_once("class_Tools.php");
         $options = array(
             'cris_org_nr' => '',
-            'cris_pub_order' => array(
-                'zeitschriftenartikel',
-                'sammelbandbeitraege',
-                'uebersetzungen',
-                'buecher',
-                'herausgeberschaften',
-                'konferenzbeitraege',
-                'abschlussarbeiten',
-                'andere'),
             'cris_cache' => '18000',
+            'cris_pub_order' => Tools::getOptionsOrder('publications'),
+            'cris_pub_subtypes_order' => Tools::getOptionsOrder('pubothersubtypes'),
             'cris_univis' => 'none',
             'cris_bibtex' => 0,
-            'cris_award_order' => array(
-                'preise',
-                'stipendien',
-                'mitgliedschaften',
-                'andere'),
+            'cris_award_order' => Tools::getOptionsOrder('awards'),
             'cris_award_link' => 'none',
-            'cris_project_order' => array(
-                'einzelfoerderung',
-                'teilprojekt',
-                'gesamtprojekt',
-                'graduiertenkolleg',
-                'eigenmittel'),
+            'cris_project_order' => Tools::getOptionsOrder('projects'),
             'cris_project_link' => 'none',
-            'cris_patent_order' => array(
-                'patentanmeldung',
-                'gebrauchsmuster',
-                'schutzrecht',
-                'nachanmeldung',
-                'nationalisierung',
-                'validierung'
-            ),
+            'cris_patent_order' => Tools::getOptionsOrder('patents'),
             'cris_patent_link' => 'none',
-            'cris_activities_order' => array(
-                'fau-gremienmitgliedschaft',
-                'organisation_konferenz',
-                'herausgeberschaft',
-                'gutachter_zeitschrift',
-                'gutachter_organisation',
-                'gutachter_sonstige',
-                'dfg-fachkollegiat',
-                'mitglied_wissenschaftsrat',
-                'vortrag',
-                'medien',
-                'sonstige'
-            ),
+            'cris_activities_order' =>  Tools::getOptionsOrder('activities'),
             'cris_activities_link' => 'none',
             'cris_sync_check' => 0
         );
@@ -306,6 +271,12 @@ class FAU_CRIS {
                         'cris_pub_order', __('Reihenfolge der Publikationen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_pub_order',
                     'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
+                        )
+                );
+                add_settings_field(
+                        'cris_pub_subtypes_order', __('Reihenfolge der Publikationen-Subtypen unter "Andere"', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'name' => 'cris_pub_subtypes_order',
+                    //'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
                         )
                 );
                 add_settings_field(
@@ -449,6 +420,7 @@ class FAU_CRIS {
 
             case 'layout':
                 $new_input['cris_pub_order'] = isset($_POST[self::option_name]['cris_pub_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_order'])) : $default_options['cris_pub_order'];
+                $new_input['cris_pub_subtypes_order'] = isset($_POST[self::option_name]['cris_pub_subtypes_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_subtypes_order'])) : $default_options['cris_pub_subtypes_order'];
                 $new_input['cris_univis'] = in_array($_POST[self::option_name]['cris_univis'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_univis'] : $default_options['cris_univis'];
                 $new_input['cris_bibtex'] = isset($_POST[self::option_name]['cris_bibtex']) ? 1 : 0;
                 $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
@@ -583,6 +555,7 @@ class FAU_CRIS {
             'award' => '',
             'awardnameid' => '',
             'type' => '',
+            'subtype' => '',
             'showname' => 1,
             'showyear' => 1,
             'showawardname' => 1,
@@ -598,6 +571,7 @@ class FAU_CRIS {
         $show = sanitize_text_field($show);
         $orderby = sanitize_text_field($orderby);
         $type = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
+        $subtype = sanitize_text_field($subtype);
         $year = sanitize_text_field($year);
         $start = sanitize_text_field($start);
         $orgid = sanitize_text_field($orgid);
@@ -795,12 +769,12 @@ class FAU_CRIS {
                     return $liste->singlePub($quotation);
                 }
                 if (!empty($items) || !empty($sortby)) {
-                    return $liste->pubListe($year, $start, $type, $quotation, $items, $sortby);
+                    return $liste->pubListe($year, $start, $type, $subtype, $quotation, $items, $sortby);
                 }
                 if (strpos($order1, 'type') !== false) {
-                    return $liste->pubNachTyp($year, $start, $type, $quotation, $order2);
+                    return $liste->pubNachTyp($year, $start, $type, $subtype, $quotation, $order2);
                 }
-                return $liste->pubNachJahr($year, $start, $type, $quotation, $order2);
+                return $liste->pubNachJahr($year, $start, $type, $subtype, $quotation, $order2);
             }
         }
         // nothing
@@ -827,6 +801,7 @@ class FAU_CRIS {
             'award' => '',
             'awardnameid' => '',
             'type' => '',
+            'subtype' => '',
             'showname' => 1,
             'showyear' => 1,
             'showawardname' => 1,
@@ -841,6 +816,7 @@ class FAU_CRIS {
         $show = sanitize_text_field($show);
         $orderby = sanitize_text_field($orderby);
         $type = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
+        $subtype = sanitize_text_field($subtype);
         $year = sanitize_text_field($year);
         $start = sanitize_text_field($start);
         $orgid = sanitize_text_field($orgid);
@@ -983,16 +959,16 @@ class FAU_CRIS {
         if( !wp_next_scheduled( 'cris_auto_update' )) {
             //Schedule the event for right now, then to repeat daily using the hook 'cris_create_cron'
             wp_schedule_event( strtotime('tomorrow'), 'daily', 'cris_auto_update' );
-        }
-        $timestamp = wp_next_scheduled( 'cris_auto_update' );
-        if ($timestamp) {
-            $message = __('Einstellungen gespeichert', 'fau-cris')
-                    . '<br />'
-                    . __('Nächste automatische Synchronisierung:', 'fau-cris') . ' '
-                    //. date ('d.m.Y - h:i', $timestamp)
-                    . get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), 'd.m.Y - H:i' );
-            add_settings_error('AutoSyncComplete', 'autosynccomplete', $message , 'updated' );
-            settings_errors();
+            $timestamp = wp_next_scheduled( 'cris_auto_update' );
+            if ($timestamp) {
+                $message = __('Einstellungen gespeichert', 'fau-cris')
+                        . '<br />'
+                        . __('Nächste automatische Synchronisierung:', 'fau-cris') . ' '
+                        //. date ('d.m.Y - h:i', $timestamp)
+                        . get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), 'd.m.Y - H:i' );
+                add_settings_error('AutoSyncComplete', 'autosynccomplete', $message , 'updated' );
+                settings_errors();
+            }
         }
     }
 

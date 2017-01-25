@@ -85,12 +85,16 @@ class CRIS_formatter {
 
         # sort data inside groups
         foreach ($final as $_k => $group) {
+            if($_k == "Other") {
+
+            } else {
                 $this->sortkey = $this->sort;
                 uasort($group, "self::compare_attributes");
                 if ($this->sort_order === SORT_DESC)
-                        $final[$_k] = array_reverse ($group, true);
+                    $final[$_k] = array_reverse ($group, true);
                 else
-                        $final[$_k] = $group;
+                    $final[$_k] = $group;
+            }
         }
 
         return $final;
