@@ -62,18 +62,18 @@ class Organisation {
             $output = '<p>' . __('Es wurden leider keine Informationen gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        $research_contacts = false;
+        $research_contacts = "";
         foreach ($orgaArray as $organisation) {
             $organisation = (array) $organisation;
             foreach ($organisation['attributes'] as $attribut => $v) {
                 $organisation[$attribut] = $v;
             }
             unset($organisation['attributes']);
-            $contacts = explode(',', $organisation['research_contact']);
+            $contacts = explode('|', $organisation['research_contact_names']);
             foreach ($contacts as $_c) {
                 $nameparts = explode(':', $_c);
-                $firstname = $nameparts[0];
-                $lastname = array_key_exists(1, $nameparts) ? $nameparts[1] : '';
+                $lastname = $nameparts[0];
+                $firstname = array_key_exists(1, $nameparts) ? $nameparts[1] : '';
                 $cid = Tools::person_exists($this->cms, $firstname, $lastname);
                 if ($cid) {
                     $research_contacts[] = $cid;

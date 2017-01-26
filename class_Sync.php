@@ -91,7 +91,6 @@ class Sync {
         require_once('class_Organisation.php');
         $orga = new Organisation();
         $research_contacts = $orga->researchContacts();
-
         if (!isset($page_research) || !count($page_research)) {
         // Seite Forschung existiert noch nicht -> anlegen
             $args = array(
@@ -219,8 +218,8 @@ class Sync {
                 $num_created_m ++;
             } else {
                 $field_mid = $field_menu_item->ID;
-                if ($field_menu_item->menu_order + ($field['position']*-1) != 100) {
-                // Wenn nötig existierende Menüposition korrigieren
+                if ($field_menu_item->menu_order + ($field['position']*-1) != 99) {
+                    // Wenn nötig existierende Menüposition korrigieren
                     self::cris_make_menu_item($this->menu_id, $field['title'], $field_pid, $research_mid, $field['position'], $field_menu_item->ID);
                     $num_updated_m ++;
                 } else {
@@ -292,7 +291,7 @@ class Sync {
                     $num_created_m ++;
                 } else {
                     $project_mid = $project_menu_item->ID;
-                    if ($project_menu_item->menu_order + ($project['position']*-1) != 100) {
+                    if ($project_menu_item->menu_order + ($project['position']*-1) != 99) {
                     // Wenn nötig existierende Menüposition korrigieren
                         self::cris_make_menu_item($this->menu_id, $project['title'], $project_pid, $field_mid, $project['position'], $project_menu_item->ID);
                         $num_updated_m ++;
