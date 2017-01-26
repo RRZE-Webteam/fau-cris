@@ -266,11 +266,13 @@ class Projekte {
             if (!in_array('abstract', $hide)) {
                 $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
                 $description = strip_tags($description, '<br><br/><a>');
-                $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
+                if ($description)
+                    $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
             }
             if (!in_array('publications', $hide)) {
                 $publications = $this->get_project_publications($id, $quotation = '');
-                $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+                if($publications)
+                    $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
             }
         }
         $projlist .= "</div>";
