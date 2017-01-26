@@ -29,10 +29,13 @@ class Sync {
         $page_project = array();
         $num_created_p = 0;
         $num_updated_p = 0;
+        $num_ok_p = 0;
         $num_created_m = 0;
         $num_updated_m = 0;
+        $num_ok_m = 0;
         $num_created_mp = 0;
         $num_updated_mp = 0;
+        $num_ok_mp = 0;
         $num_errors = 0;
         $title_research = __('Forschung', 'fau-cris');
         $page_template_portal = ( '' != locate_template('page-templates/page-portalindex.php')) ? 'page-templates/page-portalindex.php' : 'page.php';
@@ -58,7 +61,7 @@ class Sync {
         $_f = new Forschungsbereiche();
         $fields = array();
         $fields = $_f->fieldsArray();
-        $menu_position = -99;
+        $menu_position = -98;
         foreach ($fields as $field) {
             $_p = new Projekte();
             $projects = $_p->fieldProj($field->ID, 'array');
@@ -117,41 +120,55 @@ class Sync {
         // Seite Forschung existiert bereits
             $page_research = $page_research[0];
             $research_pid = $page_research->ID;
-            $num_updated_p ++;
+            $updated = false;
             // Wenn nötig Page-Template und Portalmenü einstellen
             $page_research_meta = get_post_meta($research_pid);
             if (!isset($page_research_meta['_wp_page_template'])
-                    || $page_research_meta['_wp_page_template'] != $page_template_portal) {
+                    || $page_research_meta['_wp_page_template'][0] != $page_template_portal) {
                 update_post_meta( $research_pid, '_wp_page_template', $page_template_portal );
+                $updated = true;
             }
             if (!isset($page_research_meta['fauval_portalmenu_thumbnailson'])
-                    || $page_research_meta['fauval_portalmenu_thumbnailson'] != 1) {
+                    || $page_research_meta['fauval_portalmenu_thumbnailson'][0] != 1) {
                 update_post_meta( $research_pid, 'fauval_portalmenu_thumbnailson', 1 );
+                $updated = true;
             }
             if (!isset($page_research_meta['fauval_portalmenu_nofallbackthumb'])
-                    || $page_research_meta['fauval_portalmenu_nofallbackthumb'] != 1) {
+                    || $page_research_meta['fauval_portalmenu_nofallbackthumb'][0] != 1) {
                 update_post_meta( $research_pid, 'fauval_portalmenu_nofallbackthumb', 1 );
+                $updated = true;
             }
             if (!isset($page_research_meta['fauval_portalmenu_nosub'])
-                    || $page_research_meta['fauval_portalmenu_nosub'] != 0) {
+                    || $page_research_meta['fauval_portalmenu_nosub'][0] != 0) {
                 update_post_meta( $research_pid, 'fauval_portalmenu_nosub', 0 );
+                $updated = true;
             }
             if (!isset($page_research_meta['portalmenu-slug'])
-                    || $page_research_meta['portalmenu-slug'] != $this->portal_id) {
+                    || $page_research_meta['portalmenu-slug'][0] != $this->portal_id) {
                 update_post_meta( $research_pid, 'portalmenu-slug', $this->portal_id );
+                $updated = true;
             }
             if (!isset($page_research_meta['sidebar_personen'])
-                    || $page_research_meta['sidebar_personen'] != $research_contacts) {
+                    || $page_research_meta['sidebar_personen'][0] != $research_contacts) {
                 update_post_meta($research_pid, 'sidebar_personen', $research_contacts);
+                $updated = true;
             }
+            $updated ? $num_updated_p ++ : $num_ok_p ++;
         }
         // Wenn nötig Hauptmenü-Eintrag anlegen
-        $research_mid = self::cris_menu_item_exists($this->menu_items, $title_research, 0, 0);
-        if (!$research_mid) {
-            $research_mid = self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, -100);
+        $research_menu_item = self::cris_menu_item_exists($this->menu_items, $title_research, 0, 0);
+        if (!$research_menu_item) {
+            $research_mid = self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, -99);
             $num_created_m ++;
         } else {
-            $num_updated_m ++;
+            if ($page_research->menu_order != -99) {
+            // Wenn nötig existierende Menüposition korrigieren
+                self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, -99, $research_menu_item->ID);
+                $num_updated_m ++;
+            } else {
+                $num_ok_m ++;
+            }
+            $research_mid = $research_menu_item->ID;
         }
 
         // Seiten Forschungsbereiche unter Forschung
@@ -184,24 +201,46 @@ class Sync {
                 }
             } else {
             // Seite Forschungsbereich existiert bereits
+                if ($page_field[0]->menu_order != $field['position']){
+                // ggf. Seitenposition anpassen
+                    wp_update_post(array(
+                        'ID' => $page_field[0]->ID,
+                        'menu_order' => $field['position']));
+                    $num_updated_p ++;
+                } else {
+                    $num_ok_p ++;
+                }
                 $field_pid = $page_field[0]->ID;
-                $num_updated_p ++;
             }
             // Wenn nötig Hauptmenü-Eintrag anlegen
-            $field_mid = self::cris_menu_item_exists($this->menu_items, $field['title'], $research_mid);
-            if (!$field_mid) {
+            $field_menu_item = self::cris_menu_item_exists($this->menu_items, $field['title'], $research_mid);
+            if (!$field_menu_item) {
                 $field_mid = self::cris_make_menu_item($this->menu_id, $field['title'], $field_pid, $research_mid, $field['position']);
                 $num_created_m ++;
             } else {
+                $field_mid = $field_menu_item->ID;
+                if ($field_menu_item->menu_order + ($field['position']*-1) != 100) {
+                // Wenn nötig existierende Menüposition korrigieren
+                    self::cris_make_menu_item($this->menu_id, $field['title'], $field_pid, $research_mid, $field['position'], $field_menu_item->ID);
                     $num_updated_m ++;
+                } else {
+                    $num_ok_m ++;
+                }
             }
             // Wenn nötig Portalmenü-Eintrag anlegen
-            $field_mpid = self::cris_menu_item_exists($this->portal_items, $field['title'], 0);
-            if (!$field_mpid) {
+            $field_portal_item = self::cris_menu_item_exists($this->portal_items, $field['title'], 0);
+            if (!$field_portal_item) {
                 $field_mpid = self::cris_make_menu_item($this->portal_id, $field['title'], $field_pid, 0, $field['position']);
                 $num_created_mp ++;
             } else {
-                $num_updated_mp ++;
+                $field_mpid = $field_portal_item->ID;
+                if ($field_portal_item->menu_order + ($field['position']*-1) != 99) {
+                // Wenn nötig existierende Menüposition korrigieren
+                    self::cris_make_menu_item($this->portal_id, $field['title'], $field_pid, 0, $field['position'], $field_portal_item->ID);
+                    $num_updated_mp ++;
+                } else {
+                    $num_ok_mp ++;
+                }
             }
 
             // Seiten Forschungsprojekte innerhalb der Forschungsbereiche
@@ -235,32 +274,54 @@ class Sync {
                     }
                 } else {
                 // Seite Forschungsprojekt existiert bereits
+                    if ($page_project[0]->menu_order != $project['position']){
+                    // ggf. Seitenposition anpassen
+                        wp_update_post(array(
+                            'ID' => $page_project[0]->ID,
+                            'menu_order' => $project['position']));
+                        $num_updated_p ++;
+                    } else {
+                        $num_ok_p ++;
+                    }
                     $project_pid = $page_project[0]->ID;
-                    $num_updated_p ++;
                 }
                 // Wenn nötig Hauptmenü-Eintrag anlegen
-                $project_mid = self::cris_menu_item_exists($this->menu_items, $project['title'], $field_mid);
-                if (!$project_mid) {
+                $project_menu_item = self::cris_menu_item_exists($this->menu_items, $project['title'], $field_mid);
+                if (!$project_menu_item) {
                     $project_mid = self::cris_make_menu_item($this->menu_id, $project['title'], $project_pid, $field_mid, $project['position']);
                     $num_created_m ++;
                 } else {
-                    $num_updated_m ++;
+                    $project_mid = $project_menu_item->ID;
+                    if ($project_menu_item->menu_order + ($project['position']*-1) != 100) {
+                    // Wenn nötig existierende Menüposition korrigieren
+                        self::cris_make_menu_item($this->menu_id, $project['title'], $project_pid, $field_mid, $project['position'], $project_menu_item->ID);
+                        $num_updated_m ++;
+                    } else {
+                        $num_ok_m ++;
+                    }
                 }
                 // Wenn nötig Portalmenü-Eintrag anlegen
-                $project_mpid = self::cris_menu_item_exists($this->portal_items, $project['title'], $field_mpid);
-                if (!$project_mpid) {
+                $project_portal_item = self::cris_menu_item_exists($this->portal_items, $project['title'], $field_mpid);
+                if (!$project_portal_item) {
                     $project_mpid = self::cris_make_menu_item($this->portal_id, $project['title'], $project_pid, $field_mpid, $project['position']);
                     $num_created_mp ++;
                 } else {
-                    $num_updated_mp ++;
+                    $project_mpid = $project_portal_item->ID;
+                    if ($project_portal_item->menu_order + ($project['position']*-1) != 99) {
+                    // Wenn nötig existierende Menüposition korrigieren
+                       self::cris_make_menu_item($this->portal_id, $project['title'], $project_pid, $field_mpid, $project['position'], $project_portal_item->ID);
+                        $num_updated_mp ++;
+                    } else {
+                        $num_ok_mp ++;
+                    }
                 }
             }
         }
 
         // Admin-Notice: Synchronisation erfolgreich
-        $message .= '<li>' . __('Seiten', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d neu', 'fau-cris' ), $num_updated_p, $num_created_p ) . '</span></li>';
-        $message .= '<li>' . __('Menüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d neu', 'fau-cris' ), $num_updated_m, $num_created_m ) . '</span></li>';
-        $message .= '<li>' . __('Portalmenüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d neu', 'fau-cris' ), $num_updated_mp, $num_created_mp ) . '</span></li>';
+        $message .= '<li>' . __('Seiten', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $num_ok_p, $num_updated_p, $num_created_p ) . '</span></li>';
+        $message .= '<li>' . __('Menüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $num_ok_m, $num_updated_m, $num_created_m ) . '</span></li>';
+        $message .= '<li>' . __('Portalmenüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $num_ok_mp, $num_updated_mp, $num_created_mp ) . '</span></li>';
         if ($num_errors > 0)
                 $message .= '<li>' . sprintf( __( '%d Seite(n) konnten nicht erstellt werden.', 'fau-cris' ), $num_errors ) . '</li>';
         $message .= '</ul>';
@@ -273,14 +334,14 @@ class Sync {
             if ($menu_item->title == $title
                     && $menu_item->menu_item_parent == $parent
                     && !isset($menu_item->_invalid)) {
-                return $menu_item->ID;
+                return $menu_item;
             }
         }
         return;
     }
 
-    private function cris_make_menu_item($menu, $title, $object_id, $parent_id, $position = 0) {
-        $mid = wp_update_nav_menu_item($menu, 0, array(
+    private function cris_make_menu_item($menu, $title, $object_id, $parent_id, $position = 0, $menu_item_db_id = 0) {
+        $mid = wp_update_nav_menu_item($menu, $menu_item_db_id, array(
             //'menu-item-db-id' => '',
             'menu-item-object-id' => $object_id,
             'menu-item-object' => 'page',
