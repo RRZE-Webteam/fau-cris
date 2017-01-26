@@ -102,8 +102,7 @@ class Forschungsbereiche {
         $fieldsArray = $this->fetch_fields();
 
         if (!count($fieldsArray)) {
-            $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
-            return $output;
+            return false;
         }
         if ($this->lang == 'en')
             $order = $sortby . '_en';

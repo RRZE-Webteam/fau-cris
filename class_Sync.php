@@ -61,23 +61,30 @@ class Sync {
         $_f = new Forschungsbereiche();
         $fields = array();
         $fields = $_f->fieldsArray();
+        if (!$fields || !is_array($fields)) {
+            if( wp_next_scheduled( 'cris_auto_update' ))
+                wp_clear_scheduled_hook('cris_auto_update');
+            $message .= '<li>Es konnten keine Forschungsbereiche gefunden werden. Bitte legen Sie zunächst Forschungsbereiche und zugeordnete Projekte in CRIS an.</li>';
+
+        }
         $menu_position = -98;
-        foreach ($fields as $field) {
-            $_p = new Projekte();
-            $projects = $_p->fieldProj($field->ID, 'array');
-            $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
-            $pages[$field->ID]['position'] = $menu_position;
-            $pages[$field->ID]['projects'] = array();
-            $menu_position ++;
-            if (!$projects)
-                continue;
-            foreach ($projects as $project) {
-                $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
-                $pages[$field->ID]['projects'][$project->ID]['position'] = $menu_position;
+        if (is_array($fields)) {
+            foreach ($fields as $field) {
+                $_p = new Projekte();
+                $projects = $_p->fieldProj($field->ID, 'array');
+                $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
+                $pages[$field->ID]['position'] = $menu_position;
+                $pages[$field->ID]['projects'] = array();
                 $menu_position ++;
+                if (!$projects)
+                    continue;
+                foreach ($projects as $project) {
+                    $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
+                    $pages[$field->ID]['projects'][$project->ID]['position'] = $menu_position;
+                    $menu_position ++;
+                }
             }
         }
-
         // Seite "Forschung" auf oberster Ebene
         $research_pages = get_pages(array('post_status' => 'publish'));
         foreach ($research_pages as $research_page) {
