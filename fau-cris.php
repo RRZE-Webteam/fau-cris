@@ -958,7 +958,7 @@ class FAU_CRIS {
         //Use wp_next_scheduled to check if the event is already scheduled*/
         if( !wp_next_scheduled( 'cris_auto_update' )) {
             //Schedule the event for right now, then to repeat daily using the hook 'cris_create_cron'
-            wp_schedule_event( strtotime('tomorrow'), 'daily', 'cris_auto_update' );
+            wp_schedule_event( strtotime('today 21:00'), 'daily', 'cris_auto_update' );
             $timestamp = wp_next_scheduled( 'cris_auto_update' );
             if ($timestamp) {
                 $message = __('Einstellungen gespeichert', 'fau-cris')
