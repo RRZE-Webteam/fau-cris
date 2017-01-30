@@ -27,6 +27,7 @@ class Sync {
         $pages = array();
         $page_field = array();
         $page_project = array();
+        $menu_position = -99;
         $num_created_p = 0;
         $num_updated_p = 0;
         $num_ok_p = 0;
@@ -38,6 +39,7 @@ class Sync {
         $num_ok_mp = 0;
         $num_errors = 0;
         $title_research = __('Forschung', 'fau-cris');
+        $title_noFieldsPage = __('Weitere Projekte', 'fau-cris');
         $page_template_portal = ( '' != locate_template('page-templates/page-portalindex.php')) ? 'page-templates/page-portalindex.php' : 'page.php';
         $page_template_nav = ( '' != locate_template('page-templates/page-subnav.php')) ? 'page-templates/page-subnav.php' : 'page.php';
         // Hauptmenü
@@ -57,35 +59,10 @@ class Sync {
             $message .= '<li>' . sprintf(__('Portalmenü "%s" neu erstellt.'), $portal_name) . '</li>';
         }
 
-        // Forschungsbereiche und -projekte auslesen -> Array
-        $_f = new Forschungsbereiche();
-        $fields = array();
-        $fields = $_f->fieldsArray();
-        if (!$fields || !is_array($fields)) {
-            if( wp_next_scheduled( 'cris_auto_update' ))
-                wp_clear_scheduled_hook('cris_auto_update');
-            $message .= '<li>Es konnten keine Forschungsbereiche gefunden werden. Bitte legen Sie zunächst Forschungsbereiche und zugeordnete Projekte in CRIS an.</li>';
+        /*
+         * Seite "Forschung" auf oberster Ebene
+         */
 
-        }
-        $menu_position = -98;
-        if (is_array($fields)) {
-            foreach ($fields as $field) {
-                $_p = new Projekte();
-                $projects = $_p->fieldProj($field->ID, 'array');
-                $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
-                $pages[$field->ID]['position'] = $menu_position;
-                $pages[$field->ID]['projects'] = array();
-                $menu_position ++;
-                if (!$projects)
-                    continue;
-                foreach ($projects as $project) {
-                    $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
-                    $pages[$field->ID]['projects'][$project->ID]['position'] = $menu_position;
-                    $menu_position ++;
-                }
-            }
-        }
-        // Seite "Forschung" auf oberster Ebene
         $research_pages = get_pages(array('post_status' => 'publish'));
         foreach ($research_pages as $research_page) {
             if ($research_page->post_title == $title_research
@@ -106,7 +83,7 @@ class Sync {
                 'post_status' => 'publish',
                 'post_type' => 'page',
                 'post_parent' => 0,
-                'menu_order' => -99,
+                'menu_order' => $menu_position,
                 'page_template' => $page_template_portal,
                 'meta_input' => array(
                     // wegen der chaotischen Benennung der Meta-Values, siehe custom-fields.php, Z. 673ff.
@@ -155,7 +132,7 @@ class Sync {
                 $updated = true;
             }
             if (!isset($page_research_meta['sidebar_personen'])
-                    || $page_research_meta['sidebar_personen'][0] != $research_contacts) {
+                    || unserialize($page_research_meta['sidebar_personen'][0]) != $research_contacts) {
                 update_post_meta($research_pid, 'sidebar_personen', $research_contacts);
                 $updated = true;
             }
@@ -164,20 +141,55 @@ class Sync {
         // Wenn nötig Hauptmenü-Eintrag anlegen
         $research_menu_item = self::cris_menu_item_exists($this->menu_items, $title_research, 0, 0);
         if (!$research_menu_item) {
-            $research_mid = self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, -99);
+            $research_mid = self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, $menu_position);
             $num_created_m ++;
         } else {
-            if ($page_research->menu_order != -99) {
+            if ($page_research->menu_order != $menu_position) {
             // Wenn nötig existierende Menüposition korrigieren
-                self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, -99, $research_menu_item->ID);
+                self::cris_make_menu_item($this->menu_id, $title_research, $research_pid, 0, $menu_position, $research_menu_item->ID);
                 $num_updated_m ++;
             } else {
                 $num_ok_m ++;
             }
             $research_mid = $research_menu_item->ID;
         }
+        $menu_position++;
 
-        // Seiten Forschungsbereiche unter Forschung
+        /*
+         *  Seiten Forschungsbereiche und -projekte vorbereiten
+         */
+
+        $_f = new Forschungsbereiche();
+        $fields = array();
+        $fields = $_f->fieldsArray();
+        if (!$fields || !is_array($fields)) {
+            if( wp_next_scheduled( 'cris_auto_update' ))
+                wp_clear_scheduled_hook('cris_auto_update');
+            $message .= '<li>Es konnten keine Forschungsbereiche gefunden werden. Bitte legen Sie zunächst Forschungsbereiche und zugeordnete Projekte in CRIS an.</li>';
+
+        }
+        if (is_array($fields)) {
+            foreach ($fields as $field) {
+                $_p = new Projekte();
+                $projects = $_p->fieldProj($field->ID, 'array');
+                $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
+                $pages[$field->ID]['position'] = $menu_position;
+                $pages[$field->ID]['projects'] = array();
+                $menu_position ++;
+                if (!$projects)
+                    continue;
+                foreach ($projects as $project) {
+                    $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
+                    $pages[$field->ID]['projects'][$project->ID]['position'] = $menu_position;
+                    $menu_position ++;
+                }
+            }
+        }
+
+        /*
+         *  Seiten Forschungsbereiche unter Forschung
+         */
+
         foreach ($pages as $field_id => $field) {
             $field_pages = get_pages(array('child_of' => $research_pid, 'post_status' => 'publish'));
             $page_field = array();
@@ -249,7 +261,10 @@ class Sync {
                 }
             }
 
-            // Seiten Forschungsprojekte innerhalb der Forschungsbereiche
+            /*
+             *  Seiten Forschungsprojekte innerhalb der Forschungsbereiche
+             */
+
             $projects = $field['projects'];
             foreach ($projects as $project_id => $project) {
                 $project_pages = get_pages(array('child_of' => $field_pid, 'post_status' => 'publish'));
@@ -324,7 +339,98 @@ class Sync {
             }
         }
 
-        // Admin-Notice: Synchronisation erfolgreich
+        /*
+         * Projekte, die keinem Forschungsbereich zugeordnet sind
+         */
+
+        foreach($pages as $field) {
+            foreach ($field['projects'] as $id => $project) {
+                $fieldProjects[] = $id;
+            }
+        }
+        $p = new CRIS_projects;
+        $allProjects = $p->by_orga_id($this->orgNr);
+        foreach ($allProjects as $_k =>$_v) {
+            $orgaProjects[] = $_k;
+        }
+        $noFieldProjects = array_diff($orgaProjects,$fieldProjects);
+
+        if (count($noFieldProjects)) {
+            $nf_pages = get_pages(array('post_status' => 'publish'));
+            foreach ($nf_pages as $nf_page) {
+                if ($nf_page->post_title == $title_noFieldsPage
+                        && $nf_page->post_parent == $research_pid
+                        && $nf_page->post_status == 'publish') {
+                    $page_nofield[] = $nf_page;
+                }
+            }
+            if (!isset($page_nofield) || !count($page_nofield)) {
+            // noFieldsPage existiert noch nicht -> anlegen
+                $proj_id_string = implode(',', $noFieldProjects);
+                $args = array(
+                    'post_content' => '[cris show=projects project="' . $proj_id_string . '"]',
+                    'post_title' => $title_noFieldsPage,
+                    'post_status' => 'publish',
+                    'post_type' => 'page',
+                    'post_parent' => $research_pid,
+                    'menu_order' => $menu_position,
+                    'page_template' => $page_template_nav
+                );
+                $nofields_pid = wp_insert_post($args);
+                if ($nofields_pid) {
+                    $num_created_p ++;
+                    $message .= '<li>' . sprintf( __( 'Seite %s wurde erstellt.', 'fau-cris' ), $title_noFieldsPage ) . '</li>';
+                }
+            } else {
+            // noFieldsPage existiert bereits
+                if ($page_nofield[0]->menu_order != $menu_position){
+                // ggf. Seitenposition anpassen
+                    wp_update_post(array(
+                        'ID' => $page_nofield[0]->ID,
+                        'menu_order' => $menu_position)
+                    );
+                    $num_updated_p ++;
+                } else {
+                    $num_ok_p ++;
+                }
+                $nofields_pid = $page_nofield[0]->ID;
+            }
+            // Wenn nötig Hauptmenü-Eintrag anlegen
+            $nofield_menu_item = self::cris_menu_item_exists($this->menu_items, $title_noFieldsPage, $research_mid);
+            if (!$nofield_menu_item) {
+                $nofield_mid = self::cris_make_menu_item($this->menu_id, $title_noFieldsPage, $nofields_pid, $research_mid, $menu_position);
+                $num_created_m ++;
+            } else {
+                $nofield_mid = $nofield_menu_item->ID;
+                if ($nofield_menu_item->menu_order + ($menu_position*-1) != 99) {
+                // Wenn nötig existierende Menüposition korrigieren
+                    self::cris_make_menu_item($this->menu_id, $title_noFieldsPage, $nofields_pid, $research_mid, $menu_position, $nofield_menu_item->ID);
+                    $num_updated_m ++;
+                } else {
+                    $num_ok_m ++;
+                }
+            }
+            // Wenn nötig Portalmenü-Eintrag anlegen
+            $nofield_portal_item = self::cris_menu_item_exists($this->portal_items, $title_noFieldsPage, 0);
+            if (!$nofield_portal_item) {
+                $project_mpid = self::cris_make_menu_item($this->portal_id, $title_noFieldsPage, $nofields_pid, 0, $menu_position);
+                $num_created_mp ++;
+            } else {
+                $project_mpid = $nofield_portal_item->ID;
+                if ($nofield_portal_item->menu_order + ($menu_position*-1) != 99) {
+                // Wenn nötig existierende Menüposition korrigieren
+                   self::cris_make_menu_item($this->portal_id, $title_noFieldsPage, $nofields_pid, 0, $menu_position, $nofield_portal_item->ID);
+                    $num_updated_mp ++;
+                } else {
+                    $num_ok_mp ++;
+                }
+            }
+        }
+
+
+        /*
+         *  Admin-Notice: Synchronisation erfolgreich
+         */
         $message .= '<li>' . __('Seiten', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $num_ok_p, $num_updated_p, $num_created_p ) . '</span></li>';
         $message .= '<li>' . __('Menüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $num_ok_m, $num_updated_m, $num_created_m ) . '</span></li>';
         $message .= '<li>' . __('Portalmenüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $num_ok_mp, $num_updated_mp, $num_created_mp ) . '</span></li>';

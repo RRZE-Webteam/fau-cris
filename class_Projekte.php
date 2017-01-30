@@ -44,7 +44,7 @@ class Projekte {
             $this->einheit = "orga";
         }
 
-            }
+    }
 
     /*
      * Ausgabe aller Projekte ohne Gliederung
@@ -94,7 +94,6 @@ class Projekte {
         foreach ($projList as $array_year => $projects) {
             if (empty($year)) {
                 $output .= '<h3>' . $array_year . '</h3>';
-                //$output .= '<h3>' . substr($array_year, 0, 4) . '</h3>';
             }
             $output .= $this->make_list($projects, $hide);
         }
@@ -158,7 +157,11 @@ class Projekte {
             return $output;
         }
 
-        $output = $this->make_single($projArray, $hide);
+        if (is_array($this->id)) {
+            $output = $this->make_list($projArray, $hide);
+        } else {
+            $output = $this->make_single($projArray, $hide);
+        }
 
         return $output;
     }

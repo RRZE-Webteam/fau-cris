@@ -616,6 +616,10 @@ class FAU_CRIS {
             $param2 = $award;
         } elseif (isset($project) && $project != '') {
             $param1 = 'project';
+            if (strpos($project, ',') !== false) {
+                $project = str_replace(' ', '', $project);
+                $project = explode(',', $project);
+            }
             $param2 = $project;
         } elseif (isset($awardnameid) && $awardnameid != '') {
             $param1 = 'awardnameid';
