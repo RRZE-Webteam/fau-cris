@@ -343,6 +343,7 @@ class Sync {
          * Projekte, die keinem Forschungsbereich zugeordnet sind
          */
 
+        $fieldProjects = array();
         foreach($pages as $field) {
             foreach ($field['projects'] as $id => $project) {
                 $fieldProjects[] = $id;
@@ -354,7 +355,7 @@ class Sync {
             $orgaProjects[] = $_k;
         }
         $noFieldProjects = array_diff($orgaProjects,$fieldProjects);
-
+        rsort($noFieldProjects);
         if (count($noFieldProjects)) {
             $nf_pages = get_pages(array('post_status' => 'publish'));
             foreach ($nf_pages as $nf_page) {
