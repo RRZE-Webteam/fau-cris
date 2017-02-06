@@ -535,7 +535,7 @@ class FAU_CRIS {
     /**
      * Add Shortcodes
      */
-    public static function cris_shortcode($atts, $content = null) {
+    public static function cris_shortcode($atts) {
         $options = self::get_options();
 
         // Attributes
@@ -814,7 +814,8 @@ class FAU_CRIS {
             'hide' => '',
             'role' => 'leader',
             'patent' => '',
-            'activity' => ''
+            'activity' => '',
+            'field' => ''
                         ), $atts));
 
         $show = sanitize_text_field($show);
@@ -836,12 +837,10 @@ class FAU_CRIS {
         $showawardname = sanitize_text_field($showawardname);
         $display = sanitize_text_field($display);
         $project = sanitize_text_field($project);
-        $hide = sanitize_text_field($hide);
-        $hide = str_replace(" ", "", $hide);
-        $hide = explode(",", $hide);
         $role = sanitize_text_field($role);
         $patent = sanitize_text_field($patent);
         $activity = sanitize_text_field($activity);
+        $field = sanitize_text_field($field);
 
         if (isset($publication) && $publication != '') {
             $param1 = 'publication';
@@ -850,6 +849,9 @@ class FAU_CRIS {
                 $publication = explode(',', $publication);
             }
             $param2 = $publication;
+        } elseif (isset($field) && $field != '') {
+            $param1 = 'field';
+            $param2 = $field;
         } elseif (isset($activity) && $activity != '') {
             $param1 = 'activity';
             $param2 = $activity;
@@ -861,6 +863,10 @@ class FAU_CRIS {
             $param2 = $award;
         } elseif (isset($project) && $project != '') {
             $param1 = 'project';
+            if (strpos($project, ',') !== false) {
+                $project = str_replace(' ', '', $project);
+                $project = explode(',', $project);
+            }
             $param2 = $project;
         } elseif (isset($awardnameid) && $awardnameid != '') {
             $param1 = 'awardnameid';
@@ -884,45 +890,39 @@ class FAU_CRIS {
             $param2 = '';
         }
 
-        // IDs mit zu groüen Abfragemengen ausschließen
-        $excluded = array(
-            '143134', // FAU
-            '141815', // MedFak
-            '142105', // NatFak
-            '141354', // PhilFak
-            '141678', // ReWi
-            '142351'  // Techfak
-        );
+        $order1 = 'year';
+        $order2 = '';
 
-        if ((!$orgid || $orgid == 0) && $persid == '' && $publication == '' && $award == '' && $awardnameid == '') {
-            // Fehlende ID oder ID=0 abfangen
-            return __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation/Auszeichnung an.', 'fau-cris') . '</strong></p>';
-        } /* elseif (in_array($orgid, $excluded)
-          &&  $persid == ''
-          && (($show == 'awards' && $award == '') || ($show == 'publications' && $publication == ''))
-          && ($year == '' && $type == '')
-          ) {
-          // IDs mit zu vielen Ergebnissen ausschließen
-          return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
-          } */ else {
-            $order1 = 'year';
-            $order2 = '';
-
-            if (!empty($orderby)) {
-                if (strpos($orderby, ',') !== false) {
-                    $orderby = str_replace(' ', '', $orderby);
-                    $order1 = explode(',', $orderby)[0];
-                    $order2 = explode(',', $orderby)[1];
-                } else {
-                    $order1 = $orderby;
-                    $order2 = '';
-                }
+        if (!empty($orderby)) {
+            if (strpos($orderby, ',') !== false) {
+                $orderby = str_replace(' ', '', $orderby);
+                $order1 = explode(',', $orderby)[0];
+                $order2 = explode(',', $orderby)[1];
+            } else {
+                $order1 = $orderby;
+                $order2 = '';
             }
+        }
 
-            if (isset($show) && $show == 'projects') {
+        if (isset($show) && $show == 'projects') {
+            // Projekte
+            require_once('class_Projekte.php');
+            $liste = new Projekte($param1, $param2);
 
+            if ($project != '') {
+                return $liste->customProj($content);
             }
-          }
+            if (!empty($items)) {
+            //    return $liste->projListe($year, $start, $type, $items, $hide, $role);
+            }
+            if (strpos($order1, 'type') !== false) {
+                return $liste->projNachTyp($year, $start, $type, $hide = array(), $role, $content);
+            }
+            if (strpos($order1, 'year') !== false) {
+                return $liste->projNachJahr($year, $start, $type, $hide = array(), $role, $content);
+            }
+            //return $liste->projListe($year, $start, $type, $items, $hide, $role);
+        }
     }
 
     public static function cris_enqueue_styles() {
