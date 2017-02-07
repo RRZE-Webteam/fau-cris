@@ -67,7 +67,7 @@ class Sync {
         } else {
             $this->portal_id = wp_create_nav_menu($portal_name);
             $this->portal_items = array();
-            $this->message .= '<li>' . sprintf(__('Portalmenü "%s" neu erstellt.'), $portal_name) . '</li>';
+            $this->message .= '<li>' . sprintf(__('Portalmenü "%s" neu erstellt.', 'fau-cris'), $portal_name) . '</li>';
         }
 
         /*
@@ -107,7 +107,7 @@ class Sync {
             $research_pid = wp_insert_post($args);
             if ($research_pid) {
                 $this->num_created_p ++;
-                $this->message .= '<li>' . sprintf( __( 'Seite %s wurde erstellt.', 'fau-cris' ), $this->title_research ) . '</li>';
+                $this->message .= '<li>' . sprintf( __( 'Seite "%s" wurde erstellt.', 'fau-cris' ), $this->title_research ) . '</li>';
             }
         } else {
         // Seite Forschung existiert bereits

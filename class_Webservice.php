@@ -46,7 +46,7 @@ class CRIS_webservice {
             $remaining = array();
             foreach ($filter->filters as $attr => $value) {
                 if (
-                    strtolower($attr) !== 'publyear' || 
+                    strtolower($attr) !== 'publyear' ||
                     strtolower($id_parts[1]) !== 'organisation'
                 ) {
                     $remaining[$attr] = $value;

@@ -504,7 +504,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= "<br />" . __('Abschlussarbeit', '') . " <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>";
+                    $publist .= "<br />" . __('Abschlussarbeit', 'fau-cris') . " <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>";
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
@@ -614,7 +614,7 @@ class CRIS_publications extends CRIS_webservice {
     }
 
     private function retrieve($reqs, &$filter = null) {
-        if ($filter !== null && !$filter instanceof CRIS_filter)
+       if ($filter !== null && !$filter instanceof CRIS_filter)
             $filter = new CRIS_filter($filter);
 
         $data = array();
