@@ -43,10 +43,21 @@ class Sync {
         $this->page_template_portal = ( '' != locate_template('page-templates/page-portalindex.php')) ? 'page-templates/page-portalindex.php' : 'page.php';
         $this->page_template_nav = ( '' != locate_template('page-templates/page-subnav.php')) ? 'page-templates/page-subnav.php' : 'page.php';
         // Hauptmenü
-        $this->menu_name = 'main-menu';
+        $menu_slug = 'main-menu';
+        $menu_name = __('Hauptnavigation', 'fau-cris');
         $locations = get_nav_menu_locations();
-        $this->menu_id = $locations[ $this->menu_name ] ;
-        $this->menu_items = wp_get_nav_menu_items($this->menu_id);
+        $menu_id = $locations[$menu_slug] ;
+        if ($menu_id == 0) {
+            $this->menu_id = wp_create_nav_menu($menu_name);
+            $menu[$menu_slug] = $this->menu_id;
+            set_theme_mod('nav_menu_locations',$menu);
+            $this->menu_items = array();
+            $this->message .= '<li>' . sprintf(__('Menü "%s" neu erstellt.', 'fau-cris'), $menu_name) . '</li>';
+        } else {
+            $this->menu_id = $menu_id;
+            $this->menu_items = wp_get_nav_menu_items($this->menu_id);
+        }
+
         // Portalmenü
         $portal_name = 'Portal '.  $this->title_research;
         $portal_exists = wp_get_nav_menu_object( $portal_name );
