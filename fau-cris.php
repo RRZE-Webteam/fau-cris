@@ -395,6 +395,9 @@ class FAU_CRIS {
                         array(
                             'name' => 'cris_sync_check',
                             'description' => __('Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und Menüeinträge generiert werden?', self::textdomain)
+
+
+
                         )
                     );
                 break;
@@ -449,16 +452,20 @@ class FAU_CRIS {
             $name = esc_attr($args['name']);
         if (array_key_exists('description', $args))
             $description = esc_attr($args['description']);
-        ?>
-        <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1' <?php
+        if ($name == 'cris_sync_check') {
+            print "<p>";
+            printf(__('%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3s Benutzerhandbuch! %3s', self::textdomain), '<strong>', '</strong>', '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/">', '</a>');
+            print "<p>";
+        } ?>
+        <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
         if (array_key_exists($name, $options)) {
             print checked($options[$name], 1, false);
         }
         ?> >
-               <?php if (isset($description)) { ?>
+        <?php if (isset($description)) { ?>
             <span class="description"><?php echo $description; ?></span></label>
-            <?php
-        }
+        <?php }
+
     }
 
     // Radio Button
