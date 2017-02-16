@@ -40,6 +40,8 @@ class Sync {
         $this->title_noFieldsPage = __('Weitere Projekte', 'fau-cris');
         $this->page_template_portal = ( '' != locate_template('page-templates/page-portalindex.php')) ? 'page-templates/page-portalindex.php' : 'page.php';
         $this->page_template_nav = ( '' != locate_template('page-templates/page-subnav.php')) ? 'page-templates/page-subnav.php' : 'page.php';
+        $this->num_menu_items= 1;
+        $this->menu_count = 1;
         // Hauptmenü
         $menu_slug = 'main-menu';
         $menu_name = __('Hauptnavigation', 'fau-cris');
@@ -166,7 +168,7 @@ class Sync {
         /*
          *  Seiten Forschungsbereiche und -projekte vorbereiten
          */
-
+        // FoBe und Projekte
         $_f = new Forschungsbereiche();
         $fields = array();
         $fields = $_f->fieldsArray();
@@ -209,28 +211,7 @@ class Sync {
                 }
             }
         }
-
-        /*
-         *  Seiten Forschungsbereiche unter Forschung
-         */
-
-        foreach ($pages as $field) {
-            $field_page = self::cris_make_page($field['title'], $field['content'], $field['contact'], $field['position'], $research_pid, $research_mid,0,1);
-
-            /*
-             *  Seiten Forschungsprojekte innerhalb der Forschungsbereiche
-             */
-
-            $projects = $field['projects'];
-            foreach ($projects as $project) {
-                $project_page = self::cris_make_page($project['title'], $project['content'], $project['contact'], $project['position'], $field_page['pid'], $field_page['mid'], $field_page['mpid'],1);
-            }
-        }
-
-        /*
-         * Projekte, die keinem Forschungsbereich zugeordnet sind
-         */
-
+        // Projekte ohne FoBe
         $pages['no_field']['title'] = $this->title_noFieldsPage;
         $pages['no_field']['content'] = '';
         $pages['no_field']['contact'] = array('-1');
@@ -238,11 +219,11 @@ class Sync {
         $pages['no_field']['projects'] = array();
         $this->menu_position ++;
 
-        $field_projects = array();
+        $this->field_projects = array();
         foreach($pages as $field) {
             foreach ($field['projects'] as $id => $project) {
                 if (!empty($field['projects'])) {
-                    $field_projects[$id] = $project;
+                    $this->field_projects[$id] = $project;
                 }
             }
 
@@ -255,26 +236,38 @@ class Sync {
             $orga_projects[$a_p->ID]['position'] = $this->menu_position;
             $orga_projects[$a_p->ID]['content'] = "[cris show=projects project=$a_p->ID]";
             $orga_projects[$a_p->ID]['contact'] = array('-1');
-            $this->menu_position ++;
         }
         foreach ($orga_projects as $o_p => $details) {
-            if (!array_key_exists($o_p, $field_projects)) {
+            if (!array_key_exists($o_p, $this->field_projects)) {
                 $pages['no_field']['projects'][$o_p] = $details;
+                $pages['no_field']['projects'][$o_p]['position'] = $this->menu_position;
+                $this->menu_position ++;
             }
         }
-        // Seite "Weitere Projekte"
+        // Inhalt "Weitere Projekte"
         if (count($pages['no_field']['projects'])) {
             $proj_id_string = implode(',', array_keys($pages['no_field']['projects']));
-            $pages['no_field']['content'] = "[cris show=projects project=$proj_id_string]";
-            $no_field_page = self::cris_make_page($this->title_noFieldsPage, $pages['no_field']['content'], $pages['no_field']['contact'], $pages['no_field']['position'], $research_pid, $research_mid, 0,1);
+            $pages['no_field']['content'] = "[cris show=projects project=\"$proj_id_string\"]";
+        }
+        $this->num_menu_items = (count($pages['no_field']['projects'])) ? count($pages) : count($pages) -1;
 
-            // Seiten Forschungsprojekte unter "Weitere Projekte"
-            $no_field_projects = $pages['no_field']['projects'];
-            foreach ($no_field_projects as $project) {
-                $no_field_project_page = self::cris_make_page($project['title'], $project['content'],  $project['contact'], $project['position'], $no_field_page['pid'], $no_field_page['mid'], $no_field_page['mpid'],1);
+
+        /*
+         *  Seiten Forschungsbereiche unter Forschung
+         */
+        foreach ($pages as $field) {
+            $field_page = self::cris_make_page($field['title'], $field['content'], $field['contact'], $field['position'], $research_pid, $research_mid,0,1);
+            $this->menu_count ++;
+
+            /*
+             *  Seiten Forschungsprojekte innerhalb der Forschungsbereiche
+             */
+
+            $projects = $field['projects'];
+            foreach ($projects as $project) {
+                $project_page = self::cris_make_page($project['title'], $project['content'], $project['contact'], $project['position'], $field_page['pid'], $field_page['mid'], $field_page['mpid'],1);
             }
         }
-
 
         /*
          *  Admin-Notice: Synchronisation erfolgreich
@@ -306,6 +299,7 @@ class Sync {
     }
 
     private function cris_make_menu_item($menu, $title, $object_id, $parent_id, $position = 0, $menu_item_db_id = 0) {
+        $last_class = ($this->menu_count == $this->num_menu_items) ? ' cris-last' : '';
         $mid = wp_update_nav_menu_item($menu, $menu_item_db_id, array(
             //'menu-item-db-id' => '',
             'menu-item-object-id' => $object_id,
@@ -318,7 +312,7 @@ class Sync {
             //'menu-item-description' => '',
             //'menu-item-attr-title' => '',
             //'menu-item-target' => '',
-            'menu-item-classes' => 'cris',
+            'menu-item-classes' => 'cris' . $last_class,
             //'menu-item-xfn' => '',
             'menu-item-status' => 'publish',
             )
@@ -336,7 +330,7 @@ class Sync {
             }
         }
         if (!isset($pages_array) || !count($pages_array)) {
-        // Seite Forschungsprojekt existiert noch nicht -> anlegen
+        // Seite existiert noch nicht -> anlegen
             $args = array(
                 'post_content' => $content,
                 'post_title' => $title,
@@ -357,7 +351,7 @@ class Sync {
                 $this->num_errors ++;
             }
         } else {
-        // Seite Forschungsprojekt existiert bereits
+        // Seite existiert bereits
             $updated = false;
             $pid = $pages_array[0]->ID;
             $page_meta = get_post_meta($pid);
@@ -372,6 +366,20 @@ class Sync {
                     || unserialize($page_meta['sidebar_personen'][0]) != $contact) {
                 update_post_meta($pid, 'sidebar_personen', $contact);
                 $updated = true;
+            }
+            if ($pages_array[0]->post_title == $this->title_noFieldsPage) {
+                $nfp_post = get_post($pages_array[0]->ID);
+                $nfp_content = $nfp_post->post_content;
+                $ist_projs = self::get_string_between($nfp_content, "[cris show=projects project=\"", "\"]");
+                $soll_projs = self::get_string_between($content, "[cris show=projects project=\"", "\"]");
+                if($ist_projs != $soll_projs) {
+                    str_replace($ist_projs, $soll_projs, $content);
+                    wp_update_post(array(
+                        'ID' => $pages_array[0]->ID,
+                        'post_content' => $content
+                    ));
+                    $updated = true;
+                }
             }
             $updated ? $this->num_updated_p ++ : $this->num_ok_p ++;
         }
@@ -400,7 +408,7 @@ class Sync {
                 $mpid = $portal_item->ID;
                 if ($portal_item->menu_order + ($position*-1) != 99) {
                 // Wenn nötig existierende Menüposition korrigieren
-                   self::cris_make_menu_item($this->portal_id, $title, $pid, $parent_mpid, $position, $portal_item->ID);
+                    self::cris_make_menu_item($this->portal_id, $title, $pid, $parent_mpid, $position, $portal_item->ID);
                     $this->num_updated_mp ++;
                 } else {
                     $this->num_ok_mp ++;
@@ -409,11 +417,45 @@ class Sync {
         } else {
             $mpid = 0;
         }
+
+        // Alte Projekt-Seiten, die es inzwischen in einem Forschungsbereich gibt, unter "Weitere Projekte" löschen
+        if (count($pages_array) && $pages_array[0]->post_title == $this->title_noFieldsPage) {
+            // Seite entfernen
+            $sub_pages = get_pages(array('child_of' => $pid, 'post_status' => 'publish'));
+            foreach ($sub_pages as $_sp) {
+                //print $_sp->post_title;
+                if (array_search($_sp->post_title, array_column($this->field_projects, 'title')) !== false) {
+                    wp_delete_post($_sp->ID);
+                }
+            }
+            // Hauptmenü-Eintrag entfernen
+            foreach ($this->menu_items as $_mi) {
+                if($_mi->menu_item_parent == $mid && array_search($_mi->title, array_column($this->field_projects, 'title')) !== false) {
+                    wp_delete_post($_mi->ID);
+                }
+            }
+            // Portalmenü-Eintrag entfernen
+            foreach ($this->portal_items as $_pi) {
+                if($_pi->menu_item_parent == $mpid && array_search($_pi->title, array_column($this->field_projects, 'title')) !== false) {
+                    wp_delete_post($_pi->ID);
+                }
+            }
+        }
+
         $ids = array(
             'pid'  => $pid,
             'mid'  => $mid,
             'mpid' => $mpid
         );
         return $ids;
+    }
+
+    private function get_string_between($string, $start, $end){
+        $string = ' ' . $string;
+        $ini = strpos($string, $start);
+        if ($ini == 0) return '';
+        $ini += strlen($start);
+        $len = strpos($string, $end, $ini) - $ini;
+        return substr($string, $ini, $len);
     }
 }
