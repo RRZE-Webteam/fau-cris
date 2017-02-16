@@ -383,9 +383,9 @@ class Aktivitaeten {
             if (!empty($activity_date))
                 $activitylist .= " (" . $activity_date . ")";
             if (!empty($activity_eventname))
-                $activitylist .= ", " . __('Veranstaltung', 'cris-fau') . ": " . $activity_eventname;
+                $activitylist .= ", " . __('Veranstaltung', 'fau-cris') . ": " . $activity_eventname;
             if (!empty($activity_nameofshow))
-                $activitylist .= ", " . __('In', 'cris-fau') . ": \"" . $activity_nameofshow . "\"";
+                $activitylist .= ", " . __('In', 'fau-cris') . ": \"" . $activity_nameofshow . "\"";
             if (!empty($activity_location))
                 $activitylist .= ", " . $activity_location;
             if (!empty($activity_url))

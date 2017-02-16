@@ -32,11 +32,42 @@ class Tools {
             case 'activities':
                 $search = CRIS_Dicts::$activities;
                 break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
+                break;
         }
         foreach ($search as $k => $v) {
             $order[$v['order']] = $k;
         }
         ksort($order);
+        return $order;
+    }
+
+    public static function getOptionsOrder($object) {
+        switch ($object) {
+            case 'publications':
+                $search = CRIS_Dicts::$publications;
+                break;
+            case 'awards':
+                $search = CRIS_Dicts::$awards;
+                break;
+            case 'projects':
+                $search = CRIS_Dicts::$projects;
+                break;
+            case 'patents':
+                $search = CRIS_Dicts::$patents;
+                break;
+            case 'activities':
+                $search = CRIS_Dicts::$activities;
+                break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
+                break;
+        }
+        $order_raw = self::getOrder($object);
+        foreach ($order_raw as $k => $v) {
+            $order[] = $search[$v]['short'];
+        }
         return $order;
     }
 
@@ -56,6 +87,9 @@ class Tools {
                 break;
             case 'activities':
                 $search = CRIS_Dicts::$activities;
+                break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
         }
         foreach ($search as $k => $v) {
@@ -84,8 +118,12 @@ class Tools {
             case 'activities':
                 $search = CRIS_Dicts::$activities;
                 break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
+                break;
         }
-        return $search[$type][$lang]['name'];
+        if (array_key_exists($type, $search))
+            return $search[$type][$lang]['name'];
     }
 
     public static function getTitle($object, $name, $lang) {
@@ -105,6 +143,9 @@ class Tools {
                 break;
             case 'activities':
                 $search = CRIS_Dicts::$activities;
+                break;
+            case 'pubothersubtypes':
+                $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
         }
         return $search[$name][$lang]['title'];
@@ -235,19 +276,44 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $type = '') {
+    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['publyear__eq'] = $year;
         if ($start !== '' && $start !== NULL)
             $filter['publyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $pubTyp = self::getType('publications', $type);
+            if (strpos($type, ',')) {
+                $type = str_replace(' ', '', $type);
+                $types = explode(',', $type);
+                foreach($types as $v) {
+                    $pubTyp[] = self::getType('publications', $v);
+                }
+            } else {
+                $pubTyp = (array) self::getType('publications', $type);
+            }
             if (empty($pubTyp)) {
-                $output = '<p>' . __('Falscher Parameter für Publikationstyp', '') . '</p>';
+                $output = '<p>' . __('Falscher Parameter für Publikationstyp', 'fau-cris') . '</p>';
                 return $output;
             }
             $filter['publication type__eq'] = $pubTyp;
+        }
+        if ($subtype !== '' && $subtype !== NULL) {
+            if (strpos($subtype, ',')) {
+                $subtype = str_replace(' ', '', $subtype);
+                $subtypes = explode(',', $subtype);
+                foreach($subtypes as $v) {
+                    $pubSubTyp[] = self::getType('pubothersubtypes', $v);
+                }
+                //$pubTyp = implode(',', $pubTypes);
+            } else {
+                $pubSubTyp = (array) self::getType('pubothersubtypes', $type);
+            }
+            if (empty($pubSubTyp)) {
+                $output = '<p>' . __('Falscher Parameter für Publikationssubtyp', 'fau-cris') . '</p>';
+                return $output;
+            }
+            $filter['type other subtype__eq'] = $pubSubTyp;
         }
         if (count($filter))
             return $filter;
@@ -265,9 +331,17 @@ class Tools {
         if ($start !== '' && $start !== NULL)
             $filter['year award__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $awardTyp = self::getType('awards', $type);
+            if (strpos($type, ',')) {
+                $type = str_replace(' ', '', $type);
+                $types = explode(',', $type);
+                foreach($types as $v) {
+                    $awardTyp[] = self::getType('awards', $v);
+                }
+            } else {
+                $awardTyp = (array) self::getType('awards', $type);
+            }
             if (empty($awardTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Auszeichnungstyp', '') . '</p>';
+                $output .= '<p>' . __('Falscher Parameter für Auszeichnungstyp', 'fau-cris') . '</p>';
                 return $output;
             }
             $filter['type of award__eq'] = $awardTyp;
@@ -283,14 +357,30 @@ class Tools {
 
     public static function project_filter($year = '', $start = '', $type = '') {
         $filter = array();
-        if ($year !== '' && $year !== NULL)
-            $filter['startyear__eq'] = $year;
+        if ($year !== '' && $year !== NULL) {
+            if ($year == 'current') {
+                $current = date('Y');
+                $filter['startyear__le'] = date('Y');
+                $filter['endyear__ge'] = date('Y');
+            } else {
+                $filter['endyear__ge'] = $year;
+                $filter['startyear__le'] = $year;
+            }
+        }
         if ($start !== '' && $start !== NULL)
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $projTyp = self::getType('projects', $type);
+            if (strpos($type, ',')) {
+                $type = str_replace(' ', '', $type);
+                $types = explode(',', $type);
+                foreach($types as $v) {
+                    $projTyp[] = self::getType('projects', $v);
+                }
+            } else {
+                $projTyp = (array) self::getType('projects', $type);
+            }
             if (empty($projTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Projekttyp', '') . '</p>';
+                $output .= '<p>' . __('Falscher Parameter für Projekttyp', 'fau-cris') . '</p>';
                 return $output;
             }
             $filter['project type__eq'] = $projTyp;
@@ -311,9 +401,17 @@ class Tools {
         if ($start !== '' && $start !== NULL)
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $patTyp = self::getType('patents', $type);
+            if (strpos($type, ',')) {
+                $type = str_replace(' ', '', $type);
+                $types = explode(',', $type);
+                foreach($types as $v) {
+                    $patTyp[] = self::getType('patents', $v);
+                }
+            } else {
+                $patTyp = (array) self::getType('patents', $type);
+            }
             if (empty($patTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Patenttyp', '') . '</p>';
+                $output .= '<p>' . __('Falscher Parameter für Patenttyp', 'fau-cris') . '</p>';
                 return $output;
             }
             $filter['patenttype__eq'] = $patTyp;
@@ -324,7 +422,7 @@ class Tools {
     }
 
     /*
-     * Array zur Definition des Filters für Patente
+     * Array zur Definition des Filters für Aktivitäten
      */
 
     public static function activity_filter($year = '', $start = '', $type = '') {
@@ -334,13 +432,37 @@ class Tools {
         if ($start !== '' && $start !== NULL)
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $patTyp = self::getType('activities', $type);
-            if (empty($patTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Aktivitätstyp', '') . '</p>';
+            if (strpos($type, ',')) {
+                $type = str_replace(' ', '', $type);
+                $types = explode(',', $type);
+                foreach($types as $v) {
+                    $activityTyp[] = self::getType('activities', $v);
+                }
+            } else {
+                $activityTyp = (array) self::getType('activities', $type);
+            }
+            if (empty($activityTyp)) {
+                $output .= '<p>' . __('Falscher Parameter für Aktivitätstyp', 'fau-cris') . '</p>';
                 return $output;
             }
-            $filter['type of activity__eq'] = $patTyp;
+            $filter['type of activity__eq'] = $activityTyp;
         }
+        if (count($filter))
+            return $filter;
+        return null;
+    }
+
+    /*
+     * Array zur Definition des Filters für Forschungsbereiche
+     */
+
+    public static function field_filter($year = '', $start = '') {
+        $filter = array();
+        if ($year !== '' && $year !== NULL)
+            $filter['startyear__eq'] = $year;
+        if ($start !== '' && $start !== NULL)
+            $filter['startyear__ge'] = $start;
+
         if (count($filter))
             return $filter;
         return null;
@@ -369,10 +491,15 @@ class Tools {
         return $univis;
     }
 
-    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis) {
+    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array()) {
         if ($cms == 'wp') {
             // WordPress
-            return self::person_slug($cms, $firstname, $lastname);
+            global $wpdb;
+            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
+            $sql = $wpdb->prepare($sql, $person);
+            $person_id = $wpdb->get_var($sql);
+            return $person_id;
         }
         if ($cms == 'wbk') {
             // Webbaukasten
@@ -382,6 +509,17 @@ class Tools {
                 }
             }
         }
+    }
+
+    public static function person_id($cms = '', $firstname = '', $lastname = '') {
+        if ($cms == 'wp') {
+            global $wpdb;
+            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
+            $sql = $wpdb->prepare($sql, $person);
+            $person_id = $wpdb->get_var($sql);
+        }
+        return $person_id;
     }
 
     public static function person_slug($cms = '', $firstname = '', $lastname = '') {
@@ -463,6 +601,43 @@ class Tools {
             $date = __('bis', 'fau-cris') . " " . $end;
         }
         return $date;
+    }
+
+    public static function numeric_xml_encode($text, $double_encode=true){
+        /*
+         * Deliver numerically encoded XML representation of special characters.
+         * E.g. use &#8211; instead of &ndash;
+         * 
+         * Adopted from user-contributed notes of
+         * http://php.net/manual/de/function.htmlentities.php
+         *
+         * @param string $text Input text
+         * @param bool $double_encode flag for double encoding (defaults to true)
+         *
+         * @return string $encoded Encoded text representation
+         */
+
+        if (!$double_encode)
+            $text = html_entity_decode(stripslashes($text), ENT_QUOTES, 'UTF-8');
+
+        // array of chars (multibyte aware)
+        $mbchars = preg_split('/(?<!^)(?!$)/u', $text);
+
+        $encoded = '';
+        foreach ($mbchars as $char){
+            $o = ord($char);
+            if ( (strlen($char) > 1) || /* multi-byte [unicode] */
+                ($o <32 || $o > 126) || /* <- control / latin weird os -> */
+                ($o >33 && $o < 40) ||/* quotes + ambersand */
+                ($o >59 && $o < 63) /* html */
+            ) {
+                // convert to numeric entity
+                $char = mb_encode_numericentity($char,
+                                        array(0x0, 0xffff, 0, 0xffff), 'UTF-8');
+            }
+            $encoded .= $char;
+        }
+        return $encoded;
     }
 
 }

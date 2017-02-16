@@ -78,3 +78,13 @@ ul.cris-activities li {
     margin-bottom: .3em;
     list-style-type: circle;
 }
+
+#nav .level2 li.cris-last {
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+#nav .level2 li.cris-last a {
+    border-bottom-color: transparent;
+}

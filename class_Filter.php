@@ -54,10 +54,12 @@ class CRIS_filter {
                  * If attribute is not present, skip filter silently. This makes
                  * the test successful and may be therefore a bad idea.
                  */
-                continue;
-
+                //continue;
+                return false;
             foreach ($_f as $operator => $reference) {
-                if ($this->compare($data->attributes[$attr], $operator, $reference) === false)
+                if($operator == 'eq' && !is_array($reference))
+                    $reference = (array)$reference;
+                if ($this->compare($data->attributes[$attr], $operator, $reference) == false)
                     return false;
             }
         }
@@ -71,7 +73,7 @@ class CRIS_filter {
          */
         switch ($operator) {
             case "eq":
-                return ($value == $reference);
+                return (in_array($value,$reference));
             case "le":
                 return ($value <= $reference);
             case "lt":
