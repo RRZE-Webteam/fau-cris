@@ -659,7 +659,7 @@ class CRIS_publication extends CRIS_Entity {
          */
 
         $doilink = preg_quote("https://dx.doi.org/", "/");
-        $title = preg_quote($this->attributes["cftitle"], "/");
+        $title = preg_quote(Tools::numeric_xml_encode($this->attributes["cftitle"]), "/");
 
         $cristmpl = '<a href="https://cris.fau.de/converis/publicweb/publication/%d" target="_blank">%s</a>';
 
@@ -675,7 +675,13 @@ class CRIS_publication extends CRIS_Entity {
             if (isset($matches[4]))
                 $apalink .= sprintf('<a href="%s" target="_blank">%s</a>', $matches[4], $matches[4]);
         } else {
-            $apalink = $apa;
+            // try to identify DOI at least
+            $splitapa = preg_match("/^(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
+            if ($splitapa === 1) {
+                $apalink = $matches[1] . \
+                    sprintf('<a href="%s" target="_blank">%s</a>', $matches[2], $matches[2]);
+            } else
+                $apalink = $apa;
         }
 
         $this->attributes["quotationapalink"] = $apalink;
