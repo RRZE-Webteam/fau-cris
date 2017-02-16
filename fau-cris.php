@@ -84,17 +84,17 @@ class FAU_CRIS {
         $error = '';
 
         if (version_compare(PHP_VERSION, self::php_version, '<')) {
-            $error = sprintf(__('Ihre PHP-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die PHP-Version %s.', self::textdomain), PHP_VERSION, self::php_version);
+            $error = sprintf(__('Ihre PHP-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die PHP-Version %s.', 'fau-cris'), PHP_VERSION, self::php_version);
         }
 
         if (version_compare($GLOBALS['wp_version'], self::wp_version, '<')) {
-            $error = sprintf(__('Ihre Wordpress-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die Wordpress-Version %s.', self::textdomain), $GLOBALS['wp_version'], self::wp_version);
+            $error = sprintf(__('Ihre Wordpress-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die Wordpress-Version %s.', 'fau-cris'), $GLOBALS['wp_version'], self::wp_version);
         }
 
         if (!empty($error)) {
             deactivate_plugins(plugin_basename(__FILE__), false, true);
             wp_die(
-                    $error, __('Fehler bei der Aktivierung des Plugins', self::textdomain), array(
+                    $error, __('Fehler bei der Aktivierung des Plugins', 'fau-cris'), array(
                 'response' => 500,
                 'back_link' => TRUE
                     )
@@ -112,7 +112,7 @@ class FAU_CRIS {
      */
     public static function add_action_links($links) {
         $mylinks = array(
-            '<a href="' . admin_url('options-general.php?page=options-fau-cris') . '">' . __('Einstellungen', self::textdomain) . '</a>',
+            '<a href="' . admin_url('options-general.php?page=options-fau-cris') . '">' . __('Einstellungen', 'fau-cris') . '</a>',
         );
         return array_merge($links, $mylinks);
     }
@@ -168,9 +168,9 @@ class FAU_CRIS {
      */
     private static function options_page_tabs() {
         $tabs = array(
-            'general' => __('Allgemein', self::textdomain),
-            'layout' => __('Darstellung', self::textdomain),
-            'sync' => __('Synchronisierung', self::textdomain)
+            'general' => __('Allgemein', 'fau-cris'),
+            'layout' => __('Darstellung', 'fau-cris'),
+            'sync' => __('Synchronisierung', 'fau-cris')
         );
         return $tabs;
     }
@@ -200,7 +200,7 @@ class FAU_CRIS {
         ?>
 
         <div class="wrap">
-            <h2><?php _e('Einstellungen', self::textdomain); ?> &rsaquo; CRIS</h2>
+            <h2><?php _e('Einstellungen', 'fau-cris'); ?> &rsaquo; CRIS</h2>
             <h2 class="nav-tab-wrapper">
                 <?php foreach( $tabs as $tab => $name ){
                     $class = ( $tab == $current ) ? ' nav-tab-active' : '';
@@ -216,7 +216,7 @@ class FAU_CRIS {
                 do_settings_sections('fau_cris_options');
                 if (isset($current) && $current == 'sync'
                         && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
-                    echo '<a href="?page=options-fau-cris&tab=sync&action=cris_sync" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;" ><span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . __('Jetzt synchronisieren', self::textdomain) . '</a>';
+                    echo '<a href="?page=options-fau-cris&tab=sync&action=cris_sync" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;" ><span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . __('Jetzt synchronisieren', 'fau-cris') . '</a>';
                 }
                 submit_button();
                 ?>
@@ -250,132 +250,132 @@ class FAU_CRIS {
                 );
                 add_settings_field(
                         'cris_org_nr', // ID
-                        __('CRIS-OrgNr.', self::textdomain), // Title
+                        __('CRIS-OrgNr.', 'fau-cris'), // Title
                         array(__CLASS__, 'cris_textbox_callback'), // Callback
                         'fau_cris_options', // Page
                         'cris_section', // Section
                         array(
                     'name' => 'cris_org_nr',
-                    'description' => __('Sie können auch mehrere Organisationsnummern &ndash; durch Komma getrennt &ndash; eingeben.', self::textdomain)
+                    'description' => __('Sie können auch mehrere Organisationsnummern &ndash; durch Komma getrennt &ndash; eingeben.', 'fau-cris')
                         )
                 );
                 break;
             case 'layout' :
                 add_settings_section(
                         'cris_publications_section', // ID
-                        __('Publikationen', self::textdomain), // Title
+                        __('Publikationen', 'fau-cris'), // Title
                         '__return_false', // Callback
                         'fau_cris_options' // Page
                 );
                 add_settings_field(
-                        'cris_pub_order', __('Reihenfolge der Publikationen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                        'cris_pub_order', __('Reihenfolge der Publikationen', 'fau-cris'), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_pub_order',
-                    'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
+                    'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', 'fau-cris')
                         )
                 );
                 add_settings_field(
-                        'cris_pub_subtypes_order', __('Reihenfolge der Publikationen-Subtypen unter "Andere"', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                        'cris_pub_subtypes_order', __('Reihenfolge der Publikationen-Subtypen unter "Andere"', 'fau-cris'), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_pub_subtypes_order',
-                    //'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', self::textdomain)
+                    //'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', 'fau-cris')
                         )
                 );
                 add_settings_field(
-                        'cris_bibtex', __('BibTeX-Link', self::textdomain), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                        'cris_bibtex', __('BibTeX-Link', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_bibtex',
-                    'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', self::textdomain)
+                    'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', 'fau-cris')
                         )
                 );
                 add_settings_field(
-                    'cris_univis', __('Autoren verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'cris_univis', __('Autoren verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_univis',
                     'options' => array(
-                        'person' => __('Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                        'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                        'none' => __('keinen Link setzen', self::textdomain))
+                        'person' => __('Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
+                        'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'none' => __('keinen Link setzen', 'fau-cris'))
                     )
                 );
                 add_settings_section(
                         'cris_awards_section', // ID
-                        __('Auszeichnungen', self::textdomain), // Title
+                        __('Auszeichnungen', 'fau-cris'), // Title
                         '__return_false', // Callback
                         'fau_cris_options' // Page
                 );
                 add_settings_field(
-                        'cris_award_order', __('Reihenfolge der Auszeichnungen', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_awards_section', array(
+                        'cris_award_order', __('Reihenfolge der Auszeichnungen', 'fau-cris'), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_awards_section', array(
                     'name' => 'cris_award_order',
-                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen.', self::textdomain)
+                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen.', 'fau-cris')
                         )
                 );
                 add_settings_field(
-                    'cris_award_link', __('Preisträger verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_awards_section', array(
+                    'cris_award_link', __('Preisträger verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_awards_section', array(
                     'name' => 'cris_award_link',
                     'options' => array(
-                        'person' => __('Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                        'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                        'none' => __('keinen Link setzen', self::textdomain))
+                        'person' => __('Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
+                        'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'none' => __('keinen Link setzen', 'fau-cris'))
                     )
                 );
                 add_settings_section(
                         'cris_projects_section', // ID
-                        __('Forschungsprojekte', self::textdomain), // Title
+                        __('Forschungsprojekte', 'fau-cris'), // Title
                         '__return_false', // Callback
                         'fau_cris_options' // Page
                 );
                 add_settings_field(
-                        'cris_project_order', __('Reihenfolge der Forschungsprojekte', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_projects_section', array(
+                        'cris_project_order', __('Reihenfolge der Forschungsprojekte', 'fau-cris'), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_projects_section', array(
                     'name' => 'cris_project_order',
-                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', self::textdomain)
+                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte.', 'fau-cris')
                         )
                 );
                 add_settings_field(
-                    'cris_project_link', __('Projektbeteiligte verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_projects_section', array(
+                    'cris_project_link', __('Projektbeteiligte verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_projects_section', array(
                     'name' => 'cris_project_link',
                     'options' => array(
-                        'person' => __('Projektleiter und -beteiligte mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                        'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                        'none' => __('keinen Link setzen', self::textdomain))
+                        'person' => __('Projektleiter und -beteiligte mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
+                        'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'none' => __('keinen Link setzen', 'fau-cris'))
                     )
                 );
                 add_settings_section(
                         'cris_patents_section', // ID
-                        __('Patente', self::textdomain), // Title
+                        __('Patente', 'fau-cris'), // Title
                         '__return_false', // Callback
                         'fau_cris_options' // Page
                 );
                 add_settings_field(
-                        'cris_patent_order', __('Reihenfolge der Patente', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_patents_section', array(
+                        'cris_patent_order', __('Reihenfolge der Patente', 'fau-cris'), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_patents_section', array(
                     'name' => 'cris_patent_order',
-                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Patente.', self::textdomain)
+                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Patente.', 'fau-cris')
                         )
                 );
                 add_settings_field(
-                    'cris_patent_link', __('Patentinhaber verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_patents_section', array(
+                    'cris_patent_link', __('Patentinhaber verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_patents_section', array(
                     'name' => 'cris_patent_link',
                     'options' => array(
-                        'person' => __('Patentinhaber mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                        'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                        'none' => __('keinen Link setzen', self::textdomain))
+                        'person' => __('Patentinhaber mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
+                        'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'none' => __('keinen Link setzen', 'fau-cris'))
                     )
                 );
                 add_settings_section(
                         'cris_activities_section', // ID
-                        __('Aktivitäten', self::textdomain), // Title
+                        __('Aktivitäten', 'fau-cris'), // Title
                         '__return_false', // Callback
                         'fau_cris_options' // Page
                 );
                 add_settings_field(
-                        'cris_activities_order', __('Reihenfolge der Aktivitäten', self::textdomain), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_activities_section', array(
+                        'cris_activities_order', __('Reihenfolge der Aktivitäten', 'fau-cris'), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_activities_section', array(
                     'name' => 'cris_activities_order',
-                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Aktivitäten.', self::textdomain)
+                    'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Aktivitäten.', 'fau-cris')
                         )
                 );
                 add_settings_field(
-                    'cris_activities_link', __('Personen verlinken', self::textdomain), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_activities_section', array(
+                    'cris_activities_link', __('Personen verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_activities_section', array(
                     'name' => 'cris_activities_link',
                     'options' => array(
-                        'person' => __('Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', self::textdomain),
-                        'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken',self::textdomain),
-                        'none' => __('keinen Link setzen', self::textdomain))
+                        'person' => __('Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
+                        'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'none' => __('keinen Link setzen', 'fau-cris'))
                     )
                 );
                 break;
@@ -388,13 +388,13 @@ class FAU_CRIS {
                 );
                 add_settings_field(
                         'cris_sync_check',
-                        __('Automatische Synchronisation', self::textdomain),
+                        __('Automatische Synchronisation', 'fau-cris'),
                         array(__CLASS__, 'cris_check_callback'),
                         'fau_cris_options',
                         'cris_sync_section',
                         array(
                             'name' => 'cris_sync_check',
-                            'description' => __('Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und Menüeinträge generiert werden?', self::textdomain)
+                            'description' => __('Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und Menüeinträge generiert werden?', 'fau-cris')
 
 
 
@@ -454,7 +454,7 @@ class FAU_CRIS {
             $description = esc_attr($args['description']);
         if ($name == 'cris_sync_check') {
             print "<p>";
-            printf(__('%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3s Benutzerhandbuch! %3s', self::textdomain), '<strong>', '</strong>', '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/">', '</a>');
+            printf(__('%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3s Benutzerhandbuch! %3s', 'fau-cris'), '<strong>', '</strong>', '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/">', '</a>');
             print "<p>";
         } ?>
         <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
@@ -990,14 +990,14 @@ class FAU_CRIS {
     public static function cris_help_menu() {
 
         $content_cris = array(
-            '<p>' . __('Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS (Currrent Research Information System)</strong> in Ihren Webauftritt ein. Das Plugin ermöglicht außerdem die Integration mit dem FAU-Person-Plugin.', self::textdomain) . '</p>',
-            '<p>' . __('Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:', self::textdomain) . '</p>'
+            '<p>' . __('Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS (Currrent Research Information System)</strong> in Ihren Webauftritt ein. Das Plugin ermöglicht außerdem die Integration mit dem FAU-Person-Plugin.', 'fau-cris') . '</p>',
+            '<p>' . __('Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:', 'fau-cris') . '</p>'
             . '<ul>'
-            . '<li>' . __('Publikationen', self::textdomain) . '</li>'
-            . '<li>' . __('Auszeichnungen', self::textdomain) . '</li>'
+            . '<li>' . __('Publikationen', 'fau-cris') . '</li>'
+            . '<li>' . __('Auszeichnungen', 'fau-cris') . '</li>'
             . '</ul>'
-            . '<p>' . __('Über den Shortcode lassen sich jeweils verschiedene Ausgabeformate einstellen.', self::textdomain) . '</p>'
-            . '<p>' . __('<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. http://cris.fau.de/converis/publicweb/Organisation/<strong><em>141517</em></strong>.', self::textdomain) . '</p>'
+            . '<p>' . __('Über den Shortcode lassen sich jeweils verschiedene Ausgabeformate einstellen.', 'fau-cris') . '</p>'
+            . '<p>' . __('<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. http://cris.fau.de/converis/publicweb/Organisation/<strong><em>141517</em></strong>.', 'fau-cris') . '</p>'
         );
 
         $content_shortcode_publikationen = array(
@@ -1006,31 +1006,31 @@ class FAU_CRIS {
             . '<li><code>[cris show="publications"]</code>: ' . __('Publikationsliste (automatisch nach Jahren gegliedert)') . '</li>'
             . '<li><code>[cris show="awards"]</code>: ' . __('Auszeichnungen (automatisch nach Jahren sortiert)') . '</li>'
             . '</ul>'
-            . '<h2>' . __('Mögliche Zusatzoptionen', self::textdomain) . '</h2>'
+            . '<h2>' . __('Mögliche Zusatzoptionen', 'fau-cris') . '</h2>'
             . '<p>' . __('Ausgabe lässt sich beliebig anpassen. Eine Übersicht der verschiedenen Shortcode-Parameter zum Filtern, Sortieren und Ändern der Darstellung finden Sie unter: ') . '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/ target="_blank">https://www.wordpress.rrze.fau.de/plugins/fau-cris/</a>'
 
         );
 
         $content_fauperson = array(
-            '<p>' . __('Wenn Sie das <strong>FAU-Person</strong>-Plugin verwenden, können Autoren mit ihrer FAU-Person-Kontaktseite verlinkt werden.', self::textdomain) . '</p>',
-            '<p>' . __('Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.', self::textdomain) . '</p>',
-            '<p>' . __('', self::textdomain) . '</p>'
+            '<p>' . __('Wenn Sie das <strong>FAU-Person</strong>-Plugin verwenden, können Autoren mit ihrer FAU-Person-Kontaktseite verlinkt werden.', 'fau-cris') . '</p>',
+            '<p>' . __('Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.', 'fau-cris') . '</p>',
+            '<p>' . __('', 'fau-cris') . '</p>'
         );
 
         $helptexts = array(
             array(
                 'id' => 'uebersicht',
-                'title' => __('Übersicht', self::textdomain),
+                'title' => __('Übersicht', 'fau-cris'),
                 'content' => implode(PHP_EOL, $content_cris),
             ),
             array(
                 'id' => 'publikationen',
-                'title' => __('Shortcodes', self::textdomain),
+                'title' => __('Shortcodes', 'fau-cris'),
                 'content' => implode(PHP_EOL, $content_shortcode_publikationen),
             ),
             array(
                 'id' => 'person',
-                'title' => __('Integration "FAU Person"', self::textdomain),
+                'title' => __('Integration "FAU Person"', 'fau-cris'),
                 'content' => implode(PHP_EOL, $content_fauperson),
             )
         );
