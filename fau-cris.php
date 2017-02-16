@@ -5,6 +5,8 @@
  * Version: 3.3
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
+ * Text Domain: fau-cris
+ * Domain Path: /languages
  * License: GPLv2 or later
  */
 /*
