@@ -1,7 +1,7 @@
 <?php
 
 require_once("class_Tools.php");
-require_once("class_DB.php");
+require_once("class_Webservice.php");
 require_once("class_Filter.php");
 require_once("class_Formatter.php");
 
@@ -250,77 +250,60 @@ class CRIS_fields extends CRIS_webservice {
      * publication requests, supports multiple organisation ids given as array.
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null, $order = 'cfname_de', $items = null) {
+    public function by_orga_id($orgaID = null, &$filter = null) {
         if ($orgaID === null || $orgaID === "0")
             throw new Exception('Please supply valid organisation ID');
 
-        $query = "SELECT *"
-                . " FROM fieldsOfResearch f "
-                . " JOIN organisation_fieldOfResearch of "
-                . " ON f.id = of.p_id";
-        if (count($orgaID) == 1) {
-            $query .= " WHERE of.o_id = '" . $orgaID[0] . "'" ;
-        } else {
-            $query .= " WHERE of.o_id IN ('" . implode("', '", $orgaID) . "')";
+        if (!is_array($orgaID))
+            $orgaID = array($orgaID);
+
+        $requests = array();
+        foreach ($orgaID as $_o) {
+            $requests[] = sprintf("getrelated/Organisation/%d/fobe_has_orga", $_o);
         }
-        if ($filter) {
-            foreach ($filter as $_f) {
-                $query .= ' AND (' . $_f . ')';
-            }
-        }
-        //$query .= " ORDER BY f." . $order;
-        if ($items != null) {
-            $query .= " LIMIT " . $items;
-        }
-        $query .= ";";
-        print $query . "<br />";
-        return;
-        return $this->get($query);
+        return $this->retrieve($requests, $filter);
     }
 
     public function by_pers_id($persID = null, &$filter = null) {
-    /*    if ($persID === null || $persID === "0")
+        if ($persID === null || $persID === "0")
             throw new Exception('Please supply valid person ID');
 
-        $query = "SELECT *"
-                . " FROM fieldsOfResearch f "
-                . " JOIN organisation_fieldOfResearch of "
-                . " ON f.id = of.p_id";
-        if (count($orgaID) == 1) {
-            $query .= " WHERE of.o_id = '" . $orgaID[0] . "'" ;
-        } else {
-            $query .= " WHERE of.o_id IN ('" . implode("', '", $orgaID) . "')";
+        if (!is_array($persID))
+            $persID = array($persID);
+
+        $requests = array();
+        foreach ($persID as $_p) {
+            $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PUBL_1', $_p);
         }
-        if ($filter) {
-            foreach ($filter as $_f) {
-                $query .= ' AND (' . $_f . ')';
-            }
-        }
-        //$query .= " ORDER BY f." . $order;
-        if ($items != null) {
-            $query .= " LIMIT " . $items;
-        }
-        $query .= ";";
-        print $query . "<br />";
-        return;
-        return $this->get($query);*/
+        return $this->retrieve($requests, $filter);
     }
 
     public function by_id($fieldID = null) {
         if ($fieldID === null || $fieldID === "0")
             throw new Exception('Please supply valid field of research ID');
 
-        $query = "SELECT *"
-                . " FROM fieldsOfResearch f ";
-        if (count($fieldID) == 1) {
-            $query .= " WHERE f.id = '" . $fieldID[0] . "'" ;
-        } else {
-            $query .= " WHERE p.id IN ('" . implode("', '", $fieldID) . "')";
+        if (!is_array($fieldID))
+            $fieldID = array($fieldID);
+
+        $requests = array();
+        foreach ($fieldID as $_p) {
+            $requests[] = sprintf('get/Forschungsbereich/%d', $_p);
         }
-        $query .= ";";
-        print $query . "<br />";
-        return;
-        return $this->get($query);
+        return $this->retrieve($requests);
+    }
+
+    public function by_project($projID = null) {
+        if ($projID === null || $projID === "0")
+            throw new Exception('Please supply valid publication ID');
+
+        if (!is_array($projID))
+            $projID = array($projID);
+
+        $requests = array();
+        foreach ($projID as $_p) {
+            $requests[] = sprintf('getrelated/Project/%d/proj_has_publ', $_p);
+        }
+        return $this->retrieve($requests);
     }
 
     private function retrieve($reqs, &$filter = null) {

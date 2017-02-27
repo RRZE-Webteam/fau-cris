@@ -278,37 +278,43 @@ class Tools {
 
     public static function publication_filter($year = '', $start = '', $type = '', $subtype = '') {
         $filter = array();
-        if ($year !== '' && $year !== NULL) {
-            $year = str_replace(' ', '', $year);
-            $years = explode(',', $year);
-            if (count($years) > 1) {
-                $filter[] = "p.publ_year IN ('" . implode("', '", $years) . "')";
-            } else {
-                $filter[] = "p.publ_year = '" . (int) $years[0] . "'" ;
-            }
-        }
-        if ($start !== '' && $start !== NULL) {
-            $filter[] = "p.publ_year > " . (int) $start;
-        }
+        if ($year !== '' && $year !== NULL)
+            $filter['publyear__eq'] = $year;
+        if ($start !== '' && $start !== NULL)
+            $filter['publyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
-            $type = str_replace(' ', '', $type);
-            $types = explode(',', $type);
-            if (count($types) > 1) {
-                $filter[] = "p.publ_type IN ('" . implode("', '", $types) . "')";
+            if (strpos($type, ',')) {
+                $type = str_replace(' ', '', $type);
+                $types = explode(',', $type);
+                foreach($types as $v) {
+                    $pubTyp[] = self::getType('publications', $v);
+                }
             } else {
-                $filter[] = "p.publ_type = '" . $types[0] . "'" ;
+                $pubTyp = (array) self::getType('publications', $type);
             }
+            if (empty($pubTyp)) {
+                $output = '<p>' . __('Falscher Parameter für Publikationstyp', 'fau-cris') . '</p>';
+                return $output;
+            }
+            $filter['publication type__eq'] = $pubTyp;
         }
         if ($subtype !== '' && $subtype !== NULL) {
-            $subtype = str_replace(' ', '', $subtype);
-            $subtypes = explode(',', $subtype);
-            if (count($subtypes) > 1) {
-                $filter[] = "p.publ_book_sub_type IN ('" . implode("', '", $subtypes) . "')";
+            if (strpos($subtype, ',')) {
+                $subtype = str_replace(' ', '', $subtype);
+                $subtypes = explode(',', $subtype);
+                foreach($subtypes as $v) {
+                    $pubSubTyp[] = self::getType('pubothersubtypes', $v);
+                }
+                //$pubTyp = implode(',', $pubTypes);
             } else {
-                $filter[] = "p.publ_book_sub_type = '" . $subtypes[0] . "'" ;
+                $pubSubTyp = (array) self::getType('pubothersubtypes', $type);
             }
+            if (empty($pubSubTyp)) {
+                $output = '<p>' . __('Falscher Parameter für Publikationssubtyp', 'fau-cris') . '</p>';
+                return $output;
+            }
+            $filter['type other subtype__eq'] = $pubSubTyp;
         }
-
         if (count($filter))
             return $filter;
         return null;
@@ -452,18 +458,10 @@ class Tools {
 
     public static function field_filter($year = '', $start = '') {
         $filter = array();
-        if ($year !== '' && $year !== NULL) {
-            $year = str_replace(' ', '', $year);
-            $years = explode(',', $year);
-            if (count($years) > 1) {
-                $filter[] = "f.startyear IN ('" . implode("', '", $years) . "')";
-            } else {
-                $filter[] = "f.startyear = '" . (int) $years[0] . "'" ;
-            }
-        }
-        if ($start !== '' && $start !== NULL) {
-            $filter[] = "f.startyear > " . (int) $start;
-        }
+        if ($year !== '' && $year !== NULL)
+            $filter['startyear__eq'] = $year;
+        if ($start !== '' && $start !== NULL)
+            $filter['startyear__ge'] = $start;
 
         if (count($filter))
             return $filter;
@@ -609,7 +607,7 @@ class Tools {
         /*
          * Deliver numerically encoded XML representation of special characters.
          * E.g. use &#8211; instead of &ndash;
-         *
+         * 
          * Adopted from user-contributed notes of
          * http://php.net/manual/de/function.htmlentities.php
          *

@@ -2,6 +2,7 @@
 
 require_once("class_Tools.php");
 require_once("class_DB.php");
+require_once("class_Webservice.php");
 require_once("class_Filter.php");
 require_once("class_Formatter.php");
 
@@ -52,6 +53,12 @@ class Publikationen {
      */
 
     public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $items = '', $sortby = 'virtualdate') {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype);
+
+        if (!count($pubArray)) {
+            $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
+            return $output;
+        }
 
         switch ($sortby) {
             case 'created':
@@ -63,13 +70,6 @@ class Publikationen {
             default:
                 $order = 'virtualdate';
         }
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $order, $items);
-
-        if (!count($pubArray)) {
-            $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
-            return $output;
-        }
-
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($pubArray);
         if ($items != '')
@@ -94,8 +94,6 @@ class Publikationen {
 
     public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author') {
         $pubArray = $this->fetch_publications($year, $start, $type, $subtype);
-        //var_dump($pubArray);
-        return;
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
@@ -257,17 +255,17 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '', $order = 'virtualdate', $items = '') {
+    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '') {
 
         $filter = Tools::publication_filter($year, $start, $type, $subtype);
         $ws = new CRIS_publications();
 
         try {
             if ($this->einheit === "orga") {
-                $pubArray = $ws->by_orga_id($this->id, $filter, $order, $items);
+                $pubArray = $ws->by_orga_id($this->id, $filter);
             }
             if ($this->einheit === "person") {
-                $pubArray = $ws->by_pers_id($this->id, $filter, $order, $items);
+                $pubArray = $ws->by_pers_id($this->id, $filter);
             }
         } catch (Exception $ex) {
             $pubArray = array();
@@ -310,11 +308,9 @@ class Publikationen {
 
         foreach ($publications as $publicationObject) {
 
-            //$publication = $publicationObject->attributes;
-            $publication = $publicationObject;
+            $publication = $publicationObject->attributes;
             // id
-            //$id = $publicationObject->ID;
-            $id = $publicationObject['id'];
+            $id = $publicationObject->ID;
             // authors
             $authors = explode(", ", $publication['relauthors']);
             $authorIDs = explode(",", $publication['relpersid']);
@@ -556,101 +552,65 @@ class Publikationen {
 
 class CRIS_publications extends CRIS_DB {
 
-    public function by_orga_id($orgaID = null, &$filter = null, $order = 'virtualdate', $items = null) {
+    public function by_orga_id($orgaID = null, &$filter = null) {
         if ($orgaID === null || $orgaID === "0")
             throw new Exception('Please supply valid organisation ID');
 
-        $query = "SELECT *"
-                . " FROM publication p "
-                . " JOIN organisation_publication op "
-                . " ON p.id = op.p_id";
-        if (count($orgaID) == 1) {
-            $query .= " WHERE op.o_id = '" . $orgaID[0] . "'" ;
-        } else {
-            $query .= " WHERE op.o_id IN ('" . implode("', '", $orgaID) . "')";
-        }
-        if ($filter) {
-            foreach ($filter as $_f) {
-                $query .= ' AND (' . $_f . ')';
-            }
-        }
-        $query .= " ORDER BY p." . $order;
-        if ($items != null) {
-            $query .= " LIMIT " . $items;
-        }
-        $query .= ";";
-        print $query . "<br />";
-        return;
+        if (!is_array($orgaID))
+            $orgaID = array($orgaID);
+
+        $query = 'SELECT * '
+                . 'FROM publication p '
+                . 'JOIN organisation_publication op '
+                . 'ON p.id = op.p_id'
+                . ' WHERE op.o_id = ' . implode(' OR op.o_id = ', $orgaID);
+
         return $this->get($query);
     }
 
-    public function by_pers_id($persID = null, &$filter = null, $order = 'virtualdate', $items = null) {
+    public function by_pers_id($persID = null, &$filter = null) {
         if ($persID === null || $persID === "0")
             throw new Exception('Please supply valid person ID');
 
-        $query = "SELECT *"
-                . " FROM publication p";
-        $query .= " WHERE (p.relpersid LIKE '%" . implode("%' OR p.relpersid LIKE '%", $persID) . "%')";
+        if (!is_array($persID))
+            $persID = array($persID);
 
-        if ($filter) {
-            foreach ($filter as $_f) {
-                $query .= ' AND (' . $_f . ')';
-            }
-        }
-        $query .= " ORDER BY  p." . $order;
-        if ($items) {
-            $query .= ' LIMIT ' . $items;
-        }
-        $query .= ";";
-        print $query . "<br />";
-        return;
+        $query = 'SELECT * '
+                . 'FROM publication p '
+                . 'JOIN publication_person pp '
+                . 'ON p.id = pp.o_id'
+                . ' WHERE pp.o_id = ' . implode(' OR pp.o_id = ', $persID);
+
         return $this->get($query);
     }
 
-    /* TODO: Tabelle noch nicht da
-    public function by_project($projID = null, $order, $items) {
-
+    public function by_project($projID = null) {
         if ($projID === null || $projID === "0")
             throw new Exception('Please supply valid publication ID');
 
-        $query = "SELECT * "
-                . "FROM publication p "
-                . "JOIN publication_project pp "
-                . "ON p.id = pp.p_id";
-        if (count($projID) == 1) {
-            $query .= " WHERE pp.o_id = '" . $projID[0] . "'" ;
-        } else {
-            $query .= " WHERE pp.o_id IN ('" . implode("', '", $projID) . "')";
-        }
-        if ($filter) {
-            foreach ($filter as $_f) {
-                $query .= ' AND (' . $_f . ')';
-            }
-        }
-        $query .= " ORDER BY  p." . $order;
-        if ($items != null) {
-            $query .= ' LIMIT ' . $items;
-        }
-        $query .= ";";
-        print $query . "<br />";
-        return;
+        if (!is_array($projID))
+            $projID = array($projID);
+
+        $query = 'SELECT * '
+                . 'FROM publication p '
+                . 'JOIN publication_project pp '
+                . 'ON p.id = pp.p_id'
+                . ' WHERE pp.o_id = ' . implode(' OR pp.o_id = ', $projID);
+
         return $this->get($query);
-    } */
+    }
 
     public function by_id($publID = null) {
         if ($publID === null || $publID === "0")
             throw new Exception('Please supply valid publication ID');
 
-        $query = "SELECT *"
-                . " FROM publication p ";
-        if (count($publID) == 1) {
-            $query .= " WHERE p.id = '" . $publID[0] . "'" ;
-        } else {
-            $query .= " WHERE p.id IN ('" . implode("', '", $publID) . "')";
-        }
-        $query .= ";";
-        print $query . "<br />";
-        return;
+        if (!is_array($publID))
+            $publID = array($publID);
+
+        $query = 'SELECT * '
+                . 'FROM publication p '
+                . 'WHERE p.id = ' . implode(' OR p.id = ', $publID);
+
         return $this->get($query);
     }
 }

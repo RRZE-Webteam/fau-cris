@@ -31,11 +31,13 @@ register_activation_hook(__FILE__, array('FAU_CRIS', 'activate'));
 register_deactivation_hook(__FILE__, array('FAU_CRIS', 'deactivate'));
 
 class FAU_CRIS {
+
     /**
      * Get Started
      */
     const version = '3.3';
     const option_name = '_fau_cris';
+    const site_option_name = '_fau_cris_site';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
     const php_version = '5.3'; // Minimal erforderliche PHP-Version
@@ -65,9 +67,13 @@ class FAU_CRIS {
         add_shortcode('cris', array(__CLASS__, 'cris_shortcode'));
         add_shortcode('cris-custom', array(__CLASS__, 'cris_custom_shortcode'));
 
-        add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2 );
+        add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2);
         add_action('cris_auto_update', array(__CLASS__, 'cris_auto_sync'));
 
+        if (is_network_admin()) {
+            add_action('network_admin_menu', array(__CLASS__, 'cris_add_network_settings_page'));
+            add_action('network_admin_edit_cris_update_network_settings',  array( __CLASS__, 'cris_update_network_settings'), 10, 0);
+        }
     }
 
     /**
@@ -148,7 +154,7 @@ class FAU_CRIS {
             'cris_project_link' => 'none',
             'cris_patent_order' => Tools::getOptionsOrder('patents'),
             'cris_patent_link' => 'none',
-            'cris_activities_order' =>  Tools::getOptionsOrder('activities'),
+            'cris_activities_order' => Tools::getOptionsOrder('activities'),
             'cris_activities_link' => 'none',
             'cris_sync_check' => 0
         );
@@ -166,8 +172,81 @@ class FAU_CRIS {
     }
 
     /*
+     * Add Network Options Page
+     */
+
+    public static function cris_add_network_settings_page() {
+        add_submenu_page('settings.php', 'CRIS', 'CRIS', 'manage_network_options', 'fau-cris', array(__CLASS__, 'cris_show_network_settings'));
+    }
+
+    public static function cris_get_network_settings() {
+        $settings = array(
+            array('id'   => 'dbhost',
+                'name' => __( 'Hostname', 'fau-cris' ),
+                'desc' => '',
+                'type' => 'text',
+                'size' => 'regular'),
+            array('id'   => 'dbname',
+                'name' => __( 'Datenbankname', 'fau-cris' ),
+                'desc' => '',
+                'type' => 'text',
+                'size' => 'regular'),
+            array('id'   => 'dbuser',
+                'name' => __( 'Benutzer', 'fau-cris' ),
+                'desc' => '',
+                'type' => 'text',
+                'size' => 'regular'),
+            array('id'   => 'dbpw',
+                'name' => __( 'Passwort', 'fau-cris' ),
+                'desc' => '',
+                'type' => 'text',
+                'size' => 'regular'),
+        );
+        return apply_filters( 'plugin_settings', $settings );
+    }
+
+    public static function cris_show_network_settings() {
+        $settings = self::cris_get_network_settings();
+        ?>
+        <div class="wrap">
+            <h2><?php _e('CRIS', 'fau-cris');?></h2>
+            <form action="edit.php?action=cris_update_network_settings" method="POST">
+                <?php wp_nonce_field('cris_update_network_settings', 'cris_update_network_nonce'); ?>
+                <table id="menu" class="form-table">
+                    <?php foreach ($settings as $setting) { ?>
+                    <tr valign="top">
+                        <th scope="row"><?php echo $setting['name']; ?></th>
+                        <td>
+                            <input type="<?php echo $setting['type']; ?>"
+                                   name="<?php echo self::site_option_name . '[' . $setting['id'] . ']'; ?>"
+                                   id="<?php echo self::site_option_name . '[' . $setting['id'] . ']'; ?>"
+                                   value="<?php echo esc_attr( get_site_option( self::site_option_name)[$setting['id']]); ?>"
+                                   class="<?php echo $setting['size'] . '-' . $setting['type']; ?>"/>
+                            <?php if (isset($setting['desc']) & $setting['desc'] != '') {
+                                echo '<p class="description">' . $setting['desc'] . '</p>';} ?>
+                        </td>
+                    </tr>
+                    <?php } ?>
+                </table>
+                <?php submit_button(); ?>
+            </form>
+        </div>
+    <?php }
+
+    public static function cris_update_network_settings(){
+        check_admin_referer('cris_update_network_settings', 'cris_update_network_nonce');
+        if(!current_user_can('manage_network_options'))
+            return;
+        $posted_settings = array_map( 'sanitize_text_field', $_POST[self::site_option_name] );
+        update_site_option( self::site_option_name,$posted_settings);
+        wp_redirect(add_query_arg(array('page' => 'fau-cris', 'updated' => 'true'), network_admin_url('settings.php')));
+        exit;
+    }
+
+    /*
      * Options page tabs
      */
+
     private static function options_page_tabs() {
         $tabs = array(
             'general' => __('Allgemein', 'fau-cris'),
@@ -176,6 +255,7 @@ class FAU_CRIS {
         );
         return $tabs;
     }
+
     private static function current_tab($tab) {
         $tabs = self::options_page_tabs();
         if (isset($tab['tab'])) {
@@ -204,24 +284,27 @@ class FAU_CRIS {
         <div class="wrap">
             <h2><?php _e('Einstellungen', 'fau-cris'); ?> &rsaquo; CRIS</h2>
             <h2 class="nav-tab-wrapper">
-                <?php foreach( $tabs as $tab => $name ){
-                    $class = ( $tab == $current ) ? ' nav-tab-active' : '';
-                    echo "<a class='nav-tab$class' href='?page=options-fau-cris&tab=$tab'>$name</a>";
-                } ?>
+            <?php
+            foreach ($tabs as $tab => $name) {
+                $class = ( $tab == $current ) ? ' nav-tab-active' : '';
+                echo "<a class='nav-tab$class' href='?page=options-fau-cris&tab=$tab'>$name</a>";
+            }
+            ?>
             </h2>
-            <?php if (isset($result)) {
-                print $result;
-            } ?>
-            <form method="post" action="options.php">
                 <?php
-                settings_fields('fau_cris_options');
-                do_settings_sections('fau_cris_options');
-                if (isset($current) && $current == 'sync'
-                        && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
-                    echo '<a href="?page=options-fau-cris&tab=sync&action=cris_sync" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;" ><span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . __('Jetzt synchronisieren', 'fau-cris') . '</a>';
+                if (isset($result)) {
+                    print $result;
                 }
-                submit_button();
                 ?>
+            <form method="post" action="options.php">
+        <?php
+        settings_fields('fau_cris_options');
+        do_settings_sections('fau_cris_options');
+        if (isset($current) && $current == 'sync' && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
+            echo '<a href="?page=options-fau-cris&tab=sync&action=cris_sync" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;" ><span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . __('Jetzt synchronisieren', 'fau-cris') . '</a>';
+        }
+        submit_button();
+        ?>
             </form>
         </div>
         <?php
@@ -233,14 +316,14 @@ class FAU_CRIS {
     public static function admin_init() {
 
         register_setting(
-            'fau_cris_options', // Option group
-            self::option_name, // Option name
-            array(__CLASS__, 'sanitize') // Sanitize Callback
+                'fau_cris_options', // Option group
+                self::option_name, // Option name
+                array(__CLASS__, 'sanitize') // Sanitize Callback
         );
 
         if (isset($_GET))
             $tab = self::current_tab($_GET);
-        switch($tab) {
+        switch ($tab) {
             case 'general' :
             default:
                 // Form Settings 1
@@ -278,7 +361,7 @@ class FAU_CRIS {
                 add_settings_field(
                         'cris_pub_subtypes_order', __('Reihenfolge der Publikationen-Subtypen unter "Andere"', 'fau-cris'), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_pub_subtypes_order',
-                    //'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', 'fau-cris')
+                        //'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', 'fau-cris')
                         )
                 );
                 add_settings_field(
@@ -288,13 +371,13 @@ class FAU_CRIS {
                         )
                 );
                 add_settings_field(
-                    'cris_univis', __('Autoren verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                        'cris_univis', __('Autoren verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_univis',
                     'options' => array(
                         'person' => __('Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
-                    )
+                        )
                 );
                 add_settings_section(
                         'cris_awards_section', // ID
@@ -309,13 +392,13 @@ class FAU_CRIS {
                         )
                 );
                 add_settings_field(
-                    'cris_award_link', __('Preisträger verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_awards_section', array(
+                        'cris_award_link', __('Preisträger verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_awards_section', array(
                     'name' => 'cris_award_link',
                     'options' => array(
                         'person' => __('Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
-                    )
+                        )
                 );
                 add_settings_section(
                         'cris_projects_section', // ID
@@ -330,13 +413,13 @@ class FAU_CRIS {
                         )
                 );
                 add_settings_field(
-                    'cris_project_link', __('Projektbeteiligte verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_projects_section', array(
+                        'cris_project_link', __('Projektbeteiligte verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_projects_section', array(
                     'name' => 'cris_project_link',
                     'options' => array(
                         'person' => __('Projektleiter und -beteiligte mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
-                    )
+                        )
                 );
                 add_settings_section(
                         'cris_patents_section', // ID
@@ -351,13 +434,13 @@ class FAU_CRIS {
                         )
                 );
                 add_settings_field(
-                    'cris_patent_link', __('Patentinhaber verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_patents_section', array(
+                        'cris_patent_link', __('Patentinhaber verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_patents_section', array(
                     'name' => 'cris_patent_link',
                     'options' => array(
                         'person' => __('Patentinhaber mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
-                    )
+                        )
                 );
                 add_settings_section(
                         'cris_activities_section', // ID
@@ -372,36 +455,28 @@ class FAU_CRIS {
                         )
                 );
                 add_settings_field(
-                    'cris_activities_link', __('Personen verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_activities_section', array(
+                        'cris_activities_link', __('Personen verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_activities_section', array(
                     'name' => 'cris_activities_link',
                     'options' => array(
                         'person' => __('Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                        'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
-                    )
+                        )
                 );
                 break;
             case 'sync':
                 add_settings_section(
-                    'cris_sync_section', // ID
-                    '', // Title
-                    '__return_false', // Callback
-                    'fau_cris_options' // Page
+                        'cris_sync_section', // ID
+                        '', // Title
+                        '__return_false', // Callback
+                        'fau_cris_options' // Page
                 );
                 add_settings_field(
-                        'cris_sync_check',
-                        __('Automatische Synchronisation', 'fau-cris'),
-                        array(__CLASS__, 'cris_check_callback'),
-                        'fau_cris_options',
-                        'cris_sync_section',
-                        array(
-                            'name' => 'cris_sync_check',
-                            'description' => __('Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und Menüeinträge generiert werden?', 'fau-cris')
-
-
-
+                        'cris_sync_check', __('Automatische Synchronisation', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_sync_section', array(
+                    'name' => 'cris_sync_check',
+                    'description' => __('Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und Menüeinträge generiert werden?', 'fau-cris')
                         )
-                    );
+                );
                 break;
         }
     }
@@ -458,16 +533,17 @@ class FAU_CRIS {
             print "<p>";
             printf(__('%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3s Benutzerhandbuch! %3s', 'fau-cris'), '<strong>', '</strong>', '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/">', '</a>');
             print "<p>";
-        } ?>
-        <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
-        if (array_key_exists($name, $options)) {
-            print checked($options[$name], 1, false);
         }
-        ?> >
+        ?>
+        <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
+            if (array_key_exists($name, $options)) {
+                print checked($options[$name], 1, false);
+            }
+            ?> >
         <?php if (isset($description)) { ?>
-            <span class="description"><?php echo $description; ?></span></label>
-        <?php }
-
+                <span class="description"><?php echo $description; ?></span></label>
+        <?php
+        }
     }
 
     // Radio Button
@@ -479,23 +555,27 @@ class FAU_CRIS {
             $description = esc_attr($args['description']);
         if (array_key_exists('options', $args))
             $radios = $args['options'];
-        foreach ($radios as $_k => $_v) { ?>
+        foreach ($radios as $_k => $_v) {
+            ?>
             <label>
                 <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>"
-                   type='radio'
-                   value='<?php print $_k; ?>'
-                   <?php
-                    if (array_key_exists($name, $options)) {
-                       checked($options[$name], $_k);
-                    } ?>
-                >
-                <?php print $_v; ?>
+                       type='radio'
+                       value='<?php print $_k; ?>'
+                       <?php
+                       if (array_key_exists($name, $options)) {
+                           checked($options[$name], $_k);
+                       }
+                       ?>
+                       >
+            <?php print $_v; ?>
             </label><br />
         <?php }
 
-        if (isset($description)) { ?>
+        if (isset($description)) {
+            ?>
             <p class="description"><?php echo $description; ?></p>
-        <?php }
+        <?php
+        }
     }
 
     // Textbox
@@ -511,7 +591,7 @@ class FAU_CRIS {
             echo $options[$name];
         }
         ?>" ><br />
-               <?php if (isset($description)) { ?>
+        <?php if (isset($description)) { ?>
             <span class="description"><?php echo $description; ?></span>
             <?php
         }
@@ -528,7 +608,7 @@ class FAU_CRIS {
         ?>
         <textarea name="<?php printf('%s[' . $name . ']', self::option_name); ?>" cols="30" rows="8"><?php
             if (array_key_exists($name, $options)) {
-                if (is_array($options[$name]) && count($options[$name])>0 && $options[$name][0] !='') {
+                if (is_array($options[$name]) && count($options[$name]) > 0 && $options[$name][0] != '') {
                     echo implode("\n", $options[$name]);
                 } else {
                     echo implode("\n", $default_options[$name]);
@@ -588,7 +668,8 @@ class FAU_CRIS {
         $publication = sanitize_text_field($publication);
         $quotation = sanitize_text_field($quotation);
         $items = sanitize_text_field($items);
-        if (in_array($sortby, array('created', 'updated'))) $sortby = sanitize_text_field($sortby);
+        if (in_array($sortby, array('created', 'updated')))
+            $sortby = sanitize_text_field($sortby);
         $award = sanitize_text_field($award);
         $awardnameid = sanitize_text_field($awardnameid);
         $showname = sanitize_text_field($showname);
@@ -606,47 +687,47 @@ class FAU_CRIS {
 
         if (isset($publication) && $publication != '') {
             $param1 = 'publication';
-            if (strpos($publication, ',')) {
-                $publication = str_replace(' ', '', $publication);
-                $publication = explode(',', $publication);
-            }
-            $param2 = $publication;
+            $publication = str_replace(' ', '', $publication);
+            $publications = explode(',', $publication);
+            $param2 = $publications;
         } elseif (isset($field) && $field != '') {
             $param1 = 'field';
-            $param2 = $field;
+            $field = str_replace(' ', '', $field);
+            $fields = explode(',', $field);
+            $param2 = $fields;
         } elseif (isset($activity) && $activity != '') {
             $param1 = 'activity';
-            $param2 = $activity;
+            $activity = str_replace(' ', '', $activity);
+            $activitys = explode(',', $activity);
+            $param2 = $activitys;
         } elseif (isset($patent) && $patent != '') {
             $param1 = 'patent';
-            $param2 = $patent;
+            $patent = str_replace(' ', '', $patent);
+            $patents = explode(',', $patent);
+            $param2 = $patents;
         } elseif (isset($award) && $award != '') {
             $param1 = 'award';
             $param2 = $award;
         } elseif (isset($project) && $project != '') {
             $param1 = 'project';
-            if (strpos($project, ',') !== false) {
-                $project = str_replace(' ', '', $project);
-                $project = explode(',', $project);
-            }
-            $param2 = $project;
+            $project = str_replace(' ', '', $project);
+            $projects = explode(',', $project);
+            $param2 = $projects;
         } elseif (isset($awardnameid) && $awardnameid != '') {
             $param1 = 'awardnameid';
-            $param2 = $awardnameid;
+            $awardnameid = str_replace(' ', '', $awardnameid);
+            $awardnameids = explode(',', $awardnameid);
+            $param2 = $awardnameids;
         } elseif (isset($persid) && $persid != '') {
             $param1 = 'person';
-            if (strpos($persid, ',') !== false) {
-                $persid = str_replace(' ', '', $persid);
-                $persid = explode(',', $persid);
-            }
-            $param2 = $persid;
+            $persid = str_replace(' ', '', $persid);
+            $persids = explode(',', $persid);
+            $param2 = $persids;
         } elseif (isset($orgid) && $orgid != '') {
             $param1 = 'orga';
-            if (strpos($orgid, ',') !== false) {
-                $orgid = str_replace(' ', '', $orgid);
-                $orgid = explode(',', $orgid);
-            }
-            $param2 = $orgid;
+            $orgid = str_replace(' ', '', $orgid);
+            $orgids = explode(',', $orgid);
+            $param2 = $orgids;
         } else {
             $param1 = '';
             $param2 = '';
@@ -838,7 +919,8 @@ class FAU_CRIS {
         $publication = sanitize_text_field($publication);
         $quotation = sanitize_text_field($quotation);
         $items = sanitize_text_field($items);
-        if (in_array($sortby, array('created', 'updated'))) $sortby = sanitize_text_field($sortby);
+        if (in_array($sortby, array('created', 'updated')))
+            $sortby = sanitize_text_field($sortby);
         $award = sanitize_text_field($award);
         $awardnameid = sanitize_text_field($awardnameid);
         $showname = sanitize_text_field($showname);
@@ -922,7 +1004,7 @@ class FAU_CRIS {
                 return $liste->customProj($content);
             }
             if (!empty($items)) {
-            //    return $liste->projListe($year, $start, $type, $items, $hide, $role);
+                //    return $liste->projListe($year, $start, $type, $items, $hide, $role);
             }
             if (strpos($order1, 'type') !== false) {
                 return $liste->projNachTyp($year, $start, $type, $hide = array(), $role, $content);
@@ -937,10 +1019,10 @@ class FAU_CRIS {
     public static function cris_enqueue_styles() {
         global $post;
         $plugin_url = plugin_dir_url(__FILE__);
-        wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
+        wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
         if ($post && has_shortcode($post->post_content, 'cris')) {
             //wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
-            wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array ( 'jquery' ));
+            wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array('jquery'));
         }
     }
 
@@ -956,30 +1038,26 @@ class FAU_CRIS {
 
     public static function cris_cron() {
         $options = get_option('_fau_cris');
-        if (isset($options['cris_sync_check'])
-                && $options['cris_sync_check'] != 1) {
-            if (wp_next_scheduled( 'cris_auto_update' ))
+        if (isset($options['cris_sync_check']) && $options['cris_sync_check'] != 1) {
+            if (wp_next_scheduled('cris_auto_update'))
                 wp_clear_scheduled_hook('cris_auto_update');
             return;
         }
-        if (!isset($options['cris_org_nr'])
-                || $options['cris_org_nr'] == 0
-                || !isset($options['cris_sync_check'])
-                || $options['cris_sync_check'] != 1) {
+        if (!isset($options['cris_org_nr']) || $options['cris_org_nr'] == 0 || !isset($options['cris_sync_check']) || $options['cris_sync_check'] != 1) {
             return;
         }
         //Use wp_next_scheduled to check if the event is already scheduled*/
-        if( !wp_next_scheduled( 'cris_auto_update' )) {
+        if (!wp_next_scheduled('cris_auto_update')) {
             //Schedule the event for right now, then to repeat daily using the hook 'cris_create_cron'
-            wp_schedule_event( strtotime('today 21:00'), 'daily', 'cris_auto_update' );
-            $timestamp = wp_next_scheduled( 'cris_auto_update' );
+            wp_schedule_event(strtotime('today 21:00'), 'daily', 'cris_auto_update');
+            $timestamp = wp_next_scheduled('cris_auto_update');
             if ($timestamp) {
                 $message = __('Einstellungen gespeichert', 'fau-cris')
                         . '<br />'
                         . __('Nächste automatische Synchronisierung:', 'fau-cris') . ' '
                         //. date ('d.m.Y - h:i', $timestamp)
-                        . get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), 'd.m.Y - H:i' );
-                add_settings_error('AutoSyncComplete', 'autosynccomplete', $message , 'updated' );
+                        . get_date_from_gmt(date('Y-m-d H:i:s', $timestamp), 'd.m.Y - H:i');
+                add_settings_error('AutoSyncComplete', 'autosynccomplete', $message, 'updated');
                 settings_errors();
             }
         }
@@ -1010,7 +1088,6 @@ class FAU_CRIS {
             . '</ul>'
             . '<h2>' . __('Mögliche Zusatzoptionen', 'fau-cris') . '</h2>'
             . '<p>' . __('Ausgabe lässt sich beliebig anpassen. Eine Übersicht der verschiedenen Shortcode-Parameter zum Filtern, Sortieren und Ändern der Darstellung finden Sie unter: ') . '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/ target="_blank">https://www.wordpress.rrze.fau.de/plugins/fau-cris/</a>'
-
         );
 
         $content_fauperson = array(

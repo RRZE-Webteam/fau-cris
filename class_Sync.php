@@ -278,8 +278,10 @@ class Sync {
         if ($this->num_errors > 0)
                 $this->message .= '<li>' . sprintf( __( '%d Seite(n) konnten nicht erstellt werden.', 'fau-cris' ), $this->num_errors ) . '</li>';
         $this->message .= '</ul>';
-        add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'updated' );
-        settings_errors();
+        if(is_admin()) {
+            add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'updated' );
+            settings_errors();
+        }
     }
 
 
