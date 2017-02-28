@@ -369,9 +369,9 @@ class Publikationen {
                 'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : '')
             );
 
-            switch ($pubDetails['pubType']) {
+            switch (strtolower($pubDetails['pubType'])) {
 
-                case "Book": // OK
+                case "book": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
@@ -398,8 +398,8 @@ class Publikationen {
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
 
-                case "Other":
-                case "Article in Edited Volumes":
+                case "other":
+                case "article in edited volumes":
                     if(($pubDetails['pubType'] == 'Other' && $pubDetails['booktitle']!='') || $pubDetails['pubType'] == 'Article in Edited Volumes') {
                         $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                         $publist .= $pubDetails['authors'] . ':';
@@ -428,8 +428,7 @@ class Publikationen {
                         $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                         break;
                     }
-                case "Other":
-                case "Journal article":
+                case "journal article":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ":";
                     $publist .= "<br />" . $pubDetails['title'];
@@ -444,7 +443,7 @@ class Publikationen {
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
 
-                case "Conference contribution": // OK
+                case "conference contribution": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
@@ -476,7 +475,7 @@ class Publikationen {
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
 
-                case "Editorial":
+                case "editorial":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
                     $publist .= "<br />" . $pubDetails['title'];
@@ -500,7 +499,7 @@ class Publikationen {
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
-                case "Thesis":
+                case "thesis":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
@@ -508,7 +507,7 @@ class Publikationen {
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
-                case "Translation":
+                case "translation":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= $pubDetails['title'];
