@@ -245,8 +245,8 @@ class Aktivitaeten {
             $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
             setlocale(LC_TIME, get_locale());
 
-            switch ($activity_type) {
-                case "FAU-interne Gremienmitgliedschaft / Funktion":
+            switch (strtolower($activity_type)) {
+                case "fau-interne gremienmitgliedschaft / funktion":
                     $activity_name = $activity['description function'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -257,7 +257,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_orga'];
                     break;
-                case "Organisation einer Tagung / Konferenz":
+                case "organisation einer tagung / konferenz":
                     $activity_name = $activity['nameconference'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -268,7 +268,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = $activity['city'];
                     break;
-                case "Herausgeberschaft":
+                case "herausgeberschaft":
                     $activity_name = $activity['namejournal'];
                     $activity_detail = $activity['role of editorship'];
                     $activity_nameofshow = '';
@@ -279,7 +279,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "Gutachtertätigkeit für eine wissenschaftliche Zeitschrift":
+                case "gutachtertätigkeit für eine wissenschaftliche zeitschrift":
                     $activity_name = $activity['namejournal'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -290,7 +290,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "Gutachtertätigkeit für eine Förderorganisation":
+                case "gutachtertätigkeit für eine förderorganisation":
                     $activity_name = $activity['type of expert activity'];
                     $activity_detail = $activity['mirror_fund'];
                     $activity_nameofshow = '';
@@ -301,7 +301,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "Sonstige FAU-externe Gutachtertätigkeit":
+                case "sonstige fau-externe gutachtertätigkeit":
                     $activity_name = $activity['type of expert activity'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -312,7 +312,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
-                case "DFG-Fachkollegiat/in":
+                case "dfg-fachkollegiat/in":
                     $activity_name = $activity['mirror_dfgfach'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -323,7 +323,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "Gremiumsmitglied im Wissenschaftsrat":
+                case "gremiumsmitglied im wissenschaftsrat":
                     $activity_name = $activity['description function'];
                     $activity_detail = $activity['memberscicouncil'];
                     $activity_nameofshow = '';
@@ -334,7 +334,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_orga'];
                     break;
-                case "Vortrag":
+                case "vortrag":
                     $activity_name = $activity['name'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -345,7 +345,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
-                case "Radio- / Fernsehbeitrag / Podcast":
+                case "radio- / fernsehbeitrag / podcast":
                     $activity_name = $activity['name of contribution'];
                     $activity_detail = '';
                     $activity_nameofshow = $activity['showname'];
@@ -356,7 +356,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "Sonstige FAU-externe Aktivität":
+                case "sonstige fau-externe aktivität":
                     $activity_name = $activity['type of extern expert activity'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
