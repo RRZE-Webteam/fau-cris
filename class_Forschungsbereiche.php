@@ -245,7 +245,7 @@ class Forschungsbereiche {
 
 }
 
-class CRIS_fields extends CRIS_webservice {
+class CRIS_fields extends CRIS_DB {
     /*
      * publication requests, supports multiple organisation ids given as array.
      */
@@ -351,69 +351,4 @@ class CRIS_fields extends CRIS_webservice {
         return $fields;
     }
 
-}
-
-class CRIS_field extends CRIS_Entity {
-    /*
-     * object for single publication
-     */
-
-    public function __construct($data) {
-        parent::__construct($data);
-    }
-
-    public function insert_quotation_links() {
-        /*
-         * Enrich APA/MLA quotation by links to publication details (CRIS
-         * website) and DOI (if present, applies only to APA).
-         */
-
-        $doilink = preg_quote("https://dx.doi.org/", "/");
-        $title = preg_quote($this->attributes["cftitle"], "/");
-
-        $cristmpl = '<a href="https://cris.fau.de/converis/publicweb/publication/%d" target="_blank">%s</a>';
-
-        $apa = $this->attributes["quotationapa"];
-        $mla = $this->attributes["quotationmla"];
-
-        $matches = array();
-        $splitapa = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
-
-        if ($splitapa === 1) {
-            $apalink = $matches[1] . \
-                    sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
-            if (isset($matches[4]))
-                $apalink .= sprintf('<a href="%s" target="_blank">%s</a>', $matches[4], $matches[4]);
-        } else {
-            $apalink = $apa;
-        }
-
-        $this->attributes["quotationapalink"] = $apalink;
-
-        $matches = array();
-        $splitmla = preg_match("/^(.+)(" . $title . ")(.+)$/", $mla, $matches);
-
-        if ($splitmla === 1) {
-            $mlalink = $matches[1] . \
-                    sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
-        } else {
-            $mlalink = $mla;
-        }
-
-        $this->attributes["quotationmlalink"] = $mlalink;
-    }
-
-}
-
-# tests possible if called on command-line
-if (!debug_backtrace()) {
-    $p = new CRIS_Publications();
-    $f = new CRIS_Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
-    $publs = $p->by_orga_id("142285", $f);
-    $order = "virtualdate";
-    $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
-    $res = $formatter->execute($publs);
-    foreach ($res[$order] as $key => $value) {
-        echo sprintf("%s: %s\n", $key, $value->attributes[$order]);
-    }
 }
