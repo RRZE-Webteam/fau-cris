@@ -334,6 +334,19 @@ class Projekte {
             $id = $project['ID'];
             $title = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
             $type = Tools::getName('projects', $project['project type'], get_locale());
+            $imgs = self::get_project_images($project['ID']);
+
+            if (count($imgs)) {
+                $projlist .= "<div class=\"cris-image\">";
+                foreach($imgs as $img) {
+                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                       $projlist .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                    }
+                }
+                $projlist .= "</div>";
+            }
+
             $projlist .= "<h3>" . $title . "</h3>";
 
             if (!empty($type))
@@ -690,6 +703,20 @@ class Projekte {
         return $liste->projectPub($project, $quotation);
     }
 
+    private function get_project_images($project) {
+        $images = array();
+        $imgString = CRIS_Dicts::$base_uri . "getrelated/project/" . $project . "/PROJ_has_PICT";
+        $imgXml = Tools::XML2obj($imgString);
+
+        if ($imgXml['size'] != 0) {
+            foreach ($imgXml as $img) {
+                $_i = new CRIS_project_image($img);
+                $images[$_i->ID] = $_i;
+            }
+        }
+        return $images;
+    }
+
 }
 
 class CRIS_projects extends CRIS_webservice {
@@ -799,5 +826,24 @@ class CRIS_project extends CRIS_Entity {
     function __construct($data) {
         parent::__construct($data);
     }
+}
 
+class CRIS_project_image extends CRIS_Entity {
+    /*
+     * object for single project image
+     */
+
+    public function __construct($data) {
+        parent::__construct($data);
+
+        foreach ($data->relation as $_r) {
+            if ($_r['type'] != "PROJ_has_PICT")
+                continue;
+            foreach($_r->attribute as $_a) {
+                if ($_a['name'] == 'description') {
+                    $this->attributes["description"] = (string) $_a->data;
+                }
+            }
+        }
+    }
 }

@@ -120,6 +120,18 @@ class Organisation {
                 $organisation[$attribut] = $v;
             }
             unset($organisation['attributes']);
+            $research_imgs = self::get_research_images($organisation['ID']);
+
+            if (count($research_imgs)) {
+                $singlefield .= "<div class=\"cris-image\">";
+                foreach($research_imgs as $img) {
+                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                       $singlefield .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                    }
+                }
+                $singlefield .= "</div>";
+            }
 
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
                 $research = ($lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
@@ -131,6 +143,19 @@ class Organisation {
         return $output;
     }
 
+    private function get_research_images($orga) {
+        $images = array();
+        $imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
+        $imgXml = Tools::XML2obj($imgString);
+
+        if ($imgXml['size'] != 0) {
+            foreach ($imgXml as $img) {
+                $_i = new CRIS_research_image($img);
+                $images[$_i->ID] = $_i;
+            }
+        }
+        return $images;
+    }
 }
 
 class CRIS_organisations extends CRIS_webservice {
@@ -190,4 +215,24 @@ class CRIS_organisation extends CRIS_Entity {
         parent::__construct($data);
     }
 
+}
+
+class CRIS_research_image extends CRIS_Entity {
+    /*
+     * object for single publication
+     */
+
+    public function __construct($data) {
+        parent::__construct($data);
+
+        foreach ($data->relation as $_r) {
+            if ($_r['type'] != "ORGA_has_research_PICT")
+                continue;
+            foreach($_r->attribute as $_a) {
+                if ($_a['name'] == 'description') {
+                    $this->attributes["description"] = (string) $_a->data;
+                }
+            }
+        }
+    }
 }

@@ -155,13 +155,25 @@ class Forschungsbereiche {
                 $field[$attribut] = $v;
             }
             unset($field['attributes']);
-
+            $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
             $title = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
             $description = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
 
             if (!in_array('title', $hide))
                 $singlefield .= "<h2>" . $title . "</h2>";
+
+            if (count($imgs)) {
+                $singlefield .= "<div class=\"cris-image\">";
+                foreach($imgs as $img) {
+                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                       $singlefield .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                    }
+                }
+                $singlefield .= "</div>";
+            }
+
             $singlefield .= $description;
 
             if (!in_array('projects', $hide)) {
@@ -243,6 +255,22 @@ class Forschungsbereiche {
         //var_dump($liste->fieldPersons($field));
     }
 
+    private function get_field_images($field) {
+        $images = array();
+        $imgString = CRIS_Dicts::$base_uri . "getrelated/Forschungsbereich/" . $field . "/FOBE_has_PICT";
+        $imgXml = Tools::XML2obj($imgString);
+
+        if ($imgXml['size'] != 0) {
+            foreach ($imgXml as $img) {
+                $_i = new CRIS_field_image($img);
+                $images[$_i->ID] = $_i;
+            }
+        }
+/*        print "<pre>";
+        var_dump($images);
+        print "</pre>";
+*/        return $images;
+    }
 }
 
 class CRIS_fields extends CRIS_webservice {
@@ -345,47 +373,26 @@ class CRIS_field extends CRIS_Entity {
         parent::__construct($data);
     }
 
-    public function insert_quotation_links() {
-        /*
-         * Enrich APA/MLA quotation by links to publication details (CRIS
-         * website) and DOI (if present, applies only to APA).
-         */
+}
 
-        $doilink = preg_quote("https://dx.doi.org/", "/");
-        $title = preg_quote($this->attributes["cftitle"], "/");
+class CRIS_field_image extends CRIS_Entity {
+    /*
+     * object for single publication
+     */
 
-        $cristmpl = '<a href="https://cris.fau.de/converis/publicweb/publication/%d" target="_blank">%s</a>';
+    public function __construct($data) {
+        parent::__construct($data);
 
-        $apa = $this->attributes["quotationapa"];
-        $mla = $this->attributes["quotationmla"];
-
-        $matches = array();
-        $splitapa = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
-
-        if ($splitapa === 1) {
-            $apalink = $matches[1] . \
-                    sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
-            if (isset($matches[4]))
-                $apalink .= sprintf('<a href="%s" target="_blank">%s</a>', $matches[4], $matches[4]);
-        } else {
-            $apalink = $apa;
+        foreach ($data->relation as $_r) {
+            if ($_r['type'] != "FOBE_has_PICT")
+                continue;
+            foreach($_r->attribute as $_a) {
+                if ($_a['name'] == 'description') {
+                    $this->attributes["description"] = (string) $_a->data;
+                }
+            }
         }
-
-        $this->attributes["quotationapalink"] = $apalink;
-
-        $matches = array();
-        $splitmla = preg_match("/^(.+)(" . $title . ")(.+)$/", $mla, $matches);
-
-        if ($splitmla === 1) {
-            $mlalink = $matches[1] . \
-                    sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
-        } else {
-            $mlalink = $mla;
-        }
-
-        $this->attributes["quotationmlalink"] = $mlalink;
     }
-
 }
 
 # tests possible if called on command-line
