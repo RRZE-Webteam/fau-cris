@@ -610,7 +610,7 @@ class Projekte {
 
     public function get_project_leaders($project, $leadIDs) {
         $leaders = array();
-        $leadersString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Project/" . $project . "/proj_has_card";
+        $leadersString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_card";
         $leadersXml = Tools::XML2obj($leadersString);
         if ($leadersXml['size'] != 0) {
             $i = 0;
@@ -636,7 +636,7 @@ class Projekte {
 
     public function get_project_members($project, $collIDs) {
         $members = array();
-        $membersString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Project/" . $project . "/proj_has_col_card";
+        $membersString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_col_card";
         $membersXml = Tools::XML2obj($membersString);
         if ($membersXml['size'] != 0) {
             $i = 0;
@@ -669,7 +669,7 @@ class Projekte {
 
     private function get_project_funding($project) {
         $funding = array();
-        $fundingString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Project/" . $project . "/proj_has_fund";
+        $fundingString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_fund";
         $fundingXml = Tools::XML2obj($fundingString);
         if ($fundingXml['size'] != 0) {
             foreach ($fundingXml->infoObject as $fund) {
