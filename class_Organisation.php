@@ -123,7 +123,7 @@ class Organisation {
 
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
                 $research = ($lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
-                $output .= "<p class=\"cris-research\">(" . $research . ")</p>";
+                $output .= "<p class=\"cris-research\">" . $research . "</p>";
             }
         }
 

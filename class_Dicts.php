@@ -37,7 +37,7 @@ class CRIS_Dicts {
             'short' => 'zeitschriftenartikel',
             'de' => array(
                 'name' => 'Beitrag in einer Fachzeitschrift',
-                'title' => 'Beitrag in Fachzeitschriften'),
+                'title' => 'Beiträge in Fachzeitschriften'),
             'en'  => array(
                 'name' => 'Journal article',
                 'title' => 'Journal Articles')

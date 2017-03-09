@@ -465,7 +465,7 @@ class Publikationen {
                         $publist .= "</span>";
                     }
                     if ($pubDetails['booktitle'] != '') {
-                        $publist .= "<span itemscope itemtype=\"http://schema.org/Book\">In: ";
+                        $publist .= "<br /><span itemscope itemtype=\"http://schema.org/Book\">In: ";
                         $publist .= $pubDetails['editiors'] != '' ? "<span itemprop=\"author\">" . $pubDetails['editiors'] . " (" . __('Hrsg.', 'fau-cris') . "): </span>" : '';
                         $publist .= "<span itemprop=\"name\" style=\"font-weight:bold;\">" . $pubDetails['booktitle'] . "</span>";
                         $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? ", <span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">" : '';
