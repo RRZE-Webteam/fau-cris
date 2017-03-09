@@ -269,6 +269,29 @@ class Sync {
             }
         }
 
+        // Seite "Weitere Projekte" löschen wenn leer
+        if (!count($pages['no_field']['projects'])) {
+            $_p = get_pages(array('child_of' => $research_pid, 'post_status' => 'publish'));
+            foreach ($_p as $_sp) {
+                if ($_sp->post_title == $this->title_noFieldsPage) {
+                    wp_delete_post($_sp->ID);
+                }
+            }
+            // Hauptmenü-Eintrag entfernen
+            foreach ($this->menu_items as $_mi) {
+                if($_mi->menu_item_parent == $research_mid && $_mi->title == $this->title_noFieldsPage) {
+                    wp_delete_post($_mi->ID);
+                }
+            }
+            // Portalmenü-Eintrag entfernen
+            foreach ($this->portal_items as $_pi) {
+                if($_pi->menu_item_parent == 0 && $_mi->title == $this->title_noFieldsPage) {
+                    wp_delete_post($_pi->ID);
+                }
+            }
+        }
+
+
         /*
          *  Admin-Notice: Synchronisation erfolgreich
          */

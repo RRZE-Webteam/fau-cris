@@ -90,6 +90,20 @@ ul.cris-activities li {
     margin-bottom: 10px;
 }
 
+#nav .level2 li.cris-first {
+    border-top: 1px solid #aaa;
+    padding-top: 10px;
+}
+
+#nav .level2 li.cris-first:before {
+    content: 'Forschungsbereiche';
+    display:block;
+    color: #fff;
+    font-weight: bold;
+    //font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
 #nav .level2 li.cris-last a {
     border-bottom-color: transparent;
 }
