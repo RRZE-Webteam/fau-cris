@@ -13,6 +13,7 @@ class CRIS_webservice {
      * generic class for web service access.
      */
     private $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+    private $cache = true;
 
     private function fetch($url) {
         /*
@@ -30,6 +31,14 @@ class CRIS_webservice {
 
         curl_close($ch);
         return $xml;
+    }
+    
+    public function disable_cache() {
+        $this->cache = false;
+    }
+
+    public function enable_cache() {
+        $this->cache = true;
     }
 
     public function get($id, &$filter) {
@@ -63,9 +72,14 @@ class CRIS_webservice {
             // mark "publyear" for skip on next evaluation
             $filter->skip[] = "publyear";
         }
+        
+        $seed = '';
+        if (!$this->cache) {
+            $seed = '?flag=seednow';
+        }
 
         try {
-            $rawxml = $this->fetch($this->base_uri . $id);
+            $rawxml = $this->fetch($this->base_uri . $id . $seed);
         } catch (Exception $ex) {
             $rawxml = null;
         }

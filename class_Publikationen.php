@@ -710,6 +710,8 @@ class CRIS_publication extends CRIS_Entity {
 # tests possible if called on command-line
 if (!debug_backtrace()) {
     $p = new CRIS_Publications();
+    // default uses the cache automatically
+    // $p->disable_cache();
     $f = new CRIS_Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
     $publs = $p->by_orga_id("142285", $f);
     $order = "virtualdate";
