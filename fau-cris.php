@@ -151,7 +151,10 @@ class FAU_CRIS {
             'cris_patent_link' => 'none',
             'cris_activities_order' =>  Tools::getOptionsOrder('activities'),
             'cris_activities_link' => 'none',
-            'cris_sync_check' => 0
+            'cris_sync_check' => 0,
+            'cris_sync_research_custom' => 0,
+            'cris_sync_field_custom' => 0,
+            'cris_sync_shortcode_format' => 0
         );
         return $options;
     }
@@ -397,17 +400,29 @@ class FAU_CRIS {
                 );
                 add_settings_field(
                         'cris_sync_check',
-                        __('Automatische Synchronisation', 'fau-cris'),
+                        __('Automatische Synchronisierung', 'fau-cris'),
                         array(__CLASS__, 'cris_check_callback'),
                         'fau_cris_options',
                         'cris_sync_section',
                         array(
                             'name' => 'cris_sync_check',
                             'description' => __('Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und Menüeinträge generiert werden?', 'fau-cris')
-
-
-
                         )
+                    );
+                add_settings_field(
+                        'cris_sync_shortcode_format',
+                        __('Shortcode-Format', 'fau-cris'),
+                        array(__CLASS__, 'cris_check_callback'),
+                        'fau_cris_options',
+                        'cris_sync_section',
+                        array(
+                            'name' => 'cris_sync_shortcode_format',
+                            'description' => __('Soll für die Shortcodes auf den automatisch erstellten Seiten das konfigurierbare Format "[cris-custom]" verwendet werden?', 'fau-cris'),
+                    'options' => array(
+                        'research' => __('Custom-Shortcode für Seite Forschung', 'fau-cris'),
+                        'fields' => __('Custom-Shortcode für Forschungsbereiche','fau-cris'),
+                        'projects' => __('Custom-Shortcode für Forschungsprojekte', 'fau-cris'))
+                            )
                     );
                 break;
         }
@@ -447,6 +462,14 @@ class FAU_CRIS {
                 break;
             case 'sync':
                 $new_input['cris_sync_check'] = isset($_POST[self::option_name]['cris_sync_check']) ? 1 : 0;
+                if(is_array($_POST[self::option_name]['cris_sync_shortcode_format'])) {
+                    /*foreach ($_POST[self::option_name]['cris_sync_shortcode_format'] as $_check){
+                        foreach ($_check as $_k => $_v) {
+                            $new_input['cris_sync_shortcode_format'][$_k] = $_v;
+                        }
+                    }*/
+                    $new_input['cris_sync_shortcode_format'] = $_POST[self::option_name]['cris_sync_shortcode_format'];
+                }
                 break;
         }
         return $new_input;
@@ -466,16 +489,33 @@ class FAU_CRIS {
             print "<p>";
             printf(__('%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3s Benutzerhandbuch! %3s', 'fau-cris'), '<strong>', '</strong>', '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/">', '</a>');
             print "<p>";
-        } ?>
-        <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
-        if (array_key_exists($name, $options)) {
-            print checked($options[$name], 1, false);
         }
-        ?> >
-        <?php if (isset($description)) { ?>
-            <span class="description"><?php echo $description; ?></span></label>
-        <?php }
-
+        if (array_key_exists('options', $args)) {
+            $checks = $args['options'];
+            foreach ($checks as $_k => $_v) { ?>
+                <label>
+                    <input name="<?php printf('%s[' . $name . '][' . $_k . ']', self::option_name); ?>"
+                        type='checkbox'
+                        value='1'
+                        <?php
+                        if (array_key_exists($name, $options)) {
+                            print checked($options[$name][ $_k], 1, false);
+                        }
+                        ?>
+                    >
+                    <?php print $_v; ?>
+                </label><br />
+            <?php }
+        } else { ?>
+            <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
+            if (array_key_exists($name, $options)) {
+                print checked($options[$name], 1, false);
+            }
+            ?> >
+            <?php if (isset($description)) { ?>
+                <span class="description"><?php echo $description; ?></span></label>
+            <?php }
+        }
     }
 
     // Radio Button

@@ -233,6 +233,8 @@ class Projekte {
 
         foreach ($projects as $project) {
             $project = (array) $project;
+            $leaders = array();
+            $members = array();
             foreach ($project['attributes'] as $attribut => $v) {
                 $project[$attribut] = $v;
             }
