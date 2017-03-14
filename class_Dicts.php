@@ -2,6 +2,8 @@
 
 class CRIS_Dicts {
 
+    public static $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+
     public static $defaults = array(
         'show' => 'publications',
         'orderby' => '',
@@ -37,7 +39,7 @@ class CRIS_Dicts {
             'short' => 'zeitschriftenartikel',
             'de' => array(
                 'name' => 'Beitrag in einer Fachzeitschrift',
-                'title' => 'Beitrag in Fachzeitschriften'),
+                'title' => 'Beiträge in Fachzeitschriften'),
             'en'  => array(
                 'name' => 'Journal article',
                 'title' => 'Journal Articles')

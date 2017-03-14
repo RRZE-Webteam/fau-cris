@@ -286,6 +286,11 @@ class Publikationen {
             $publication->insert_quotation_links();
             $publist .= "<li>";
             $publist .= $publication->attributes['quotation' . $quotation . 'link'];
+            if (isset($this->options['cris_url'])
+                    && $this->options['cris_url'] == 1
+                    && !empty($publication->attributes['cfuri'])) {
+                $publist .= "<br />URL: <a href='" . $publication->attributes['cfuri'] . "' target='blank' itemprop=\"url\">" . $publication->attributes['cfuri'] . "</a>";
+            }
             if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
                 $publist .= "<br />BibTeX: " . $publication->attributes['bibtex_link'];
             }
@@ -460,7 +465,7 @@ class Publikationen {
                         $publist .= "</span>";
                     }
                     if ($pubDetails['booktitle'] != '') {
-                        $publist .= "<span itemscope itemtype=\"http://schema.org/Book\">In: ";
+                        $publist .= "<br /><span itemscope itemtype=\"http://schema.org/Book\">In: ";
                         $publist .= $pubDetails['editiors'] != '' ? "<span itemprop=\"author\">" . $pubDetails['editiors'] . " (" . __('Hrsg.', 'fau-cris') . "): </span>" : '';
                         $publist .= "<span itemprop=\"name\" style=\"font-weight:bold;\">" . $pubDetails['booktitle'] . "</span>";
                         $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? ", <span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">" : '';
@@ -499,6 +504,7 @@ class Publikationen {
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
+
                 case "thesis":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
@@ -507,6 +513,7 @@ class Publikationen {
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
+
                 case "translation":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ':';
@@ -703,6 +710,8 @@ class CRIS_publication extends CRIS_Entity {
 # tests possible if called on command-line
 if (!debug_backtrace()) {
     $p = new CRIS_Publications();
+    // default uses the cache automatically
+    // $p->disable_cache();
     $f = new CRIS_Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
     $publs = $p->by_orga_id("142285", $f);
     $order = "virtualdate";

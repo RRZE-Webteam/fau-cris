@@ -49,7 +49,7 @@ class Forschungsbereiche {
      * Ausgabe aller Forschungsbereiche
      */
 
-    public function fieldListe() {
+    public function fieldListe($hide) {
         $sortby = 'cfname';
         $fieldsArray = $this->fetch_fields();
 
@@ -57,6 +57,7 @@ class Forschungsbereiche {
             $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
+        $hide = explode(',', $hide);
         if ($this->lang == 'en')
             $order = $sortby . '_en';
          else
@@ -78,6 +79,26 @@ class Forschungsbereiche {
 
     public function singleField($hide) {
         $ws = new CRIS_fields();
+        try {
+            $fieldsArray = $ws->by_id($this->id);
+        } catch (Exception $ex) {
+            return;
+        }
+        if (!count($fieldsArray))
+            return;
+        $hide = explode(',', $hide);
+
+        $output = $this->make_single($fieldsArray, $hide);
+
+        return $output;
+    }
+
+    /*
+     * Ausgabe eines einzelnen Forschungsbereichs per Custom-Shortcode
+     */
+
+    public function customField($content = '') {
+        $ws = new CRIS_fields();
 
         try {
             $fieldsArray = $ws->by_id($this->id);
@@ -88,7 +109,7 @@ class Forschungsbereiche {
         if (!count($fieldsArray))
             return;
 
-        $output = $this->make_single($fieldsArray, $hide);
+        $output = $this->make_custom_single($fieldsArray, $content);
 
         return $output;
     }
@@ -143,6 +164,10 @@ class Forschungsbereiche {
         return $pubArray;
     }
 
+    /*
+     * Ausgabe der Forschungsbereiche
+     */
+
     private function make_single($fields, $hide = array()) {
 
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
@@ -155,13 +180,25 @@ class Forschungsbereiche {
                 $field[$attribut] = $v;
             }
             unset($field['attributes']);
-
+            $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
             $title = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
             $description = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
 
             if (!in_array('title', $hide))
                 $singlefield .= "<h2>" . $title . "</h2>";
+
+            if (count($imgs)) {
+                $singlefield .= "<div class=\"cris-image\">";
+                foreach($imgs as $img) {
+                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                       $singlefield .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                    }
+                }
+                $singlefield .= "</div>";
+            }
+
             $singlefield .= $description;
 
             if (!in_array('projects', $hide)) {
@@ -197,9 +234,58 @@ class Forschungsbereiche {
     }
 
 
-    /*
-     * Ausgabe der Forschungsbereiche
-     */
+    private function make_custom_single($fields, $content) {
+
+        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
+        $field_details = array();
+        $output = "<div class=\"cris-fields\">";;
+        $vars = array('[title]','[description]','[projects]','[persons]'/*, '[publications]'*/);
+
+        foreach ($fields as $field) {
+            $field = (array) $field;
+            foreach ($field['attributes'] as $attribut => $v) {
+                $field[$attribut] = $v;
+            }
+            unset($field['attributes']);
+            $imgs = self::get_field_images($field['ID']);
+            $id = $field['ID'];
+            $field_details['title'] = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
+            $field_details['description'] = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
+            $field_details['projects'] = $this->get_field_projects($id);
+            $field_details['persons'] = '';
+            $persons = $this->get_field_persons($id);
+            if ($persons) {
+                $field_details['persons'] .= "<ul>";
+                foreach ($persons as $type => $person) {
+                    foreach ($person as $id => $details) {
+                        $field_details['persons'] .= "<li>";
+                        $field_details['persons'] .= Tools::get_person_link($id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                        $field_details['persons'] .= "</li>";
+                    }
+                }
+                $field_details['persons'] .= "</ul>";
+            }
+            // TODO
+            /* $field_details['publications'] .= "ToDo"; */
+            $field_details['image1'] = '';
+            if (count($imgs)) {
+                $i = 1;
+                foreach($imgs as $img) {
+                    $field_details['image'.$i] .= "<div class=\"cris-image\">";
+                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                       $field_details['image'.$i] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                    $field_details['image'.$i] .= "</div>";
+                    }
+                    array_push($vars,'[image'.$i.']');
+                    $i++;
+                }
+            }
+            $output .= str_replace($vars, $field_details, $content);
+        }
+        $output .= "</div>";
+        return $output;
+    }
 
     private function make_list($fields) {
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
@@ -243,6 +329,22 @@ class Forschungsbereiche {
         //var_dump($liste->fieldPersons($field));
     }
 
+    private function get_field_images($field) {
+        $images = array();
+        $imgString = CRIS_Dicts::$base_uri . "getrelated/Forschungsbereich/" . $field . "/FOBE_has_PICT";
+        $imgXml = Tools::XML2obj($imgString);
+
+        if ($imgXml['size'] != 0) {
+            foreach ($imgXml as $img) {
+                $_i = new CRIS_field_image($img);
+                $images[$_i->ID] = $_i;
+            }
+        }
+/*        print "<pre>";
+        var_dump($images);
+        print "</pre>";
+*/        return $images;
+    }
 }
 
 class CRIS_fields extends CRIS_webservice {
@@ -345,47 +447,26 @@ class CRIS_field extends CRIS_Entity {
         parent::__construct($data);
     }
 
-    public function insert_quotation_links() {
-        /*
-         * Enrich APA/MLA quotation by links to publication details (CRIS
-         * website) and DOI (if present, applies only to APA).
-         */
+}
 
-        $doilink = preg_quote("https://dx.doi.org/", "/");
-        $title = preg_quote($this->attributes["cftitle"], "/");
+class CRIS_field_image extends CRIS_Entity {
+    /*
+     * object for single publication
+     */
 
-        $cristmpl = '<a href="https://cris.fau.de/converis/publicweb/publication/%d" target="_blank">%s</a>';
+    public function __construct($data) {
+        parent::__construct($data);
 
-        $apa = $this->attributes["quotationapa"];
-        $mla = $this->attributes["quotationmla"];
-
-        $matches = array();
-        $splitapa = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
-
-        if ($splitapa === 1) {
-            $apalink = $matches[1] . \
-                    sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
-            if (isset($matches[4]))
-                $apalink .= sprintf('<a href="%s" target="_blank">%s</a>', $matches[4], $matches[4]);
-        } else {
-            $apalink = $apa;
+        foreach ($data->relation as $_r) {
+            if ($_r['type'] != "FOBE_has_PICT")
+                continue;
+            foreach($_r->attribute as $_a) {
+                if ($_a['name'] == 'description') {
+                    $this->attributes["description"] = (string) $_a->data;
+                }
+            }
         }
-
-        $this->attributes["quotationapalink"] = $apalink;
-
-        $matches = array();
-        $splitmla = preg_match("/^(.+)(" . $title . ")(.+)$/", $mla, $matches);
-
-        if ($splitmla === 1) {
-            $mlalink = $matches[1] . \
-                    sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
-        } else {
-            $mlalink = $mla;
-        }
-
-        $this->attributes["quotationmlalink"] = $mlalink;
     }
-
 }
 
 # tests possible if called on command-line

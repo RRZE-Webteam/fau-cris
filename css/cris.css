@@ -79,10 +79,29 @@ ul.cris-activities li {
     list-style-type: circle;
 }
 
+.cris-image {
+    float: right;
+    margin: 0 0 10px 20px;
+}
+
 #nav .level2 li.cris-last {
     border-bottom: 1px solid #aaa;
     padding-bottom: 10px;
     margin-bottom: 10px;
+}
+
+#nav .level2 li.cris-first {
+    border-top: 1px solid #aaa;
+    padding-top: 10px;
+}
+
+#nav .level2 li.cris-first:before {
+    content: 'Forschungsbereiche';
+    display:block;
+    color: #fff;
+    font-weight: bold;
+    //font-size: 1.2em;
+    margin-bottom: 5px;
 }
 
 #nav .level2 li.cris-last a {

@@ -338,7 +338,7 @@ class Auszeichnungen {
     private function get_pic($award) {
 
         $pic = array();
-        $picString = "https://cris.fau.de/ws-cached/1.0/public/infoobject/getrelated/Award/" . $award . "/awar_has_pict";
+        $picString = CRIS_Dicts::$base_uri . "getrelated/Award/" . $award . "/awar_has_pict";
         $picXml = Tools::XML2obj($picString);
 
         if ($picXml['size'] != 0) {
