@@ -1,5 +1,6 @@
 <?php
 
+require_once("class_Organisation.php");
 require_once("class_Forschungsbereiche.php");
 require_once("class_Projekte.php");
 
@@ -86,7 +87,7 @@ class Sync {
         }
         require_once('class_Organisation.php');
         $orga = new Organisation();
-        $research_contacts = $orga->researchContacts();
+        $research_contacts = $orga->researchContacts(true);
         if (!isset($page_research) || !count($page_research)) {
         // Seite Forschung existiert noch nicht -> anlegen
             if ($this->options['cris_sync_shortcode_format']['research'] == 1) {
@@ -181,7 +182,7 @@ class Sync {
         // FoBe und Projekte
         $_f = new Forschungsbereiche();
         $fields = array();
-        $fields = $_f->fieldsArray();
+        $fields = $_f->fieldsArray(true);
         if (!$fields || !is_array($fields)) {
             if( wp_next_scheduled( 'cris_auto_update' ))
                 wp_clear_scheduled_hook('cris_auto_update');
@@ -191,7 +192,7 @@ class Sync {
         if (is_array($fields)) {
             foreach ($fields as $field) {
                 $_p = new Projekte();
-                $projects = $_p->fieldProj($field->ID, 'array');
+                $projects = $_p->fieldProj($field->ID, 'array', true);
                 $field_contacts = array();
                 $fcids = array();
                 $field_contacts = explode('|', $field->attributes['contact_names']);
@@ -261,6 +262,7 @@ class Sync {
 
         }
         $p = new CRIS_projects;
+        $p->disable_cache();
         $all_projects = $p->by_orga_id($this->orgNr);
         $orga_projects = array();
         foreach ($all_projects as $a_p) {

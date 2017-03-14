@@ -71,8 +71,10 @@ class Organisation {
         return $output;
     }
 
-    public function researchContacts() {
+    public function researchContacts($seed=false) {
         $ws = new CRIS_organisations();
+        if($seed)
+            $ws->disable_cache();
         try {
             $orgaArray = $ws->by_id($this->id);
         } catch (Exception $ex) {

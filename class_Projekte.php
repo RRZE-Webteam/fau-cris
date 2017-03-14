@@ -577,8 +577,10 @@ class Projekte {
         return do_shortcode($projlist);
     }
 
-    public function fieldProj($field, $return = 'list') {
+    public function fieldProj($field, $return = 'list', $seed=false) {
         $ws = new CRIS_projects();
+        if($seed)
+            $ws->disable_cache();
         try {
             $projArray = $ws->by_field($field);
         } catch (Exception $ex) {

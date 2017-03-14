@@ -118,9 +118,9 @@ class Forschungsbereiche {
      * Array aller Forschungsbereiche für die Synchonisierung
      */
 
-    public function fieldsArray() {
+    public function fieldsArray($seed=false) {
         $sortby = 'cfname';
-        $fieldsArray = $this->fetch_fields();
+        $fieldsArray = $this->fetch_fields($seed);
 
         if (!count($fieldsArray)) {
             return false;
@@ -146,10 +146,11 @@ class Forschungsbereiche {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_fields() {
+    private function fetch_fields($seed=false) {
         $filter = Tools::field_filter();
         $ws = new CRIS_fields();
-
+        if ($seed)
+            $ws->disable_cache();
         try {
             if ($this->einheit === "orga") {
                 $pubArray = $ws->by_orga_id($this->id, $filter);
@@ -271,7 +272,7 @@ class Forschungsbereiche {
             if (count($imgs)) {
                 $i = 1;
                 foreach($imgs as $img) {
-                    $field_details['image'.$i] .= "<div class=\"cris-image\">";
+                    $field_details['image'.$i] = "<div class=\"cris-image\">";
                     if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
                        $field_details['image'.$i] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
@@ -340,10 +341,7 @@ class Forschungsbereiche {
                 $images[$_i->ID] = $_i;
             }
         }
-/*        print "<pre>";
-        var_dump($images);
-        print "</pre>";
-*/        return $images;
+        return $images;
     }
 }
 
