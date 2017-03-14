@@ -593,256 +593,152 @@ class FAU_CRIS {
      * Add Shortcodes
      */
     public static function cris_shortcode($atts) {
-        $options = self::get_options();
+        $parameter = self::cris_shortcode_parameter($atts);
 
-        // Attributes
-        extract(shortcode_atts(
-                        array(
-            'show' => 'publications',
-            'orderby' => '',
-            'year' => '',
-            'start' => '',
-            'orgid' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
-            'persid' => '',
-            'publication' => '',
-            'pubtype' => '',
-            'quotation' => '',
-            'items' => '',
-            'sortby' => '',
-            'award' => '',
-            'awardnameid' => '',
-            'type' => '',
-            'subtype' => '',
-            'showname' => 1,
-            'showyear' => 1,
-            'showawardname' => 1,
-            'display' => 'list',
-            'project' => '',
-            'hide' => '',
-            'role' => 'leader',
-            'patent' => '',
-            'activity' => '',
-            'field' => ''
-                        ), $atts));
+        if (isset($parameter['show']) && $parameter['show'] == 'organisation') {
+            // Forschung
+            require_once('class_Organisation.php');
+            $liste = new Organisation($parameter['entity'], $parameter['entity_id']);
+            return $liste->singleOrganisation($parameter['hide']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'fields') {
+            // Forschungsbereiche
+            require_once('class_Forschungsbereiche.php');
+            $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
 
-        $show = sanitize_text_field($show);
-        $orderby = sanitize_text_field($orderby);
-        $type = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
-        $subtype = sanitize_text_field($subtype);
-        $year = sanitize_text_field($year);
-        $start = sanitize_text_field($start);
-        $orgid = sanitize_text_field($orgid);
-        $persid = sanitize_text_field($persid);
-        $publication = sanitize_text_field($publication);
-        $quotation = sanitize_text_field($quotation);
-        $items = sanitize_text_field($items);
-        if (in_array($sortby, array('created', 'updated'))) $sortby = sanitize_text_field($sortby);
-        $award = sanitize_text_field($award);
-        $awardnameid = sanitize_text_field($awardnameid);
-        $showname = sanitize_text_field($showname);
-        $showyear = sanitize_text_field($showyear);
-        $showawardname = sanitize_text_field($showawardname);
-        $display = sanitize_text_field($display);
-        $project = sanitize_text_field($project);
-        $hide = sanitize_text_field($hide);
-        $hide = str_replace(" ", "", $hide);
-        $hide = explode(",", $hide);
-        $role = sanitize_text_field($role);
-        $patent = sanitize_text_field($patent);
-        $activity = sanitize_text_field($activity);
-        $field = sanitize_text_field($field);
-
-        if (isset($publication) && $publication != '') {
-            $param1 = 'publication';
-            if (strpos($publication, ',')) {
-                $publication = str_replace(' ', '', $publication);
-                $publication = explode(',', $publication);
+            if ($parameter['field'] != '') {
+                return $liste->singleField($parameter['hide']);
             }
-            $param2 = $publication;
-        } elseif (isset($field) && $field != '') {
-            $param1 = 'field';
-            $param2 = $field;
-        } elseif (isset($activity) && $activity != '') {
-            $param1 = 'activity';
-            $param2 = $activity;
-        } elseif (isset($patent) && $patent != '') {
-            $param1 = 'patent';
-            $param2 = $patent;
-        } elseif (isset($award) && $award != '') {
-            $param1 = 'award';
-            $param2 = $award;
-        } elseif (isset($project) && $project != '') {
-            $param1 = 'project';
-            if (strpos($project, ',') !== false) {
-                $project = str_replace(' ', '', $project);
-                $project = explode(',', $project);
-            }
-            $param2 = $project;
-        } elseif (isset($awardnameid) && $awardnameid != '') {
-            $param1 = 'awardnameid';
-            $param2 = $awardnameid;
-        } elseif (isset($persid) && $persid != '') {
-            $param1 = 'person';
-            if (strpos($persid, ',') !== false) {
-                $persid = str_replace(' ', '', $persid);
-                $persid = explode(',', $persid);
-            }
-            $param2 = $persid;
-        } elseif (isset($orgid) && $orgid != '') {
-            $param1 = 'orga';
-            if (strpos($orgid, ',') !== false) {
-                $orgid = str_replace(' ', '', $orgid);
-                $orgid = explode(',', $orgid);
-            }
-            $param2 = $orgid;
-        } else {
-            $param1 = '';
-            $param2 = '';
-        }
-
-        // IDs mit zu groüen Abfragemengen ausschließen
-        $excluded = array(
-            '143134', // FAU
-            '141815', // MedFak
-            '142105', // NatFak
-            '141354', // PhilFak
-            '141678', // ReWi
-            '142351'  // Techfak
-        );
-
-        if ((!$orgid || $orgid == 0) && $persid == '' && $publication == '' && $award == '' && $awardnameid == '' && $field == '') {
-            // Fehlende ID oder ID=0 abfangen
-            return __('Bitte geben Sie eine CRIS-ID an.', 'fau-cris') . '</strong></p>';
-        } /* elseif (in_array($orgid, $excluded)
-          &&  $persid == ''
-          && (($show == 'awards' && $award == '') || ($show == 'publications' && $publication == ''))
-          && ($year == '' && $type == '')
-          ) {
-          // IDs mit zu vielen Ergebnissen ausschließen
-          return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
-          } */ else {
-            $order1 = 'year';
-            $order2 = '';
-
-            if (!empty($orderby)) {
-                if (strpos($orderby, ',') !== false) {
-                    $orderby = str_replace(' ', '', $orderby);
-                    $order1 = explode(',', $orderby)[0];
-                    $order2 = explode(',', $orderby)[1];
-                } else {
-                    $order1 = $orderby;
-                    $order2 = '';
-                }
-            }
-
-            if (isset($show) && $show == 'organisation') {
-                // Forschungsbereiche
-                require_once('class_Organisation.php');
-                $liste = new Organisation($param1, $param2);
-                return $liste->singleOrganisation($hide);
-            } elseif (isset($show) && $show == 'fields') {
-                // Forschungsbereiche
-                require_once('class_Forschungsbereiche.php');
-                $liste = new Forschungsbereiche($param1, $param2);
-
-                if ($field != '') {
-                    return $liste->singleField($hide);
-                }
-                if (!empty($items)) {
-                    return $liste->fieldListe();
-                }
+            if (!empty($parameter['items'])) {
                 return $liste->fieldListe();
-            } elseif (isset($show) && $show == 'activities') {
-                // Projekte
-                require_once('class_Aktivitaeten.php');
-                $liste = new Aktivitaeten($param1, $param2);
-
-                if ($activity != '') {
-                    return $liste->singleActivity($hide);
-                }
-                if (!empty($items)) {
-                    return $liste->actiListe($year, $start, $type, $items, $hide);
-                }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->actiNachTyp($year, $start, $type, $hide);
-                }
-                if (strpos($order1, 'year') !== false) {
-                    return $liste->actiNachJahr($year, $start, $type, $hide);
-                }
-                return $liste->actiListe($year, $start, $type, $items, $hide);
-            } elseif (isset($show) && $show == 'patents') {
-                // Projekte
-                require_once('class_Patente.php');
-                $liste = new Patente($param1, $param2);
-
-                if ($patent != '') {
-                    return $liste->singlePatent($hide);
-                }
-                if (!empty($items)) {
-                    return $liste->patListe($year, $start, $type, $items, $hide);
-                }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->patNachTyp($year, $start, $type, $hide);
-                }
-                if (strpos($order1, 'year') !== false) {
-                    return $liste->patNachJahr($year, $start, $type, $hide);
-                }
-                return $liste->patListe($year, $start, $type, $items, $hide);
-            } elseif (isset($show) && $show == 'projects') {
-                // Projekte
-                require_once('class_Projekte.php');
-                $liste = new Projekte($param1, $param2);
-
-                if ($project != '') {
-                    return $liste->singleProj($hide);
-                }
-                if (!empty($items)) {
-                    return $liste->projListe($year, $start, $type, $items, $hide, $role);
-                }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->projNachTyp($year, $start, $type, $hide, $role);
-                }
-                if (strpos($order1, 'year') !== false) {
-                    return $liste->projNachJahr($year, $start, $type, $hide, $role);
-                }
-                return $liste->projListe($year, $start, $type, $items, $hide, $role);
-            } elseif (isset($show) && $show == 'awards') {
-                // Awards
-                require_once('class_Auszeichnungen.php');
-                $liste = new Auszeichnungen($param1, $param2, $display);
-
-                if ($award != '') {
-                    return $liste->singleAward($showname, $showyear, $showawardname, $display);
-                }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display, $order2);
-                }
-                if (strpos($order1, 'year') !== false) {
-                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, 0, $showawardname, $display, $order2);
-                }
-                return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
-            } else {
-                // Publications
-                require_once('class_Publikationen.php');
-                $liste = new Publikationen($param1, $param2);
-
-                if ($publication != '') {
-                    return $liste->singlePub($quotation);
-                }
-                if (!empty($items) || !empty($sortby)) {
-                    return $liste->pubListe($year, $start, $type, $subtype, $quotation, $items, $sortby);
-                }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->pubNachTyp($year, $start, $type, $subtype, $quotation, $order2);
-                }
-                return $liste->pubNachJahr($year, $start, $type, $subtype, $quotation, $order2);
             }
+            return $liste->fieldListe();
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'activities') {
+            // Projekte
+            require_once('class_Aktivitaeten.php');
+            $liste = new Aktivitaeten($parameter['entity'], $parameter['entity_id']);
+
+            if ($parameter['activity'] != '') {
+                return $liste->singleActivity($parameter['hide']);
+            }
+            if (!empty($parameter['items'])) {
+                return $liste->actiListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->actiNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
+            }
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->actiNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
+            }
+            return $liste->actiListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'patents') {
+            // Projekte
+            require_once('class_Patente.php');
+            $liste = new Patente($parameter['entity'], $parameter['entity_id']);
+
+            if ($parameter['patent'] != '') {
+                return $liste->singlePatent($parameter['hide']);
+            }
+            if (!empty($parameter['items'])) {
+                return $liste->patListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->patNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
+            }
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->patNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
+            }
+            return $liste->patListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
+            // Projekte
+            require_once('class_Projekte.php');
+            $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
+
+            if ($parameter['project'] != '') {
+                return $liste->singleProj($parameter['hide']);
+            }
+            if (!empty($parameter['items'])) {
+                return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->projNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role']);
+            }
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role']);
+            }
+            return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'awards') {
+            // Awards
+            require_once('class_Auszeichnungen.php');
+            $liste = new Auszeichnungen($parameter['entity'], $parameter['entity_id'], $parameter['display']);
+
+            if ($parameter['award'] != '') {
+                return $liste->singleAward($parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display']);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->awardsNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display'], $parameter['order2']);
+            }
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->awardsNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], 0, $parameter['showawardname'], $parameter['display'], $parameter['order2']);
+            }
+            return $liste->awardsListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display']);
+        } else {
+            // Publications
+            require_once('class_Publikationen.php');
+            $liste = new Publikationen($parameter['entity'], $parameter['entity_id']);
+
+            if ($parameter['publication'] != '') {
+                return $liste->singlePub($parameter['quotation']);
+            }
+            if (!empty($parameter['items']) || !empty($parameter['sortby'])) {
+                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby']);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2']);
+            }
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2']);
         }
+
         // nothing
         return '';
     }
 
     public static function cris_custom_shortcode($atts, $content = null) {
+        $parameter = self::cris_shortcode_parameter($atts);
+
+        if ($parameter['show'] == 'organisation') {
+        // Forschung
+            require_once('class_Organisation.php');
+            $liste = new Organisation($parameter['entity'], $parameter['entity_id']);
+            return $liste->customOrganisation($content);
+        } elseif ($parameter['show'] == 'fields') {
+        // Forschungsbereiche
+            require_once('class_Forschungsbereiche.php');
+            $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
+            if ($parameter['field'] != '') {
+                return $liste->customField($content);
+            }
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
+        // Projekte
+            require_once('class_Projekte.php');
+            $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
+            if ($parameter['project'] != '') {
+                return $liste->customProj($content);
+            }
+            /*if (!empty($parameter['items'])) {
+                return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->projNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'] = array(), $parameter['role'], $content);
+            }
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'] = array(), $parameter['role'], $content);
+            }
+            return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);*/
+        }
+    }
+
+
+    private static function cris_shortcode_parameter($atts) {
         $options = self::get_options();
 
         // Attributes
@@ -875,89 +771,90 @@ class FAU_CRIS {
             'field' => ''
                         ), $atts));
 
-        $show = sanitize_text_field($show);
-        $orderby = sanitize_text_field($orderby);
-        $type = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
-        $subtype = sanitize_text_field($subtype);
-        $year = sanitize_text_field($year);
-        $start = sanitize_text_field($start);
-        $orgid = sanitize_text_field($orgid);
-        $persid = sanitize_text_field($persid);
-        $publication = sanitize_text_field($publication);
-        $quotation = sanitize_text_field($quotation);
-        $items = sanitize_text_field($items);
-        if (in_array($sortby, array('created', 'updated'))) $sortby = sanitize_text_field($sortby);
-        $award = sanitize_text_field($award);
-        $awardnameid = sanitize_text_field($awardnameid);
-        $showname = sanitize_text_field($showname);
-        $showyear = sanitize_text_field($showyear);
-        $showawardname = sanitize_text_field($showawardname);
-        $display = sanitize_text_field($display);
-        $project = sanitize_text_field($project);
-        $role = sanitize_text_field($role);
-        $patent = sanitize_text_field($patent);
-        $activity = sanitize_text_field($activity);
-        $field = sanitize_text_field($field);
+        $sc_param['orderby'] = sanitize_text_field($orderby);
+        $sc_param['orgid'] = sanitize_text_field($orgid);
+        $sc_param['persid'] = sanitize_text_field($persid);
+        $sc_param['publication'] = sanitize_text_field($publication);
+        $sc_param['award'] = sanitize_text_field($award);
+        $sc_param['awardnameid'] = sanitize_text_field($awardnameid);
+        $sc_param['project'] = sanitize_text_field($project);
+        $sc_param['patent'] = sanitize_text_field($patent);
+        $sc_param['activity'] = sanitize_text_field($activity);
+        $sc_param['field'] = sanitize_text_field($field);
+        $sc_param['show'] = sanitize_text_field($show);
+        $sc_param['type'] = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
+        $sc_param['subtype'] = sanitize_text_field($subtype);
+        $sc_param['year'] = sanitize_text_field($year);
+        $sc_param['start'] = sanitize_text_field($start);
+        $sc_param['quotation'] = sanitize_text_field($quotation);
+        $sc_param['items'] = sanitize_text_field($items);
+        $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : null;
+        $sc_param['showname'] = sanitize_text_field($showname);
+        $sc_param['showyear'] = sanitize_text_field($showyear);
+        $sc_param['showawardname'] = sanitize_text_field($showawardname);
+        $sc_param['display'] = sanitize_text_field($display);
+        $sc_param['role'] = sanitize_text_field($role);
+        $sc_param['hide'] = sanitize_text_field($hide);
 
-        if (isset($publication) && $publication != '') {
-            $param1 = 'publication';
-            if (strpos($publication, ',')) {
-                $publication = str_replace(' ', '', $publication);
-                $publication = explode(',', $publication);
+        if ($sc_param['publication'] != '') {
+            $sc_param['entity'] = 'publication';
+            if (strpos($sc_param['publication'], ',')) {
+                $sc_param['publication'] = str_replace(' ', '', $sc_param['publication']);
+                $sc_param['publication'] = explode(',', $sc_param['publication']);
             }
-            $param2 = $publication;
-        } elseif (isset($field) && $field != '') {
-            $param1 = 'field';
-            $param2 = $field;
-        } elseif (isset($activity) && $activity != '') {
-            $param1 = 'activity';
-            $param2 = $activity;
-        } elseif (isset($patent) && $patent != '') {
-            $param1 = 'patent';
-            $param2 = $patent;
-        } elseif (isset($award) && $award != '') {
-            $param1 = 'award';
-            $param2 = $award;
-        } elseif (isset($project) && $project != '') {
-            $param1 = 'project';
-            if (strpos($project, ',') !== false) {
-                $project = str_replace(' ', '', $project);
-                $project = explode(',', $project);
+            $sc_param['entity_id'] = $sc_param['publication'];
+        } elseif ($sc_param['field'] != '') {
+            $sc_param['entity'] = 'field';
+            $sc_param['entity_id'] = $sc_param['field'];
+        } elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
+            $sc_param['entity'] = 'activity';
+            $sc_param['entity_id'] = $sc_param['activity'];
+        } elseif (isset($sc_param['patent']) && $sc_param['patent'] != '') {
+            $sc_param['entity'] = 'patent';
+            $sc_param['entity_id'] = $sc_param['patent'];
+        } elseif (isset($sc_param['award']) && $sc_param['award'] != '') {
+            $sc_param['entity'] = 'award';
+            $sc_param['entity_id'] = $sc_param['award'];
+        } elseif (isset($sc_param['project']) && $sc_param['project'] != '') {
+            $sc_param['entity'] = 'project';
+            if (strpos($sc_param['project'], ',') !== false) {
+                $sc_param['project'] = str_replace(' ', '', $sc_param['project']);
+                $sc_param['project'] = explode(',', $sc_param['project']);
             }
-            $param2 = $project;
-        } elseif (isset($awardnameid) && $awardnameid != '') {
-            $param1 = 'awardnameid';
-            $param2 = $awardnameid;
-        } elseif (isset($persid) && $persid != '') {
-            $param1 = 'person';
-            if (strpos($persid, ',') !== false) {
-                $persid = str_replace(' ', '', $persid);
-                $persid = explode(',', $persid);
+            $sc_param['entity_id'] = $sc_param['project'];
+        } elseif (isset($sc_param['awardnameid']) && $sc_param['awardnameid'] != '') {
+            $sc_param['entity'] = 'awardnameid';
+            $sc_param['entity_id'] = $sc_param['awardnameid'];
+        } elseif (isset($sc_param['persid']) && $sc_param['persid'] != '') {
+            $sc_param['entity'] = 'person';
+            if (strpos($sc_param['persid'], ',') !== false) {
+                $sc_param['persid'] = str_replace(' ', '', $sc_param['persid']);
+                $sc_param['persid'] = explode(',', $sc_param['persid']);
             }
-            $param2 = $persid;
-        } elseif (isset($orgid) && $orgid != '') {
-            $param1 = 'orga';
-            if (strpos($orgid, ',') !== false) {
-                $orgid = str_replace(' ', '', $orgid);
-                $orgid = explode(',', $orgid);
+            $sc_param['entity_id'] = $sc_param['persid'];
+        } elseif (isset($sc_param['orgid']) && $sc_param['orgid'] != '') {
+            $sc_param['entity'] = 'orga';
+            if (strpos($sc_param['orgid'], ',') !== false) {
+                $sc_param['orgid'] = str_replace(' ', '', $sc_param['orgid']);
+                $sc_param['orgid'] = explode(',', $sc_param['orgid']);
             }
-            $param2 = $orgid;
+            $sc_param['entity_id'] = $sc_param['orgid'];
         } else {
-            $param1 = '';
-            $param2 = '';
+            $sc_param['entity'] = '';
+            $sc_param['entity_id'] = '';
         }
 
-        $order1 = 'year';
-        $order2 = '';
+        $sc_param['order1'] = 'year';
+        $sc_param['order2'] = '';
 
         if (!empty($orderby)) {
             if (strpos($orderby, ',') !== false) {
                 $orderby = str_replace(' ', '', $orderby);
-                $order1 = explode(',', $orderby)[0];
-                $order2 = explode(',', $orderby)[1];
+                $sc_param['order1'] = explode(',', $orderby)[0];
+                $sc_param['order2'] = explode(',', $orderby)[1];
             } else {
-                $order1 = $orderby;
-                $order2 = '';
+                $sc_param['order1'] = $orderby;
+                $sc_param['order2'] = '';
             }
         }
 
