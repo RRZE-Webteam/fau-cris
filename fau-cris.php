@@ -858,25 +858,7 @@ class FAU_CRIS {
             }
         }
 
-        if (isset($show) && $show == 'projects') {
-            // Projekte
-            require_once('class_Projekte.php');
-            $liste = new Projekte($param1, $param2);
-
-            if ($project != '') {
-                return $liste->customProj($content);
-            }
-            if (!empty($items)) {
-            //    return $liste->projListe($year, $start, $type, $items, $hide, $role);
-            }
-            if (strpos($order1, 'type') !== false) {
-                return $liste->projNachTyp($year, $start, $type, $hide = array(), $role, $content);
-            }
-            if (strpos($order1, 'year') !== false) {
-                return $liste->projNachJahr($year, $start, $type, $hide = array(), $role, $content);
-            }
-            //return $liste->projListe($year, $start, $type, $items, $hide, $role);
-        }
+        return $sc_param;
     }
 
     public static function cris_enqueue_styles() {

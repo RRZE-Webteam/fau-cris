@@ -49,7 +49,7 @@ class Forschungsbereiche {
      * Ausgabe aller Forschungsbereiche
      */
 
-    public function fieldListe() {
+    public function fieldListe($hide) {
         $sortby = 'cfname';
         $fieldsArray = $this->fetch_fields();
 
@@ -57,6 +57,7 @@ class Forschungsbereiche {
             $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
+        $hide = explode(',', $hide);
         if ($this->lang == 'en')
             $order = $sortby . '_en';
          else
@@ -78,6 +79,26 @@ class Forschungsbereiche {
 
     public function singleField($hide) {
         $ws = new CRIS_fields();
+        try {
+            $fieldsArray = $ws->by_id($this->id);
+        } catch (Exception $ex) {
+            return;
+        }
+        if (!count($fieldsArray))
+            return;
+        $hide = explode(',', $hide);
+
+        $output = $this->make_single($fieldsArray, $hide);
+
+        return $output;
+    }
+
+    /*
+     * Ausgabe eines einzelnen Forschungsbereichs per Custom-Shortcode
+     */
+
+    public function customField($content = '') {
+        $ws = new CRIS_fields();
 
         try {
             $fieldsArray = $ws->by_id($this->id);
@@ -88,7 +109,7 @@ class Forschungsbereiche {
         if (!count($fieldsArray))
             return;
 
-        $output = $this->make_single($fieldsArray, $hide);
+        $output = $this->make_custom_single($fieldsArray, $content);
 
         return $output;
     }
@@ -142,6 +163,10 @@ class Forschungsbereiche {
 
         return $pubArray;
     }
+
+    /*
+     * Ausgabe der Forschungsbereiche
+     */
 
     private function make_single($fields, $hide = array()) {
 
@@ -209,9 +234,58 @@ class Forschungsbereiche {
     }
 
 
-    /*
-     * Ausgabe der Forschungsbereiche
-     */
+    private function make_custom_single($fields, $content) {
+
+        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
+        $field_details = array();
+        $output = "<div class=\"cris-fields\">";;
+        $vars = array('[title]','[description]','[projects]','[persons]'/*, '[publications]'*/);
+
+        foreach ($fields as $field) {
+            $field = (array) $field;
+            foreach ($field['attributes'] as $attribut => $v) {
+                $field[$attribut] = $v;
+            }
+            unset($field['attributes']);
+            $imgs = self::get_field_images($field['ID']);
+            $id = $field['ID'];
+            $field_details['title'] = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
+            $field_details['description'] = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
+            $field_details['projects'] = $this->get_field_projects($id);
+            $field_details['persons'] = '';
+            $persons = $this->get_field_persons($id);
+            if ($persons) {
+                $field_details['persons'] .= "<ul>";
+                foreach ($persons as $type => $person) {
+                    foreach ($person as $id => $details) {
+                        $field_details['persons'] .= "<li>";
+                        $field_details['persons'] .= Tools::get_person_link($id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                        $field_details['persons'] .= "</li>";
+                    }
+                }
+                $field_details['persons'] .= "</ul>";
+            }
+            // TODO
+            /* $field_details['publications'] .= "ToDo"; */
+            $field_details['image1'] = '';
+            if (count($imgs)) {
+                $i = 1;
+                foreach($imgs as $img) {
+                    $field_details['image'.$i] .= "<div class=\"cris-image\">";
+                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                       $field_details['image'.$i] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                    $field_details['image'.$i] .= "</div>";
+                    }
+                    array_push($vars,'[image'.$i.']');
+                    $i++;
+                }
+            }
+            $output .= str_replace($vars, $field_details, $content);
+        }
+        $output .= "</div>";
+        return $output;
+    }
 
     private function make_list($fields) {
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';

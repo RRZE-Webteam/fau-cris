@@ -57,6 +57,7 @@ class Projekte {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
+        $hide = explode(',', $hide);
 
         // sortiere nach Erscheinungsdatum
         $order = "cfstartdate";
@@ -85,6 +86,7 @@ class Projekte {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
+        $hide = explode(',', $hide);
 
         // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
         $formatter = new CRIS_formatter("startyear", SORT_DESC, "cftitle", SORT_ASC);
@@ -115,6 +117,7 @@ class Projekte {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
+        $hide = explode(',', $hide);
 
         // Publikationstypen sortieren
         $order = $this->order;
@@ -165,6 +168,7 @@ class Projekte {
             return $output;
         }
 
+        $hide = explode(',', $hide);
         if (is_array($this->id)) {
             $output = $this->make_list($projArray, $hide);
         } else {
@@ -228,8 +232,9 @@ class Projekte {
 
     private function make_custom_single($projects, $custom_text) {
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
-        $projlist = '';
-        $projlist .= "<div class=\"cris-projects\">";
+        $proj_details = array();
+        $projlist = "<div class=\"cris-projects\">";
+        $proj_vars = array('[title]','[type]','[parentprojecttitle]','[leaders]','[members]','[start]','[end]','[funding]','[url]','[acronym]','[description]','[publications]');
 
         foreach ($projects as $project) {
             $project = (array) $project;
@@ -272,8 +277,6 @@ class Projekte {
             $proj_details['description'] = strip_tags($description, '<br><br/><a>');
             $proj_details['publications'] = $this->get_project_publications($id, $quotation = '');
 
-            $proj_vars = array(
-                '[title]','[type]','[parentprojecttitle]','[leaders]','[members]','[start]','[end]','[funding]','[url]','[acronym]','[description]','[publications]');
             $projlist .= str_replace($proj_vars, $proj_details, $custom_text);
 
         }
@@ -320,7 +323,7 @@ class Projekte {
         return $projlist;
     }
 
-    private function make_single($projects, $hide = '') {
+    private function make_single($projects, $hide = array()) {
 
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $projlist = '';
@@ -487,7 +490,7 @@ class Projekte {
                         . "<div class=\"abstract\">" . $description . '</div>'
                         . '</div>';
             }
-            if (!in_array('link', $hide) && !empty($id))
+            if (!in_array('link', $hide) && !empty($id)) {
                 $link = "https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1');
                 if ($this->cms == 'wp') {
                     $proj_pages = get_pages(array('child_of' => $post->ID, 'post_status' => 'publish'));
@@ -507,6 +510,7 @@ class Projekte {
                     }
                 }
                 $projlist .= "<div>" . "<a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> &#8594; </div>";
+            }
             $projlist .= "</li>";
         }
         $projlist .= "</ul>";

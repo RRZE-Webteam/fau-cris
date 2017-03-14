@@ -89,6 +89,14 @@ class Sync {
         $research_contacts = $orga->researchContacts();
         if (!isset($page_research) || !count($page_research)) {
         // Seite Forschung existiert noch nicht -> anlegen
+            if ($this->options['cris_sync_shortcode_format']['research'] == 1) {
+                $research_content = "[cris-custom show=organisation]\n"
+                        . "[image]\n"
+                        . "[description]\n"
+                        . "[/cris-custom]";
+            } else {
+                $research_content = '[cris show=organisation]';
+            }
             $args = array(
                 'post_content' => '[cris show=organisation]',
                 'post_title' => $this->title_research,
