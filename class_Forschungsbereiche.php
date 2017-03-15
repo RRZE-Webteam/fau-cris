@@ -118,19 +118,22 @@ class Forschungsbereiche {
      * Array aller Forschungsbereiche für die Synchonisierung
      */
 
-    public function fieldsArray($seed=false) {
-        $sortby = 'cfname';
+    public function fieldsArray($seed=false, $sortby=NULL) {
         $fieldsArray = $this->fetch_fields($seed);
 
         if (!count($fieldsArray)) {
             return false;
         }
-        if ($this->lang == 'en')
-            $order = $sortby . '_en';
-         else
-            $order = $sortby;
-
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+        if ($sortby != NULL) {
+            if ($this->lang == 'en')
+                $order = $sortby . '_en';
+            else
+                $order = $sortby;
+        } else {
+            $order = strtolower(__('O.A.', 'fau-cris'));
+        }
+        
+        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
         $fieldList = $res[$order];
 
