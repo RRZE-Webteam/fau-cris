@@ -39,10 +39,8 @@ class Sync {
         $this->num_errors = 0;
         $this->title_research = __('Forschung', 'fau-cris');
         $this->title_noFieldsPage = __('Weitere Projekte', 'fau-cris');
-        $this->page_template_portal = ( '' != locate_template('page-templates/page-portal.php')) ? 'page-templates/page-portalindex.php' : 'page.php';
-        //$this->page_template_portal = ( '' != locate_template('page-templates/page-portalindex.php')) ? 'page-templates/page-portalindex.php' : 'page.php';
-        $this->page_template_nav = 'page.php';
-        //$this->page_template_nav = ( '' != locate_template('page-templates/page-subnav.php')) ? 'page-templates/page-subnav.php' : 'page.php';
+        $this->page_template_portal = ( '' != locate_template('page-templates/page-portal.php')) ? 'page-templates/page-portal.php' : 'page.php';
+        $this->page_template_nav = ( '' != locate_template('page-templates/page-subnav.php')) ? 'page-templates/page-subnav.php' : 'page.php';
         $this->num_menu_items= 1;
         $this->menu_count = 1;
         // Hauptmenü
@@ -334,7 +332,7 @@ class Sync {
 
             $projects = $field['projects'];
             foreach ($projects as $project) {
-                $project_page = self::cris_make_page($project['title'], $project['content'], $project['contact'], $project['position'], $field_page['pid'], $field_page['mid'], $field_page['mpid'],1);
+                $project_page = self::cris_make_page($project['title'], $project['content'], $project['contact'], $project['position'], $field_page['pid'], $field_page['mid'], $field_page['mpid'],1,$this->page_template_nav);
             }
         }
 
@@ -414,7 +412,7 @@ class Sync {
             return $mid;
     }
 
-    private function cris_make_page($title, $content, $contact = array('-1'), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1) {
+    private function cris_make_page($title, $content, $contact = array('-1'), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php') {
         $pages = get_pages(array('child_of' => $parent_pid, 'post_status' => 'publish'));
         $pages_array = array();
         foreach ($pages as $page) {
@@ -431,7 +429,7 @@ class Sync {
                 'post_type' => 'page',
                 'post_parent' => $parent_pid,
                 'menu_order' => $position,
-                'page_template' => $this->page_template_nav,
+                'page_template' => $template,
                 'meta_input' => array(
                     'sidebar_personen' => $contact )
             );
