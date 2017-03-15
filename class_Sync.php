@@ -92,8 +92,8 @@ class Sync {
         // Seite Forschung existiert noch nicht -> anlegen
             if ($this->options['cris_sync_shortcode_format']['research'] == 1) {
                 $research_content = "[cris-custom show=organisation]\n"
-                        . "[image]\n"
-                        . "[description]\n"
+                        . "#image1#\n"
+                        . "#description#\n"
                         . "[/cris-custom]";
             } else {
                 $research_content = '[cris show=organisation]';
@@ -205,9 +205,22 @@ class Sync {
                         $fcids[] = $fcid;
                     }
                 }
+                if ($this->options['cris_sync_shortcode_format']['fields'] == 1) {
+                    $field_content = "[cris-custom show=fields field=$field->ID]"
+                            . "<h2>#title#</h2>"
+                            . "#image1# "
+                            . "#description#"
+                            . "<h3>" . __('Projekte', 'fau-cris') . ": </h3>"
+                            . "#projects#"
+                            . "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>"
+                            . "#persons#"
+                            . "[/cris-custom]";
+                } else {
+                    $field_content = "[cris show=fields field=$field->ID]";
+                }
                 $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
                 $pages[$field->ID]['position'] = $this->menu_position;
-                $pages[$field->ID]['content'] = "[cris show=fields field=$field->ID]";
+                $pages[$field->ID]['content'] = $field_content;
                 $pages[$field->ID]['contact'] = $fcids;
                 $pages[$field->ID]['projects'] = array();
                 $this->menu_position ++;
@@ -216,22 +229,22 @@ class Sync {
                 foreach ($projects as $project) {
                     if ($this->options['cris_sync_shortcode_format']['projects'] == 1) {
                         $proj_content = "[cris-custom show=projects project=$project->ID]\n"
-                            . "<h3>[title]</h3>\n"
-                            . "<p class=\"project-type\">([type])</p>\n"
+                            . "<h3>#title#</h3>\n"
+                            . "<p class=\"project-type\">(#type#)</p>\n"
                             . "<p class=\"project-details\">"
-                            . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> [parentprojecttitle]"
-                            . "<br /><b>" . __('Projektleitung', 'fau-cris') . ":</b> [leaders]"
-                            . "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ":</b> [members]"
-                            . "<br /><b>" . __('Projektstart', 'fau-cris') . ":</b> [start]"
-                            . "<br /><b>" . __('Projektende', 'fau-cris') . ":</b> [end]"
-                            . "<br /><b>" . __('Akronym', 'fau-cris') . ":  </b> [acronym]"
-                            . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> [funding]"
-                            . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"[url]\">[url]</a>"
+                            . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> #parentprojecttitle#"
+                            . "<br /><b>" . __('Projektleitung', 'fau-cris') . ":</b> #leaders#"
+                            . "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ":</b> #members#"
+                            . "<br /><b>" . __('Projektstart', 'fau-cris') . ":</b> #start#"
+                            . "<br /><b>" . __('Projektende', 'fau-cris') . ":</b> #end#"
+                            . "<br /><b>" . __('Akronym', 'fau-cris') . ":  </b> #acronym#"
+                            . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> #funding#"
+                            . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"#url#\">#url#</a>"
                             . "</p>"
                             . "<h4>" . __('Abstract', 'fau-cris') . ":</h4>"
-                            . "<p class=\"project-description\">[description]</p>"
+                            . "<p class=\"project-description\">#description#</p>"
                             . "<h4>" . __('Publikationen', 'fau-cris') . ":</h4>"
-                            . "[publications]\n"
+                            . "#publications#\n"
                             . "[/cris-custom]";
                     } else {
                         $proj_content = "[cris show=projects project=$project->ID]";
@@ -268,22 +281,22 @@ class Sync {
         foreach ($all_projects as $a_p) {
             if ($this->options['cris_sync_shortcode_format']['projects'] == 1) {
                 $nf_proj_content = "[cris-custom show=projects project=$a_p->ID]\n"
-                        . "<h3>[title]</h3>\n"
-                        . "<p class=\"project-type\">([type])</p>\n"
+                        . "<h3>#title#</h3>\n"
+                        . "<p class=\"project-type\">(#type#)</p>\n"
                         . "<p class=\"project-details\">"
-                        . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> [parentprojecttitle]"
-                        . "<br /><b>" . __('Projektleitung', 'fau-cris') . ":</b> [leaders]"
-                        . "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ":</b> [members]"
-                        . "<br /><b>" . __('Projektstart', 'fau-cris') . ":</b> [start]"
-                        . "<br /><b>" . __('Projektende', 'fau-cris') . ":</b> [end]"
-                        . "<br /><b>" . __('Akronym', 'fau-cris') . ":  </b> [acronym]"
-                        . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> [funding]"
-                        . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"[url]\">[url]</a>"
+                        . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> #parentprojecttitle#"
+                        . "<br /><b>" . __('Projektleitung', 'fau-cris') . ":</b> #leaders#"
+                        . "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ":</b> #members#"
+                        . "<br /><b>" . __('Projektstart', 'fau-cris') . ":</b> #start#"
+                        . "<br /><b>" . __('Projektende', 'fau-cris') . ":</b> #end#"
+                        . "<br /><b>" . __('Akronym', 'fau-cris') . ":  </b> #acronym#"
+                        . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> #funding#"
+                        . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"#url#\">#url#</a>"
                         . "</p>"
                         . "<h4>" . __('Abstract', 'fau-cris') . ":</h4>"
-                        . "<p class=\"project-description\">[description]</p>"
+                        . "<p class=\"project-description\">#description#</p>"
                         . "<h4>" . __('Publikationen', 'fau-cris') . ":</h4>"
-                        . "[publications]\n"
+                        . "#publications#\n"
                         . "[/cris-custom]";
             } else {
                 $nf_proj_content = "[cris-custom show=projects project=$a_p->ID]";

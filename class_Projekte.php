@@ -234,7 +234,6 @@ class Projekte {
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $proj_details = array();
         $projlist = "<div class=\"cris-projects\">";
-        $proj_vars = array('[title]','[type]','[parentprojecttitle]','[leaders]','[members]','[start]','[end]','[funding]','[url]','[acronym]','[description]','[publications]');
 
         foreach ($projects as $project) {
             $project = (array) $project;
@@ -246,38 +245,51 @@ class Projekte {
             unset($project['attributes']);
 
             $id = $project['ID'];
+            $imgs = self::get_project_images($project['ID']);
             $proj_details = array();
 
-            $proj_details['title'] = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
-            $proj_details['type'] = Tools::getName('projects', $project['project type'], get_locale());
-            $proj_details['parentprojecttitle'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
+            $proj_details['#title#'] = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+            $proj_details['#type#'] = Tools::getName('projects', $project['project type'], get_locale());
+            $proj_details['#parentprojecttitle#'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $leaderIDs = explode(",", $project['relpersidlead']);
             $collIDs = explode(",", $project['relpersidcoll']);
             $persons = $this->get_project_persons($id, $leaderIDs, $collIDs);
-            $proj_details['leaders'] = array();
+            $proj_details['#leaders#'] = array();
             foreach ($persons['leaders'] as $l_id => $l_names) {
                 $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
             }
-            $proj_details['leaders'] = implode(', ', $leaders);
-            $proj_details['members'] = array();
+            $proj_details['#leaders#'] = implode(', ', $leaders);
+            $proj_details['#members#'] = array();
             foreach ($persons['members'] as $m_id => $m_names) {
                 $members[] = Tools::get_person_link($m_id, $m_names['firstname'], $m_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
             }
-            $proj_details['members'] = implode(', ', $members);
+            $proj_details['#members#'] = implode(', ', $members);
             setlocale(LC_TIME, get_locale());
             $start = $project['cfstartdate'];
-            $proj_details['start']= strftime('%x', strtotime($start));
+            $proj_details['#start#']= strftime('%x', strtotime($start));
             $end = $project['virtualenddate'];
-            $proj_details['end'] = strftime('%x', strtotime($end));
+            $proj_details['#end#'] = strftime('%x', strtotime($end));
             $funding = $this->get_project_funding($id);
-            $proj_details['funding'] = implode(', ', $funding);
-            $proj_details['url'] = $project['cfuri'];
-            $proj_details['acronym'] = $project['cfacro'];
+            $proj_details['#funding#'] = implode(', ', $funding);
+            $proj_details['#url#'] = $project['cfuri'];
+            $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['description'] = strip_tags($description, '<br><br/><a>');
-            $proj_details['publications'] = $this->get_project_publications($id, $quotation = '');
-
-            $projlist .= str_replace($proj_vars, $proj_details, $custom_text);
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a>');
+            $proj_details['#publications#'] = $this->get_project_publications($id, $quotation = '');
+            $proj_details['#image1#'] = '';
+            if (count($imgs)) {
+                $i = 1;
+                foreach($imgs as $img) {
+                    $proj_details["#image$i#"] = "<div class=\"cris-image\">";
+                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                       $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                    $proj_details["#image$i#"] .= "</div>";
+                    }
+                    $i++;
+                }
+            }
+            $projlist .= strtr($custom_text, $proj_details);
 
         }
         $projlist .= "</div>";
@@ -297,26 +309,39 @@ class Projekte {
             unset($project['attributes']);
 
             $id = $project['ID'];
+            $imgs = self::get_project_images($project['ID']);
+
             $proj_details = array();
-            $proj_details['title'] = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
-            $proj_details['type'] = Tools::getName('projects', $project['project type'], get_locale());
-            $proj_details['parentprojecttitle'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
+            $proj_details['#title#'] = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+            $proj_details['#type#'] = Tools::getName('projects', $project['project type'], get_locale());
+            $proj_details['#parentprojecttitle#'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             setlocale(LC_TIME, get_locale());
             $start = $project['cfstartdate'];
-            $proj_details['start']= strftime('%x', strtotime($start));
+            $proj_details['#start#'] = strftime('%x', strtotime($start));
             $end = $project['virtualenddate'];
-            $proj_details['end'] = strftime('%x', strtotime($end));
+            $proj_details['#end#'] = strftime('%x', strtotime($end));
             $funding = $this->get_project_funding($id);
-            $proj_details['funding'] = implode(', ', $funding);
-            $proj_details['url'] = $project['cfuri'];
-            $proj_details['acronym'] = $project['cfacro'];
+            $proj_details['#funding#'] = implode(', ', $funding);
+            $proj_details['#url#'] = $project['cfuri'];
+            $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['description'] = strip_tags($description, '<br><br/><a>');
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a>');
+            $proj_details['#image1#'] = '';
+            if (count($imgs)) {
+                $i = 1;
+                foreach($imgs as $img) {
+                    $proj_details["#image$i#"] = "<div class=\"cris-image\">";
+                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                       $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                    $proj_details["#image$i#"] .= "</div>";
+                    }
+                    $i++;
+                }
+            }
 
-            $proj_vars = array(
-                '[title]','[type]','[parentprojecttitle]','[start]','[end]','[funding]','[url]','[acronym]','[description]');
             $projlist .= "<li>";
-            $projlist .= str_replace($proj_vars, $proj_details, $custom_text);
+            $projlist .= strtr($custom_text, $proj_details);
             $projlist .= "</li>";
         }
         $projlist .= "</ul>";

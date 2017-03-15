@@ -176,9 +176,10 @@ class Organisation {
                 $organisation[$attribut] = $v;
             }
             unset($organisation['attributes']);
-            $details['image'] = '';
+            $details['#image1#'] = '';
             $research_imgs = self::get_research_images($organisation['ID']);
             if (count($research_imgs)) {
+                $i = 1;
                 $image = "<div class=\"cris-image\">";
                 foreach($research_imgs as $img) {
                     if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
@@ -187,15 +188,15 @@ class Organisation {
                     }
                 }
                 $image .= "</div>";
-                $details['image'] = $image;
+                $details["#image.$i.#"] .= $image;
+                $i++;
             }
-            $details['description'] = '';
+            $details['#description#'] = '';
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
                 $research = ($lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
-                $details['description'] = "<p class=\"cris-research\">" . $research . "</p>";
+                $details['#description#'] .= "<p class=\"cris-research\">" . $research . "</p>";
             }
-            $vars = array('[image]', '[description]');
-            $output .= str_replace($vars, $details, $custom_text);
+            $output .= strtr($custom_text, $details);
         }
         $output .= "</div>";
         return $output;
