@@ -102,7 +102,7 @@ class Sync {
                 'post_status' => 'publish',
                 'post_type' => 'page',
                 'post_parent' => 0,
-                'menu_order' => $this->menu_position,
+                //'menu_order' => $this->menu_position,
                 'page_template' => $this->page_template_portal,
                 'meta_input' => array(
                     // wegen der chaotischen Benennung der Meta-Values, siehe custom-fields.php, Z. 673ff.
