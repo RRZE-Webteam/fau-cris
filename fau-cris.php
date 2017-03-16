@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.32
+ * Version: 3.34
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -34,7 +34,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '3.32';
+    const version = '3.33';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -154,7 +154,11 @@ class FAU_CRIS {
             'cris_sync_check' => 0,
             'cris_sync_research_custom' => 0,
             'cris_sync_field_custom' => 0,
-            'cris_sync_shortcode_format' => 0
+            'cris_sync_shortcode_format' => array(
+                'research' => 0,
+                'fields' => 0,
+                'projects' => 0,
+            )
         );
         return $options;
     }
@@ -606,14 +610,14 @@ class FAU_CRIS {
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
 
             if ($parameter['field'] != '') {
-                return $liste->singleField($parameter['hide']);
+                return $liste->singleField($parameter['hide'],$parameter['quotation']);
             }
             if (!empty($parameter['items'])) {
                 return $liste->fieldListe();
             }
             return $liste->fieldListe();
         } elseif (isset($parameter['show']) && $parameter['show'] == 'activities') {
-            // Projekte
+            // Aktivitäten
             require_once('class_Aktivitaeten.php');
             $liste = new Aktivitaeten($parameter['entity'], $parameter['entity_id']);
 
@@ -631,7 +635,7 @@ class FAU_CRIS {
             }
             return $liste->actiListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'patents') {
-            // Projekte
+            // Patente
             require_once('class_Patente.php');
             $liste = new Patente($parameter['entity'], $parameter['entity_id']);
 
@@ -654,7 +658,7 @@ class FAU_CRIS {
             $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
 
             if ($parameter['project'] != '') {
-                return $liste->singleProj($parameter['hide']);
+                return $liste->singleProj($parameter['hide'], $parameter['quotation']);
             }
             if (!empty($parameter['items'])) {
                 return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
@@ -715,14 +719,14 @@ class FAU_CRIS {
             require_once('class_Forschungsbereiche.php');
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
             if ($parameter['field'] != '') {
-                return $liste->customField($content);
+                return $liste->customField($content, $parameter['quotation']);
             }
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
         // Projekte
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
             if ($parameter['project'] != '') {
-                return $liste->customProj($content);
+                return $liste->customProj($content, $parameter['quotation']);
             }
             /*if (!empty($parameter['items'])) {
                 return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);

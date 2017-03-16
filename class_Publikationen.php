@@ -246,6 +246,28 @@ class Publikationen {
         return $output;
     }
 
+    public function fieldPub($field, $quotation = '', $seed=false) {
+        $ws = new CRIS_publications();
+        if($seed)
+            $ws->disable_cache();
+        try {
+            $pubArray = $ws->by_field($field);
+        } catch (Exception $ex) {
+            return;
+        }
+
+        if (!count($pubArray))
+            return;
+
+        if ($quotation == 'apa' || $quotation == 'mla') {
+            $output = $this->make_quotation_list($pubArray, $quotation);
+        } else {
+            $output = $this->make_list($pubArray);
+        }
+
+        return $output;
+    }
+
     /* =========================================================================
      * Private Functions
       ======================================================================== */
@@ -619,6 +641,20 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
+    public function by_field($fieldID = null) {
+        if ($fieldID === null || $fieldID === "0")
+            throw new Exception('Please supply valid publication ID');
+
+        if (!is_array($fieldID))
+            $fieldID = array($fieldID);
+
+        $requests = array();
+        foreach ($fieldID as $_p) {
+            $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_has_top_publ', $_p);
+        }
+        return $this->retrieve($requests);
+    }
+
     private function retrieve($reqs, &$filter = null) {
        if ($filter !== null && !$filter instanceof CRIS_filter)
             $filter = new CRIS_filter($filter);
@@ -675,7 +711,7 @@ class CRIS_publication extends CRIS_Entity {
         $matches = array();
         $splitapa = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
 
-        if ($splitapa === 1) {
+        if ($splitapa === 1 && isset($matches[2])) {
             $apalink = $matches[1] . \
                     sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
             if (isset($matches[4]))
@@ -683,7 +719,7 @@ class CRIS_publication extends CRIS_Entity {
         } else {
             // try to identify DOI at least
             $splitapa = preg_match("/^(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
-            if ($splitapa === 1) {
+            if ($splitapa === 1 && isset($matches[2])) {
                 $apalink = $matches[1] . \
                     sprintf('<a href="%s" target="_blank">%s</a>', $matches[2], $matches[2]);
             } else

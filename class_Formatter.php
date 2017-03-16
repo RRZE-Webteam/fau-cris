@@ -87,6 +87,8 @@ class CRIS_formatter {
         foreach ($final as $_k => $group) {
             if($_k == "Other") {
 
+            } elseif (!is_array($this->sort)){
+                $final[$_k] = $group;
             } else {
                 $this->sortkey = $this->sort;
                 uasort($group, "self::compare_attributes");
@@ -96,8 +98,7 @@ class CRIS_formatter {
                     $final[$_k] = $group;
             }
         }
-
-        return $final;
+       return $final;
     }
 
     private function compare_group($a, $b) {

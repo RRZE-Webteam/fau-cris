@@ -32,7 +32,7 @@ class CRIS_webservice {
         curl_close($ch);
         return $xml;
     }
-    
+
     public function disable_cache() {
         $this->cache = false;
     }
@@ -72,7 +72,7 @@ class CRIS_webservice {
             // mark "publyear" for skip on next evaluation
             $filter->skip[] = "publyear";
         }
-        
+
         $seed = '';
         if (!$this->cache) {
             $seed = '?flag=seednow';
