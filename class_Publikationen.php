@@ -246,6 +246,28 @@ class Publikationen {
         return $output;
     }
 
+    public function fieldPub($field, $quotation = '', $seed=false) {
+        $ws = new CRIS_publications();
+        if($seed)
+            $ws->disable_cache();
+        try {
+            $pubArray = $ws->by_field($field);
+        } catch (Exception $ex) {
+            return;
+        }
+
+        if (!count($pubArray))
+            return;
+
+        if ($quotation == 'apa' || $quotation == 'mla') {
+            $output = $this->make_quotation_list($pubArray, $quotation);
+        } else {
+            $output = $this->make_list($pubArray);
+        }
+
+        return $output;
+    }
+
     /* =========================================================================
      * Private Functions
       ======================================================================== */
@@ -615,6 +637,20 @@ class CRIS_publications extends CRIS_webservice {
         $requests = array();
         foreach ($projID as $_p) {
             $requests[] = sprintf('getrelated/Project/%d/proj_has_publ', $_p);
+        }
+        return $this->retrieve($requests);
+    }
+
+    public function by_field($fieldID = null) {
+        if ($fieldID === null || $fieldID === "0")
+            throw new Exception('Please supply valid publication ID');
+
+        if (!is_array($fieldID))
+            $fieldID = array($fieldID);
+
+        $requests = array();
+        foreach ($fieldID as $_p) {
+            $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_has_top_publ', $_p);
         }
         return $this->retrieve($requests);
     }

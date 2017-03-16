@@ -155,7 +155,7 @@ class Projekte {
      * Ausgabe eines einzelnen Projektes
      */
 
-    public function singleProj($hide = '') {
+    public function singleProj($hide = '', $quotation = '') {
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -172,7 +172,7 @@ class Projekte {
         if (is_array($this->id)) {
             $output = $this->make_list($projArray, $hide);
         } else {
-            $output = $this->make_single($projArray, $hide);
+            $output = $this->make_single($projArray, $hide, $quotation);
         }
 
         return $output;
@@ -182,7 +182,7 @@ class Projekte {
      * Ausgabe eines Projektes per Custom-Shortcode
      */
 
-    public function customProj($content = '') {
+    public function customProj($content = '', $quotation = '') {
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -195,7 +195,7 @@ class Projekte {
             return $output;
         }
 
-        $output = $this->make_custom_single($projArray, $content);
+        $output = $this->make_custom_single($projArray, $content, $quotation);
         return $output;
     }
 
@@ -230,7 +230,7 @@ class Projekte {
      * Ausgabe der Projekte
      */
 
-    private function make_custom_single($projects, $custom_text) {
+    private function make_custom_single($projects, $custom_text, $quotation = '') {
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $proj_details = array();
         $projlist = "<div class=\"cris-projects\">";
@@ -275,7 +275,7 @@ class Projekte {
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
             $proj_details['#description#'] = strip_tags($description, '<br><br/><a>');
-            $proj_details['#publications#'] = $this->get_project_publications($id, $quotation = '');
+            $proj_details['#publications#'] = $this->get_project_publications($id, $quotation);
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
                 $i = 1;
@@ -348,7 +348,7 @@ class Projekte {
         return $projlist;
     }
 
-    private function make_single($projects, $hide = array()) {
+    private function make_single($projects, $hide = array(), $quotation = '') {
 
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $projlist = '';
@@ -377,7 +377,9 @@ class Projekte {
                 $projlist .= "</div>";
             }
 
-            $projlist .= "<h3>" . $title . "</h3>";
+            if (!in_array('title', $hide)) {
+                $projlist .= "<h3>" . $title . "</h3>";
+            }
 
             if (!empty($type))
                 $projlist .= "<p class=\"project-type\">(" . $type . ")</p>";
@@ -437,7 +439,7 @@ class Projekte {
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
             }
             if (!in_array('publications', $hide)) {
-                $publications = $this->get_project_publications($id, $quotation = '');
+                $publications = $this->get_project_publications($id, $quotation);
                 if($publications)
                     $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
             }

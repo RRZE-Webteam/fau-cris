@@ -610,7 +610,7 @@ class FAU_CRIS {
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
 
             if ($parameter['field'] != '') {
-                return $liste->singleField($parameter['hide']);
+                return $liste->singleField($parameter['hide'],$parameter['quotation']);
             }
             if (!empty($parameter['items'])) {
                 return $liste->fieldListe();
@@ -658,7 +658,7 @@ class FAU_CRIS {
             $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
 
             if ($parameter['project'] != '') {
-                return $liste->singleProj($parameter['hide']);
+                return $liste->singleProj($parameter['hide'], $parameter['quotation']);
             }
             if (!empty($parameter['items'])) {
                 return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
@@ -719,14 +719,14 @@ class FAU_CRIS {
             require_once('class_Forschungsbereiche.php');
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
             if ($parameter['field'] != '') {
-                return $liste->customField($content);
+                return $liste->customField($content, $parameter['quotation']);
             }
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
         // Projekte
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
             if ($parameter['project'] != '') {
-                return $liste->customProj($content);
+                return $liste->customProj($content, $parameter['quotation']);
             }
             /*if (!empty($parameter['items'])) {
                 return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);

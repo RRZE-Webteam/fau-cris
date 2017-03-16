@@ -77,7 +77,7 @@ class Forschungsbereiche {
      * Ausgabe eines einzelnen Forschungsbereichs
      */
 
-    public function singleField($hide) {
+    public function singleField($hide, $quotation = '') {
         $ws = new CRIS_fields();
         try {
             $fieldsArray = $ws->by_id($this->id);
@@ -88,7 +88,7 @@ class Forschungsbereiche {
             return;
         $hide = explode(',', $hide);
 
-        $output = $this->make_single($fieldsArray, $hide);
+        $output = $this->make_single($fieldsArray, $hide, $quotation);
 
         return $output;
     }
@@ -97,7 +97,7 @@ class Forschungsbereiche {
      * Ausgabe eines einzelnen Forschungsbereichs per Custom-Shortcode
      */
 
-    public function customField($content = '') {
+    public function customField($content = '', $quotation = '') {
         $ws = new CRIS_fields();
 
         try {
@@ -109,7 +109,7 @@ class Forschungsbereiche {
         if (!count($fieldsArray))
             return;
 
-        $output = $this->make_custom_single($fieldsArray, $content);
+        $output = $this->make_custom_single($fieldsArray, $content, $quotation);
 
         return $output;
     }
@@ -132,7 +132,7 @@ class Forschungsbereiche {
         } else {
             $order = strtolower(__('O.A.', 'fau-cris'));
         }
-        
+
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
         $fieldList = $res[$order];
@@ -172,7 +172,7 @@ class Forschungsbereiche {
      * Ausgabe der Forschungsbereiche
      */
 
-    private function make_single($fields, $hide = array()) {
+    private function make_single($fields, $hide = array(), $quotation = '') {
 
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $singlefield = '';
@@ -218,28 +218,29 @@ class Forschungsbereiche {
                     $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
                     $singlefield .= "<ul>";
                     foreach ($persons as $type => $person) {
-                        foreach ($person as $id => $details) {
+                        foreach ($person as $p_id => $details) {
                             $singlefield .= "<li>";
-                            $singlefield .= Tools::get_person_link($id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                            $singlefield .= Tools::get_person_link($p_id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                             $singlefield .= "</li>";
                         }
                     }
                     $singlefield .= "</ul>";
                 }
             }
-            // TODO
-            /* if (!in_array('publications', $hide)) {
-                $singlefield .= "<h3>" . __('Publikationen', 'fau-cris') . ": </h3>";
-                $singlefield .= "ToDo";
-            }*/
+            if (!in_array('publications', $hide)) {
+                $publications = $this->get_field_publications($id, $quotation);
+                if ($publications) {
+                    $singlefield .= "<h3>" . __('Publikationen', 'fau-cris') . ": </h3>";
+                    $singlefield .= $publications;
+                }
+            }
         }
         $singlefield .= "</div>";
         return $singlefield;
     }
 
 
-    private function make_custom_single($fields, $content) {
-
+    private function make_custom_single($fields, $content, $quotation = '') {
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $field_details = array();
         $output = "<div class=\"cris-fields\">";;
@@ -260,16 +261,18 @@ class Forschungsbereiche {
             if ($persons) {
                 $field_details['#persons#'] .= "<ul>";
                 foreach ($persons as $type => $person) {
-                    foreach ($person as $id => $details) {
+                    foreach ($person as $p_id => $details) {
                         $field_details['#persons#'] .= "<li>";
-                        $field_details['#persons#'] .= Tools::get_person_link($id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                        $field_details['#persons#'] .= Tools::get_person_link($p_id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                         $field_details['#persons#'] .= "</li>";
                     }
                 }
                 $field_details['#persons#'] .= "</ul>";
             }
-            // TODO
-            /* $field_details['#publications#'] = "ToDo"; */
+            $field_details['#publications#'] = '';
+            $publications = $this->get_field_publications($id, $quotation);
+            if ($publications)
+                $field_details['#publications#'] = $publications;
             $field_details['#image1#'] = '';
             if (count($imgs)) {
                 $i = 1;
@@ -329,6 +332,12 @@ class Forschungsbereiche {
         $liste = new Projekte();
         return $liste->fieldPersons($field);
         //var_dump($liste->fieldPersons($field));
+    }
+
+    private function get_field_publications($field = NULL, $quotation = '') {
+        require_once('class_Publikationen.php');
+        $liste = new Publikationen();
+        return $liste->fieldPub($field, $quotation);
     }
 
     private function get_field_images($field) {
