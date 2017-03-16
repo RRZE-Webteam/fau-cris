@@ -154,7 +154,11 @@ class FAU_CRIS {
             'cris_sync_check' => 0,
             'cris_sync_research_custom' => 0,
             'cris_sync_field_custom' => 0,
-            'cris_sync_shortcode_format' => array()
+            'cris_sync_shortcode_format' => array(
+                'research' => 0,
+                'fields' => 0,
+                'projects' => 0,
+            )
         );
         return $options;
     }
