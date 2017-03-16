@@ -205,16 +205,15 @@ class Sync {
                 }
                 if ($this->options['cris_sync_shortcode_format']['fields'] == 1) {
                     $field_content = "[cris-custom show=fields field=$field->ID]"
-                            . "<h2>#title#</h2>"
                             . "#image1# "
                             . "#description#"
-                            . "<h3>" . __('Projekte', 'fau-cris') . ": </h3>"
+                            . "<h3>" . __('Projekte', 'fau-cris') . "</h3>"
                             . "#projects#"
-                            . "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>"
+                            . "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . "</h3>"
                             . "#persons#"
                             . "[/cris-custom]";
                 } else {
-                    $field_content = "[cris show=fields field=$field->ID]";
+                    $field_content = "[cris show=fields field=$field->ID hide=\"title\"]";
                 }
                 $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
                 $pages[$field->ID]['position'] = $this->menu_position;
@@ -227,7 +226,7 @@ class Sync {
                 foreach ($projects as $project) {
                     if ($this->options['cris_sync_shortcode_format']['projects'] == 1) {
                         $proj_content = "[cris-custom show=projects project=$project->ID]\n"
-                            . "<h3>#title#</h3>\n"
+                            . "<h2>#title#</h2>\n"
                             . "<p class=\"project-type\">(#type#)</p>\n"
                             . "<p class=\"project-details\">"
                             . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> #parentprojecttitle#"
@@ -239,9 +238,9 @@ class Sync {
                             . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> #funding#"
                             . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"#url#\">#url#</a>"
                             . "</p>"
-                            . "<h4>" . __('Abstract', 'fau-cris') . ":</h4>"
+                            . "<h3>" . __('Abstract', 'fau-cris') . "</h3>"
                             . "<p class=\"project-description\">#description#</p>"
-                            . "<h4>" . __('Publikationen', 'fau-cris') . ":</h4>"
+                            . "<h3>" . __('Publikationen', 'fau-cris') . "</h3>"
                             . "#publications#\n"
                             . "[/cris-custom]";
                     } else {
@@ -279,7 +278,7 @@ class Sync {
         foreach ($all_projects as $a_p) {
             if ($this->options['cris_sync_shortcode_format']['projects'] == 1) {
                 $nf_proj_content = "[cris-custom show=projects project=$a_p->ID]\n"
-                        . "<h3>#title#</h3>\n"
+                        . "<h2>#title#</h2>\n"
                         . "<p class=\"project-type\">(#type#)</p>\n"
                         . "<p class=\"project-details\">"
                         . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> #parentprojecttitle#"
@@ -291,9 +290,9 @@ class Sync {
                         . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> #funding#"
                         . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"#url#\">#url#</a>"
                         . "</p>"
-                        . "<h4>" . __('Abstract', 'fau-cris') . ":</h4>"
+                        . "<h3>" . __('Abstract', 'fau-cris') . "</h3>"
                         . "<p class=\"project-description\">#description#</p>"
-                        . "<h4>" . __('Publikationen', 'fau-cris') . ":</h4>"
+                        . "<h3>" . __('Publikationen', 'fau-cris') . "</h3>"
                         . "#publications#\n"
                         . "[/cris-custom]";
             } else {
@@ -433,6 +432,9 @@ class Sync {
                 'meta_input' => array(
                     'sidebar_personen' => $contact )
             );
+            if ($contact[0] != '-1') {
+                $args['meta_input']['sidebar_title_personen'] = __('Kontakt', 'fau-cris');
+            }
             $pid = wp_insert_post($args);
             if($pid) {
                 $this->message .= '<li>' . sprintf( __( 'Seite "%s" wurde erstellt.', 'fau-cris' ), $title ) . '</li>';
