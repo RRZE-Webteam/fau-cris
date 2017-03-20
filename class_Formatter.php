@@ -97,6 +97,9 @@ class CRIS_formatter {
                 else
                     $final[$_k] = $group;
             }
+            if (empty($group)) {
+                unset($final[$_k]);
+            }
         }
        return $final;
     }

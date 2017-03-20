@@ -32,17 +32,13 @@ class Aktivitaeten {
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris') . '</strong></p>';
-            return;
         }
-        if (in_array($einheit, array("person", "orga", "activity"))) {
+        $this->id = $this->orgNr;
+        $this->einheit = "orga";
+            if (in_array($einheit, array("person", "activity"))) {
             $this->id = $id;
             $this->einheit = $einheit;
-        } else {
-            // keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
-            $this->id = $this->orgNr;
-            $this->einheit = "orga";
         }
-
     }
 
     /*
@@ -486,6 +482,8 @@ class CRIS_activities extends CRIS_webservice {
                     }
                     if (!empty($a->attributes['sortdate'])) {
                         $a->attributes['year'] = substr($a->attributes['sortdate'], 0, 4);
+                    } else {
+                        $a->attributes['year'] = '';
                     }
                 }
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))
