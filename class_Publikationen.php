@@ -308,6 +308,11 @@ class Publikationen {
             $publication->insert_quotation_links();
             $publist .= "<li>";
             $publist .= $publication->attributes['quotation' . $quotation . 'link'];
+            if (isset($this->options['cris_doi'])
+                    && $this->options['cris_doi'] == 1
+                    && !empty($publication->attributes['doi'])) {
+                $publist .= "<br />DOI: <a href='" . $publication->attributes['doi'] . "' target='blank' itemprop=\"url\">" . $publication->attributes['doi'] . "</a>";
+            }
             if (isset($this->options['cris_url'])
                     && $this->options['cris_url'] == 1
                     && !empty($publication->attributes['cfuri'])) {
