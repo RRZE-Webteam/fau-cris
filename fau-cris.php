@@ -800,7 +800,7 @@ class FAU_CRIS {
         $sc_param['start'] = sanitize_text_field($start);
         $sc_param['quotation'] = sanitize_text_field($quotation);
         $sc_param['items'] = sanitize_text_field($items);
-        $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : null;
+        $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : 'virtualdate';
         $sc_param['showname'] = sanitize_text_field($showname);
         $sc_param['showyear'] = sanitize_text_field($showyear);
         $sc_param['showawardname'] = sanitize_text_field($showawardname);
