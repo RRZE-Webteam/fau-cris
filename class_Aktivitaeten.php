@@ -241,8 +241,8 @@ class Aktivitaeten {
             $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
             setlocale(LC_TIME, get_locale());
 
-            switch (strtolower($activity_type)) {
-                case "fau-interne gremienmitgliedschaft / funktion":
+            switch (strtolower($activity['type of activity'])) {
+                case "fau-interne gremienmitgliedschaften / funktionen":
                     $activity_name = $activity['description function'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -319,7 +319,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "gremiumsmitglied im wissenschaftsrat":
+                case "gremiumsmitglied wissenschaftsrat":
                     $activity_name = $activity['description function'];
                     $activity_detail = $activity['memberscicouncil'];
                     $activity_nameofshow = '';
@@ -352,7 +352,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "sonstige fau-externe aktivität":
+                case "sonstige fau-externe aktivitäten":
                     $activity_name = $activity['type of extern expert activity'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
