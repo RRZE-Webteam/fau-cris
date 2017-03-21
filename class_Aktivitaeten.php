@@ -275,7 +275,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "gutachtertätigkeit für eine wissenschaftliche zeitschrift":
+                case "gutachtertätigkeit für wissenschaftliche zeitschrift":
                     $activity_name = $activity['namejournal'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -286,7 +286,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "gutachtertätigkeit für eine förderorganisation":
+                case "gutachtertätigkeit für förderorganisation":
                     $activity_name = $activity['type of expert activity'];
                     $activity_detail = $activity['mirror_fund'];
                     $activity_nameofshow = '';
