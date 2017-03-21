@@ -124,6 +124,8 @@ class Tools {
         }
         if (array_key_exists($type, $search))
             return $search[$type][$lang]['name'];
+
+        return $type;
     }
 
     public static function getTitle($object, $name, $lang) {
@@ -148,7 +150,10 @@ class Tools {
                 $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
         }
-        return $search[$name][$lang]['title'];
+        if (isset($search[$name][$lang]['title']))
+            return $search[$name][$lang]['title'];
+
+        return $name;
     }
 
 
@@ -607,7 +612,7 @@ class Tools {
         /*
          * Deliver numerically encoded XML representation of special characters.
          * E.g. use &#8211; instead of &ndash;
-         * 
+         *
          * Adopted from user-contributed notes of
          * http://php.net/manual/de/function.htmlentities.php
          *

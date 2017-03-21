@@ -445,12 +445,12 @@ class CRIS_Dicts {
                 'title' => 'Newspaper Articles'
             )
         ),
-        'Working paper' => array(
+        'Working Paper' => array(
             'order' => 4,
             'short' => 'workingpaper',
             'de' => array(
-                'name' => 'Diskussionspapier / working paper',
-                'title' => 'Diskussionspapiere / working papers'
+                'name' => 'Diskussionspapier / Working Paper',
+                'title' => 'Diskussionspapiere / Working Papers'
             ),
             'en' => array(
                 'name' => 'Working paper',
