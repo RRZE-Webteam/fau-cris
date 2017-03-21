@@ -592,12 +592,19 @@ class Tools {
     }
 
     public static function make_date ($start, $end) {
-        setlocale(LC_TIME, get_locale());
+        $fmt = datefmt_create(
+            get_locale(),
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::NONE,
+            date_default_timezone_get(),
+            IntlDateFormatter::GREGORIAN
+        );
+        
         $date = '';
         if ($start != '')
-            $start = strftime('%x', strtotime($start));
+            $start = datefmt_format($fmt, strtotime($start));
         if ($end != '')
-            $end = strftime('%x', strtotime($end));
+            $end = datefmt_format($fmt, strtotime($end));
         if ($start !='' && $end != '') {
             $date = $start . " - " . $end;
         } elseif ($start != '' && $end =='') {
