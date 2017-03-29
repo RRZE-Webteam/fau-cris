@@ -250,6 +250,28 @@ class Publikationen {
         return $output;
     }
 
+    public function fieldPub($field, $quotation = '', $seed=false) {
+        $ws = new CRIS_publications();
+        if($seed)
+            $ws->disable_cache();
+        try {
+            $pubArray = $ws->by_field($field);
+        } catch (Exception $ex) {
+            return;
+        }
+
+        if (!count($pubArray))
+            return;
+
+        if ($quotation == 'apa' || $quotation == 'mla') {
+            $output = $this->make_quotation_list($pubArray, $quotation);
+        } else {
+            $output = $this->make_list($pubArray);
+        }
+
+        return $output;
+    }
+
     /* =========================================================================
      * Private Functions
       ======================================================================== */
@@ -319,13 +341,9 @@ class Publikationen {
 
         $publist = "<ul class=\"cris-publications\">";
 
-        foreach ($publications as $publicationObject) {
+        foreach ($publications as $publication) {
 
-            //$publication = $publicationObject->attributes;
-            $publication = $publicationObject;
-            // id
-            //$id = $publicationObject->ID;
-            $id = $publicationObject['id'];
+            $id = $publication['id'];
             // authors
             $authors = explode(", ", $publication['relauthors']);
             $authorIDs = explode(",", $publication['relpersid']);
@@ -385,7 +403,7 @@ class Publikationen {
                 'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : '')
             );
 
-            switch ($pubDetails['pubType']) {
+            switch (strtolower($pubDetails['pubType'])) {
 
                 case "book": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
@@ -572,8 +590,9 @@ class CRIS_publications extends CRIS_DB {
         if ($orgaID === null || $orgaID === "0")
             throw new Exception('Please supply valid organisation ID');
 
-        $query = "SELECT *"
-                . " FROM publication p "
+        $query = "SELECT * FROM publications";
+        /*$query = "SELECT *"
+                . " FROM publications p "
                 . " JOIN organisation_publication op "
                 . " ON p.id = op.p_id";
         if (count($orgaID) == 1) {
@@ -589,10 +608,10 @@ class CRIS_publications extends CRIS_DB {
         $query .= " ORDER BY p." . $order;
         if ($items != null) {
             $query .= " LIMIT " . $items;
-        }
+        }*/
         $query .= ";";
         print $query . "<br />";
-        return;
+
         return $this->get($query);
     }
 
@@ -601,7 +620,7 @@ class CRIS_publications extends CRIS_DB {
             throw new Exception('Please supply valid person ID');
 
         $query = "SELECT *"
-                . " FROM publication p";
+                . " FROM publications p";
         $query .= " WHERE (p.relpersid LIKE '%" . implode("%' OR p.relpersid LIKE '%", $persID) . "%')";
 
         if ($filter) {
@@ -615,7 +634,7 @@ class CRIS_publications extends CRIS_DB {
         }
         $query .= ";";
         print $query . "<br />";
-        return;
+
         return $this->get($query);
     }
 
@@ -626,7 +645,7 @@ class CRIS_publications extends CRIS_DB {
             throw new Exception('Please supply valid publication ID');
 
         $query = "SELECT * "
-                . "FROM publication p "
+                . "FROM publications p "
                 . "JOIN publication_project pp "
                 . "ON p.id = pp.p_id";
         if (count($projID) == 1) {
@@ -645,7 +664,7 @@ class CRIS_publications extends CRIS_DB {
         }
         $query .= ";";
         print $query . "<br />";
-        return;
+
         return $this->get($query);
     } */
 
@@ -654,7 +673,7 @@ class CRIS_publications extends CRIS_DB {
             throw new Exception('Please supply valid publication ID');
 
         $query = "SELECT *"
-                . " FROM publication p ";
+                . " FROM publications p ";
         if (count($publID) == 1) {
             $query .= " WHERE p.id = '" . $publID[0] . "'" ;
         } else {
@@ -662,7 +681,7 @@ class CRIS_publications extends CRIS_DB {
         }
         $query .= ";";
         print $query . "<br />";
-        return;
+
         return $this->get($query);
     }
 }
@@ -776,14 +795,10 @@ class CRIS_publications extends CRIS_DB {
 
 }*/
 
-class CRIS_publication extends CRIS_Entity {
+class CRIS_publication {
     /*
      * object for single publication
      */
-
-    public function __construct($data) {
-        parent::__construct($data);
-    }
 
     public function insert_quotation_links() {
         /*

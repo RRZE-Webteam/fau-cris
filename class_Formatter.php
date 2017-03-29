@@ -45,7 +45,7 @@ class CRIS_formatter {
         $final = array();
         foreach ($data as $single_dataset) {
             if ($this->group != null) {
-                if (!array_key_exists($this->group, $single_dataset->attributes))
+                if (!array_key_exists($this->group, $single_dataset))
                         throw new Exception('attribute not found: '. $this->group);
                 $group_key = $this->group;
             } else {
@@ -57,7 +57,7 @@ class CRIS_formatter {
             if ($this->group === null)
                 $value = $group_key;
             else
-                $value = $single_dataset->attributes[$group_key];
+                $value = $single_dataset[$group_key];
 
             if (!array_key_exists($value, $final))
                 $final[$value] = array();
@@ -112,7 +112,8 @@ class CRIS_formatter {
     }
 
     private function compare_attributes($a, $b) {
+        var_dump($a);
         # Compare data based on attribute specified in self::sortkey
-        return strcmp($a->attributes[$this->sortkey], $b->attributes[$this->sortkey]);
+        return strcmp($a[$this->sortkey], $b[$this->sortkey]);
     }
 }
