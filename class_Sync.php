@@ -1,5 +1,6 @@
 <?php
 
+require_once("class_Organisation.php");
 require_once("class_Forschungsbereiche.php");
 require_once("class_Projekte.php");
 
@@ -38,7 +39,7 @@ class Sync {
         $this->num_errors = 0;
         $this->title_research = __('Forschung', 'fau-cris');
         $this->title_noFieldsPage = __('Weitere Projekte', 'fau-cris');
-        $this->page_template_portal = ( '' != locate_template('page-templates/page-portalindex.php')) ? 'page-templates/page-portalindex.php' : 'page.php';
+        $this->page_template_portal = ( '' != locate_template('page-templates/page-portal.php')) ? 'page-templates/page-portal.php' : 'page.php';
         $this->page_template_nav = ( '' != locate_template('page-templates/page-subnav.php')) ? 'page-templates/page-subnav.php' : 'page.php';
         $this->num_menu_items= 1;
         $this->menu_count = 1;
@@ -84,16 +85,24 @@ class Sync {
         }
         require_once('class_Organisation.php');
         $orga = new Organisation();
-        $research_contacts = $orga->researchContacts();
+        $research_contacts = $orga->researchContacts(true);
         if (!isset($page_research) || !count($page_research)) {
         // Seite Forschung existiert noch nicht -> anlegen
+            if ($this->options['cris_sync_shortcode_format']['research'] == 1) {
+                $research_content = "[cris-custom show=organisation]\n"
+                        . "#image1#\n"
+                        . "#description#\n"
+                        . "[/cris-custom]";
+            } else {
+                $research_content = '[cris show=organisation]';
+            }
             $args = array(
                 'post_content' => '[cris show=organisation]',
                 'post_title' => $this->title_research,
                 'post_status' => 'publish',
                 'post_type' => 'page',
                 'post_parent' => 0,
-                'menu_order' => $this->menu_position,
+                //'menu_order' => $this->menu_position,
                 'page_template' => $this->page_template_portal,
                 'meta_input' => array(
                     // wegen der chaotischen Benennung der Meta-Values, siehe custom-fields.php, Z. 673ff.
@@ -171,7 +180,7 @@ class Sync {
         // FoBe und Projekte
         $_f = new Forschungsbereiche();
         $fields = array();
-        $fields = $_f->fieldsArray();
+        $fields = $_f->fieldsArray(true);
         if (!$fields || !is_array($fields)) {
             if( wp_next_scheduled( 'cris_auto_update' ))
                 wp_clear_scheduled_hook('cris_auto_update');
@@ -181,7 +190,7 @@ class Sync {
         if (is_array($fields)) {
             foreach ($fields as $field) {
                 $_p = new Projekte();
-                $projects = $_p->fieldProj($field->ID, 'array');
+                $projects = $_p->fieldProj($field->ID, 'array', true);
                 $field_contacts = array();
                 $fcids = array();
                 $field_contacts = explode('|', $field->attributes['contact_names']);
@@ -194,18 +203,52 @@ class Sync {
                         $fcids[] = $fcid;
                     }
                 }
+                if ($this->options['cris_sync_shortcode_format']['fields'] == 1) {
+                    $field_content = "[cris-custom show=fields field=$field->ID]"
+                            . "#image1# "
+                            . "#description#"
+                            . "<h3>" . __('Projekte', 'fau-cris') . "</h3>"
+                            . "#projects#"
+                            . "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . "</h3>"
+                            . "#persons#"
+                            . "[/cris-custom]";
+                } else {
+                    $field_content = "[cris show=fields field=$field->ID hide=\"title\"]";
+                }
                 $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
                 $pages[$field->ID]['position'] = $this->menu_position;
-                $pages[$field->ID]['content'] = "[cris show=fields field=$field->ID]";
+                $pages[$field->ID]['content'] = $field_content;
                 $pages[$field->ID]['contact'] = $fcids;
                 $pages[$field->ID]['projects'] = array();
                 $this->menu_position ++;
                 if (!$projects)
                     continue;
                 foreach ($projects as $project) {
+                    if ($this->options['cris_sync_shortcode_format']['projects'] == 1) {
+                        $proj_content = "[cris-custom show=projects project=$project->ID]\n"
+                            . "<h2>#title#</h2>\n"
+                            . "<p class=\"project-type\">(#type#)</p>\n"
+                            . "<p class=\"project-details\">"
+                            . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> #parentprojecttitle#"
+                            . "<br /><b>" . __('Projektleitung', 'fau-cris') . ":</b> #leaders#"
+                            . "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ":</b> #members#"
+                            . "<br /><b>" . __('Projektstart', 'fau-cris') . ":</b> #start#"
+                            . "<br /><b>" . __('Projektende', 'fau-cris') . ":</b> #end#"
+                            . "<br /><b>" . __('Akronym', 'fau-cris') . ":  </b> #acronym#"
+                            . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> #funding#"
+                            . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"#url#\">#url#</a>"
+                            . "</p>"
+                            . "<h3>" . __('Abstract', 'fau-cris') . "</h3>"
+                            . "<p class=\"project-description\">#description#</p>"
+                            . "<h3>" . __('Publikationen', 'fau-cris') . "</h3>"
+                            . "#publications#\n"
+                            . "[/cris-custom]";
+                    } else {
+                        $proj_content = "[cris show=projects project=$project->ID]";
+                    }
                     $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
                     $pages[$field->ID]['projects'][$project->ID]['position'] = $this->menu_position;
-                    $pages[$field->ID]['projects'][$project->ID]['content'] = "[cris show=projects project=$project->ID]";
+                    $pages[$field->ID]['projects'][$project->ID]['content'] = $proj_content;
                     $pages[$field->ID]['projects'][$project->ID]['contact'] = array('-1');
                     $this->menu_position ++;
                 }
@@ -229,12 +272,35 @@ class Sync {
 
         }
         $p = new CRIS_projects;
+        $p->disable_cache();
         $all_projects = $p->by_orga_id($this->orgNr);
         $orga_projects = array();
         foreach ($all_projects as $a_p) {
+            if ($this->options['cris_sync_shortcode_format']['projects'] == 1) {
+                $nf_proj_content = "[cris-custom show=projects project=$a_p->ID]\n"
+                        . "<h2>#title#</h2>\n"
+                        . "<p class=\"project-type\">(#type#)</p>\n"
+                        . "<p class=\"project-details\">"
+                        . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> #parentprojecttitle#"
+                        . "<br /><b>" . __('Projektleitung', 'fau-cris') . ":</b> #leaders#"
+                        . "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ":</b> #members#"
+                        . "<br /><b>" . __('Projektstart', 'fau-cris') . ":</b> #start#"
+                        . "<br /><b>" . __('Projektende', 'fau-cris') . ":</b> #end#"
+                        . "<br /><b>" . __('Akronym', 'fau-cris') . ":  </b> #acronym#"
+                        . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> #funding#"
+                        . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"#url#\">#url#</a>"
+                        . "</p>"
+                        . "<h3>" . __('Abstract', 'fau-cris') . "</h3>"
+                        . "<p class=\"project-description\">#description#</p>"
+                        . "<h3>" . __('Publikationen', 'fau-cris') . "</h3>"
+                        . "#publications#\n"
+                        . "[/cris-custom]";
+            } else {
+                $nf_proj_content = "[cris-custom show=projects project=$a_p->ID]";
+            }
             $orga_projects[$a_p->ID]['title'] = $a_p->attributes['cftitle'.$lang];
             $orga_projects[$a_p->ID]['position'] = $this->menu_position;
-            $orga_projects[$a_p->ID]['content'] = "[cris show=projects project=$a_p->ID]";
+            $orga_projects[$a_p->ID]['content'] = $nf_proj_content;
             $orga_projects[$a_p->ID]['contact'] = array('-1');
         }
         foreach ($orga_projects as $o_p => $details) {
@@ -265,9 +331,32 @@ class Sync {
 
             $projects = $field['projects'];
             foreach ($projects as $project) {
-                $project_page = self::cris_make_page($project['title'], $project['content'], $project['contact'], $project['position'], $field_page['pid'], $field_page['mid'], $field_page['mpid'],1);
+                $project_page = self::cris_make_page($project['title'], $project['content'], $project['contact'], $project['position'], $field_page['pid'], $field_page['mid'], $field_page['mpid'],1,$this->page_template_nav);
             }
         }
+
+        // Seite "Weitere Projekte" löschen wenn leer
+        if (!count($pages['no_field']['projects'])) {
+            $_p = get_pages(array('child_of' => $research_pid, 'post_status' => 'publish'));
+            foreach ($_p as $_sp) {
+                if ($_sp->post_title == $this->title_noFieldsPage) {
+                    wp_delete_post($_sp->ID);
+                }
+            }
+            // Hauptmenü-Eintrag entfernen
+            foreach ($this->menu_items as $_mi) {
+                if($_mi->menu_item_parent == $research_mid && $_mi->title == $this->title_noFieldsPage) {
+                    wp_delete_post($_mi->ID);
+                }
+            }
+            // Portalmenü-Eintrag entfernen
+            foreach ($this->portal_items as $_pi) {
+                if($_pi->menu_item_parent == 0 && $_mi->title == $this->title_noFieldsPage) {
+                    wp_delete_post($_pi->ID);
+                }
+            }
+        }
+
 
         /*
          *  Admin-Notice: Synchronisation erfolgreich
@@ -278,10 +367,8 @@ class Sync {
         if ($this->num_errors > 0)
                 $this->message .= '<li>' . sprintf( __( '%d Seite(n) konnten nicht erstellt werden.', 'fau-cris' ), $this->num_errors ) . '</li>';
         $this->message .= '</ul>';
-        if(is_admin()) {
-            add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'updated' );
-            settings_errors();
-        }
+        add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'updated' );
+        settings_errors();
     }
 
 
@@ -301,6 +388,7 @@ class Sync {
     }
 
     private function cris_make_menu_item($menu, $title, $object_id, $parent_id, $position = 0, $menu_item_db_id = 0) {
+        $first_class = ($this->menu_count == 1) ? ' cris-first' : '';
         $last_class = ($this->menu_count == $this->num_menu_items) ? ' cris-last' : '';
         $mid = wp_update_nav_menu_item($menu, $menu_item_db_id, array(
             //'menu-item-db-id' => '',
@@ -314,7 +402,7 @@ class Sync {
             //'menu-item-description' => '',
             //'menu-item-attr-title' => '',
             //'menu-item-target' => '',
-            'menu-item-classes' => 'cris' . $last_class,
+            'menu-item-classes' => 'cris' . $first_class . $last_class,
             //'menu-item-xfn' => '',
             'menu-item-status' => 'publish',
             )
@@ -323,7 +411,7 @@ class Sync {
             return $mid;
     }
 
-    private function cris_make_page($title, $content, $contact = array('-1'), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1) {
+    private function cris_make_page($title, $content, $contact = array('-1'), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php') {
         $pages = get_pages(array('child_of' => $parent_pid, 'post_status' => 'publish'));
         $pages_array = array();
         foreach ($pages as $page) {
@@ -340,10 +428,13 @@ class Sync {
                 'post_type' => 'page',
                 'post_parent' => $parent_pid,
                 'menu_order' => $position,
-                'page_template' => $this->page_template_nav,
+                'page_template' => $template,
                 'meta_input' => array(
                     'sidebar_personen' => $contact )
             );
+            if ($contact[0] != '-1') {
+                $args['meta_input']['sidebar_title_personen'] = __('Kontakt', 'fau-cris');
+            }
             $pid = wp_insert_post($args);
             if($pid) {
                 $this->message .= '<li>' . sprintf( __( 'Seite "%s" wurde erstellt.', 'fau-cris' ), $title ) . '</li>';

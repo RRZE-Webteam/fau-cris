@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.3
+ * Version: 3.34
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -31,11 +31,10 @@ register_activation_hook(__FILE__, array('FAU_CRIS', 'activate'));
 register_deactivation_hook(__FILE__, array('FAU_CRIS', 'deactivate'));
 
 class FAU_CRIS {
-
     /**
      * Get Started
      */
-    const version = '3.3';
+    const version = '3.33';
     const option_name = '_fau_cris';
     const site_option_name = '_fau_cris_site';
     const version_option_name = '_fau_cris_version';
@@ -67,7 +66,7 @@ class FAU_CRIS {
         add_shortcode('cris', array(__CLASS__, 'cris_shortcode'));
         add_shortcode('cris-custom', array(__CLASS__, 'cris_custom_shortcode'));
 
-        add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2);
+        add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2 );
         add_action('cris_auto_update', array(__CLASS__, 'cris_auto_sync'));
 
         if (is_network_admin()) {
@@ -148,15 +147,24 @@ class FAU_CRIS {
             'cris_pub_subtypes_order' => Tools::getOptionsOrder('pubothersubtypes'),
             'cris_univis' => 'none',
             'cris_bibtex' => 0,
+            'cris_url' => 0,
+            'cris_doi' => 0,
             'cris_award_order' => Tools::getOptionsOrder('awards'),
             'cris_award_link' => 'none',
             'cris_project_order' => Tools::getOptionsOrder('projects'),
             'cris_project_link' => 'none',
             'cris_patent_order' => Tools::getOptionsOrder('patents'),
             'cris_patent_link' => 'none',
-            'cris_activities_order' => Tools::getOptionsOrder('activities'),
+            'cris_activities_order' =>  Tools::getOptionsOrder('activities'),
             'cris_activities_link' => 'none',
-            'cris_sync_check' => 0
+            'cris_sync_check' => 0,
+            'cris_sync_research_custom' => 0,
+            'cris_sync_field_custom' => 0,
+            'cris_sync_shortcode_format' => array(
+                'research' => 0,
+                'fields' => 0,
+                'projects' => 0,
+            )
         );
         return $options;
     }
@@ -246,7 +254,6 @@ class FAU_CRIS {
     /*
      * Options page tabs
      */
-
     private static function options_page_tabs() {
         $tabs = array(
             'general' => __('Allgemein', 'fau-cris'),
@@ -255,7 +262,6 @@ class FAU_CRIS {
         );
         return $tabs;
     }
-
     private static function current_tab($tab) {
         $tabs = self::options_page_tabs();
         if (isset($tab['tab'])) {
@@ -284,23 +290,20 @@ class FAU_CRIS {
         <div class="wrap">
             <h2><?php _e('Einstellungen', 'fau-cris'); ?> &rsaquo; CRIS</h2>
             <h2 class="nav-tab-wrapper">
-            <?php
-            foreach ($tabs as $tab => $name) {
+                <?php foreach( $tabs as $tab => $name ){
                 $class = ( $tab == $current ) ? ' nav-tab-active' : '';
                 echo "<a class='nav-tab$class' href='?page=options-fau-cris&tab=$tab'>$name</a>";
-            }
-            ?>
+                } ?>
             </h2>
-                <?php
-                if (isset($result)) {
+            <?php if (isset($result)) {
                     print $result;
-                }
-                ?>
+            } ?>
             <form method="post" action="options.php">
         <?php
         settings_fields('fau_cris_options');
         do_settings_sections('fau_cris_options');
-        if (isset($current) && $current == 'sync' && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
+                if (isset($current) && $current == 'sync'
+                        && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
             echo '<a href="?page=options-fau-cris&tab=sync&action=cris_sync" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;" ><span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . __('Jetzt synchronisieren', 'fau-cris') . '</a>';
         }
         submit_button();
@@ -323,7 +326,7 @@ class FAU_CRIS {
 
         if (isset($_GET))
             $tab = self::current_tab($_GET);
-        switch ($tab) {
+        switch($tab) {
             case 'general' :
             default:
                 // Form Settings 1
@@ -365,6 +368,18 @@ class FAU_CRIS {
                         )
                 );
                 add_settings_field(
+                        'cris_doi', __('DOI-Link', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'name' => 'cris_doi',
+                    'description' => __('Soll auch im APA- und MLA-Zitierstil (wenn vorhanden) für jede Publikation ein DOI-Link angezeigt werden?', 'fau-cris')
+                        )
+                );
+                add_settings_field(
+                        'cris_url', __('URL', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'name' => 'cris_url',
+                    'description' => __('Soll auch im APA- und MLA-Zitierstil (wenn vorhanden) ein Link zu einer Website angezeigt werden?', 'fau-cris')
+                        )
+                );
+                add_settings_field(
                         'cris_bibtex', __('BibTeX-Link', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_bibtex',
                     'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', 'fau-cris')
@@ -375,7 +390,7 @@ class FAU_CRIS {
                     'name' => 'cris_univis',
                     'options' => array(
                         'person' => __('Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
+                        'cris' => __('Autoren mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
                         )
                 );
@@ -396,7 +411,7 @@ class FAU_CRIS {
                     'name' => 'cris_award_link',
                     'options' => array(
                         'person' => __('Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
+                        'cris' => __('Preisträger mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
                         )
                 );
@@ -417,7 +432,7 @@ class FAU_CRIS {
                     'name' => 'cris_project_link',
                     'options' => array(
                         'person' => __('Projektleiter und -beteiligte mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
+                        'cris' => __('Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
                         )
                 );
@@ -438,7 +453,7 @@ class FAU_CRIS {
                     'name' => 'cris_patent_link',
                     'options' => array(
                         'person' => __('Patentinhaber mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
+                        'cris' => __('Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
                         )
                 );
@@ -459,7 +474,7 @@ class FAU_CRIS {
                     'name' => 'cris_activities_link',
                     'options' => array(
                         'person' => __('Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
-                        'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken', 'fau-cris'),
+                        'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
                         'none' => __('keinen Link setzen', 'fau-cris'))
                         )
                 );
@@ -472,11 +487,31 @@ class FAU_CRIS {
                         'fau_cris_options' // Page
                 );
                 add_settings_field(
-                        'cris_sync_check', __('Automatische Synchronisation', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_sync_section', array(
+                        'cris_sync_check',
+                        __('Automatische Synchronisierung', 'fau-cris'),
+                        array(__CLASS__, 'cris_check_callback'),
+                        'fau_cris_options',
+                        'cris_sync_section',
+                        array(
                     'name' => 'cris_sync_check',
                     'description' => __('Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und Menüeinträge generiert werden?', 'fau-cris')
                         )
                 );
+                add_settings_field(
+                        'cris_sync_shortcode_format',
+                        __('Shortcode-Format', 'fau-cris'),
+                        array(__CLASS__, 'cris_check_callback'),
+                        'fau_cris_options',
+                        'cris_sync_section',
+                        array(
+                            'name' => 'cris_sync_shortcode_format',
+                            'description' => __('Soll für die Shortcodes auf den automatisch erstellten Seiten das konfigurierbare Format "[cris-custom]" verwendet werden?', 'fau-cris'),
+                    'options' => array(
+                        'research' => __('Custom-Shortcode für Seite Forschung', 'fau-cris'),
+                        'fields' => __('Custom-Shortcode für Forschungsbereiche','fau-cris'),
+                        'projects' => __('Custom-Shortcode für Forschungsprojekte', 'fau-cris'))
+                            )
+                    );
                 break;
         }
     }
@@ -503,6 +538,8 @@ class FAU_CRIS {
                 $new_input['cris_pub_subtypes_order'] = isset($_POST[self::option_name]['cris_pub_subtypes_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_subtypes_order'])) : $default_options['cris_pub_subtypes_order'];
                 $new_input['cris_univis'] = in_array($_POST[self::option_name]['cris_univis'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_univis'] : $default_options['cris_univis'];
                 $new_input['cris_bibtex'] = isset($_POST[self::option_name]['cris_bibtex']) ? 1 : 0;
+                $new_input['cris_url'] = isset($_POST[self::option_name]['cris_url']) ? 1 : 0;
+                $new_input['cris_doi'] = isset($_POST[self::option_name]['cris_doi']) ? 1 : 0;
                 $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
                 $new_input['cris_award_link'] = in_array($_POST[self::option_name]['cris_award_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_award_link'] : $default_options['cris_award_link'];
                 $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_project_order'])) : $default_options['cris_project_order'];
@@ -514,6 +551,14 @@ class FAU_CRIS {
                 break;
             case 'sync':
                 $new_input['cris_sync_check'] = isset($_POST[self::option_name]['cris_sync_check']) ? 1 : 0;
+                if(is_array($_POST[self::option_name]['cris_sync_shortcode_format'])) {
+                    /*foreach ($_POST[self::option_name]['cris_sync_shortcode_format'] as $_check){
+                        foreach ($_check as $_k => $_v) {
+                            $new_input['cris_sync_shortcode_format'][$_k] = $_v;
+                        }
+                    }*/
+                    $new_input['cris_sync_shortcode_format'] = $_POST[self::option_name]['cris_sync_shortcode_format'];
+                }
                 break;
         }
         return $new_input;
@@ -534,7 +579,23 @@ class FAU_CRIS {
             printf(__('%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3s Benutzerhandbuch! %3s', 'fau-cris'), '<strong>', '</strong>', '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/">', '</a>');
             print "<p>";
         }
+        if (array_key_exists('options', $args)) {
+            $checks = $args['options'];
+            foreach ($checks as $_k => $_v) { ?>
+                <label>
+                    <input name="<?php printf('%s[' . $name . '][' . $_k . ']', self::option_name); ?>"
+                        type='checkbox'
+                        value='1'
+                        <?php
+                        if (array_key_exists($name, $options)) {
+                            print checked($options[$name][ $_k], 1, false);
+                        }
         ?>
+                    >
+                    <?php print $_v; ?>
+                </label><br />
+            <?php }
+        } else { ?>
         <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
             if (array_key_exists($name, $options)) {
                 print checked($options[$name], 1, false);
@@ -542,7 +603,7 @@ class FAU_CRIS {
             ?> >
         <?php if (isset($description)) { ?>
                 <span class="description"><?php echo $description; ?></span></label>
-        <?php
+            <?php }
         }
     }
 
@@ -555,8 +616,7 @@ class FAU_CRIS {
             $description = esc_attr($args['description']);
         if (array_key_exists('options', $args))
             $radios = $args['options'];
-        foreach ($radios as $_k => $_v) {
-            ?>
+        foreach ($radios as $_k => $_v) { ?>
             <label>
                 <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>"
                        type='radio'
@@ -564,19 +624,16 @@ class FAU_CRIS {
                        <?php
                        if (array_key_exists($name, $options)) {
                            checked($options[$name], $_k);
-                       }
-                       ?>
+                    } ?>
                        >
             <?php print $_v; ?>
             </label><br />
         <?php }
 
-        if (isset($description)) {
-            ?>
+        if (isset($description)) { ?>
             <p class="description"><?php echo $description; ?></p>
-        <?php
+        <?php }
         }
-    }
 
     // Textbox
     public static function cris_textbox_callback($args) {
@@ -608,7 +665,7 @@ class FAU_CRIS {
         ?>
         <textarea name="<?php printf('%s[' . $name . ']', self::option_name); ?>" cols="30" rows="8"><?php
             if (array_key_exists($name, $options)) {
-                if (is_array($options[$name]) && count($options[$name]) > 0 && $options[$name][0] != '') {
+                if (is_array($options[$name]) && count($options[$name])>0 && $options[$name][0] !='') {
                     echo implode("\n", $options[$name]);
                 } else {
                     echo implode("\n", $default_options[$name]);
@@ -625,257 +682,152 @@ class FAU_CRIS {
      * Add Shortcodes
      */
     public static function cris_shortcode($atts) {
-        $options = self::get_options();
+        $parameter = self::cris_shortcode_parameter($atts);
 
-        // Attributes
-        extract(shortcode_atts(
-                        array(
-            'show' => 'publications',
-            'orderby' => '',
-            'year' => '',
-            'start' => '',
-            'orgid' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
-            'persid' => '',
-            'publication' => '',
-            'pubtype' => '',
-            'quotation' => '',
-            'items' => '',
-            'sortby' => '',
-            'award' => '',
-            'awardnameid' => '',
-            'type' => '',
-            'subtype' => '',
-            'showname' => 1,
-            'showyear' => 1,
-            'showawardname' => 1,
-            'display' => 'list',
-            'project' => '',
-            'hide' => '',
-            'role' => 'leader',
-            'patent' => '',
-            'activity' => '',
-            'field' => ''
-                        ), $atts));
-
-        $show = sanitize_text_field($show);
-        $orderby = sanitize_text_field($orderby);
-        $type = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
-        $subtype = sanitize_text_field($subtype);
-        $year = sanitize_text_field($year);
-        $start = sanitize_text_field($start);
-        $orgid = sanitize_text_field($orgid);
-        $persid = sanitize_text_field($persid);
-        $publication = sanitize_text_field($publication);
-        $quotation = sanitize_text_field($quotation);
-        $items = sanitize_text_field($items);
-        if (in_array($sortby, array('created', 'updated')))
-            $sortby = sanitize_text_field($sortby);
-        $award = sanitize_text_field($award);
-        $awardnameid = sanitize_text_field($awardnameid);
-        $showname = sanitize_text_field($showname);
-        $showyear = sanitize_text_field($showyear);
-        $showawardname = sanitize_text_field($showawardname);
-        $display = sanitize_text_field($display);
-        $project = sanitize_text_field($project);
-        $hide = sanitize_text_field($hide);
-        $hide = str_replace(" ", "", $hide);
-        $hide = explode(",", $hide);
-        $role = sanitize_text_field($role);
-        $patent = sanitize_text_field($patent);
-        $activity = sanitize_text_field($activity);
-        $field = sanitize_text_field($field);
-
-        if (isset($publication) && $publication != '') {
-            $param1 = 'publication';
-            $publication = str_replace(' ', '', $publication);
-            $publications = explode(',', $publication);
-            $param2 = $publications;
-        } elseif (isset($field) && $field != '') {
-            $param1 = 'field';
-            $field = str_replace(' ', '', $field);
-            $fields = explode(',', $field);
-            $param2 = $fields;
-        } elseif (isset($activity) && $activity != '') {
-            $param1 = 'activity';
-            $activity = str_replace(' ', '', $activity);
-            $activitys = explode(',', $activity);
-            $param2 = $activitys;
-        } elseif (isset($patent) && $patent != '') {
-            $param1 = 'patent';
-            $patent = str_replace(' ', '', $patent);
-            $patents = explode(',', $patent);
-            $param2 = $patents;
-        } elseif (isset($award) && $award != '') {
-            $param1 = 'award';
-            $param2 = $award;
-        } elseif (isset($project) && $project != '') {
-            $param1 = 'project';
-            $project = str_replace(' ', '', $project);
-            $projects = explode(',', $project);
-            $param2 = $projects;
-        } elseif (isset($awardnameid) && $awardnameid != '') {
-            $param1 = 'awardnameid';
-            $awardnameid = str_replace(' ', '', $awardnameid);
-            $awardnameids = explode(',', $awardnameid);
-            $param2 = $awardnameids;
-        } elseif (isset($persid) && $persid != '') {
-            $param1 = 'person';
-            $persid = str_replace(' ', '', $persid);
-            $persids = explode(',', $persid);
-            $param2 = $persids;
-        } elseif (isset($orgid) && $orgid != '') {
-            $param1 = 'orga';
-            $orgid = str_replace(' ', '', $orgid);
-            $orgids = explode(',', $orgid);
-            $param2 = $orgids;
-        } else {
-            $param1 = '';
-            $param2 = '';
-        }
-
-        // IDs mit zu groüen Abfragemengen ausschließen
-        $excluded = array(
-            '143134', // FAU
-            '141815', // MedFak
-            '142105', // NatFak
-            '141354', // PhilFak
-            '141678', // ReWi
-            '142351'  // Techfak
-        );
-
-        if ((!$orgid || $orgid == 0) && $persid == '' && $publication == '' && $award == '' && $awardnameid == '' && $field == '') {
-            // Fehlende ID oder ID=0 abfangen
-            return __('Bitte geben Sie eine CRIS-ID an.', 'fau-cris') . '</strong></p>';
-        } /* elseif (in_array($orgid, $excluded)
-          &&  $persid == ''
-          && (($show == 'awards' && $award == '') || ($show == 'publications' && $publication == ''))
-          && ($year == '' && $type == '')
-          ) {
-          // IDs mit zu vielen Ergebnissen ausschließen
-          return __('Abfragemenge zu groß. Bitte filtern Sie nach Jahr oder Typ.','fau-cris');
-          } */ else {
-            $order1 = 'year';
-            $order2 = '';
-
-            if (!empty($orderby)) {
-                if (strpos($orderby, ',') !== false) {
-                    $orderby = str_replace(' ', '', $orderby);
-                    $order1 = explode(',', $orderby)[0];
-                    $order2 = explode(',', $orderby)[1];
-                } else {
-                    $order1 = $orderby;
-                    $order2 = '';
-                }
-            }
-
-            if (isset($show) && $show == 'organisation') {
-                // Forschungsbereiche
+        if (isset($parameter['show']) && $parameter['show'] == 'organisation') {
+            // Forschung
                 require_once('class_Organisation.php');
-                $liste = new Organisation($param1, $param2);
-                return $liste->singleOrganisation($hide);
-            } elseif (isset($show) && $show == 'fields') {
+            $liste = new Organisation($parameter['entity'], $parameter['entity_id']);
+            return $liste->singleOrganisation($parameter['hide']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'fields') {
                 // Forschungsbereiche
                 require_once('class_Forschungsbereiche.php');
-                $liste = new Forschungsbereiche($param1, $param2);
+            $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
 
-                if ($field != '') {
-                    return $liste->singleField($hide);
+            if ($parameter['field'] != '') {
+                return $liste->singleField($parameter['hide'],$parameter['quotation']);
                 }
-                if (!empty($items)) {
+            if (!empty($parameter['items'])) {
                     return $liste->fieldListe();
                 }
                 return $liste->fieldListe();
-            } elseif (isset($show) && $show == 'activities') {
-                // Projekte
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'activities') {
+            // Aktivitäten
                 require_once('class_Aktivitaeten.php');
-                $liste = new Aktivitaeten($param1, $param2);
+            $liste = new Aktivitaeten($parameter['entity'], $parameter['entity_id']);
 
-                if ($activity != '') {
-                    return $liste->singleActivity($hide);
+            if ($parameter['activity'] != '') {
+                return $liste->singleActivity($parameter['hide']);
                 }
-                if (!empty($items)) {
-                    return $liste->actiListe($year, $start, $type, $items, $hide);
+            if (!empty($parameter['items'])) {
+                return $liste->actiListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
                 }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->actiNachTyp($year, $start, $type, $hide);
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->actiNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
                 }
-                if (strpos($order1, 'year') !== false) {
-                    return $liste->actiNachJahr($year, $start, $type, $hide);
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->actiNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
                 }
-                return $liste->actiListe($year, $start, $type, $items, $hide);
-            } elseif (isset($show) && $show == 'patents') {
-                // Projekte
+            return $liste->actiListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'patents') {
+            // Patente
                 require_once('class_Patente.php');
-                $liste = new Patente($param1, $param2);
+            $liste = new Patente($parameter['entity'], $parameter['entity_id']);
 
-                if ($patent != '') {
-                    return $liste->singlePatent($hide);
+            if ($parameter['patent'] != '') {
+                return $liste->singlePatent($parameter['hide']);
                 }
-                if (!empty($items)) {
-                    return $liste->patListe($year, $start, $type, $items, $hide);
+            if (!empty($parameter['items'])) {
+                return $liste->patListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
                 }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->patNachTyp($year, $start, $type, $hide);
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->patNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
                 }
-                if (strpos($order1, 'year') !== false) {
-                    return $liste->patNachJahr($year, $start, $type, $hide);
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->patNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
                 }
-                return $liste->patListe($year, $start, $type, $items, $hide);
-            } elseif (isset($show) && $show == 'projects') {
+            return $liste->patListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
                 // Projekte
                 require_once('class_Projekte.php');
-                $liste = new Projekte($param1, $param2);
+            $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
 
-                if ($project != '') {
-                    return $liste->singleProj($hide);
+            if ($parameter['project'] != '') {
+                return $liste->singleProj($parameter['hide'], $parameter['quotation']);
                 }
-                if (!empty($items)) {
-                    return $liste->projListe($year, $start, $type, $items, $hide, $role);
+            if (!empty($parameter['items'])) {
+                return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
                 }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->projNachTyp($year, $start, $type, $hide, $role);
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->projNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role']);
                 }
-                if (strpos($order1, 'year') !== false) {
-                    return $liste->projNachJahr($year, $start, $type, $hide, $role);
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role']);
                 }
-                return $liste->projListe($year, $start, $type, $items, $hide, $role);
-            } elseif (isset($show) && $show == 'awards') {
+            return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'awards') {
                 // Awards
                 require_once('class_Auszeichnungen.php');
-                $liste = new Auszeichnungen($param1, $param2, $display);
+            $liste = new Auszeichnungen($parameter['entity'], $parameter['entity_id'], $parameter['display']);
 
-                if ($award != '') {
-                    return $liste->singleAward($showname, $showyear, $showawardname, $display);
+            if ($parameter['award'] != '') {
+                return $liste->singleAward($parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display']);
                 }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->awardsNachTyp($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display, $order2);
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->awardsNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display'], $parameter['order2']);
                 }
-                if (strpos($order1, 'year') !== false) {
-                    return $liste->awardsNachJahr($year, $start, $type, $awardnameid, $showname, 0, $showawardname, $display, $order2);
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->awardsNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], 0, $parameter['showawardname'], $parameter['display'], $parameter['order2']);
                 }
-                return $liste->awardsListe($year, $start, $type, $awardnameid, $showname, $showyear, $showawardname, $display);
+            return $liste->awardsListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display']);
             } else {
                 // Publications
                 require_once('class_Publikationen.php');
-                $liste = new Publikationen($param1, $param2);
+            $liste = new Publikationen($parameter['entity'], $parameter['entity_id']);
 
-                if ($publication != '') {
-                    return $liste->singlePub($quotation);
+            if ($parameter['publication'] != '') {
+                return $liste->singlePub($parameter['quotation']);
                 }
-                if (!empty($items) || !empty($sortby)) {
-                    return $liste->pubListe($year, $start, $type, $subtype, $quotation, $items, $sortby);
+            if (!empty($parameter['items']) || !empty($parameter['sortby'])) {
+                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby']);
                 }
-                if (strpos($order1, 'type') !== false) {
-                    return $liste->pubNachTyp($year, $start, $type, $subtype, $quotation, $order2);
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2']);
                 }
-                return $liste->pubNachJahr($year, $start, $type, $subtype, $quotation, $order2);
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2']);
             }
-        }
+
         // nothing
         return '';
     }
 
     public static function cris_custom_shortcode($atts, $content = null) {
+        $parameter = self::cris_shortcode_parameter($atts);
+
+        if ($parameter['show'] == 'organisation') {
+        // Forschung
+            require_once('class_Organisation.php');
+            $liste = new Organisation($parameter['entity'], $parameter['entity_id']);
+            return $liste->customOrganisation($content);
+        } elseif ($parameter['show'] == 'fields') {
+        // Forschungsbereiche
+            require_once('class_Forschungsbereiche.php');
+            $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
+            if ($parameter['field'] != '') {
+                return $liste->customField($content, $parameter['quotation']);
+            }
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
+        // Projekte
+            require_once('class_Projekte.php');
+            $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
+            if ($parameter['project'] != '') {
+                return $liste->customProj($content, $parameter['quotation']);
+            }
+            /*if (!empty($parameter['items'])) {
+                return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->projNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'] = array(), $parameter['role'], $content);
+            }
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'] = array(), $parameter['role'], $content);
+            }
+            return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);*/
+        }
+    }
+
+
+    private static function cris_shortcode_parameter($atts) {
         $options = self::get_options();
 
         // Attributes
@@ -908,121 +860,103 @@ class FAU_CRIS {
             'field' => ''
                         ), $atts));
 
-        $show = sanitize_text_field($show);
-        $orderby = sanitize_text_field($orderby);
-        $type = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
-        $subtype = sanitize_text_field($subtype);
-        $year = sanitize_text_field($year);
-        $start = sanitize_text_field($start);
-        $orgid = sanitize_text_field($orgid);
-        $persid = sanitize_text_field($persid);
-        $publication = sanitize_text_field($publication);
-        $quotation = sanitize_text_field($quotation);
-        $items = sanitize_text_field($items);
-        if (in_array($sortby, array('created', 'updated')))
-            $sortby = sanitize_text_field($sortby);
-        $award = sanitize_text_field($award);
-        $awardnameid = sanitize_text_field($awardnameid);
-        $showname = sanitize_text_field($showname);
-        $showyear = sanitize_text_field($showyear);
-        $showawardname = sanitize_text_field($showawardname);
-        $display = sanitize_text_field($display);
-        $project = sanitize_text_field($project);
-        $role = sanitize_text_field($role);
-        $patent = sanitize_text_field($patent);
-        $activity = sanitize_text_field($activity);
-        $field = sanitize_text_field($field);
+        $sc_param['orderby'] = sanitize_text_field($orderby);
+        $sc_param['orgid'] = sanitize_text_field($orgid);
+        $sc_param['persid'] = sanitize_text_field($persid);
+        $sc_param['publication'] = sanitize_text_field($publication);
+        $sc_param['award'] = sanitize_text_field($award);
+        $sc_param['awardnameid'] = sanitize_text_field($awardnameid);
+        $sc_param['project'] = sanitize_text_field($project);
+        $sc_param['patent'] = sanitize_text_field($patent);
+        $sc_param['activity'] = sanitize_text_field($activity);
+        $sc_param['field'] = sanitize_text_field($field);
+        $sc_param['show'] = sanitize_text_field($show);
+        $sc_param['type'] = (!empty($pubtype)) ? sanitize_text_field($pubtype) : sanitize_text_field($type); //Abwärtskompatibilität
+        $sc_param['subtype'] = sanitize_text_field($subtype);
+        $sc_param['year'] = sanitize_text_field($year);
+        $sc_param['start'] = sanitize_text_field($start);
+        $sc_param['quotation'] = sanitize_text_field($quotation);
+        $sc_param['items'] = sanitize_text_field($items);
+        $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : 'virtualdate';
+        $sc_param['showname'] = sanitize_text_field($showname);
+        $sc_param['showyear'] = sanitize_text_field($showyear);
+        $sc_param['showawardname'] = sanitize_text_field($showawardname);
+        $sc_param['display'] = sanitize_text_field($display);
+        $sc_param['role'] = sanitize_text_field($role);
+        $sc_param['hide'] = sanitize_text_field($hide);
 
-        if (isset($publication) && $publication != '') {
-            $param1 = 'publication';
-            if (strpos($publication, ',')) {
-                $publication = str_replace(' ', '', $publication);
-                $publication = explode(',', $publication);
+        if ($sc_param['publication'] != '') {
+            $sc_param['entity'] = 'publication';
+            if (strpos($sc_param['publication'], ',')) {
+                $sc_param['publication'] = str_replace(' ', '', $sc_param['publication']);
+                $sc_param['publication'] = explode(',', $sc_param['publication']);
             }
-            $param2 = $publication;
-        } elseif (isset($field) && $field != '') {
-            $param1 = 'field';
-            $param2 = $field;
-        } elseif (isset($activity) && $activity != '') {
-            $param1 = 'activity';
-            $param2 = $activity;
-        } elseif (isset($patent) && $patent != '') {
-            $param1 = 'patent';
-            $param2 = $patent;
-        } elseif (isset($award) && $award != '') {
-            $param1 = 'award';
-            $param2 = $award;
-        } elseif (isset($project) && $project != '') {
-            $param1 = 'project';
-            if (strpos($project, ',') !== false) {
-                $project = str_replace(' ', '', $project);
-                $project = explode(',', $project);
+            $sc_param['entity_id'] = $sc_param['publication'];
+        } elseif ($sc_param['field'] != '') {
+            $sc_param['entity'] = 'field';
+            $sc_param['entity_id'] = $sc_param['field'];
+        } elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
+            $sc_param['entity'] = 'activity';
+            $sc_param['entity_id'] = $sc_param['activity'];
+        } elseif (isset($sc_param['patent']) && $sc_param['patent'] != '') {
+            $sc_param['entity'] = 'patent';
+            $sc_param['entity_id'] = $sc_param['patent'];
+        } elseif (isset($sc_param['award']) && $sc_param['award'] != '') {
+            $sc_param['entity'] = 'award';
+            $sc_param['entity_id'] = $sc_param['award'];
+        } elseif (isset($sc_param['project']) && $sc_param['project'] != '') {
+            $sc_param['entity'] = 'project';
+            if (strpos($sc_param['project'], ',') !== false) {
+                $sc_param['project'] = str_replace(' ', '', $sc_param['project']);
+                $sc_param['project'] = explode(',', $sc_param['project']);
             }
-            $param2 = $project;
-        } elseif (isset($awardnameid) && $awardnameid != '') {
-            $param1 = 'awardnameid';
-            $param2 = $awardnameid;
-        } elseif (isset($persid) && $persid != '') {
-            $param1 = 'person';
-            if (strpos($persid, ',') !== false) {
-                $persid = str_replace(' ', '', $persid);
-                $persid = explode(',', $persid);
+            $sc_param['entity_id'] = $sc_param['project'];
+        } elseif (isset($sc_param['awardnameid']) && $sc_param['awardnameid'] != '') {
+            $sc_param['entity'] = 'awardnameid';
+            $sc_param['entity_id'] = $sc_param['awardnameid'];
+        } elseif (isset($sc_param['persid']) && $sc_param['persid'] != '') {
+            $sc_param['entity'] = 'person';
+            if (strpos($sc_param['persid'], ',') !== false) {
+                $sc_param['persid'] = str_replace(' ', '', $sc_param['persid']);
+                $sc_param['persid'] = explode(',', $sc_param['persid']);
             }
-            $param2 = $persid;
-        } elseif (isset($orgid) && $orgid != '') {
-            $param1 = 'orga';
-            if (strpos($orgid, ',') !== false) {
-                $orgid = str_replace(' ', '', $orgid);
-                $orgid = explode(',', $orgid);
+            $sc_param['entity_id'] = $sc_param['persid'];
+        } elseif (isset($sc_param['orgid']) && $sc_param['orgid'] != '') {
+            $sc_param['entity'] = 'orga';
+            if (strpos($sc_param['orgid'], ',') !== false) {
+                $sc_param['orgid'] = str_replace(' ', '', $sc_param['orgid']);
+                $sc_param['orgid'] = explode(',', $sc_param['orgid']);
             }
-            $param2 = $orgid;
+            $sc_param['entity_id'] = $sc_param['orgid'];
         } else {
-            $param1 = '';
-            $param2 = '';
+            $sc_param['entity'] = '';
+            $sc_param['entity_id'] = '';
         }
 
-        $order1 = 'year';
-        $order2 = '';
+        $sc_param['order1'] = 'year';
+        $sc_param['order2'] = '';
 
         if (!empty($orderby)) {
             if (strpos($orderby, ',') !== false) {
                 $orderby = str_replace(' ', '', $orderby);
-                $order1 = explode(',', $orderby)[0];
-                $order2 = explode(',', $orderby)[1];
+                $sc_param['order1'] = explode(',', $orderby)[0];
+                $sc_param['order2'] = explode(',', $orderby)[1];
             } else {
-                $order1 = $orderby;
-                $order2 = '';
+                $sc_param['order1'] = $orderby;
+                $sc_param['order2'] = '';
             }
         }
 
-        if (isset($show) && $show == 'projects') {
-            // Projekte
-            require_once('class_Projekte.php');
-            $liste = new Projekte($param1, $param2);
-
-            if ($project != '') {
-                return $liste->customProj($content);
+        return $sc_param;
             }
-            if (!empty($items)) {
-                //    return $liste->projListe($year, $start, $type, $items, $hide, $role);
-            }
-            if (strpos($order1, 'type') !== false) {
-                return $liste->projNachTyp($year, $start, $type, $hide = array(), $role, $content);
-            }
-            if (strpos($order1, 'year') !== false) {
-                return $liste->projNachJahr($year, $start, $type, $hide = array(), $role, $content);
-            }
-            //return $liste->projListe($year, $start, $type, $items, $hide, $role);
-        }
-    }
 
     public static function cris_enqueue_styles() {
         global $post;
         $plugin_url = plugin_dir_url(__FILE__);
-        wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
+        wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
         if ($post && has_shortcode($post->post_content, 'cris')) {
             //wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
-            wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array('jquery'));
+            wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array ( 'jquery' ));
         }
     }
 
@@ -1038,26 +972,30 @@ class FAU_CRIS {
 
     public static function cris_cron() {
         $options = get_option('_fau_cris');
-        if (isset($options['cris_sync_check']) && $options['cris_sync_check'] != 1) {
-            if (wp_next_scheduled('cris_auto_update'))
+        if (isset($options['cris_sync_check'])
+                && $options['cris_sync_check'] != 1) {
+            if (wp_next_scheduled( 'cris_auto_update' ))
                 wp_clear_scheduled_hook('cris_auto_update');
             return;
         }
-        if (!isset($options['cris_org_nr']) || $options['cris_org_nr'] == 0 || !isset($options['cris_sync_check']) || $options['cris_sync_check'] != 1) {
+        if (!isset($options['cris_org_nr'])
+                || $options['cris_org_nr'] == 0
+                || !isset($options['cris_sync_check'])
+                || $options['cris_sync_check'] != 1) {
             return;
         }
         //Use wp_next_scheduled to check if the event is already scheduled*/
-        if (!wp_next_scheduled('cris_auto_update')) {
+        if( !wp_next_scheduled( 'cris_auto_update' )) {
             //Schedule the event for right now, then to repeat daily using the hook 'cris_create_cron'
-            wp_schedule_event(strtotime('today 21:00'), 'daily', 'cris_auto_update');
-            $timestamp = wp_next_scheduled('cris_auto_update');
+            wp_schedule_event( strtotime('today 21:00'), 'daily', 'cris_auto_update' );
+            $timestamp = wp_next_scheduled( 'cris_auto_update' );
             if ($timestamp) {
                 $message = __('Einstellungen gespeichert', 'fau-cris')
                         . '<br />'
                         . __('Nächste automatische Synchronisierung:', 'fau-cris') . ' '
                         //. date ('d.m.Y - h:i', $timestamp)
-                        . get_date_from_gmt(date('Y-m-d H:i:s', $timestamp), 'd.m.Y - H:i');
-                add_settings_error('AutoSyncComplete', 'autosynccomplete', $message, 'updated');
+                        . get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), 'd.m.Y - H:i' );
+                add_settings_error('AutoSyncComplete', 'autosynccomplete', $message , 'updated' );
                 settings_errors();
             }
         }
@@ -1088,6 +1026,7 @@ class FAU_CRIS {
             . '</ul>'
             . '<h2>' . __('Mögliche Zusatzoptionen', 'fau-cris') . '</h2>'
             . '<p>' . __('Ausgabe lässt sich beliebig anpassen. Eine Übersicht der verschiedenen Shortcode-Parameter zum Filtern, Sortieren und Ändern der Darstellung finden Sie unter: ') . '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/ target="_blank">https://www.wordpress.rrze.fau.de/plugins/fau-cris/</a>'
+
         );
 
         $content_fauperson = array(

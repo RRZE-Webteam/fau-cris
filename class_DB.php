@@ -19,17 +19,21 @@ class CRIS_DB {
 
     public function get($query) {
         $db = $this->db;
+        //var_dump($db);
         $result = $db->query($query);
         $items = array();
+        //var_dump($result);
         if($result){
-            while ($row = $result->fetch_array()){
+            //printf("Select returned %d rows.\n", $result->num_rows);
+            while ($row = $result->fetch_assoc()) {
                 $items[] = $row;
-           }
-           $result->close();
-           if ($db->more_results()) {
-               $db->next_result();
-           }
-           return $items;
+            }
+            $result->close();
+            if ($db->more_results()) {
+                $db->next_result();
+            }
+            //var_dump($items);
+            return $items;
         }
         return false;
     }

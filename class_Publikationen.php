@@ -95,7 +95,7 @@ class Publikationen {
     public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author') {
         $pubArray = $this->fetch_publications($year, $start, $type, $subtype);
         //var_dump($pubArray);
-        return;
+
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
@@ -107,8 +107,9 @@ class Publikationen {
         } else {
             $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
         }
+        //var_dump($formatter);
         $pubList = $formatter->execute($pubArray);
-
+        //var_dump($pubList);
         $output = '';
         $showsubtype = ($subtype == '') ? 1 : 0;
         foreach ($pubList as $array_year => $publications) {
@@ -289,6 +290,16 @@ class Publikationen {
             $publication->insert_quotation_links();
             $publist .= "<li>";
             $publist .= $publication->attributes['quotation' . $quotation . 'link'];
+            if (isset($this->options['cris_doi'])
+                    && $this->options['cris_doi'] == 1
+                    && !empty($publication->attributes['doi'])) {
+                $publist .= "<br />DOI: <a href='" . $publication->attributes['doi'] . "' target='blank' itemprop=\"url\">" . $publication->attributes['doi'] . "</a>";
+            }
+            if (isset($this->options['cris_url'])
+                    && $this->options['cris_url'] == 1
+                    && !empty($publication->attributes['cfuri'])) {
+                $publist .= "<br />URL: <a href='" . $publication->attributes['cfuri'] . "' target='blank' itemprop=\"url\">" . $publication->attributes['cfuri'] . "</a>";
+            }
             if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
                 $publist .= "<br />BibTeX: " . $publication->attributes['bibtex_link'];
             }
@@ -376,7 +387,7 @@ class Publikationen {
 
             switch ($pubDetails['pubType']) {
 
-                case "Book": // OK
+                case "book": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
@@ -403,8 +414,8 @@ class Publikationen {
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
 
-                case "Other":
-                case "Article in Edited Volumes":
+                case "other":
+                case "article in edited volumes":
                     if(($pubDetails['pubType'] == 'Other' && $pubDetails['booktitle']!='') || $pubDetails['pubType'] == 'Article in Edited Volumes') {
                         $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                         $publist .= $pubDetails['authors'] . ':';
@@ -433,8 +444,7 @@ class Publikationen {
                         $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                         break;
                     }
-                case "Other":
-                case "Journal article":
+                case "journal article":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ":";
                     $publist .= "<br />" . $pubDetails['title'];
@@ -449,7 +459,7 @@ class Publikationen {
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
 
-                case "Conference contribution": // OK
+                case "conference contribution": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
@@ -481,7 +491,7 @@ class Publikationen {
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
 
-                case "Editorial":
+                case "editorial":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
                     $publist .= "<br />" . $pubDetails['title'];
@@ -505,7 +515,8 @@ class Publikationen {
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
-                case "Thesis":
+
+                case "thesis":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
@@ -513,7 +524,8 @@ class Publikationen {
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
-                case "Translation":
+
+                case "translation":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= $pubDetails['title'];
@@ -720,6 +732,20 @@ class CRIS_publications extends CRIS_DB {
         return $this->retrieve($requests);
     }
 
+    public function by_field($fieldID = null) {
+        if ($fieldID === null || $fieldID === "0")
+            throw new Exception('Please supply valid publication ID');
+
+        if (!is_array($fieldID))
+            $fieldID = array($fieldID);
+
+        $requests = array();
+        foreach ($fieldID as $_p) {
+            $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_has_top_publ', $_p);
+        }
+        return $this->retrieve($requests);
+    }
+
     private function retrieve($reqs, &$filter = null) {
        if ($filter !== null && !$filter instanceof CRIS_filter)
             $filter = new CRIS_filter($filter);
@@ -776,7 +802,7 @@ class CRIS_publication extends CRIS_Entity {
         $matches = array();
         $splitapa = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
 
-        if ($splitapa === 1) {
+        if ($splitapa === 1 && isset($matches[2])) {
             $apalink = $matches[1] . \
                     sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
             if (isset($matches[4]))
@@ -784,7 +810,7 @@ class CRIS_publication extends CRIS_Entity {
         } else {
             // try to identify DOI at least
             $splitapa = preg_match("/^(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
-            if ($splitapa === 1) {
+            if ($splitapa === 1 && isset($matches[2])) {
                 $apalink = $matches[1] . \
                     sprintf('<a href="%s" target="_blank">%s</a>', $matches[2], $matches[2]);
             } else

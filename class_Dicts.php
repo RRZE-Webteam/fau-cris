@@ -2,6 +2,8 @@
 
 class CRIS_Dicts {
 
+    public static $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+
     public static $defaults = array(
         'show' => 'publications',
         'orderby' => '',
@@ -37,7 +39,7 @@ class CRIS_Dicts {
             'short' => 'zeitschriftenartikel',
             'de' => array(
                 'name' => 'Beitrag in einer Fachzeitschrift',
-                'title' => 'Beitrag in Fachzeitschriften'),
+                'title' => 'Beiträge in Fachzeitschriften'),
             'en'  => array(
                 'name' => 'Journal article',
                 'title' => 'Journal Articles')
@@ -155,15 +157,25 @@ class CRIS_Dicts {
                 'name' => 'Academy membership',
                 'title' => 'Academy Memberships')
         ),
-        '' => array(
+        'Kleiner Preis' => array(
             'order' => 4,
+            'short' => 'kleine',
+            'de' => array(
+                'name' => 'Weiterer Preis / Auszeichnung',
+                'title' => 'Weiterere Preise / Auszeichnungen'),
+            'en'  => array(
+                'name' => 'Other Award',
+                'title' => 'Other Awards')
+        ),
+        '' => array(
+            'order' => 5,
             'short' => 'andere',
             'de' => array(
                 'name' => 'Weiterer Preis / Auszeichnung',
                 'title' => 'Weiterere Preise / Auszeichnungen'),
             'en'  => array(
-                'name' => 'Miscellaneous',
-                'title' => 'Miscellaneous')
+                'name' => 'Other Award',
+                'title' => 'Other Awards')
         ),
     );
 
@@ -433,12 +445,12 @@ class CRIS_Dicts {
                 'title' => 'Newspaper Articles'
             )
         ),
-        'Working paper' => array(
+        'Working Paper' => array(
             'order' => 4,
             'short' => 'workingpaper',
             'de' => array(
-                'name' => 'Diskussionspapier / working paper',
-                'title' => 'Diskussionspapiere / working papers'
+                'name' => 'Diskussionspapier / Working Paper',
+                'title' => 'Diskussionspapiere / Working Papers'
             ),
             'en' => array(
                 'name' => 'Working paper',

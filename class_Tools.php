@@ -124,6 +124,8 @@ class Tools {
         }
         if (array_key_exists($type, $search))
             return $search[$type][$lang]['name'];
+
+        return $type;
     }
 
     public static function getTitle($object, $name, $lang) {
@@ -148,7 +150,10 @@ class Tools {
                 $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
         }
+        if (isset($search[$name][$lang]['title']))
         return $search[$name][$lang]['title'];
+
+        return $name;
     }
 
 
@@ -589,12 +594,19 @@ class Tools {
     }
 
     public static function make_date ($start, $end) {
-        setlocale(LC_TIME, get_locale());
+        $fmt = datefmt_create(
+            get_locale(),
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::NONE,
+            date_default_timezone_get(),
+            IntlDateFormatter::GREGORIAN
+        );
+
         $date = '';
         if ($start != '')
-            $start = strftime('%x', strtotime($start));
+            $start = datefmt_format($fmt, strtotime($start));
         if ($end != '')
-            $end = strftime('%x', strtotime($end));
+            $end = datefmt_format($fmt, strtotime($end));
         if ($start !='' && $end != '') {
             $date = $start . " - " . $end;
         } elseif ($start != '' && $end =='') {
