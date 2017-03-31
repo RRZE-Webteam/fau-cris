@@ -112,7 +112,6 @@ class CRIS_formatter {
     }
 
     private function compare_attributes($a, $b) {
-        var_dump($a);
         # Compare data based on attribute specified in self::sortkey
         return strcmp($a[$this->sortkey], $b[$this->sortkey]);
     }
