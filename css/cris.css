@@ -82,6 +82,7 @@ ul.cris-activities li {
 .cris-image {
     float: right;
     margin: 0 0 10px 20px;
+    max-width: 180px;
 }
 
 #nav .level2 li.cris-last {
