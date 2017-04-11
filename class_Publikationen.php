@@ -357,9 +357,11 @@ class Publikationen {
             }
             $authors_html = implode("., ", $authorList) . ".";
             // title (bei Rezensionen mit Original-Autor davor)
-            $title = ((array_key_exists('originalauthors', $publication) && !empty($publication['originalauthors'])) ? strip_tags($publication['originalauthors']).': ' : '');
+            $title = '';
+            if (($publication['publication type'] == 'Translation' || $publication['type other subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
+                $title = strip_tags($publication['originalauthors']) . ': ';
+                }
             $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
-
             $title_html = "<span class=\"title\" itemprop=\"name\" style=\"font-weight: bold;\">"
                     . "<a href=\"https://cris.fau.de/converis/publicweb/Publication/" . $id . "\" target=\"blank\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                     . $title
