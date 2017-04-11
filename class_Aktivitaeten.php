@@ -33,11 +33,13 @@ class Aktivitaeten {
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris') . '</strong></p>';
         }
-        $this->id = $this->orgNr;
-        $this->einheit = "orga";
-            if (in_array($einheit, array("person", "activity"))) {
+        if (in_array($einheit, array("person", "orga", "activity"))) {
             $this->id = $id;
             $this->einheit = $einheit;
+        } else {
+            // keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
+            $this->id = $this->orgNr;
+            $this->einheit = "orga";
         }
     }
 
@@ -218,6 +220,7 @@ class Aktivitaeten {
 
         foreach ($activities as $activity) {
             $activity = (array) $activity;
+            $namesArray = array();
             foreach ($activity['attributes'] as $attribut => $v) {
                 $activity[$attribut] = $v;
             }
@@ -373,7 +376,7 @@ class Aktivitaeten {
             if (!empty($activity_type) & $showtype != 0)
                 $activitylist .= $activity_type;
             if (!empty($activity_name))
-                $activitylist .= " <strong>\"<a href=\"https://cris.fau.de/converis/publicweb/activity/" . $activity_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_name . "</a>\"</strong>";
+                $activitylist .= " <strong><a href=\"https://cris.fau.de/converis/publicweb/activity/" . $activity_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
             if (!empty($activity_detail))
                 $activitylist .= " (" . $activity_detail . ")";
             if (!empty($activity_date))
