@@ -829,7 +829,7 @@ class CRIS_projects extends CRIS_webservice {
                 $data[] = $this->get($_i, $filter);
             } catch (Exception $e) {
                 // TODO: logging?
-                echo $e->getMessage();
+                //echo $e->getMessage();
                 continue;
             }
         }

@@ -215,6 +215,8 @@ class Sync {
                             . "#projects#"
                             . "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . "</h3>"
                             . "#persons#"
+                            . "<h3>" . __('Publikationen', 'fau-cris') . "</h3>"
+                            . "#publications#"
                             . "[/cris-custom]";
                 } else {
                     $field_content = "[cris show=fields field=$field->ID hide=\"title\"]";
@@ -245,7 +247,7 @@ class Sync {
                             . "<h3>" . __('Abstract', 'fau-cris') . "</h3>"
                             . "<p class=\"project-description\">#description#</p>"
                             . "<h3>" . __('Publikationen', 'fau-cris') . "</h3>"
-                            . "#publications#\n"
+                            . "#publications#"
                             . "[/cris-custom]";
                     } else {
                         $proj_content = "[cris show=projects project=$project->ID]";
