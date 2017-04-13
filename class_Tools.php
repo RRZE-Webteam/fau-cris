@@ -632,11 +632,17 @@ class Tools {
         if (!$double_encode)
             $text = html_entity_decode(stripslashes($text), ENT_QUOTES, 'UTF-8');
 
+        $html_specials = array('&', '<', '>', '"');
+
         // array of chars (multibyte aware)
         $mbchars = preg_split('/(?<!^)(?!$)/u', $text);
 
         $encoded = '';
         foreach ($mbchars as $char){
+            if (in_array($char, $html_specials)) {
+                $encoded .= htmlentities($char);
+                continue;
+            }
             $o = ord($char);
             if ( (strlen($char) > 1) || /* multi-byte [unicode] */
                 ($o <32 || $o > 126) || /* <- control / latin weird os -> */
