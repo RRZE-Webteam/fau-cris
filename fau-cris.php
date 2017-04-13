@@ -632,7 +632,7 @@ class FAU_CRIS {
             if ($parameter['activity'] != '') {
                 return $liste->singleActivity($parameter['hide']);
             }
-            if (!empty($parameter['items'])) {
+            if ($parameter['items'] != '' ) {
                 return $liste->actiListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
@@ -701,7 +701,7 @@ class FAU_CRIS {
             if ($parameter['publication'] != '') {
                 return $liste->singlePub($parameter['quotation']);
             }
-            if (!empty($parameter['items']) || !empty($parameter['sortby'])) {
+            if ($parameter['items'] != '' || $parameter['sortby'] != '') {
                 return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
@@ -800,7 +800,7 @@ class FAU_CRIS {
         $sc_param['start'] = sanitize_text_field($start);
         $sc_param['quotation'] = sanitize_text_field($quotation);
         $sc_param['items'] = sanitize_text_field($items);
-        $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : 'virtualdate';
+        $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : '';
         $sc_param['showname'] = sanitize_text_field($showname);
         $sc_param['showyear'] = sanitize_text_field($showyear);
         $sc_param['showawardname'] = sanitize_text_field($showawardname);

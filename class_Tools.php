@@ -312,7 +312,7 @@ class Tools {
                 }
                 //$pubTyp = implode(',', $pubTypes);
             } else {
-                $pubSubTyp = (array) self::getType('pubothersubtypes', $type);
+                $pubSubTyp = (array) self::getType('pubothersubtypes', $subtype);
             }
             if (empty($pubSubTyp)) {
                 $output = '<p>' . __('Falscher Parameter für Publikationssubtyp', 'fau-cris') . '</p>';
@@ -599,7 +599,7 @@ class Tools {
             date_default_timezone_get(),
             IntlDateFormatter::GREGORIAN
         );
-        
+
         $date = '';
         if ($start != '')
             $start = datefmt_format($fmt, strtotime($start));

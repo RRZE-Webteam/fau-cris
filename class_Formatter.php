@@ -85,9 +85,8 @@ class CRIS_formatter {
 
         # sort data inside groups
         foreach ($final as $_k => $group) {
-            if ($_k == "Other") {
-
-/*            } elseif (!is_array($this->sort)){*/
+            if ($_k == "Other" || $_k == "O.A." || $_k == "o.a.") {
+            /* } elseif (!is_array($this->sort)){*/
                 $final[$_k] = $group;
             } else {
                 $this->sortkey = $this->sort;
