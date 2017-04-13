@@ -124,6 +124,8 @@ class Tools {
         }
         if (array_key_exists($type, $search))
             return $search[$type][$lang]['name'];
+
+        return $type;
     }
 
     public static function getTitle($object, $name, $lang) {
@@ -148,7 +150,10 @@ class Tools {
                 $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
         }
-        return $search[$name][$lang]['title'];
+        if (isset($search[$name][$lang]['title']))
+            return $search[$name][$lang]['title'];
+
+        return $name;
     }
 
 
@@ -307,7 +312,7 @@ class Tools {
                 }
                 //$pubTyp = implode(',', $pubTypes);
             } else {
-                $pubSubTyp = (array) self::getType('pubothersubtypes', $type);
+                $pubSubTyp = (array) self::getType('pubothersubtypes', $subtype);
             }
             if (empty($pubSubTyp)) {
                 $output = '<p>' . __('Falscher Parameter für Publikationssubtyp', 'fau-cris') . '</p>';
@@ -587,12 +592,19 @@ class Tools {
     }
 
     public static function make_date ($start, $end) {
-        setlocale(LC_TIME, get_locale());
+        $fmt = datefmt_create(
+            get_locale(),
+            IntlDateFormatter::MEDIUM,
+            IntlDateFormatter::NONE,
+            date_default_timezone_get(),
+            IntlDateFormatter::GREGORIAN
+        );
+
         $date = '';
         if ($start != '')
-            $start = strftime('%x', strtotime($start));
+            $start = datefmt_format($fmt, strtotime($start));
         if ($end != '')
-            $end = strftime('%x', strtotime($end));
+            $end = datefmt_format($fmt, strtotime($end));
         if ($start !='' && $end != '') {
             $date = $start . " - " . $end;
         } elseif ($start != '' && $end =='') {
@@ -607,7 +619,7 @@ class Tools {
         /*
          * Deliver numerically encoded XML representation of special characters.
          * E.g. use &#8211; instead of &ndash;
-         * 
+         *
          * Adopted from user-contributed notes of
          * http://php.net/manual/de/function.htmlentities.php
          *
@@ -620,11 +632,17 @@ class Tools {
         if (!$double_encode)
             $text = html_entity_decode(stripslashes($text), ENT_QUOTES, 'UTF-8');
 
+        $html_specials = array('&', '<', '>', '"');
+
         // array of chars (multibyte aware)
         $mbchars = preg_split('/(?<!^)(?!$)/u', $text);
 
         $encoded = '';
         foreach ($mbchars as $char){
+            if (in_array($char, $html_specials)) {
+                $encoded .= htmlentities($char);
+                continue;
+            }
             $o = ord($char);
             if ( (strlen($char) > 1) || /* multi-byte [unicode] */
                 ($o <32 || $o > 126) || /* <- control / latin weird os -> */

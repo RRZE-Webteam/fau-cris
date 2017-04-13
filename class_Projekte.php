@@ -280,11 +280,11 @@ class Projekte {
             if (count($imgs)) {
                 $i = 1;
                 foreach($imgs as $img) {
-                    $proj_details["#image$i#"] = "<div class=\"cris-image\">";
                     if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
-                       $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        $proj_details["#image$i#"] = "<div class=\"cris-image\">";
+                        $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
-                    $proj_details["#image$i#"] .= "</div>";
+                        $proj_details["#image$i#"] .= "</div>";
                     }
                     $i++;
                 }
@@ -434,7 +434,7 @@ class Projekte {
 
             if (!in_array('abstract', $hide)) {
                 $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-                $description = strip_tags($description, '<br><br/><a>');
+                $description = strip_tags($description, '<br><br/><a><sup><sub>');
                 if ($description)
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
             }

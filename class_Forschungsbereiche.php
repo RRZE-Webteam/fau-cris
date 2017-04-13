@@ -49,7 +49,7 @@ class Forschungsbereiche {
      * Ausgabe aller Forschungsbereiche
      */
 
-    public function fieldListe($hide) {
+    public function fieldListe($hide = '') {
         $sortby = 'cfname';
         $fieldsArray = $this->fetch_fields();
 
@@ -77,7 +77,7 @@ class Forschungsbereiche {
      * Ausgabe eines einzelnen Forschungsbereichs
      */
 
-    public function singleField($hide, $quotation = '') {
+    public function singleField($hide = '', $quotation = '') {
         $ws = new CRIS_fields();
         try {
             $fieldsArray = $ws->by_id($this->id);

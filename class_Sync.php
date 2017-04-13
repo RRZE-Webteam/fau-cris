@@ -6,6 +6,8 @@ require_once("class_Projekte.php");
 
 class Sync {
 
+    private $menu_position_start = 2;
+
     public function __construct() {
         $this->options = (array) get_option('_fau_cris');
         $this->orgNr = $this->options['cris_org_nr'];
@@ -26,7 +28,7 @@ class Sync {
         $this->message = __('Synchronisierung abgeschlossen:', 'fau-cris') . '<ul style="list-style-type: disc; padding-left: 40px;">';
         $lang = ($this->lang == 'en') ? '_en' : '';
         $pages = array();
-        $this->menu_position = -99;
+        $this->menu_position = $this->menu_position_start;
         $this->num_created_p = 0;
         $this->num_updated_p = 0;
         $this->num_ok_p = 0;
@@ -48,26 +50,28 @@ class Sync {
         $menu_name = __('Hauptnavigation', 'fau-cris');
         $locations = get_nav_menu_locations();
         $menu_id = $locations[$menu_slug] ;
+        $this->menu_items = array();
         if ($menu_id == 0) {
             $this->menu_id = wp_create_nav_menu($menu_name);
             $menu[$menu_slug] = $this->menu_id;
             set_theme_mod('nav_menu_locations',$menu);
-            $this->menu_items = array();
             $this->message .= '<li>' . sprintf(__('Menü "%s" neu erstellt.', 'fau-cris'), $menu_name) . '</li>';
         } else {
             $this->menu_id = $menu_id;
-            $this->menu_items = wp_get_nav_menu_items($this->menu_id);
+            if (wp_get_nav_menu_items($this->menu_id))
+                $this->menu_items = wp_get_nav_menu_items($this->menu_id);
         }
 
         // Portalmenü
         $portal_name = 'Portal '.  $this->title_research;
         $portal_exists = wp_get_nav_menu_object( $portal_name );
-        if( $portal_exists){
+        $this->portal_items = array();
+        if ($portal_exists){
             $this->portal_id = $portal_exists->term_id;
-            $this->portal_items = wp_get_nav_menu_items($portal_name);
+            if (wp_get_nav_menu_items($portal_name))
+                $this->portal_items = wp_get_nav_menu_items($portal_name);
         } else {
             $this->portal_id = wp_create_nav_menu($portal_name);
-            $this->portal_items = array();
             $this->message .= '<li>' . sprintf(__('Portalmenü "%s" neu erstellt.', 'fau-cris'), $portal_name) . '</li>';
         }
 
@@ -163,13 +167,13 @@ class Sync {
             $research_mid = self::cris_make_menu_item($this->menu_id, $this->title_research, $research_pid, 0, $this->menu_position);
             $this->num_created_m ++;
         } else {
-            if ($page_research->menu_order != $this->menu_position) {
+            /*if ($page_research->menu_order != $this->menu_position) {
             // Wenn nötig existierende Menüposition korrigieren
                 self::cris_make_menu_item($this->menu_id, $this->title_research, $research_pid, 0, $this->menu_position, $research_menu_item->ID);
                 $this->num_updated_m ++;
-            } else {
+            } else {*/
                 $this->num_ok_m ++;
-            }
+            /*}*/
             $research_mid = $research_menu_item->ID;
         }
         $this->menu_position++;
@@ -187,7 +191,7 @@ class Sync {
             $this->message .= '<li>Es konnten keine Forschungsbereiche gefunden werden. Bitte legen Sie zunächst Forschungsbereiche und zugeordnete Projekte in CRIS an.</li>';
 
         }
-        if (is_array($fields)) {
+        if ($fields) {
             foreach ($fields as $field) {
                 $_p = new Projekte();
                 $projects = $_p->fieldProj($field->ID, 'array', true);
@@ -317,11 +321,21 @@ class Sync {
         }
         $this->num_menu_items = (count($pages['no_field']['projects'])) ? count($pages) : count($pages) -1;
 
+        if (count($pages) < 2 && !count($pages['no_field']['projects'])) {
+            if (count($this->portal_items) < 1)
+                wp_delete_nav_menu($portal_name);
+            $this->message = __('Der Bereich "Forschung" konnte nicht erstellt werden: Es wurden keine Forschungsprojekte gefunden.','fau-cris');
+            add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'error' );
+            settings_errors();
+            return;
+        }
 
         /*
          *  Seiten Forschungsbereiche unter Forschung
          */
         foreach ($pages as $field) {
+            if ($field['title'] == $this->title_noFieldsPage && (!count($field['projects'])))
+                continue;
             $field_page = self::cris_make_page($field['title'], $field['content'], $field['contact'], $field['position'], $research_pid, $research_mid,0,1);
             $this->menu_count ++;
 
@@ -351,7 +365,7 @@ class Sync {
             }
             // Portalmenü-Eintrag entfernen
             foreach ($this->portal_items as $_pi) {
-                if($_pi->menu_item_parent == 0 && $_mi->title == $this->title_noFieldsPage) {
+                if($_pi->menu_item_parent == 0 && $_pi->title == $this->title_noFieldsPage) {
                     wp_delete_post($_pi->ID);
                 }
             }
@@ -377,6 +391,8 @@ class Sync {
      */
 
     private function cris_menu_item_exists($menu, $title, $parent = 0) {
+        if (!is_array($menu))
+            return;
         foreach ($menu as $menu_item) {
             if ($menu_item->title == $title
                     && $menu_item->menu_item_parent == $parent
@@ -483,7 +499,7 @@ class Sync {
             $this->num_created_m ++;
         } else {
             $mid = $menu_item->ID;
-            if ($menu_item->menu_order + ($position*-1) != 99) {
+            if ($menu_item->menu_order != $position) {
             // Wenn nötig existierende Menüposition korrigieren
                 self::cris_make_menu_item($this->menu_id, $title, $pid, $parent_mid, $position, $menu_item->ID);
                 $this->num_updated_m ++;
@@ -499,7 +515,7 @@ class Sync {
                 $this->num_created_mp ++;
             } else {
                 $mpid = $portal_item->ID;
-                if ($portal_item->menu_order + ($position*-1) != 99) {
+                if ($portal_item->menu_order != ($position - $this->menu_position_start)) {
                 // Wenn nötig existierende Menüposition korrigieren
                     self::cris_make_menu_item($this->portal_id, $title, $pid, $parent_mpid, $position, $portal_item->ID);
                     $this->num_updated_mp ++;

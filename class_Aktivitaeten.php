@@ -32,7 +32,6 @@ class Aktivitaeten {
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris') . '</strong></p>';
-            return;
         }
         if (in_array($einheit, array("person", "orga", "activity"))) {
             $this->id = $id;
@@ -42,7 +41,6 @@ class Aktivitaeten {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
-
     }
 
     /*
@@ -222,6 +220,7 @@ class Aktivitaeten {
 
         foreach ($activities as $activity) {
             $activity = (array) $activity;
+            $namesArray = array();
             foreach ($activity['attributes'] as $attribut => $v) {
                 $activity[$attribut] = $v;
             }
@@ -245,8 +244,8 @@ class Aktivitaeten {
             $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
             setlocale(LC_TIME, get_locale());
 
-            switch (strtolower($activity_type)) {
-                case "fau-interne gremienmitgliedschaft / funktion":
+            switch (strtolower($activity['type of activity'])) {
+                case "fau-interne gremienmitgliedschaften / funktionen":
                     $activity_name = $activity['description function'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -279,7 +278,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "gutachtertätigkeit für eine wissenschaftliche zeitschrift":
+                case "gutachtertätigkeit für wissenschaftliche zeitschrift":
                     $activity_name = $activity['namejournal'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -290,7 +289,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "gutachtertätigkeit für eine förderorganisation":
+                case "gutachtertätigkeit für förderorganisation":
                     $activity_name = $activity['type of expert activity'];
                     $activity_detail = $activity['mirror_fund'];
                     $activity_nameofshow = '';
@@ -323,7 +322,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "gremiumsmitglied im wissenschaftsrat":
+                case "gremiumsmitglied wissenschaftsrat":
                     $activity_name = $activity['description function'];
                     $activity_detail = $activity['memberscicouncil'];
                     $activity_nameofshow = '';
@@ -356,7 +355,7 @@ class Aktivitaeten {
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
-                case "sonstige fau-externe aktivität":
+                case "sonstige fau-externe aktivitäten":
                     $activity_name = $activity['type of extern expert activity'];
                     $activity_detail = '';
                     $activity_nameofshow = '';
@@ -377,7 +376,7 @@ class Aktivitaeten {
             if (!empty($activity_type) & $showtype != 0)
                 $activitylist .= $activity_type;
             if (!empty($activity_name))
-                $activitylist .= " <strong>\"<a href=\"https://cris.fau.de/converis/publicweb/activity/" . $activity_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_name . "</a>\"</strong>";
+                $activitylist .= " <strong><a href=\"https://cris.fau.de/converis/publicweb/activity/" . $activity_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
             if (!empty($activity_detail))
                 $activitylist .= " (" . $activity_detail . ")";
             if (!empty($activity_date))
@@ -486,6 +485,8 @@ class CRIS_activities extends CRIS_webservice {
                     }
                     if (!empty($a->attributes['sortdate'])) {
                         $a->attributes['year'] = substr($a->attributes['sortdate'], 0, 4);
+                    } else {
+                        $a->attributes['year'] = '';
                     }
                 }
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))

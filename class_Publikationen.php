@@ -34,7 +34,6 @@ class Publikationen {
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
-            return;
         }
         if (in_array($einheit, array("person", "orga", "publication"))) {
             $this->id = $id;
@@ -135,7 +134,7 @@ class Publikationen {
 
         // Publikationstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$publications, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$publications, 'short')) !== false) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('publications', $value);
             }
@@ -308,6 +307,11 @@ class Publikationen {
             $publication->insert_quotation_links();
             $publist .= "<li>";
             $publist .= $publication->attributes['quotation' . $quotation . 'link'];
+            if (isset($this->options['cris_doi'])
+                    && $this->options['cris_doi'] == 1
+                    && !empty($publication->attributes['doi'])) {
+                $publist .= "<br />DOI: <a href='" . $publication->attributes['doi'] . "' target='blank' itemprop=\"url\">" . $publication->attributes['doi'] . "</a>";
+            }
             if (isset($this->options['cris_url'])
                     && $this->options['cris_url'] == 1
                     && !empty($publication->attributes['cfuri'])) {
@@ -353,9 +357,11 @@ class Publikationen {
             }
             $authors_html = implode("., ", $authorList) . ".";
             // title (bei Rezensionen mit Original-Autor davor)
-            $title = ((array_key_exists('originalauthors', $publication) && !empty($publication['originalauthors'])) ? strip_tags($publication['originalauthors']).': ' : '');
+            $title = '';
+            if (($publication['publication type'] == 'Translation' || $publication['type other subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
+                $title = strip_tags($publication['originalauthors']) . ': ';
+                }
             $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
-
             $title_html = "<span class=\"title\" itemprop=\"name\" style=\"font-weight: bold;\">"
                     . "<a href=\"https://cris.fau.de/converis/publicweb/Publication/" . $id . "\" target=\"blank\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                     . $title
