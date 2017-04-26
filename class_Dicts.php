@@ -459,7 +459,7 @@ class CRIS_Dicts {
         ),
         'online publication' => array(
             'order' => 5,
-            'short' => 'onlinepublication',
+            'short' => 'onlinepublikation',
             'de' => array(
                 'name' => 'Online-Publikation',
                 'title' => 'Online-Publikationen'
@@ -471,7 +471,7 @@ class CRIS_Dicts {
         ),
         'Conference report' => array(
             'order' => 6,
-            'short' => 'conferencereport',
+            'short' => 'konferenzbericht',
             'de' => array(
                 'name' => 'Konferenzbericht',
                 'title' => 'Konferenzberichte'

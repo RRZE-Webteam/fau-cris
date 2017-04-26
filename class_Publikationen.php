@@ -35,7 +35,7 @@ class Publikationen {
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
         }
-        if (in_array($einheit, array("person", "orga", "publication"))) {
+        if (in_array($einheit, array("person", "orga", "publication", "project"))) {
             $this->id = $id;
             $this->einheit = $einheit;
         } else {
