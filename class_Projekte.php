@@ -30,9 +30,9 @@ class Projekte {
         if ($this->cms == 'wbk' && $this->cris_project_link == 'person') {
             $this->univis = Tools::get_univis();
         }
-
+        
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
+            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
             return;
         }
         if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project"))) {
@@ -107,7 +107,7 @@ class Projekte {
     }
 
     /*
-     * Ausgabe aller Publikationen nach Publikationstypen gegliedert
+     * Ausgabe aller Projekte nach Projekttypen gegliedert
      */
 
     public function projNachTyp($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '') {
@@ -119,7 +119,7 @@ class Projekte {
         }
         $hide = explode(',', $hide);
 
-        // Publikationstypen sortieren
+        // Projekttypen sortieren
         $order = $this->order;
         if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$projects, 'short'))) {
             foreach ($order as $key => $value) {
@@ -274,7 +274,7 @@ class Projekte {
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a>');
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub>');
             $proj_details['#publications#'] = $this->get_project_publications($id, $quotation);
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
@@ -734,7 +734,7 @@ class Projekte {
 
     private function get_project_publications($project = NULL, $quotation = '') {
         require_once('class_Publikationen.php');
-        $liste = new Publikationen();
+        $liste = new Publikationen('project', $project);
         return $liste->projectPub($project, $quotation);
     }
 
