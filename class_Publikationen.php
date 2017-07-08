@@ -509,6 +509,7 @@ class Publikationen {
                     break;
 
                 case "editorial":
+                case "edited volumes":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
                     $publist .= "<br />" . $pubDetails['title'];
