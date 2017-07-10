@@ -43,8 +43,7 @@ class Auszeichnungen {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
-
-            }
+    }
 
     /*
      * Ausgabe aller Auszeichnungen ohne Gliederung
@@ -86,10 +85,10 @@ class Auszeichnungen {
             return $output;
         }
 
-        if ($order2 == 'author') {
-            $formatter = new CRIS_formatter("year award", SORT_DESC, "award_preistraeger", SORT_ASC);
+        if ($order2 == 'name') {
+            $formatter = new CRIS_formatter("year award", SORT_DESC, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("year award", SORT_DESC, "award_preistraeger", SORT_ASC);
+            $formatter = new CRIS_formatter("year award", SORT_DESC, "year award", SORT_ASC);
         }
         $awardList = $formatter->execute($awardArray);
 
@@ -232,22 +231,23 @@ class Auszeichnungen {
             }
             unset($award['attributes']);
 
-            $preistraeger = explode(", ", $award['award_preistraeger']);
-	    $preistraegerIDs = explode(",", $award['relpersid']);
-	    $preistraegerArray = array();
-	    foreach ($preistraegerIDs as $i => $key) {
-                $preistraegerArray[] = array('id' => $key, 'name' => $preistraeger[$i]);
+            $preistraeger = explode("|", $award['exportnames']);
+            $preistraegerIDs = explode(",", $award['relpersid']);
+            $preistraegerArray = array();
+            foreach ($preistraegerIDs as $i => $key) {
+                $nameparts = explode(":", $preistraeger[$i]);
+                $preistraegerArray[] = array(
+                    'id' => $key,
+                    'lastname' => $nameparts[0],
+                    'firstname' => $nameparts[1]);
             }
             $preistraegerList = array();
             foreach ($preistraegerArray as $pt) {
-                $preistraeger_elements = explode(" ", $pt['name']);
-                $preistraeger_lastname = array_pop($preistraeger_elements);
-                $preistraeger_firstname = implode(" ", $preistraeger_elements);
-                $preistraegerList[] = Tools::get_person_link($pt['id'], $preistraeger_firstname, $preistraeger_lastname, $this->cris_award_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
+                $preistraegerList[] = Tools::get_person_link($pt['id'], $pt['firstname'], $pt['lastname'], $this->cris_award_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
             }
             $preistraeger_html = implode(", ", $preistraegerList);
-            	     
-	    if (!empty($award['award_name'])) {
+
+            if (!empty($award['award_name'])) {
                 $award_name = $award['award_name'];
             } elseif (!empty($award['award_name_manual'])) {
                 $award_name = $award['award_name_manual'];
@@ -263,16 +263,16 @@ class Auszeichnungen {
             if ($year == 1 && $name == 1) {
                 $awardlist .= (!empty($preistraeger_html) ? $preistraeger_html : "")
                         . (($awardname == 1) ? ": <strong>" . $award_name . "</strong> "
-                            . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" )
+                        . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" )
                         . (!empty($award_year) ? " &ndash; " . $award_year : "");
             } elseif ($year == 1 && $name == 0) {
                 $awardlist .= (!empty($award_year) ? $award_year . ": " : "")
                         . (($awardname == 1) ? "<strong>" . $award_name . "</strong> "
-                            . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
+                        . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             } elseif ($year == 0 && $name == 1) {
                 $awardlist .= (!empty($preistraeger_html) ? $preistraeger_html . ": " : "")
                         . (($awardname == 1) ? "<strong>" . $award_name . "</strong> "
-                            . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
+                        . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             } else {
                 $awardlist .= "<strong>" . $award_name . "</strong>"
                         . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "");
@@ -333,7 +333,7 @@ class Auszeichnungen {
             $awardlist .= (isset($award_pic['png']) && strlen($award_pic['png']) > 30) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic['png'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
             $awardlist .= $name == 1 ? $award_preistraeger : '';
             $awardlist .= (($awardname == 1) ? " <strong>" . $award_name . "</strong> "
-                            . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
+                    . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             $awardlist .= ($year == 1 && !empty($award_year)) ? "<br />" . $award_year : '';
             $awardlist .= (isset($award_pic['desc']) && strlen($award_pic['desc']) > 0) ? "<br /><span class=\"imgsrc\">(" . _x('Bild:', 'Wird bei Galerien vor die Bildquelle geschrieben.', 'fau-cris') . " " . $award_pic['desc'] . ")</span>" : "";
             $awardlist .= "</li>";
