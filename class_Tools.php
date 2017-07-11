@@ -346,7 +346,7 @@ class Tools {
                 $awardTyp = (array) self::getType('awards', $type);
             }
             if (empty($awardTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Auszeichnungstyp', 'fau-cris') . '</p>';
+                $output = '<p>' . __('Falscher Parameter für Auszeichnungstyp', 'fau-cris') . '</p>';
                 return $output;
             }
             $filter['type of award__eq'] = $awardTyp;
