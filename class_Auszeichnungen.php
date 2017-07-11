@@ -77,7 +77,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Jahren gegliedert
      */
 
-    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = 'list', $order2 = 'year') {
+    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = 'list', $order2 = 'name') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -85,10 +85,10 @@ class Auszeichnungen {
             return $output;
         }
 
-        if ($order2 == 'name') {
-            $formatter = new CRIS_formatter("year award", SORT_DESC, "exportnames", SORT_ASC);
+        if ($order2 == 'year') {
+            $formatter = new CRIS_formatter("year award", SORT_DESC, "year award", SORT_DESC);
         } else {
-            $formatter = new CRIS_formatter("year award", SORT_DESC, "year award", SORT_ASC);
+            $formatter = new CRIS_formatter("year award", SORT_DESC, "exportnames", SORT_ASC);
         }
         $awardList = $formatter->execute($awardArray);
 
@@ -136,9 +136,9 @@ class Auszeichnungen {
 
         // sortiere nach Typenliste, innerhalb des Typs nach Name aufwärts sortieren
         if ($order2 == 'name') {
-            $formatter = new CRIS_formatter("type of award", SORT_DESC, "award_preistraeger", SORT_ASC);
+            $formatter = new CRIS_formatter("type of award", array_values($order), "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("type of award", SORT_DESC, "year award", SORT_DESC);
+            $formatter = new CRIS_formatter("type of award", array_values($order), "year award", SORT_DESC);
         }
         $awardList = $formatter->execute($awardArray);
         $output = '';
