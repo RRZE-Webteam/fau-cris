@@ -159,7 +159,7 @@ class CRIS_Dicts {
         ),
         'Kleiner Preis' => array(
             'order' => 4,
-            'short' => 'kleine',
+            'short' => 'andere',
             'de' => array(
                 'name' => 'Weiterer Preis / Auszeichnung',
                 'title' => 'Weiterere Preise / Auszeichnungen'),
@@ -169,7 +169,7 @@ class CRIS_Dicts {
         ),
         '' => array(
             'order' => 5,
-            'short' => 'andere',
+            'short' => 'keintyp',
             'de' => array(
                 'name' => 'Weiterer Preis / Auszeichnung',
                 'title' => 'Weiterere Preise / Auszeichnungen'),
