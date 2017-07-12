@@ -648,7 +648,7 @@ class Projekte {
             foreach ($persons as $project) {
                 foreach ($project as $type => $person) {
                     foreach ($person as $id => $details) {
-                        $persList[$type][$id] = $details;
+                        $persList[$id] = $details;
                     }
                 }
             }
