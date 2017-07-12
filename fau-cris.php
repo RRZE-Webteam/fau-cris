@@ -2,11 +2,13 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.4.3
+ * Version: 3.4.4
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
  * Domain Path: /languages
+ * Requires at least: 3.9.2
+ * Tested up to: 4.8
  * License: GPLv2 or later
  */
 /*
@@ -34,7 +36,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '3.4.1';
+    const version = '3.4.4';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -702,12 +704,12 @@ class FAU_CRIS {
                 return $liste->singlePub($parameter['quotation']);
             }
             if ($parameter['items'] != '' || $parameter['sortby'] != '') {
-                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby']);
+                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2']);
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau']);
             }
-            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2']);
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau']);
         }
 
         // nothing
@@ -780,7 +782,8 @@ class FAU_CRIS {
             'role' => 'leader',
             'patent' => '',
             'activity' => '',
-            'field' => ''
+            'field' => '',
+            'fau' => ''
                         ), $atts));
 
         $sc_param['orderby'] = sanitize_text_field($orderby);
@@ -809,7 +812,8 @@ class FAU_CRIS {
         $sc_param['display'] = sanitize_text_field($display);
         $sc_param['role'] = sanitize_text_field($role);
         $sc_param['hide'] = sanitize_text_field($hide);
-
+        $sc_param['fau'] = sanitize_text_field($fau);
+        
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {

@@ -50,8 +50,8 @@ class Publikationen {
      * Ausgabe aller Publikationen ohne Gliederung
      */
 
-    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $items = '', $sortby = 'virtualdate') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype);
+    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $items = '', $sortby = 'virtualdate', $fau = '') {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -90,8 +90,8 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype);
+    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author', $fau = '') {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau);
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
@@ -124,8 +124,8 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'date') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype);
+    public function pubNachTyp($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'date', $fau = '') {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -275,9 +275,8 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '') {
-
-        $filter = Tools::publication_filter($year, $start, $type, $subtype);
+    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '', $fau = '') {
+        $filter = Tools::publication_filter($year, $start, $type, $subtype, $fau);
         $ws = new CRIS_publications();
 
         try {
@@ -663,9 +662,9 @@ class CRIS_publications extends CRIS_webservice {
     }
 
     private function retrieve($reqs, &$filter = null) {
-       if ($filter !== null && !$filter instanceof CRIS_filter)
+       if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
-
+       }
         $data = array();
         foreach ($reqs as $_i) {
             try {
@@ -686,7 +685,6 @@ class CRIS_publications extends CRIS_webservice {
                     $publs[$p->ID] = $p;
             }
         }
-
         return $publs;
     }
 

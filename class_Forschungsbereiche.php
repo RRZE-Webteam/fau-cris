@@ -217,12 +217,10 @@ class Forschungsbereiche {
                 if ($persons) {
                     $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
                     $singlefield .= "<ul>";
-                    foreach ($persons as $type => $person) {
-                        foreach ($person as $p_id => $details) {
-                            $singlefield .= "<li>";
-                            $singlefield .= Tools::get_person_link($p_id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                            $singlefield .= "</li>";
-                        }
+                    foreach ($persons as $p_id => $person) {
+                        $singlefield .= "<li>";
+                        $singlefield .= Tools::get_person_link($p_id, $person['firstname'], $person['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                        $singlefield .= "</li>";                        
                     }
                     $singlefield .= "</ul>";
                 }
@@ -260,13 +258,11 @@ class Forschungsbereiche {
             $persons = $this->get_field_persons($id);
             if ($persons) {
                 $field_details['#persons#'] .= "<ul>";
-                foreach ($persons as $type => $person) {
-                    foreach ($person as $p_id => $details) {
+                foreach ($persons as $p_id => $person) {
                         $field_details['#persons#'] .= "<li>";
-                        $field_details['#persons#'] .= Tools::get_person_link($p_id, $details['firstname'], $details['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                        $field_details['#persons#'] .= "</li>";
+                        $field_details['#persons#'] .= Tools::get_person_link($p_id, $person['firstname'], $person['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                        $field_details['#persons#'] .= "</li>";                        
                     }
-                }
                 $field_details['#persons#'] .= "</ul>";
             }
             $field_details['#publications#'] = '';
