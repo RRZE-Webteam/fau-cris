@@ -702,12 +702,12 @@ class FAU_CRIS {
                 return $liste->singlePub($parameter['quotation']);
             }
             if ($parameter['items'] != '' || $parameter['sortby'] != '') {
-                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby']);
+                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2']);
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau']);
             }
-            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2']);
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau']);
         }
 
         // nothing
@@ -780,7 +780,8 @@ class FAU_CRIS {
             'role' => 'leader',
             'patent' => '',
             'activity' => '',
-            'field' => ''
+            'field' => '',
+            'fau' => ''
                         ), $atts));
 
         $sc_param['orderby'] = sanitize_text_field($orderby);
@@ -809,7 +810,8 @@ class FAU_CRIS {
         $sc_param['display'] = sanitize_text_field($display);
         $sc_param['role'] = sanitize_text_field($role);
         $sc_param['hide'] = sanitize_text_field($hide);
-
+        $sc_param['fau'] = sanitize_text_field($fau);
+        
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {

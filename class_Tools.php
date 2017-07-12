@@ -281,7 +281,7 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '') {
+    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '', $fau = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['publyear__eq'] = $year;
@@ -319,6 +319,13 @@ class Tools {
                 return $output;
             }
             $filter['type other subtype__eq'] = $pubSubTyp;
+        }
+        if ($fau !== '') {
+            if ($fau == 1) {
+                $filter['fau publikation__eq'] = 'yes';
+            } elseif ($fau == 0) {
+                $filter['fau publikation__eq'] = 'no';
+            }
         }
         if (count($filter))
             return $filter;
