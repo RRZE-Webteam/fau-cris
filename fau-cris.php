@@ -672,7 +672,7 @@ class FAU_CRIS {
             if ($parameter['project'] != '') {
                 return $liste->singleProj($parameter['hide'], $parameter['quotation']);
             }
-            if (!empty($parameter['items'])) { var_dump($parameter['current']);
+            if (!empty($parameter['items'])) {
                 return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role'], $parameter['current']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
