@@ -10,6 +10,8 @@
  * Requires at least: 3.9.2
  * Tested up to: 4.8
  * License: GPLv2 or later
+ * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris
+ * GitHub Branch: master
  */
 /*
  * This program is free software; you can redistribute it and/or
