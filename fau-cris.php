@@ -704,12 +704,12 @@ class FAU_CRIS {
                 return $liste->singlePub($parameter['quotation']);
             }
             if ($parameter['items'] != '' || $parameter['sortby'] != '') {
-                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau']);
+                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau']);
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed']);
             }
-            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau']);
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed']);
         }
 
         // nothing
@@ -783,7 +783,8 @@ class FAU_CRIS {
             'patent' => '',
             'activity' => '',
             'field' => '',
-            'fau' => ''
+            'fau' => '',
+            'peerreviewed' => ''
                         ), $atts));
 
         $sc_param['orderby'] = sanitize_text_field($orderby);
@@ -813,6 +814,7 @@ class FAU_CRIS {
         $sc_param['role'] = sanitize_text_field($role);
         $sc_param['hide'] = sanitize_text_field($hide);
         $sc_param['fau'] = sanitize_text_field($fau);
+        $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
         
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';

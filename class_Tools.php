@@ -281,7 +281,7 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '', $fau = '') {
+    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['publyear__eq'] = $year;
@@ -325,6 +325,13 @@ class Tools {
                 $filter['fau publikation__eq'] = 'yes';
             } elseif ($fau == 0) {
                 $filter['fau publikation__eq'] = 'no';
+            }
+        }
+        if ($peerreviewed !== '') {
+            if ($peerreviewed == 1) {
+                $filter['peerreviewed__eq'] = 'Yes';
+            } elseif ($fau == 0) {
+                $filter['peerreviewed__eq'] = 'No';
             }
         }
         if (count($filter))
