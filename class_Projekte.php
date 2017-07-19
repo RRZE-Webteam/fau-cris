@@ -274,7 +274,7 @@ class Projekte {
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub>');
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#publications#'] = $this->get_project_publications($id, $quotation);
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
@@ -434,7 +434,7 @@ class Projekte {
 
             if (!in_array('abstract', $hide)) {
                 $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-                $description = strip_tags($description, '<br><br/><a><sup><sub><ul><li>');
+                $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
                 if ($description)
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
             }
