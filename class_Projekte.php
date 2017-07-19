@@ -50,8 +50,8 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($year = '', $start = '', $type = '', $items = '', $hide = '', $role = 'leader') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role);
+    public function projListe($year = '', $start = '', $type = '', $items = '', $hide = '', $role = 'leader', $current = '') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -79,8 +79,8 @@ class Projekte {
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
 
-    public function projNachJahr($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role);
+    public function projNachJahr($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '', $current = '') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -110,8 +110,8 @@ class Projekte {
      * Ausgabe aller Projekte nach Projekttypen gegliedert
      */
 
-    public function projNachTyp($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role);
+    public function projNachTyp($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '', $current = '') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -207,8 +207,8 @@ class Projekte {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_projects($year = '', $start = '', $type = '', $role = 'leader') {
-        $filter = Tools::project_filter($year, $start, $type);
+    private function fetch_projects($year = '', $start = '', $type = '', $role = 'leader', $current = '') {
+        $filter = Tools::project_filter($year, $start, $type, $current);
 
         $ws = new CRIS_projects();
         $awardArray = array();

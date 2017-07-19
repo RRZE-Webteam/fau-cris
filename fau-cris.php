@@ -668,20 +668,20 @@ class FAU_CRIS {
             // Projekte
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
-
+            
             if ($parameter['project'] != '') {
                 return $liste->singleProj($parameter['hide'], $parameter['quotation']);
             }
-            if (!empty($parameter['items'])) {
-                return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
+            if (!empty($parameter['items'])) { var_dump($parameter['current']);
+                return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role'], $parameter['current']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->projNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role']);
+                return $liste->projNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role'], '', $parameter['current']);
             }
             if (strpos($parameter['order1'], 'year') !== false) {
-                return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role']);
+                return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role'], '', $parameter['current']);
             }
-            return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role']);
+            return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['items'], $parameter['hide'], $parameter['role'], $parameter['current']);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'awards') {
             // Awards
             require_once('class_Auszeichnungen.php');
@@ -786,7 +786,8 @@ class FAU_CRIS {
             'activity' => '',
             'field' => '',
             'fau' => '',
-            'peerreviewed' => ''
+            'peerreviewed' => '',
+            'current' => ''
                         ), $atts));
 
         $sc_param['orderby'] = sanitize_text_field($orderby);
@@ -817,6 +818,7 @@ class FAU_CRIS {
         $sc_param['hide'] = sanitize_text_field($hide);
         $sc_param['fau'] = sanitize_text_field($fau);
         $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
+        $sc_param['current'] = sanitize_text_field($current);
         
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';

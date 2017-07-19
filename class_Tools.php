@@ -374,7 +374,7 @@ class Tools {
      * Array zur Definition des Filters für Projekte
      */
 
-    public static function project_filter($year = '', $start = '', $type = '') {
+    public static function project_filter($year = '', $start = '', $type = '', $current = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL) {
             if ($year == 'current') {
@@ -403,6 +403,11 @@ class Tools {
                 return $output;
             }
             $filter['project type__eq'] = $projTyp;
+        }
+        if ($current == '1') {
+            $today = date('Y-m-d');
+            $filter['cfstartdate__le'] = $today;
+            $filter['virtualenddate__ge'] = $today;
         }
         if (count($filter))
             return $filter;
