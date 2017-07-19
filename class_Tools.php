@@ -281,7 +281,7 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '', $fau = '') {
+    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['publyear__eq'] = $year;
@@ -325,6 +325,13 @@ class Tools {
                 $filter['fau publikation__eq'] = 'yes';
             } elseif ($fau == 0) {
                 $filter['fau publikation__eq'] = 'no';
+            }
+        }
+        if ($peerreviewed !== '') {
+            if ($peerreviewed == 1) {
+                $filter['peerreviewed__eq'] = 'Yes';
+            } elseif ($fau == 0) {
+                $filter['peerreviewed__eq'] = 'No';
             }
         }
         if (count($filter))
@@ -507,7 +514,7 @@ class Tools {
         if ($cms == 'wp') {
             // WordPress
             global $wpdb;
-            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
             $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
             $person_id = $wpdb->get_var($sql);
@@ -568,7 +575,7 @@ class Tools {
         return $univisID;
     }
 
-    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0) {
+    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0) {
         $person = '';
         switch ($target) {
             case 'cris' :
@@ -592,6 +599,19 @@ class Tools {
             default:
                 $link_pre = '';
                 $link_post = '';
+        }
+        if ($shortfirst == 1) {
+            if (strpos($firstname, ' ') !== false) {
+                $firstnames = explode(' ', $firstname);
+            } elseif (strpos($firstname, '-') !== false) {
+                $firstnames = explode('-', $firstname);
+            } else {
+                $firstnames[] = $firstname;
+            }
+            foreach ($firstnames as $_fn) {
+                $fn_shorts[] = substr($_fn,0,1);
+            }
+            $firstname = implode('', $fn_shorts) . '.';
         }
         $name = $inv == 0 ? $firstname . " " . $lastname : $lastname . " " . $firstname;
         $person = "<span class=\"author\" itemprop=\"author\">" . $link_pre . $name . $link_post . "</span>";

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.4.4
+ * Version: 3.4.5
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -36,7 +36,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '3.4.4';
+    const version = '3.4.5';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -704,12 +704,12 @@ class FAU_CRIS {
                 return $liste->singlePub($parameter['quotation']);
             }
             if ($parameter['items'] != '' || $parameter['sortby'] != '') {
-                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau']);
+                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau']);
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed']);
             }
-            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau']);
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed']);
         }
 
         // nothing
@@ -783,7 +783,8 @@ class FAU_CRIS {
             'patent' => '',
             'activity' => '',
             'field' => '',
-            'fau' => ''
+            'fau' => '',
+            'peerreviewed' => ''
                         ), $atts));
 
         $sc_param['orderby'] = sanitize_text_field($orderby);
@@ -813,6 +814,7 @@ class FAU_CRIS {
         $sc_param['role'] = sanitize_text_field($role);
         $sc_param['hide'] = sanitize_text_field($hide);
         $sc_param['fau'] = sanitize_text_field($fau);
+        $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
         
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
@@ -882,9 +884,9 @@ class FAU_CRIS {
     public static function cris_enqueue_styles() {
         global $post;
         $plugin_url = plugin_dir_url(__FILE__);
-        wp_enqueue_style( 'cris', $plugin_url . 'css/cris.css' );
-        if ($post && has_shortcode($post->post_content, 'cris')) {
-            //wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
+        if ($post && has_shortcode($post->post_content, 'cris') 
+                || $post && has_shortcode($post->post_content, 'cris-custom')) {
+            wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
             wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array ( 'jquery' ));
         }
     }

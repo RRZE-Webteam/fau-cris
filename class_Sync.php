@@ -252,7 +252,7 @@ class Sync {
                     } else {
                         $proj_content = "[cris show=projects project=$project->ID]";
                     }
-                    $pages[$field->ID]['projects'][$project->ID]['title'] = $project->attributes['cftitle'.$lang];
+                    $pages[$field->ID]['projects'][$project->ID]['title'] = str_replace('"', '&quot;',$project->attributes['cftitle'.$lang]);
                     $pages[$field->ID]['projects'][$project->ID]['position'] = $this->menu_position;
                     $pages[$field->ID]['projects'][$project->ID]['content'] = $proj_content;
                     $pages[$field->ID]['projects'][$project->ID]['contact'] = array('-1');
@@ -302,7 +302,7 @@ class Sync {
                         . "#publications#\n"
                         . "[/cris-custom]";
             } else {
-                $nf_proj_content = "[cris-custom show=projects project=$a_p->ID]";
+                $nf_proj_content = "[cris show=projects project=$a_p->ID]";
             }
             $orga_projects[$a_p->ID]['title'] = $a_p->attributes['cftitle'.$lang];
             $orga_projects[$a_p->ID]['position'] = $this->menu_position;
@@ -395,8 +395,8 @@ class Sync {
     private function cris_menu_item_exists($menu, $title, $parent = 0) {
         if (!is_array($menu))
             return;
-        foreach ($menu as $menu_item) {
-            if ($menu_item->title == $title
+        foreach ($menu as $menu_item) {        
+            if (basename($menu_item->url) == sanitize_title($title)
                     && $menu_item->menu_item_parent == $parent
                     && !isset($menu_item->_invalid)) {
                 return $menu_item;

@@ -50,8 +50,8 @@ class Publikationen {
      * Ausgabe aller Publikationen ohne Gliederung
      */
 
-    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $items = '', $sortby = 'virtualdate', $fau = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau);
+    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $items = '', $sortby = 'virtualdate', $fau = '', $peerreviewed = '') {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -90,8 +90,8 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author', $fau = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau);
+    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author', $fau = '', $peerreviewed = '') {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed);
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
@@ -124,8 +124,8 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'date', $fau = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau);
+    public function pubNachTyp($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'date', $fau = '', $peerreviewed = '') {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -275,8 +275,8 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '', $fau = '') {
-        $filter = Tools::publication_filter($year, $start, $type, $subtype, $fau);
+    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '') {
+        $filter = Tools::publication_filter($year, $start, $type, $subtype, $fau, $peerreviewed);
         $ws = new CRIS_publications();
 
         try {
@@ -341,20 +341,21 @@ class Publikationen {
             // id
             $id = $publicationObject->ID;
             // authors
-            $authors = explode(", ", $publication['relauthors']);
+            $authors = explode("|", $publication['exportauthors']);
             $authorIDs = explode(",", $publication['relpersid']);
             $authorsArray = array();
             foreach ($authorIDs as $i => $key) {
-                $authorsArray[] = array('id' => $key, 'name' => $authors[$i]);
+                $nameparts = explode(":", $authors[$i]);
+                $authorsArray[] = array(
+                    'id' => $key,
+                    'lastname' => $nameparts[0],
+                    'firstname' => $nameparts[1]);
             }
             $authorList = array();
             foreach ($authorsArray as $author) {
-                $author_elements = explode(" ", $author['name']);
-                $author_firstname = array_pop($author_elements);
-                $author_lastname = implode(" ", $author_elements);
-                $authorList[] = Tools::get_person_link($author['id'], $author_firstname, $author_lastname, $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
+                $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1);
             }
-            $authors_html = implode("., ", $authorList) . ".";
+            $authors_html = implode(", ", $authorList);
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['type other subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
@@ -398,7 +399,8 @@ class Publikationen {
                 'origTitle' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
                 'language' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 'bibtex_link' => (array_key_exists('bibtex_link', $publication) ? $publication['bibtex_link'] : __('Nicht verfügbar', 'fau-cris')),
-                'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : '')
+                'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
+                'thesisSubtype' =>(array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : '')
             );
 
             switch (strtolower($pubDetails['pubType'])) {
@@ -537,7 +539,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= "<br />" . __('Abschlussarbeit', 'fau-cris') . " <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>";
+                    $publist .= " (" . ($pubDetails['thesisSubtype'] != '' ? $pubDetails['thesisSubtype'] : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)";        
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
