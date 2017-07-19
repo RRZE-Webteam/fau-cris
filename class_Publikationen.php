@@ -341,20 +341,21 @@ class Publikationen {
             // id
             $id = $publicationObject->ID;
             // authors
-            $authors = explode(", ", $publication['relauthors']);
+            $authors = explode("|", $publication['exportauthors']);
             $authorIDs = explode(",", $publication['relpersid']);
             $authorsArray = array();
             foreach ($authorIDs as $i => $key) {
-                $authorsArray[] = array('id' => $key, 'name' => $authors[$i]);
+                $nameparts = explode(":", $authors[$i]);
+                $authorsArray[] = array(
+                    'id' => $key,
+                    'lastname' => $nameparts[0],
+                    'firstname' => $nameparts[1]);
             }
             $authorList = array();
             foreach ($authorsArray as $author) {
-                $author_elements = explode(" ", $author['name']);
-                $author_firstname = array_pop($author_elements);
-                $author_lastname = implode(" ", $author_elements);
-                $authorList[] = Tools::get_person_link($author['id'], $author_firstname, $author_lastname, $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1);
+                $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1);
             }
-            $authors_html = implode("., ", $authorList) . ".";
+            $authors_html = implode(", ", $authorList);
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['type other subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
