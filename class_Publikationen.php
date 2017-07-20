@@ -400,7 +400,8 @@ class Publikationen {
                 'language' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 'bibtex_link' => (array_key_exists('bibtex_link', $publication) ? $publication['bibtex_link'] : __('Nicht verfügbar', 'fau-cris')),
                 'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
-                'thesisSubtype' =>(array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : '')
+                'thesisSubtype' =>(array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
+                'articleNumber' =>(array_key_exists('article number', $publication) ? $publication['article number'] : '')
             );
 
             switch (strtolower($pubDetails['pubType'])) {
@@ -448,7 +449,11 @@ class Publikationen {
                             $publist .= $pubDetails['publisher'] != '' ? "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span>" : '';
                             $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? "</span>" : '';
                             $publist .= $pubDetails['year'] != '' ? ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
-                            $publist .= $pubDetails['pagesRange'] != '' ? ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>" : '';
+                            if ($pubDetails['pagesRange'] != '') {
+                                $publist .= ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>";
+                            } elseif ($pubDetails['articleNumber'] != '') {
+                                $publist .= ", " . _x('Art.Nr.', 'Abkürzung für "Artikelnummer" bei Publikationen', 'fau-cris') . ": <span itemprop=\"pagination\">" . $pubDetails['articleNumber'] . "</span>";
+                            }
                             $publist .= $pubDetails['lexiconColumn'] != '' ? ", " . _x('Sp.', 'Abkürzung für "Spalte" bei Lexikonartikeln', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['lexiconColumn'] . "</span>" : '';
                             if (!empty($pubDetails['series'])) {
                                 $publist .= $pubDetails['series'] != '' ? " (" . $pubDetails['series'] : '';
@@ -470,7 +475,11 @@ class Publikationen {
                     $publist .= $pubDetails['journaltitle'] != '' ? "In: <span itemscope itemtype=\"http://schema.org/Periodical\" itemid=\"#periodical_" . $pubDetails['id'] . "\"><span itemprop=\"name\" style=\"font-weight: bold;\">" . $pubDetails['journaltitle'] . "</span></span>" : '';
                     $publist .= $pubDetails['seriesNumber'] != '' ? " <span itemprop=\"isPartOf\" itemscope itemtype=\"http://schema.org/PublicationVolume\"><link itemprop=\"isPartOf\" href=\"#periodical_" . $pubDetails['id'] . "\" /><span itemprop=\"volumeNumber\">" . $pubDetails['seriesNumber'] . "</span></span> " : '';
                     $publist .= $pubDetails['year'] != '' ? " (<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)" : '';
-                    $publist .= $pubDetails['pagesRange'] != '' ? ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>" : '';
+                    if ($pubDetails['pagesRange'] != '') {
+                        $publist .= ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>";
+                    } elseif ($pubDetails['articleNumber'] != '') {
+                        $publist .= ", " . _x('Art.Nr.', 'Abkürzung für "Artikelnummer" bei Publikationen', 'fau-cris') . ": <span itemprop=\"pagination\">" . $pubDetails['articleNumber'] . "</span>";
+                    }
                     $publist .= $pubDetails['lexiconColumn'] != '' ? ", " . _x('Sp.', 'Abkürzung für "Spalte" bei Lexikonartikeln', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['lexiconColumn'] . "</span>" : '';
                     $publist .= $pubDetails['ISSN'] != '' ? "<br><span itemscope itemtype=\"http://schema.org/Periodical\" itemid=\"#periodical_" . $pubDetails['id'] . "\"><span itemprop=\"issn\">ISSN: " . $pubDetails['ISSN'] . "</span></span></span>" : "</span>";
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
