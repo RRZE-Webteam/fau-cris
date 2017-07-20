@@ -195,7 +195,7 @@ class Forschungsbereiche {
             if (count($imgs)) {
                 $singlefield .= "<div class=\"cris-image\">";
                 foreach($imgs as $img) {
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                        $singlefield .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }
@@ -274,7 +274,7 @@ class Forschungsbereiche {
                 $i = 1;
                 foreach($imgs as $img) {
                     $field_details['#image'.$i.'#'] = "<div class=\"cris-image\">";
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                        $field_details['#image'.$i.'#'] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     $field_details['#image'.$i.'#'] .= "</div>";

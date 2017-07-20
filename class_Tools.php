@@ -263,12 +263,12 @@ class Tools {
         foreach ($cols as $col => $order) {
             $eval .= '$colarr[\'' . $col . '\'],' . $order . ',';
         }
-        $eval = substr($eval, 0, -1) . ');';
+        $eval = mb_substr($eval, 0, -1) . ');';
         eval($eval);
         $ret = array();
         foreach ($colarr as $col => $arr) {
             foreach ($arr as $k => $v) {
-                $k = substr($k, 1);
+                $k = mb_substr($k, 1);
                 if (!isset($ret[$k]))
                     $ret[$k] = $array[$k];
                 $ret[$k][$col] = $array[$k][$col];
@@ -289,7 +289,7 @@ class Tools {
             $filter['publyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = str_replace(' ', '', $type);
+                $type = mb_str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $pubTyp[] = self::getType('publications', $v);
@@ -305,7 +305,7 @@ class Tools {
         }
         if ($subtype !== '' && $subtype !== NULL) {
             if (strpos($subtype, ',')) {
-                $subtype = str_replace(' ', '', $subtype);
+                $subtype = mb_str_replace(' ', '', $subtype);
                 $subtypes = explode(',', $subtype);
                 foreach($subtypes as $v) {
                     $pubSubTyp[] = self::getType('pubothersubtypes', $v);
@@ -351,7 +351,7 @@ class Tools {
             $filter['year award__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = str_replace(' ', '', $type);
+                $type = mb_str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $awardTyp[] = self::getType('awards', $v);
@@ -390,7 +390,7 @@ class Tools {
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = str_replace(' ', '', $type);
+                $type = mb_str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $projTyp[] = self::getType('projects', $v);
@@ -426,7 +426,7 @@ class Tools {
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = str_replace(' ', '', $type);
+                $type = mb_str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $patTyp[] = self::getType('patents', $v);
@@ -457,7 +457,7 @@ class Tools {
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = str_replace(' ', '', $type);
+                $type = mb_str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $activityTyp[] = self::getType('activities', $v);
@@ -571,7 +571,7 @@ class Tools {
         while (!feof($fh)) {
             $line = fgets($fh);
             $line = trim($line);
-            if ((substr($line, 0, 11) == 'UnivISOrgNr')) {
+            if ((mb_substr($line, 0, 11) == 'UnivISOrgNr')) {
                 $arr_opts = preg_split('/\t/', $line);
                 $univisID = $arr_opts[1];
             }
@@ -614,7 +614,7 @@ class Tools {
                 $firstnames[] = $firstname;
             }
             foreach ($firstnames as $_fn) {
-                $fn_shorts[] = substr($_fn,0,1);
+                $fn_shorts[] = mb_substr($_fn,0,1);
             }
             $firstname = implode('', $fn_shorts) . '.';
         }
@@ -676,7 +676,7 @@ class Tools {
                 continue;
             }
             $o = ord($char);
-            if ( (strlen($char) > 1) || /* multi-byte [unicode] */
+            if ( (mb_strlen($char) > 1) || /* multi-byte [unicode] */
                 ($o <32 || $o > 126) || /* <- control / latin weird os -> */
                 ($o >33 && $o < 40) ||/* quotes + ambersand */
                 ($o >59 && $o < 63) /* html */

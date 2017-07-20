@@ -403,7 +403,7 @@ class Publikationen {
                 'thesisSubtype' =>(array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
                 'articleNumber' =>(array_key_exists('article number', $publication) ? $publication['article number'] : '')
             );
-
+            
             switch (strtolower($pubDetails['pubType'])) {
 
                 case "book": // OK

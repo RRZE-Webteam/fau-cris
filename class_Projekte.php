@@ -280,7 +280,7 @@ class Projekte {
             if (count($imgs)) {
                 $i = 1;
                 foreach($imgs as $img) {
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                         $proj_details["#image$i#"] = "<div class=\"cris-image\">";
                         $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
@@ -331,7 +331,7 @@ class Projekte {
                 $i = 1;
                 foreach($imgs as $img) {
                     $proj_details["#image$i#"] = "<div class=\"cris-image\">";
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                        $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     $proj_details["#image$i#"] .= "</div>";
@@ -369,7 +369,7 @@ class Projekte {
             if (count($imgs)) {
                 $projlist .= "<div class=\"cris-image\">";
                 foreach($imgs as $img) {
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                        $projlist .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }
@@ -567,7 +567,7 @@ class Projekte {
             $description = $project['cfabstr'.$lang_key];
             $description = strip_tags($description, '<br><br/><a>');
             $pos = strpos($description, ' ', 500);
-            $description = substr($description, 0, $pos) . '&hellip;';
+            $description = mb_substr($description, 0, $pos) . '&hellip;';
             if (!empty($project['kurzbeschreibung'.$lang_key])) {
                 $description = $project['kurzbeschreibung'.$lang_key];
             }
@@ -840,9 +840,9 @@ class CRIS_projects extends CRIS_webservice {
             foreach ($_d as $project) {
                 $a = new CRIS_project($project);
                 if ($a->ID) {
-                    $a->attributes['startyear'] = substr($a->attributes['cfstartdate'], 0, 4);
-                    $a->attributes['endyear'] = substr($a->attributes['virtualenddate'], 0, 4);
-                    //$a->attributes['endyear'] = $a->attributes['cfenddate'] != '' ? substr($a->attributes['cfenddate'], 0, 4) : substr($a->attributes['virtualenddate'], 0, 4);
+                    $a->attributes['startyear'] = mb_substr($a->attributes['cfstartdate'], 0, 4);
+                    $a->attributes['endyear'] = mb_substr($a->attributes['virtualenddate'], 0, 4);
+                    //$a->attributes['endyear'] = $a->attributes['cfenddate'] != '' ? mb_substr($a->attributes['cfenddate'], 0, 4) : mb_substr($a->attributes['virtualenddate'], 0, 4);
                 }
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))
                     $projects[$a->ID] = $a;
