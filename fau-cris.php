@@ -461,19 +461,19 @@ class FAU_CRIS {
                 break;
 
             case 'layout':
-                $new_input['cris_pub_order'] = isset($_POST[self::option_name]['cris_pub_order']) ? explode("\n", mb_str_replace("\r", "", $_POST[self::option_name]['cris_pub_order'])) : $default_options['cris_pub_order'];
-                $new_input['cris_pub_subtypes_order'] = isset($_POST[self::option_name]['cris_pub_subtypes_order']) ? explode("\n", mb_str_replace("\r", "", $_POST[self::option_name]['cris_pub_subtypes_order'])) : $default_options['cris_pub_subtypes_order'];
+                $new_input['cris_pub_order'] = isset($_POST[self::option_name]['cris_pub_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_order'])) : $default_options['cris_pub_order'];
+                $new_input['cris_pub_subtypes_order'] = isset($_POST[self::option_name]['cris_pub_subtypes_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_subtypes_order'])) : $default_options['cris_pub_subtypes_order'];
                 $new_input['cris_univis'] = in_array($_POST[self::option_name]['cris_univis'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_univis'] : $default_options['cris_univis'];
                 $new_input['cris_bibtex'] = isset($_POST[self::option_name]['cris_bibtex']) ? 1 : 0;
                 $new_input['cris_url'] = isset($_POST[self::option_name]['cris_url']) ? 1 : 0;
                 $new_input['cris_doi'] = isset($_POST[self::option_name]['cris_doi']) ? 1 : 0;
-                $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", mb_str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
+                $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
                 $new_input['cris_award_link'] = in_array($_POST[self::option_name]['cris_award_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_award_link'] : $default_options['cris_award_link'];
-                $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", mb_str_replace("\r", "", $_POST[self::option_name]['cris_project_order'])) : $default_options['cris_project_order'];
+                $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_project_order'])) : $default_options['cris_project_order'];
                 $new_input['cris_project_link'] = in_array($_POST[self::option_name]['cris_project_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_project_link'] : $default_options['cris_project_link'];
-                $new_input['cris_patent_order'] = isset($_POST[self::option_name]['cris_patent_order']) ? explode("\n", mb_str_replace("\r", "", $_POST[self::option_name]['cris_patent_order'])) : $default_options['cris_patent_order'];
+                $new_input['cris_patent_order'] = isset($_POST[self::option_name]['cris_patent_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_patent_order'])) : $default_options['cris_patent_order'];
                 $new_input['cris_patent_link'] = in_array($_POST[self::option_name]['cris_patent_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_patent_link'] : $default_options['cris_patent_link'];
-                $new_input['cris_activities_order'] = isset($_POST[self::option_name]['cris_activities_order']) ? explode("\n", mb_str_replace("\r", "", $_POST[self::option_name]['cris_activities_order'])) : $default_options['cris_activities_order'];
+                $new_input['cris_activities_order'] = isset($_POST[self::option_name]['cris_activities_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_activities_order'])) : $default_options['cris_activities_order'];
                 $new_input['cris_activities_link'] = in_array($_POST[self::option_name]['cris_activities_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_activities_link'] : $default_options['cris_activities_link'];
                 break;
             case 'sync':
@@ -823,7 +823,7 @@ class FAU_CRIS {
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {
-                $sc_param['publication'] = mb_str_replace(' ', '', $sc_param['publication']);
+                $sc_param['publication'] = str_replace(' ', '', $sc_param['publication']);
                 $sc_param['publication'] = explode(',', $sc_param['publication']);
             }
             $sc_param['entity_id'] = $sc_param['publication'];
@@ -842,7 +842,7 @@ class FAU_CRIS {
         } elseif (isset($sc_param['project']) && $sc_param['project'] != '') {
             $sc_param['entity'] = 'project';
             if (strpos($sc_param['project'], ',') !== false) {
-                $sc_param['project'] = mb_str_replace(' ', '', $sc_param['project']);
+                $sc_param['project'] = str_replace(' ', '', $sc_param['project']);
                 $sc_param['project'] = explode(',', $sc_param['project']);
             }
             $sc_param['entity_id'] = $sc_param['project'];
@@ -852,14 +852,14 @@ class FAU_CRIS {
         } elseif (isset($sc_param['persid']) && $sc_param['persid'] != '') {
             $sc_param['entity'] = 'person';
             if (strpos($sc_param['persid'], ',') !== false) {
-                $sc_param['persid'] = mb_str_replace(' ', '', $sc_param['persid']);
+                $sc_param['persid'] = str_replace(' ', '', $sc_param['persid']);
                 $sc_param['persid'] = explode(',', $sc_param['persid']);
             }
             $sc_param['entity_id'] = $sc_param['persid'];
         } elseif (isset($sc_param['orgid']) && $sc_param['orgid'] != '') {
             $sc_param['entity'] = 'orga';
             if (strpos($sc_param['orgid'], ',') !== false) {
-                $sc_param['orgid'] = mb_str_replace(' ', '', $sc_param['orgid']);
+                $sc_param['orgid'] = str_replace(' ', '', $sc_param['orgid']);
                 $sc_param['orgid'] = explode(',', $sc_param['orgid']);
             }
             $sc_param['entity_id'] = $sc_param['orgid'];
@@ -873,7 +873,7 @@ class FAU_CRIS {
 
         if (!empty($orderby)) {
             if (strpos($orderby, ',') !== false) {
-                $orderby = mb_str_replace(' ', '', $orderby);
+                $orderby = str_replace(' ', '', $orderby);
                 $sc_param['order1'] = explode(',', $orderby)[0];
                 $sc_param['order2'] = explode(',', $orderby)[1];
             } else {

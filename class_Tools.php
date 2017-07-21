@@ -289,7 +289,7 @@ class Tools {
             $filter['publyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = mb_str_replace(' ', '', $type);
+                $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $pubTyp[] = self::getType('publications', $v);
@@ -305,7 +305,7 @@ class Tools {
         }
         if ($subtype !== '' && $subtype !== NULL) {
             if (strpos($subtype, ',')) {
-                $subtype = mb_str_replace(' ', '', $subtype);
+                $subtype = str_replace(' ', '', $subtype);
                 $subtypes = explode(',', $subtype);
                 foreach($subtypes as $v) {
                     $pubSubTyp[] = self::getType('pubothersubtypes', $v);
@@ -351,7 +351,7 @@ class Tools {
             $filter['year award__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = mb_str_replace(' ', '', $type);
+                $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $awardTyp[] = self::getType('awards', $v);
@@ -390,7 +390,7 @@ class Tools {
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = mb_str_replace(' ', '', $type);
+                $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $projTyp[] = self::getType('projects', $v);
@@ -426,7 +426,7 @@ class Tools {
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = mb_str_replace(' ', '', $type);
+                $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $patTyp[] = self::getType('patents', $v);
@@ -457,7 +457,7 @@ class Tools {
             $filter['startyear__ge'] = $start;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
-                $type = mb_str_replace(' ', '', $type);
+                $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
                     $activityTyp[] = self::getType('activities', $v);

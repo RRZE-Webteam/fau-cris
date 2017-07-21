@@ -252,7 +252,7 @@ class Sync {
                     } else {
                         $proj_content = "[cris show=projects project=$project->ID]";
                     }
-                    $pages[$field->ID]['projects'][$project->ID]['title'] = mb_str_replace('"', '&quot;',$project->attributes['cftitle'.$lang]);
+                    $pages[$field->ID]['projects'][$project->ID]['title'] = str_replace('"', '&quot;',$project->attributes['cftitle'.$lang]);
                     $pages[$field->ID]['projects'][$project->ID]['position'] = $this->menu_position;
                     $pages[$field->ID]['projects'][$project->ID]['content'] = $proj_content;
                     $pages[$field->ID]['projects'][$project->ID]['contact'] = array('-1');
@@ -484,7 +484,7 @@ class Sync {
                 $ist_projs = self::get_string_between($nfp_content, "[cris show=projects project=\"", "\"]");
                 $soll_projs = self::get_string_between($content, "[cris show=projects project=\"", "\"]");
                 if($ist_projs != $soll_projs) {
-                    mb_str_replace($ist_projs, $soll_projs, $content);
+                    str_replace($ist_projs, $soll_projs, $content);
                     wp_update_post(array(
                         'ID' => $pages_array[0]->ID,
                         'post_content' => $content
