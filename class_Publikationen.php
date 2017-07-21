@@ -358,7 +358,7 @@ class Publikationen {
                 }
                 $authors_html = implode(", ", $authorList);
             } else {
-                $authors_html = $publication['srcAuthors'];
+                $authors_html = $publication['srcauthors'];
             }
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
