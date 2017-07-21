@@ -341,21 +341,25 @@ class Publikationen {
             // id
             $id = $publicationObject->ID;
             // authors
-            $authors = explode("|", $publication['exportauthors']);
-            $authorIDs = explode(",", $publication['relpersid']);
-            $authorsArray = array();
-            foreach ($authorIDs as $i => $key) {
-                $nameparts = explode(":", $authors[$i]);
-                $authorsArray[] = array(
-                    'id' => $key,
-                    'lastname' => $nameparts[0],
-                    'firstname' => $nameparts[1]);
+            if (strtolower($publication['complete author relations']) == 'yes') {
+                $authors = explode("|", $publication['exportauthors']);
+                $authorIDs = explode(",", $publication['relpersid']);
+                $authorsArray = array();
+                foreach ($authorIDs as $i => $key) {
+                    $nameparts = explode(":", $authors[$i]);
+                    $authorsArray[] = array(
+                        'id' => $key,
+                        'lastname' => $nameparts[0],
+                        'firstname' => $nameparts[1]);
+                }
+                $authorList = array();
+                foreach ($authorsArray as $author) {
+                    $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1);
+                }
+                $authors_html = implode(", ", $authorList);
+            } else {
+                $authors_html = $publication['srcAuthors'];
             }
-            $authorList = array();
-            foreach ($authorsArray as $author) {
-                $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1);
-            }
-            $authors_html = implode(", ", $authorList);
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['type other subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
