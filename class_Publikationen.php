@@ -245,7 +245,7 @@ class Publikationen {
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed=false) {
+    public function fieldPub($field, $quotation = '', $seed=false, $num_pub) {
         $ws = new CRIS_publications();
         if($seed)
             $ws->disable_cache();
@@ -257,11 +257,17 @@ class Publikationen {
 
         if (!count($pubArray))
             return;
-
-        if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubArray, $quotation);
+        if ($num_pub != '') {
+            $pubList = array_slice($pubArray, 0, $num_pub, true);
         } else {
-            $output = $this->make_list($pubArray);
+            $pubList = $pubArray;
+        }
+
+        $output = '';
+        if ($quotation == 'apa' || $quotation == 'mla') {
+            $output = $this->make_quotation_list($pubList, $quotation);
+        } else {
+            $output = $this->make_list($pubList);
         }
 
         return $output;

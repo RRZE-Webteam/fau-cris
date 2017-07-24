@@ -566,8 +566,10 @@ class Projekte {
             $type = Tools::getName('projects', $project['project type'], get_locale());
             $description = $project['cfabstr'.$lang_key];
             $description = strip_tags($description, '<br><br/><a>');
-            $pos = strpos($description, ' ', 500);
-            $description = mb_substr($description, 0, $pos) . '&hellip;';
+            if (mb_strlen($description) > 500) {
+                $pos = strpos($description, ' ', 500);
+                $description = mb_substr($description, 0, $pos) . '&hellip;';
+            } 
             if (!empty($project['kurzbeschreibung'.$lang_key])) {
                 $description = $project['kurzbeschreibung'.$lang_key];
             }
