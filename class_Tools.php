@@ -515,11 +515,15 @@ class Tools {
         return $univis;
     }
 
-    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array()) {
+    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array(), $nameorder = '') {
         if ($cms == 'wp') {
             // WordPress
             global $wpdb;
-            $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
+            if ($nameorder == 'lastname-firstname') {
+                $person = '%' . $wpdb->esc_like($lastname) . '%' . $wpdb->esc_like($firstname) . '%';
+            } else {
+                $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
+            }
             $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
             $person_id = $wpdb->get_var($sql);
@@ -538,7 +542,11 @@ class Tools {
     public static function person_id($cms = '', $firstname = '', $lastname = '') {
         if ($cms == 'wp') {
             global $wpdb;
-            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            if ($nameorder == 'lastname-firstname') {
+                $person = '%' . $wpdb->esc_like($lastname) . '%' . $wpdb->esc_like($firstname) . '%';
+            } else {
+                $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
+            }
             $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
             $person_id = $wpdb->get_var($sql);
@@ -546,11 +554,15 @@ class Tools {
         return $person_id;
     }
 
-    public static function person_slug($cms = '', $firstname = '', $lastname = '') {
+    public static function person_slug($cms = '', $firstname = '', $lastname = '', $nameorder = '') {
         if ($cms == 'wp') {
             // WordPress
             global $wpdb;
-            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            if ($nameorder == 'lastname-firstname') {
+                $person = '%' . $wpdb->esc_like($lastname) . '%' . $wpdb->esc_like($firstname) . '%';
+            } else {
+                $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
+            }
             $sql = "SELECT post_name FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
             $person_slug = $wpdb->get_var($sql);
@@ -580,7 +592,7 @@ class Tools {
         return $univisID;
     }
 
-    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0) {
+    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = '') {
         $person = '';
         switch ($target) {
             case 'cris' :
@@ -593,8 +605,8 @@ class Tools {
                 }
                 break;
             case 'person':
-                if (self::person_exists($cms, $firstname, $lastname, $univis)) {
-                    $link_pre = "<a href=\"" . $path . self::person_slug($cms, $firstname, $lastname) . "\">";
+                if (self::person_exists($cms, $firstname, $lastname, $univis, $nameorder)) {
+                    $link_pre = "<a href=\"" . $path . self::person_slug($cms, $firstname, $lastname, $nameorder) . "\">";
                     $link_post = "</a>";
                 } else {
                     $link_pre = '';

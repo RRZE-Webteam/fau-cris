@@ -10,7 +10,7 @@ class Publikationen {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $nameorder = '') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -42,6 +42,9 @@ class Publikationen {
             // keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
             $this->id = $this->orgNr;
             $this->einheit = "orga";
+        }
+        if (strlen(trim($nameorder))) {
+            $this->nameorder = $nameorder;
         }
 
     }
@@ -80,7 +83,7 @@ class Publikationen {
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output .= $this->make_quotation_list($pubList, $quotation);
         } else {
-            $output .= $this->make_list($pubList, 1);
+            $output .= $this->make_list($pubList, 1, $this->nameorder);
         }
 
         return $output;
@@ -114,7 +117,7 @@ class Publikationen {
             if ($quotation == 'apa' || $quotation == 'mla') {
                 $output .= $this->make_quotation_list($publications, $quotation);
             } else {
-                $output .= $this->make_list($publications, $showsubtype);
+                $output .= $this->make_list($publications, $showsubtype, $this->nameorder);
             }
         }
         return $output;
@@ -194,7 +197,7 @@ class Publikationen {
                 if ($quotation == 'apa' || $quotation == 'mla') {
                     $output .= $this->make_quotation_list($publications, $quotation);
                 } else {
-                    $output .= $this->make_list($publications);
+                    $output .= $this->make_list($publications, $this->nameorder);
                 }
             }
         }
@@ -337,7 +340,7 @@ class Publikationen {
      * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
      */
 
-    private function make_list($publications, $showsubtype = 0) {
+    private function make_list($publications, $showsubtype = 0, $nameorder = '') {
 
         $publist = "<ul class=\"cris-publications\">";
 
@@ -360,7 +363,7 @@ class Publikationen {
                 }
                 $authorList = array();
                 foreach ($authorsArray as $author) {
-                    $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1);
+                    $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1, $nameorder);
                 }
                 $authors_html = implode(", ", $authorList);
             } else {
