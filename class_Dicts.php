@@ -518,4 +518,103 @@ class CRIS_Dicts {
             )
         ),
     );
+    
+    public static $pubThesisSubtypes = array(
+        'Habilitationsschrift' => array(
+            'order' => 1,
+            'short' => 'habilitation',
+            'de' => array(
+                'name' => 'Habilitationsschrift',
+                'title' => 'Habilitationsschriften'
+            ),
+            'en' => array(
+                'name' => 'Habilitation',
+                'title' => 'Habilitations'
+            )
+        ),
+        'Dissertation' => array(
+            'order' => 2,
+            'short' => 'dissertation',
+            'de' => array(
+                'name' => 'Dissertation',
+                'title' => 'Dissertationen'
+            ),
+            'en' => array(
+                'name' => 'Dissertation',
+                'title' => 'Dissertations'
+            )
+        ),
+        'Diplomarbeit' => array(
+            'order' => 3,
+            'short' => 'diplomarbeit',
+            'de' => array(
+                'name' => 'Diplomarbeit',
+                'title' => 'Diplomarbeiten'
+            ),
+            'en' => array(
+                'name' => 'Diploma thesis',
+                'title' => 'Diploma Theses'
+            )
+        ),
+        'Magisterarbeit' => array(
+            'order' => 4,
+            'short' => 'magisterarbeit',
+            'de' => array(
+                'name' => 'Magisterarbeit',
+                'title' => 'Magisterarbeiten'
+            ),
+            'en' => array(
+                'name' => 'Magister thesis',
+                'title' => 'Magister Theses'
+            )
+        ),
+        'Zulassungsarbeit' => array(
+            'order' => 5,
+            'short' => 'zulassungsarbeit',
+            'de' => array(
+                'name' => 'Zulassungsarbeit',
+                'title' => 'Zulassungsarbeiten'
+            ),
+            'en' => array(
+                'name' => 'Degree thesis',
+                'title' => 'Degree Theses'
+            )
+        ),
+        'Masterarbeit' => array(
+            'order' => 6,
+            'short' => 'masterarbeit',
+            'de' => array(
+                'name' => 'Masterarbeit',
+                'title' => 'Masterarbeiten'
+            ),
+            'en' => array(
+                'name' => 'Master thesis',
+                'title' => 'Master Theses'
+            )
+        ),
+        'Bachelorarbeit' => array(
+            'order' => 7,
+            'short' => 'bachelorarbeit',
+            'de' => array(
+                'name' => 'Bachelorarbeit',
+                'title' => 'Bachelorarbeiten'
+            ),
+            'en' => array(
+                'name' => 'Bachelor thesis',
+                'title' => 'Bachelor Theses'
+            )
+        ),
+        'Studienarbeit' => array(
+            'order' => 8,
+            'short' => 'studienarbeit',
+            'de' => array(
+                'name' => 'Studienarbeit (Vordiplom)',
+                'title' => 'Studienarbeiten (Vordiplom)'
+            ),
+            'en' => array(
+                'name' => 'Mid-study thesis',
+                'title' => 'Mid-study Theses'
+            )        
+        ),
+    );    
 }

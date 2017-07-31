@@ -121,6 +121,9 @@ class Tools {
             case 'pubothersubtypes':
                 $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
+            case 'pubthesissubtypes':
+                $search = CRIS_Dicts::$pubThesisSubtypes;
+                break;
         }
         if (array_key_exists($type, $search))
             return $search[$type][$lang]['name'];
