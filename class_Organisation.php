@@ -147,7 +147,7 @@ class Organisation {
             if (count($research_imgs)) {
                 $output .= "<div class=\"cris-image\">";
                 foreach($research_imgs as $img) {
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                        $output .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }
@@ -182,7 +182,7 @@ class Organisation {
                 $i = 1;
                 $image = "<div class=\"cris-image\">";
                 foreach($research_imgs as $img) {
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                        $image .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }

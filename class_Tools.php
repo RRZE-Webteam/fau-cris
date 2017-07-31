@@ -121,6 +121,9 @@ class Tools {
             case 'pubothersubtypes':
                 $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
+            case 'pubthesissubtypes':
+                $search = CRIS_Dicts::$pubThesisSubtypes;
+                break;
         }
         if (array_key_exists($type, $search))
             return $search[$type][$lang]['name'];
@@ -263,12 +266,12 @@ class Tools {
         foreach ($cols as $col => $order) {
             $eval .= '$colarr[\'' . $col . '\'],' . $order . ',';
         }
-        $eval = substr($eval, 0, -1) . ');';
+        $eval = mb_substr($eval, 0, -1) . ');';
         eval($eval);
         $ret = array();
         foreach ($colarr as $col => $arr) {
             foreach ($arr as $k => $v) {
-                $k = substr($k, 1);
+                $k = mb_substr($k, 1);
                 if (!isset($ret[$k]))
                     $ret[$k] = $array[$k];
                 $ret[$k][$col] = $array[$k][$col];
@@ -374,7 +377,7 @@ class Tools {
      * Array zur Definition des Filters für Projekte
      */
 
-    public static function project_filter($year = '', $start = '', $type = '') {
+    public static function project_filter($year = '', $start = '', $type = '', $current = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL) {
             if ($year == 'current') {
@@ -403,6 +406,11 @@ class Tools {
                 return $output;
             }
             $filter['project type__eq'] = $projTyp;
+        }
+        if ($current == '1') {
+            $today = date('Y-m-d');
+            $filter['cfstartdate__le'] = $today;
+            $filter['virtualenddate__ge'] = $today;
         }
         if (count($filter))
             return $filter;
@@ -510,11 +518,15 @@ class Tools {
         return $univis;
     }
 
-    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array()) {
+    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array(), $nameorder = '') {
         if ($cms == 'wp') {
             // WordPress
             global $wpdb;
-            $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
+            if ($nameorder == 'lastname-firstname') {
+                $person = '%' . $wpdb->esc_like($lastname) . '%' . $wpdb->esc_like($firstname) . '%';
+            } else {
+                $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
+            }
             $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
             $person_id = $wpdb->get_var($sql);
@@ -533,7 +545,11 @@ class Tools {
     public static function person_id($cms = '', $firstname = '', $lastname = '') {
         if ($cms == 'wp') {
             global $wpdb;
-            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            if ($nameorder == 'lastname-firstname') {
+                $person = '%' . $wpdb->esc_like($lastname) . '%' . $wpdb->esc_like($firstname) . '%';
+            } else {
+                $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
+            }
             $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
             $person_id = $wpdb->get_var($sql);
@@ -541,11 +557,15 @@ class Tools {
         return $person_id;
     }
 
-    public static function person_slug($cms = '', $firstname = '', $lastname = '') {
+    public static function person_slug($cms = '', $firstname = '', $lastname = '', $nameorder = '') {
         if ($cms == 'wp') {
             // WordPress
             global $wpdb;
-            $person = $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname);
+            if ($nameorder == 'lastname-firstname') {
+                $person = '%' . $wpdb->esc_like($lastname) . '%' . $wpdb->esc_like($firstname) . '%';
+            } else {
+                $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
+            }
             $sql = "SELECT post_name FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
             $person_slug = $wpdb->get_var($sql);
@@ -566,7 +586,7 @@ class Tools {
         while (!feof($fh)) {
             $line = fgets($fh);
             $line = trim($line);
-            if ((substr($line, 0, 11) == 'UnivISOrgNr')) {
+            if ((mb_substr($line, 0, 11) == 'UnivISOrgNr')) {
                 $arr_opts = preg_split('/\t/', $line);
                 $univisID = $arr_opts[1];
             }
@@ -575,7 +595,7 @@ class Tools {
         return $univisID;
     }
 
-    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0) {
+    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = '') {
         $person = '';
         switch ($target) {
             case 'cris' :
@@ -588,8 +608,8 @@ class Tools {
                 }
                 break;
             case 'person':
-                if (self::person_exists($cms, $firstname, $lastname, $univis)) {
-                    $link_pre = "<a href=\"" . $path . self::person_slug($cms, $firstname, $lastname) . "\">";
+                if (self::person_exists($cms, $firstname, $lastname, $univis, $nameorder)) {
+                    $link_pre = "<a href=\"" . $path . self::person_slug($cms, $firstname, $lastname, $nameorder) . "\">";
                     $link_post = "</a>";
                 } else {
                     $link_pre = '';
@@ -609,7 +629,7 @@ class Tools {
                 $firstnames[] = $firstname;
             }
             foreach ($firstnames as $_fn) {
-                $fn_shorts[] = substr($_fn,0,1);
+                $fn_shorts[] = mb_substr($_fn,0,1);
             }
             $firstname = implode('', $fn_shorts) . '.';
         }
@@ -671,7 +691,7 @@ class Tools {
                 continue;
             }
             $o = ord($char);
-            if ( (strlen($char) > 1) || /* multi-byte [unicode] */
+            if ( (mb_strlen($char) > 1) || /* multi-byte [unicode] */
                 ($o <32 || $o > 126) || /* <- control / latin weird os -> */
                 ($o >33 && $o < 40) ||/* quotes + ambersand */
                 ($o >59 && $o < 63) /* html */

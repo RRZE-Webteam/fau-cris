@@ -50,8 +50,8 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($year = '', $start = '', $type = '', $items = '', $hide = '', $role = 'leader') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role);
+    public function projListe($year = '', $start = '', $type = '', $items = '', $hide = '', $role = 'leader', $current = '') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -79,8 +79,8 @@ class Projekte {
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
 
-    public function projNachJahr($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role);
+    public function projNachJahr($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '', $current = '') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -110,8 +110,8 @@ class Projekte {
      * Ausgabe aller Projekte nach Projekttypen gegliedert
      */
 
-    public function projNachTyp($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role);
+    public function projNachTyp($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '', $current = '') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -207,8 +207,8 @@ class Projekte {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_projects($year = '', $start = '', $type = '', $role = 'leader') {
-        $filter = Tools::project_filter($year, $start, $type);
+    private function fetch_projects($year = '', $start = '', $type = '', $role = 'leader', $current = '') {
+        $filter = Tools::project_filter($year, $start, $type, $current);
 
         $ws = new CRIS_projects();
         $awardArray = array();
@@ -274,13 +274,13 @@ class Projekte {
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub>');
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#publications#'] = $this->get_project_publications($id, $quotation);
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
                 $i = 1;
                 foreach($imgs as $img) {
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                         $proj_details["#image$i#"] = "<div class=\"cris-image\">";
                         $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
@@ -331,7 +331,7 @@ class Projekte {
                 $i = 1;
                 foreach($imgs as $img) {
                     $proj_details["#image$i#"] = "<div class=\"cris-image\">";
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                        $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     $proj_details["#image$i#"] .= "</div>";
@@ -369,7 +369,7 @@ class Projekte {
             if (count($imgs)) {
                 $projlist .= "<div class=\"cris-image\">";
                 foreach($imgs as $img) {
-                    if (isset($img->attributes['png180']) && strlen($img->attributes['png180']) > 30) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                        $projlist .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }
@@ -434,7 +434,7 @@ class Projekte {
 
             if (!in_array('abstract', $hide)) {
                 $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-                $description = strip_tags($description, '<br><br/><a><sup><sub>');
+                $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
                 if ($description)
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
             }
@@ -566,8 +566,10 @@ class Projekte {
             $type = Tools::getName('projects', $project['project type'], get_locale());
             $description = $project['cfabstr'.$lang_key];
             $description = strip_tags($description, '<br><br/><a>');
-            $pos = strpos($description, ' ', 500);
-            $description = substr($description, 0, $pos) . '&hellip;';
+            if (mb_strlen($description) > 500) {
+                $pos = strpos($description, ' ', 500);
+                $description = mb_substr($description, 0, $pos) . '&hellip;';
+            } 
             if (!empty($project['kurzbeschreibung'.$lang_key])) {
                 $description = $project['kurzbeschreibung'.$lang_key];
             }
@@ -840,9 +842,9 @@ class CRIS_projects extends CRIS_webservice {
             foreach ($_d as $project) {
                 $a = new CRIS_project($project);
                 if ($a->ID) {
-                    $a->attributes['startyear'] = substr($a->attributes['cfstartdate'], 0, 4);
-                    $a->attributes['endyear'] = substr($a->attributes['virtualenddate'], 0, 4);
-                    //$a->attributes['endyear'] = $a->attributes['cfenddate'] != '' ? substr($a->attributes['cfenddate'], 0, 4) : substr($a->attributes['virtualenddate'], 0, 4);
+                    $a->attributes['startyear'] = mb_substr($a->attributes['cfstartdate'], 0, 4);
+                    $a->attributes['endyear'] = mb_substr($a->attributes['virtualenddate'], 0, 4);
+                    //$a->attributes['endyear'] = $a->attributes['cfenddate'] != '' ? mb_substr($a->attributes['cfenddate'], 0, 4) : mb_substr($a->attributes['virtualenddate'], 0, 4);
                 }
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))
                     $projects[$a->ID] = $a;

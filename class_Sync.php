@@ -565,8 +565,8 @@ class Sync {
         $string = ' ' . $string;
         $ini = strpos($string, $start);
         if ($ini == 0) return '';
-        $ini += strlen($start);
+        $ini += mb_strlen($start);
         $len = strpos($string, $end, $ini) - $ini;
-        return substr($string, $ini, $len);
+        return mb_substr($string, $ini, $len);
     }
 }

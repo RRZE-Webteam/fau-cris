@@ -324,12 +324,12 @@ class Auszeichnungen {
             $award_pic = self::get_pic($award['ID']);
 
             $awardlist .= "<li>";
-            $awardlist .= (isset($award_pic['png']) && strlen($award_pic['png']) > 30) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic['png'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
+            $awardlist .= (isset($award_pic['png']) && mb_strlen($award_pic['png']) > 30) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic['png'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
             $awardlist .= $name == 1 ? $preistraeger_html . ': ' : '';
             $awardlist .= (($awardname == 1) ? " <strong>" . $award_name . "</strong> "
                     . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             $awardlist .= ($year == 1 && !empty($award_year)) ? "<br />" . $award_year : '';
-            $awardlist .= (isset($award_pic['desc']) && strlen($award_pic['desc']) > 0) ? "<br /><span class=\"imgsrc\">(" . _x('Bild:', 'Wird bei Galerien vor die Bildquelle geschrieben.', 'fau-cris') . " " . $award_pic['desc'] . ")</span>" : "";
+            $awardlist .= (isset($award_pic['desc']) && mb_strlen($award_pic['desc']) > 0) ? "<br /><span class=\"imgsrc\">(" . _x('Bild:', 'Wird bei Galerien vor die Bildquelle geschrieben.', 'fau-cris') . " " . $award_pic['desc'] . ")</span>" : "";
             $awardlist .= "</li>";
         }
 

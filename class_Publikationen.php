@@ -10,7 +10,7 @@ class Publikationen {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $nameorder = '') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -42,6 +42,9 @@ class Publikationen {
             // keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
             $this->id = $this->orgNr;
             $this->einheit = "orga";
+        }
+        if (strlen(trim($nameorder))) {
+            $this->nameorder = $nameorder;
         }
 
     }
@@ -80,7 +83,7 @@ class Publikationen {
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output .= $this->make_quotation_list($pubList, $quotation);
         } else {
-            $output .= $this->make_list($pubList, 1);
+            $output .= $this->make_list($pubList, 1, $this->nameorder);
         }
 
         return $output;
@@ -114,7 +117,7 @@ class Publikationen {
             if ($quotation == 'apa' || $quotation == 'mla') {
                 $output .= $this->make_quotation_list($publications, $quotation);
             } else {
-                $output .= $this->make_list($publications, $showsubtype);
+                $output .= $this->make_list($publications, $showsubtype, $this->nameorder);
             }
         }
         return $output;
@@ -194,7 +197,7 @@ class Publikationen {
                 if ($quotation == 'apa' || $quotation == 'mla') {
                     $output .= $this->make_quotation_list($publications, $quotation);
                 } else {
-                    $output .= $this->make_list($publications);
+                    $output .= $this->make_list($publications, $this->nameorder);
                 }
             }
         }
@@ -245,7 +248,7 @@ class Publikationen {
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed=false) {
+    public function fieldPub($field, $quotation = '', $seed=false, $num_pub) {
         $ws = new CRIS_publications();
         if($seed)
             $ws->disable_cache();
@@ -257,11 +260,17 @@ class Publikationen {
 
         if (!count($pubArray))
             return;
-
-        if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubArray, $quotation);
+        if ($num_pub != '') {
+            $pubList = array_slice($pubArray, 0, $num_pub, true);
         } else {
-            $output = $this->make_list($pubArray);
+            $pubList = $pubArray;
+        }
+
+        $output = '';
+        if ($quotation == 'apa' || $quotation == 'mla') {
+            $output = $this->make_quotation_list($pubList, $quotation);
+        } else {
+            $output = $this->make_list($pubList);
         }
 
         return $output;
@@ -331,7 +340,7 @@ class Publikationen {
      * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
      */
 
-    private function make_list($publications, $showsubtype = 0) {
+    private function make_list($publications, $showsubtype = 0, $nameorder = '') {
 
         $publist = "<ul class=\"cris-publications\">";
 
@@ -341,21 +350,25 @@ class Publikationen {
             // id
             $id = $publicationObject->ID;
             // authors
-            $authors = explode("|", $publication['exportauthors']);
-            $authorIDs = explode(",", $publication['relpersid']);
-            $authorsArray = array();
-            foreach ($authorIDs as $i => $key) {
-                $nameparts = explode(":", $authors[$i]);
-                $authorsArray[] = array(
-                    'id' => $key,
-                    'lastname' => $nameparts[0],
-                    'firstname' => $nameparts[1]);
+            if (strtolower($publication['complete author relations']) == 'yes') {
+                $authors = explode("|", $publication['exportauthors']);
+                $authorIDs = explode(",", $publication['relpersid']);
+                $authorsArray = array();
+                foreach ($authorIDs as $i => $key) {
+                    $nameparts = explode(":", $authors[$i]);
+                    $authorsArray[] = array(
+                        'id' => $key,
+                        'lastname' => $nameparts[0],
+                        'firstname' => $nameparts[1]);
+                }
+                $authorList = array();
+                foreach ($authorsArray as $author) {
+                    $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1, $nameorder);
+                }
+                $authors_html = implode(", ", $authorList);
+            } else {
+                $authors_html = $publication['srcauthors'];
             }
-            $authorList = array();
-            foreach ($authorsArray as $author) {
-                $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1);
-            }
-            $authors_html = implode(", ", $authorList);
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['type other subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
@@ -400,9 +413,10 @@ class Publikationen {
                 'language' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 'bibtex_link' => (array_key_exists('bibtex_link', $publication) ? $publication['bibtex_link'] : __('Nicht verfügbar', 'fau-cris')),
                 'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
-                'thesisSubtype' =>(array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : '')
+                'thesisSubtype' =>(array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
+                'articleNumber' =>(array_key_exists('article number', $publication) ? $publication['article number'] : '')
             );
-
+            
             switch (strtolower($pubDetails['pubType'])) {
 
                 case "book": // OK
@@ -448,7 +462,11 @@ class Publikationen {
                             $publist .= $pubDetails['publisher'] != '' ? "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span>" : '';
                             $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? "</span>" : '';
                             $publist .= $pubDetails['year'] != '' ? ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
-                            $publist .= $pubDetails['pagesRange'] != '' ? ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>" : '';
+                            if ($pubDetails['pagesRange'] != '') {
+                                $publist .= ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>";
+                            } elseif ($pubDetails['articleNumber'] != '') {
+                                $publist .= ", " . _x('Art.Nr.', 'Abkürzung für "Artikelnummer" bei Publikationen', 'fau-cris') . ": <span itemprop=\"pagination\">" . $pubDetails['articleNumber'] . "</span>";
+                            }
                             $publist .= $pubDetails['lexiconColumn'] != '' ? ", " . _x('Sp.', 'Abkürzung für "Spalte" bei Lexikonartikeln', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['lexiconColumn'] . "</span>" : '';
                             if (!empty($pubDetails['series'])) {
                                 $publist .= $pubDetails['series'] != '' ? " (" . $pubDetails['series'] : '';
@@ -470,7 +488,11 @@ class Publikationen {
                     $publist .= $pubDetails['journaltitle'] != '' ? "In: <span itemscope itemtype=\"http://schema.org/Periodical\" itemid=\"#periodical_" . $pubDetails['id'] . "\"><span itemprop=\"name\" style=\"font-weight: bold;\">" . $pubDetails['journaltitle'] . "</span></span>" : '';
                     $publist .= $pubDetails['seriesNumber'] != '' ? " <span itemprop=\"isPartOf\" itemscope itemtype=\"http://schema.org/PublicationVolume\"><link itemprop=\"isPartOf\" href=\"#periodical_" . $pubDetails['id'] . "\" /><span itemprop=\"volumeNumber\">" . $pubDetails['seriesNumber'] . "</span></span> " : '';
                     $publist .= $pubDetails['year'] != '' ? " (<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)" : '';
-                    $publist .= $pubDetails['pagesRange'] != '' ? ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>" : '';
+                    if ($pubDetails['pagesRange'] != '') {
+                        $publist .= ", " . _x('S.', 'Abkürzung für "Seite" bei Publikationen', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['pagesRange'] . "</span>";
+                    } elseif ($pubDetails['articleNumber'] != '') {
+                        $publist .= ", " . _x('Art.Nr.', 'Abkürzung für "Artikelnummer" bei Publikationen', 'fau-cris') . ": <span itemprop=\"pagination\">" . $pubDetails['articleNumber'] . "</span>";
+                    }
                     $publist .= $pubDetails['lexiconColumn'] != '' ? ", " . _x('Sp.', 'Abkürzung für "Spalte" bei Lexikonartikeln', 'fau-cris') . " <span itemprop=\"pagination\">" . $pubDetails['lexiconColumn'] . "</span>" : '';
                     $publist .= $pubDetails['ISSN'] != '' ? "<br><span itemscope itemtype=\"http://schema.org/Periodical\" itemid=\"#periodical_" . $pubDetails['id'] . "\"><span itemprop=\"issn\">ISSN: " . $pubDetails['ISSN'] . "</span></span></span>" : "</span>";
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
@@ -539,7 +561,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= " (" . ($pubDetails['thesisSubtype'] != '' ? $pubDetails['thesisSubtype'] : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)";        
+                    $publist .= " (" . ($pubDetails['thesisSubtype'] != '' ? Tools::getName('pubthesissubtypes', $pubDetails['thesisSubtype'], get_locale()) : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)";        
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='http://dx.doi.org/" . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;

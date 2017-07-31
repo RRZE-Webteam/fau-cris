@@ -335,9 +335,9 @@ class CRIS_patents extends CRIS_webservice {
             foreach ($_d as $patent) {
                 $a = new CRIS_patent($patent);
                 if ($a->ID) {
-                    $a->attributes['registryear'] = substr($a->attributes['cfregistrdate'], 0, 4);
-                    $a->attributes['approvyear'] = $a->attributes['cfapprovdate'] != '' ? substr($a->attributes['cfapprovdate'], 0, 4) : '';
-                    $a->attributes['expiryyear'] = $a->attributes['patexpirydate'] != '' ? substr($a->attributes['patexpirydate'], 0, 4) : '';
+                    $a->attributes['registryear'] = mb_substr($a->attributes['cfregistrdate'], 0, 4);
+                    $a->attributes['approvyear'] = $a->attributes['cfapprovdate'] != '' ? mb_substr($a->attributes['cfapprovdate'], 0, 4) : '';
+                    $a->attributes['expiryyear'] = $a->attributes['patexpirydate'] != '' ? mb_substr($a->attributes['patexpirydate'], 0, 4) : '';
                 }
 
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))

@@ -474,17 +474,17 @@ class CRIS_activities extends CRIS_webservice {
                 $a = new CRIS_activity($activity);
                 if ($a->ID) {
                     if (!empty($a->attributes['date'])) {
-                        $a->attributes['year'] = substr($a->attributes['date'], 0, 4);
+                        $a->attributes['year'] = mb_substr($a->attributes['date'], 0, 4);
                         $a->attributes['sortdate'] = $a->attributes['date'];
                     } elseif (!empty($a->attributes['start date'])) {
-                        $a->attributes['year'] = substr($a->attributes['start date'], 0, 4);
+                        $a->attributes['year'] = mb_substr($a->attributes['start date'], 0, 4);
                         $a->attributes['sortdate'] = $a->attributes['start date'];
                     } elseif (!empty($a->attributes['mandate start'])) {
-                        $a->attributes['year'] = substr($a->attributes['mandate start'], 0, 4);
+                        $a->attributes['year'] = mb_substr($a->attributes['mandate start'], 0, 4);
                         $a->attributes['sortdate'] = $a->attributes['mandate start'];
                     }
                     if (!empty($a->attributes['sortdate'])) {
-                        $a->attributes['year'] = substr($a->attributes['sortdate'], 0, 4);
+                        $a->attributes['year'] = mb_substr($a->attributes['sortdate'], 0, 4);
                     } else {
                         $a->attributes['year'] = '';
                     }
