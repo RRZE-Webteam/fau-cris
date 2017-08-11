@@ -669,7 +669,7 @@ class FAU_CRIS {
      */
     public static function cris_shortcode($atts) {
         $parameter = self::cris_shortcode_parameter($atts);
-
+        
         if (isset($parameter['show']) && $parameter['show'] == 'organisation') {
             // Forschung
             require_once('class_Organisation.php');
@@ -768,9 +768,9 @@ class FAU_CRIS {
                 return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed']);
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
             }
-            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed']);
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
         }
 
         // nothing
@@ -848,7 +848,8 @@ class FAU_CRIS {
             'peerreviewed' => '',
             'current' => '',
             'num_pub' => isset($options['cris_fields_num_pub']) ? $options['cris_fields_num_pub'] : $options['cris_fields_num_pub'],
-            'name_order_plugin' => isset($options['cris_name_order_plugin']) ? $options['cris_name_order_plugin'] : 'firstname-lastname'
+            'name_order_plugin' => isset($options['cris_name_order_plugin']) ? $options['cris_name_order_plugin'] : 'firstname-lastname',
+            'notable' => ''
                         ), $atts));
 
         $sc_param['orderby'] = sanitize_text_field($orderby);
@@ -882,6 +883,7 @@ class FAU_CRIS {
         $sc_param['current'] = sanitize_text_field($current);
         $sc_param['num_pub'] = sanitize_text_field($num_pub);
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
+        $sc_param['notable'] = $notable == 1 ? 1 : 0;
         
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';

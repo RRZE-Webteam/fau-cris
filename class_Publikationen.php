@@ -93,8 +93,9 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author', $fau = '', $peerreviewed = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed);
+    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author', $fau = '', $peerreviewed = '', $notable = 0) {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed, $notable);
+        
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
@@ -127,8 +128,8 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'date', $fau = '', $peerreviewed = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed);
+    public function pubNachTyp($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'date', $fau = '', $peerreviewed = '', $notable = 0) {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed, $notable);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -284,7 +285,7 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '') {
+    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0) {
         $filter = Tools::publication_filter($year, $start, $type, $subtype, $fau, $peerreviewed);
         $ws = new CRIS_publications();
 
@@ -293,7 +294,7 @@ class Publikationen {
                 $pubArray = $ws->by_orga_id($this->id, $filter);
             }
             if ($this->einheit === "person") {
-                $pubArray = $ws->by_pers_id($this->id, $filter);
+                $pubArray = $ws->by_pers_id($this->id, $filter, $notable);
             }
         } catch (Exception $ex) {
             $pubArray = array();
@@ -629,7 +630,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null) {
+    public function by_pers_id($persID = null, &$filter = null, $notable = 0) {
         if ($persID === null || $persID === "0")
             throw new Exception('Please supply valid person ID');
 
@@ -637,8 +638,14 @@ class CRIS_publications extends CRIS_webservice {
             $persID = array($persID);
 
         $requests = array();
-        foreach ($persID as $_p) {
-            $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PUBL_1', $_p);
+        if ($notable == 1) { 
+            foreach ($persID as $_p) {
+                $requests[] = sprintf('getrelated/Person/%d/PUBL_has_PERS', $_p);
+            }
+        } else {
+            foreach ($persID as $_p) {
+                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PUBL_1', $_p);
+            }    
         }
         return $this->retrieve($requests, $filter);
     }
