@@ -681,12 +681,12 @@ class FAU_CRIS {
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
 
             if ($parameter['field'] != '') {
-                return $liste->singleField($parameter['hide'],$parameter['quotation'], $parameter['num_pub']);
+                return $liste->singleField($parameter);
             }
             if (!empty($parameter['items'])) {
-                return $liste->fieldListe();
+                return $liste->fieldListe($parameter);
             }
-            return $liste->fieldListe();
+            return $liste->fieldListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'activities') {
             // Aktivitäten
             require_once('class_Aktivitaeten.php');
@@ -764,7 +764,7 @@ class FAU_CRIS {
             if ($parameter['publication'] != '') {
                 return $liste->singlePub($parameter['quotation']);
             }
-            if ($parameter['items'] != '' || $parameter['sortby'] != '') {
+            if ($parameter['order1'] = '' && ($parameter['items'] != '' || $parameter['sortby'] != '')) {
                 return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
@@ -790,7 +790,7 @@ class FAU_CRIS {
             require_once('class_Forschungsbereiche.php');
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
             if ($parameter['field'] != '') {
-                return $liste->customField($content, $parameter['quotation'], $parameter['num_pub']);
+                return $liste->customField($content, $parameter['quotation'], $parameter['publications_number']);
             }
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
         // Projekte
@@ -847,11 +847,19 @@ class FAU_CRIS {
             'fau' => '',
             'peerreviewed' => '',
             'current' => '',
-            'num_pub' => isset($options['cris_fields_num_pub']) ? $options['cris_fields_num_pub'] : $options['cris_fields_num_pub'],
+            'publications_number' => isset($options['cris_fields_num_pub']) ? $options['cris_fields_num_pub'] : '5',
             'name_order_plugin' => isset($options['cris_name_order_plugin']) ? $options['cris_name_order_plugin'] : 'firstname-lastname',
-            'notable' => ''
+            'notable' => '',
+            'publications_year' => '',
+            'publications_start' => '',
+            'publications_type' => '',
+            'publications_subtype' => '',
+            'publications_fau' => '',
+            'publications_peerreviewed' => '',
+            'publications_orderby' => '',
+            'publications_notable' => ''
                         ), $atts));
-
+        
         $sc_param['orderby'] = sanitize_text_field($orderby);
         $sc_param['orgid'] = sanitize_text_field($orgid);
         $sc_param['persid'] = sanitize_text_field($persid);
@@ -881,10 +889,18 @@ class FAU_CRIS {
         $sc_param['fau'] = sanitize_text_field($fau);
         $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
         $sc_param['current'] = sanitize_text_field($current);
-        $sc_param['num_pub'] = sanitize_text_field($num_pub);
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
         $sc_param['notable'] = $notable == 1 ? 1 : 0;
-        
+        $sc_param['publications_number'] = sanitize_text_field($publications_number);
+        $sc_param['publications_year'] = sanitize_text_field($publications_year);
+        $sc_param['publications_start'] = sanitize_text_field($publications_start);
+        $sc_param['publications_type'] = sanitize_text_field($publications_type);
+        $sc_param['publications_subtype'] = sanitize_text_field($publications_subtype);
+        $sc_param['publications_fau'] = sanitize_text_field($publications_fau);
+        $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
+        $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
+        $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
+                
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {
@@ -946,7 +962,7 @@ class FAU_CRIS {
                 $sc_param['order2'] = '';
             }
         }
-
+        //var_dump($sc_param);        
         return $sc_param;
     }
 

@@ -77,7 +77,7 @@ class Forschungsbereiche {
      * Ausgabe eines einzelnen Forschungsbereichs
      */
 
-    public function singleField($hide = '', $quotation = '', $num_pub = '') {
+    public function singleField($param = array()) {
         $ws = new CRIS_fields();
         try {
             $fieldsArray = $ws->by_id($this->id);
@@ -86,9 +86,8 @@ class Forschungsbereiche {
         }
         if (!count($fieldsArray))
             return;
-        $hide = explode(',', $hide);
-
-        $output = $this->make_single($fieldsArray, $hide, $quotation, $num_pub);
+        
+        $output = $this->make_single($fieldsArray, $param);
 
         return $output;
     }
@@ -97,7 +96,7 @@ class Forschungsbereiche {
      * Ausgabe eines einzelnen Forschungsbereichs per Custom-Shortcode
      */
 
-    public function customField($content = '', $quotation = '', $num_pub = '') {
+    public function customField($content = '', $param = array()) {
         $ws = new CRIS_fields();
 
         try {
@@ -109,7 +108,7 @@ class Forschungsbereiche {
         if (!count($fieldsArray))
             return;
 
-        $output = $this->make_custom_single($fieldsArray, $content, $quotation, $num_pub);
+        $output = $this->make_custom_single($fieldsArray, $content, $param);
 
         return $output;
     }
@@ -172,8 +171,9 @@ class Forschungsbereiche {
      * Ausgabe der Forschungsbereiche
      */
 
-    private function make_single($fields, $hide = array(), $quotation = '', $num_pub = '') {
-
+    private function make_single($fields, $param) {
+        $hide = $hide = explode(',', $param['hide']);
+                        
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $singlefield = '';
         $singlefield .= "<div class=\"cris-fields\">";
@@ -226,7 +226,7 @@ class Forschungsbereiche {
                 }
             }        
             if (!in_array('publications', $hide)) {
-                $publications = $this->get_field_publications($id, $quotation, $num_pub);
+                $publications = $this->get_field_publications($param);
                 if ($publications) {
                     $singlefield .= "<h3>" . __('Publikationen', 'fau-cris') . ": </h3>";
                     $singlefield .= $publications;
@@ -238,7 +238,7 @@ class Forschungsbereiche {
     }
 
 
-    private function make_custom_single($fields, $content, $quotation = '', $num_pub = '') {
+    private function make_custom_single($fields, $content, $param = array()) {
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $field_details = array();
         $output = "<div class=\"cris-fields\">";;
@@ -266,7 +266,7 @@ class Forschungsbereiche {
                 $field_details['#persons#'] .= "</ul>";
             }
             $field_details['#publications#'] = '';
-            $publications = $this->get_field_publications($id, $quotation, $num_pub);
+            $publications = $this->get_field_publications($param);
             if ($publications)
                 $field_details['#publications#'] = $publications;
             $field_details['#image1#'] = '';
@@ -330,10 +330,35 @@ class Forschungsbereiche {
         //var_dump($liste->fieldPersons($field));
     }
 
-    private function get_field_publications($field = NULL, $quotation = '', $num_pub = '') {
+    private function get_field_publications($param = array()) {
+                
         require_once('class_Publikationen.php');
-        $liste = new Publikationen();
-        return $liste->fieldPub($field, $quotation, false, $num_pub);
+        $liste = new Publikationen('field', $param['field']);
+        if ($param['publications_orderby'] == 'year')
+            return $liste->pubNachJahr (
+                    $param['publications_year'], 
+                    $param['publications_start'], 
+                    $param['publications_type'], 
+                    $param['publications_subtype'], 
+                    $param['quotation'], 
+                    $param['publications_order2'] = '', 
+                    $param['publications_fau'], 
+                    $param['publications_peerreviewed'], 
+                    $param['publications_notable'],
+                    $param['field']);        
+        if ($param['publications_orderby'] == 'type')
+            return $liste->pubNachTyp (
+                    $param['publications_year'], 
+                    $param['publications_start'], 
+                    $param['publications_type'], 
+                    $param['publications_subtype'], 
+                    $param['quotation'], 
+                    $param['publications_order2'] = '', 
+                    $param['publications_fau'], 
+                    $param['publications_peerreviewed'], 
+                    $param['publications_notable'],
+                    $param['field']); 
+        return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_number']);
     }
 
     private function get_field_images($field) {
