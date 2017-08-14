@@ -761,10 +761,10 @@ class FAU_CRIS {
             require_once('class_Publikationen.php');
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], $parameter['name_order_plugin']);
 
-            if ($parameter['publication'] != '') {
+            if ($parameter['publication'] != '' && $parameter['order1'] == '') {
                 return $liste->singlePub($parameter['quotation']);
             }
-            if ($parameter['order1'] = '' && ($parameter['items'] != '' || $parameter['sortby'] != '')) {
+            if ($parameter['order1'] == '' && ($parameter['items'] != '' || $parameter['sortby'] != '')) {
                 return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
@@ -949,7 +949,7 @@ class FAU_CRIS {
             $sc_param['entity_id'] = '';
         }
 
-        $sc_param['order1'] = 'year';
+        $sc_param['order1'] = '';
         $sc_param['order2'] = '';
 
         if (!empty($orderby)) {

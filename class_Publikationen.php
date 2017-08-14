@@ -302,6 +302,9 @@ class Publikationen {
             if ($this->einheit === "field") {
                 $pubArray = $ws->by_field($field, $filter);
             }
+            if ($this->einheit === "publication") {
+                $pubArray = $ws->by_id($this->id);
+            }
         } catch (Exception $ex) {
             $pubArray = array();
         }
