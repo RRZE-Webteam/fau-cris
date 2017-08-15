@@ -764,8 +764,8 @@ class FAU_CRIS {
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
                 return $liste->singlePub($parameter['quotation']);
             }
-            if ($parameter['order1'] == '' && ($parameter['items'] != '' || $parameter['sortby'] != '')) {
-                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed']);
+            if ($parameter['order1'] == '' && ($parameter['items'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['items'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
                 return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);

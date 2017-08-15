@@ -55,8 +55,8 @@ class Publikationen {
      * Ausgabe aller Publikationen ohne Gliederung
      */
 
-    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $items = '', $sortby = 'virtualdate', $fau = '', $peerreviewed = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed);
+    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $items = '', $sortby = 'virtualdate', $fau = '', $peerreviewed = '', $notable = '') {
+        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed, $notable);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
