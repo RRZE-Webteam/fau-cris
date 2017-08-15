@@ -250,7 +250,7 @@ class Publikationen {
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed=false, $publications_number) {
+    public function fieldPub($field, $quotation = '', $seed=false, $publications_items) {
         $ws = new CRIS_publications();
         if($seed)
             $ws->disable_cache();
@@ -262,8 +262,8 @@ class Publikationen {
 
         if (!count($pubArray))
             return;
-        if ($publications_number != '') {
-            $pubList = array_slice($pubArray, 0, $publications_number, true);
+        if ($publications_items != '') {
+            $pubList = array_slice($pubArray, 0, $publications_items, true);
         } else {
             $pubList = $pubArray;
         }
