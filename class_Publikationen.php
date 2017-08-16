@@ -55,7 +55,7 @@ class Publikationen {
      * Ausgabe aller Publikationen ohne Gliederung
      */
 
-    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $items = '', $sortby = 'virtualdate', $fau = '', $peerreviewed = '', $notable = '') {
+    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $limit = '', $sortby = 'virtualdate', $fau = '', $peerreviewed = '', $notable = '') {
         $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed, $notable);
 
         if (!count($pubArray)) {
@@ -75,8 +75,8 @@ class Publikationen {
         }
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($pubArray);
-        if ($items != '')
-            $pubList = array_slice($res[$order], 0, $items);
+        if ($limit != '')
+            $pubList = array_slice($res[$order], 0, $limit);
         else
             $pubList = $res[$order];
 
@@ -250,7 +250,7 @@ class Publikationen {
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed=false, $publications_items) {
+    public function fieldPub($field, $quotation = '', $seed=false, $publications_limit) {
         $ws = new CRIS_publications();
         if($seed)
             $ws->disable_cache();
@@ -262,8 +262,8 @@ class Publikationen {
 
         if (!count($pubArray))
             return;
-        if ($publications_items != '') {
-            $pubList = array_slice($pubArray, 0, $publications_items, true);
+        if ($publications_limit != '') {
+            $pubList = array_slice($pubArray, 0, $publications_limit, true);
         } else {
             $pubList = $pubArray;
         }

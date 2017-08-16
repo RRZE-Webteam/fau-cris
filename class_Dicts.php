@@ -21,7 +21,7 @@ class CRIS_Dicts {
         'showawardname' => 1,
         'display' => 'list',
         'quotation' => '',
-        'items' => '',
+        'limit' => '',
         'role' => 'leader'
     );
 

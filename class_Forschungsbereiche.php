@@ -358,7 +358,7 @@ class Forschungsbereiche {
                     $param['publications_peerreviewed'], 
                     $param['publications_notable'],
                     $param['field']); 
-        return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_items']);
+        return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit']);
     }
 
     private function get_field_images($field) {

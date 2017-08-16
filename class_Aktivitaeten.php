@@ -47,7 +47,7 @@ class Aktivitaeten {
      * Ausgabe aller Aktivitäten ohne Gliederung
      */
 
-    public function actiListe($year = '', $start = '', $type = '', $items='', $hide='') {
+    public function actiListe($year = '', $start = '', $type = '', $limit='', $hide='') {
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 1;
         $showactivityname = 1;

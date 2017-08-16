@@ -50,7 +50,7 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($year = '', $start = '', $type = '', $items = '', $hide = '', $role = 'leader', $current = '') {
+    public function projListe($year = '', $start = '', $type = '', $limit = '', $hide = '', $role = 'leader', $current = '') {
         $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
@@ -63,8 +63,8 @@ class Projekte {
         $order = "cfstartdate";
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($projArray);
-        if ($items != '')
-            $projList = array_slice($res[$order], 0, $items);
+        if ($limit != '')
+            $projList = array_slice($res[$order], 0, $limit);
         else
             $projList = $res[$order];
 
