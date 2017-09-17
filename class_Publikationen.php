@@ -199,7 +199,7 @@ class Publikationen {
                 if ($quotation == 'apa' || $quotation == 'mla') {
                     $output .= $this->make_quotation_list($publications, $quotation);
                 } else {
-                    $output .= $this->make_list($publications, $this->nameorder);
+                    $output .= $this->make_list($publications, 0, $this->nameorder);
                 }
             }
         }
@@ -223,7 +223,7 @@ class Publikationen {
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output = $this->make_quotation_list($pubArray, $quotation);
         } else {
-            $output = $this->make_list($pubArray);
+            $output = $this->make_list($pubArray, 0, $this->nameorder);
         }
 
         return $output;
@@ -244,7 +244,7 @@ class Publikationen {
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output = $this->make_quotation_list($pubArray, $quotation);
         } else {
-            $output = $this->make_list($pubArray);
+            $output = $this->make_list($pubArray, 0, $this->nameorder);
         }
 
         return $output;
@@ -272,7 +272,7 @@ class Publikationen {
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output = $this->make_quotation_list($pubList, $quotation);
         } else {
-            $output = $this->make_list($pubList);
+            $output = $this->make_list($pubList, 0, $this->nameorder);
         }
 
         return $output;
