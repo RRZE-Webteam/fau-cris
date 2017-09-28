@@ -473,11 +473,6 @@ class Sync {
                     'menu_order' => $position));
                 $updated = true;
             }
-            if (!isset($page_meta['sidebar_personen'])
-                    || unserialize($page_meta['sidebar_personen'][0]) != $contact) {
-                update_post_meta($pid, 'sidebar_personen', $contact);
-                $updated = true;
-            }
             if ($pages_array[0]->post_title == $this->title_noFieldsPage) {
                 $nfp_post = get_post($pages_array[0]->ID);
                 $nfp_content = $nfp_post->post_content;
