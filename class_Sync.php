@@ -473,8 +473,7 @@ class Sync {
                     'menu_order' => $position));
                 $updated = true;
             }
-            if (!isset($page_meta['sidebar_personen'])
-                    || unserialize($page_meta['sidebar_personen'][0]) != $contact) {
+            if (!empty($contact) && empty(unserialize($page_meta['sidebar_personen'][0]))) {
                 update_post_meta($pid, 'sidebar_personen', $contact);
                 $updated = true;
             }
