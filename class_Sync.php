@@ -130,7 +130,7 @@ class Sync {
             // Wenn nötig Page-Template und Portalmenü einstellen
             $page_research_meta = get_post_meta($research_pid);
             if (!isset($page_research_meta['_wp_page_template'])
-                    || $page_research_meta['_wp_page_template'][0] != $this->page_template_portal) {
+                    /*|| $page_research_meta['_wp_page_template'][0] != $this->page_template_portal*/) {
                 update_post_meta( $research_pid, '_wp_page_template', $this->page_template_portal );
                 $updated = true;
             }
