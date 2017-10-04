@@ -473,10 +473,7 @@ class Sync {
                     'menu_order' => $position));
                 $updated = true;
             }
-            if (!empty($contact) && empty(unserialize($page_meta['sidebar_personen'][0]))) {
-                update_post_meta($pid, 'sidebar_personen', $contact);
-                $updated = true;
-            }
+            // ggf. Übersicht der Projekte ohne Forschungsbereich anpassen
             if ($pages_array[0]->post_title == $this->title_noFieldsPage) {
                 $nfp_post = get_post($pages_array[0]->ID);
                 $nfp_content = $nfp_post->post_content;
