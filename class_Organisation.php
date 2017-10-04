@@ -25,7 +25,7 @@ class Organisation {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation an.', 'fau-cris') . '</strong></p>';
             return;
         }
-        $this->id = $this->orgNr;
+        $this->id = ($id != '' ? $id : $this->orgNr);
         $this->einheit = "orga";
     }
 
