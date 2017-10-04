@@ -49,7 +49,7 @@ class Forschungsbereiche {
      * Ausgabe aller Forschungsbereiche
      */
 
-    public function fieldListe($hide = '') {
+    public function fieldListe($param = array()) {
         $sortby = 'cfname';
         $fieldsArray = $this->fetch_fields();
 
@@ -57,7 +57,7 @@ class Forschungsbereiche {
             $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        $hide = explode(',', $hide);
+        $hide = explode(',', $param['hide']);
         if ($this->lang == 'en')
             $order = $sortby . '_en';
          else
@@ -86,7 +86,7 @@ class Forschungsbereiche {
         }
         if (!count($fieldsArray))
             return;
-        
+
         $output = $this->make_single($fieldsArray, $param);
 
         return $output;
@@ -173,7 +173,7 @@ class Forschungsbereiche {
 
     private function make_single($fields, $param) {
         $hide = $hide = explode(',', $param['hide']);
-                        
+
         $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $singlefield = '';
         $singlefield .= "<div class=\"cris-fields\">";
@@ -220,11 +220,11 @@ class Forschungsbereiche {
                     foreach ($persons as $p_id => $person) {
                         $singlefield .= "<li>";
                         $singlefield .= Tools::get_person_link($p_id, $person['firstname'], $person['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                        $singlefield .= "</li>";                        
+                        $singlefield .= "</li>";
                     }
                     $singlefield .= "</ul>";
                 }
-            }        
+            }
             if (!in_array('publications', $hide)) {
                 $publications = $this->get_field_publications($param);
                 if ($publications) {
@@ -261,7 +261,7 @@ class Forschungsbereiche {
                 foreach ($persons as $p_id => $person) {
                         $field_details['#persons#'] .= "<li>";
                         $field_details['#persons#'] .= Tools::get_person_link($p_id, $person['firstname'], $person['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                        $field_details['#persons#'] .= "</li>";                        
+                        $field_details['#persons#'] .= "</li>";
                     }
                 $field_details['#persons#'] .= "</ul>";
             }
@@ -331,33 +331,33 @@ class Forschungsbereiche {
     }
 
     private function get_field_publications($param = array()) {
-                
+
         require_once('class_Publikationen.php');
         $liste = new Publikationen('field', $param['field']);
         if ($param['publications_orderby'] == 'year')
             return $liste->pubNachJahr (
-                    $param['publications_year'], 
-                    $param['publications_start'], 
-                    $param['publications_type'], 
-                    $param['publications_subtype'], 
-                    $param['quotation'], 
-                    $param['publications_order2'] = '', 
-                    $param['publications_fau'], 
-                    $param['publications_peerreviewed'], 
+                    $param['publications_year'],
+                    $param['publications_start'],
+                    $param['publications_type'],
+                    $param['publications_subtype'],
+                    $param['quotation'],
+                    $param['publications_order2'] = '',
+                    $param['publications_fau'],
+                    $param['publications_peerreviewed'],
                     $param['publications_notable'],
-                    $param['field']);        
+                    $param['field']);
         if ($param['publications_orderby'] == 'type')
             return $liste->pubNachTyp (
-                    $param['publications_year'], 
-                    $param['publications_start'], 
-                    $param['publications_type'], 
-                    $param['publications_subtype'], 
-                    $param['quotation'], 
-                    $param['publications_order2'] = '', 
-                    $param['publications_fau'], 
-                    $param['publications_peerreviewed'], 
+                    $param['publications_year'],
+                    $param['publications_start'],
+                    $param['publications_type'],
+                    $param['publications_subtype'],
+                    $param['quotation'],
+                    $param['publications_order2'] = '',
+                    $param['publications_fau'],
+                    $param['publications_peerreviewed'],
                     $param['publications_notable'],
-                    $param['field']); 
+                    $param['field']);
         return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit']);
     }
 

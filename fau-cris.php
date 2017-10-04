@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.4.7
+ * Version: 3.4.8
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -38,7 +38,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '3.4.5';
+    const version = '3.4.8';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -480,7 +480,7 @@ class FAU_CRIS {
      * Sanitize each setting field as needed
      */
     public static function sanitize() {
-        
+
         $new_input = self::get_options();
         $default_options = self::default_options();
         $parts = parse_url($_POST['_wp_http_referer']);
@@ -597,7 +597,7 @@ class FAU_CRIS {
             <p class="description"><?php echo $description; ?></p>
         <?php }
     }
-    
+
     //Select
     public static function cris_select_callback($args){
         $options = self::get_options();
@@ -609,15 +609,15 @@ class FAU_CRIS {
             $limit = $args['options']; ?>
         <select name="<?php printf('%s[' . $name . ']', self::option_name); ?>">
         <?php foreach ($limit as $_k => $_v) { ?>
-            <option value='<?php print $_k; ?>' 
+            <option value='<?php print $_k; ?>'
                 <?php if (array_key_exists($name, $options)) { selected($options[$name], $_k); } ?>>
                     <?php print $_v; ?>
             </option>
         <?php } ?>
         </select>
-        <?php 
+        <?php
         if (isset($description)) { ?>
-            <p class="description"><?php echo $description; ?></p>        
+            <p class="description"><?php echo $description; ?></p>
         <?php }
     }
 
@@ -669,7 +669,7 @@ class FAU_CRIS {
      */
     public static function cris_shortcode($atts) {
         $parameter = self::cris_shortcode_parameter($atts);
-        
+
         if (isset($parameter['show']) && $parameter['show'] == 'organisation') {
             // Forschung
             require_once('class_Organisation.php');
@@ -727,7 +727,7 @@ class FAU_CRIS {
             // Projekte
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
-            
+
             if ($parameter['project'] != '') {
                 return $liste->singleProj($parameter['hide'], $parameter['quotation']);
             }
@@ -790,7 +790,7 @@ class FAU_CRIS {
             require_once('class_Forschungsbereiche.php');
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
             if ($parameter['field'] != '') {
-                return $liste->customField($content, $parameter['quotation'], $parameter['publications_limit']);
+                return $liste->customField($content, $parameter);
             }
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
         // Projekte
@@ -860,7 +860,7 @@ class FAU_CRIS {
             'publications_orderby' => '',
             'publications_notable' => ''
                         ), $atts));
-        
+
         $sc_param['orderby'] = sanitize_text_field($orderby);
         $sc_param['orgid'] = sanitize_text_field($orgid);
         $sc_param['persid'] = sanitize_text_field($persid);
@@ -902,7 +902,7 @@ class FAU_CRIS {
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
-                
+
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {
@@ -964,14 +964,14 @@ class FAU_CRIS {
                 $sc_param['order2'] = '';
             }
         }
-        //var_dump($sc_param);        
+        //var_dump($sc_param);
         return $sc_param;
     }
 
     public static function cris_enqueue_styles() {
         global $post;
         $plugin_url = plugin_dir_url(__FILE__);
-        if ($post && has_shortcode($post->post_content, 'cris') 
+        if ($post && has_shortcode($post->post_content, 'cris')
                 || $post && has_shortcode($post->post_content, 'cris-custom')) {
             wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
             wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array ( 'jquery' ));

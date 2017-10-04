@@ -130,7 +130,7 @@ class Sync {
             // Wenn nötig Page-Template und Portalmenü einstellen
             $page_research_meta = get_post_meta($research_pid);
             if (!isset($page_research_meta['_wp_page_template'])
-                    || $page_research_meta['_wp_page_template'][0] != $this->page_template_portal) {
+                    /*|| $page_research_meta['_wp_page_template'][0] != $this->page_template_portal*/) {
                 update_post_meta( $research_pid, '_wp_page_template', $this->page_template_portal );
                 $updated = true;
             }
@@ -195,18 +195,18 @@ class Sync {
             foreach ($fields as $field) {
                 $_p = new Projekte();
                 $projects = $_p->fieldProj($field->ID, 'array', true);
-                $field_contacts = array();
-                $fcids = array();
-                $field_contacts = explode('|', $field->attributes['contact_names']);
-                foreach ($field_contacts as $_fc) {
-                    $nameparts = explode(':', $_fc);
-                    $lastname = $nameparts[0];
-                    $firstname = array_key_exists(1, $nameparts) ? $nameparts[1] : '';
-                    $fcid = Tools::person_exists('wp', $firstname, $lastname);
-                    if ($fcid) {
-                        $fcids[] = $fcid;
+                    $field_contacts = array();
+                    $fcids = array();
+                    $field_contacts = explode('|', $field->attributes['contact_names']);
+                    foreach ($field_contacts as $_fc) {
+                        $nameparts = explode(':', $_fc);
+                        $lastname = $nameparts[0];
+                        $firstname = array_key_exists(1, $nameparts) ? $nameparts[1] : '';
+                        $fcid = Tools::person_exists('wp', $firstname, $lastname);
+                        if ($fcid) {
+                            $fcids[] = $fcid;
+                        }
                     }
-                }
                 if ($this->options['cris_sync_shortcode_format']['fields'] == 1) {
                     $field_content = "[cris-custom show=fields field=$field->ID]"
                             . "#image1# "
@@ -255,7 +255,7 @@ class Sync {
                     $pages[$field->ID]['projects'][$project->ID]['title'] = str_replace('"', '&quot;',$project->attributes['cftitle'.$lang]);
                     $pages[$field->ID]['projects'][$project->ID]['position'] = $this->menu_position;
                     $pages[$field->ID]['projects'][$project->ID]['content'] = $proj_content;
-                    $pages[$field->ID]['projects'][$project->ID]['contact'] = array('-1');
+                    $pages[$field->ID]['projects'][$project->ID]['contact'] = array();
                     $this->menu_position ++;
                 }
             }
@@ -263,7 +263,7 @@ class Sync {
         // Projekte ohne FoBe
         $pages['no_field']['title'] = $this->title_noFieldsPage;
         $pages['no_field']['content'] = '';
-        $pages['no_field']['contact'] = array('-1');
+        $pages['no_field']['contact'] = array();
         $pages['no_field']['position'] = $this->menu_position;
         $pages['no_field']['projects'] = array();
         $this->menu_position ++;
@@ -307,7 +307,7 @@ class Sync {
             $orga_projects[$a_p->ID]['title'] = $a_p->attributes['cftitle'.$lang];
             $orga_projects[$a_p->ID]['position'] = $this->menu_position;
             $orga_projects[$a_p->ID]['content'] = $nf_proj_content;
-            $orga_projects[$a_p->ID]['contact'] = array('-1');
+            $orga_projects[$a_p->ID]['contact'] = array();
         }
         foreach ($orga_projects as $o_p => $details) {
             if (!array_key_exists($o_p, $this->field_projects)) {
@@ -429,7 +429,7 @@ class Sync {
             return $mid;
     }
 
-    private function cris_make_page($title, $content, $contact = array('-1'), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php') {
+    private function cris_make_page($title, $content, $contact = array(), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php') {
         $pages = get_pages(array('child_of' => $parent_pid, 'post_status' => 'publish'));
         $pages_array = array();
         foreach ($pages as $page) {
@@ -473,11 +473,7 @@ class Sync {
                     'menu_order' => $position));
                 $updated = true;
             }
-            if (!isset($page_meta['sidebar_personen'])
-                    || unserialize($page_meta['sidebar_personen'][0]) != $contact) {
-                update_post_meta($pid, 'sidebar_personen', $contact);
-                $updated = true;
-            }
+            // ggf. Übersicht der Projekte ohne Forschungsbereich anpassen
             if ($pages_array[0]->post_title == $this->title_noFieldsPage) {
                 $nfp_post = get_post($pages_array[0]->ID);
                 $nfp_content = $nfp_post->post_content;

@@ -521,6 +521,9 @@ class Tools {
     public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array(), $nameorder = '') {
         if ($cms == 'wp') {
             // WordPress
+            if ($firstname == '' && $lastname == '') {
+                return;
+            }
             global $wpdb;
             if ($nameorder == 'lastname-firstname') {
                 $person = '%' . $wpdb->esc_like($lastname) . '%' . $wpdb->esc_like($firstname) . '%';
