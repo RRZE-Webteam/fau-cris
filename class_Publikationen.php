@@ -95,7 +95,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author', $fau = '', $peerreviewed = '', $notable = 0, $field='') {
+    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author', $fau = '', $peerreviewed = '', $notable = 0, $field='', $format = '') {
         $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed, $notable, $field);
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -112,14 +112,28 @@ class Publikationen {
 
         $output = '';
         $showsubtype = ($subtype == '') ? 1 : 0;
-        foreach ($pubList as $array_year => $publications) {
-            if (empty($year)) {
-                $output .= '<h3>' . $array_year . '</h3>';
+        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($pubList as $array_year => $publications) {
+                if ($quotation == 'apa' || $quotation == 'mla') {
+                    $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_quotation_list($publications, $quotation) . '[/collapse]');
+                } else {
+                    $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($publications, $showsubtype, $this->nameorder) . '[/collapse]');
+                }
+                $openfirst = '';
             }
-            if ($quotation == 'apa' || $quotation == 'mla') {
-                $output .= $this->make_quotation_list($publications, $quotation);
-            } else {
-                $output .= $this->make_list($publications, $showsubtype, $this->nameorder);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+            foreach ($pubList as $array_year => $publications) {
+                if (empty($year)) {
+                    $output .= '<h3>' . $array_year . '</h3>';
+                }
+                if ($quotation == 'apa' || $quotation == 'mla') {
+                    $output .= $this->make_quotation_list($publications, $quotation);
+                } else {
+                    $output .= $this->make_list($publications, $showsubtype, $this->nameorder);
+                }
             }
         }
         return $output;

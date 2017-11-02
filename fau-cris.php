@@ -768,9 +768,9 @@ class FAU_CRIS {
                 return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['limit'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable'], $parameter['format']);
             }
-            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable'], $field = '', $parameter['format']);
         }
 
         // nothing
@@ -831,6 +831,7 @@ class FAU_CRIS {
             'items' => '',
             'limit' => '',
             'sortby' => '',
+            'format' => '',
             'award' => '',
             'awardnameid' => '',
             'type' => '',
@@ -882,6 +883,7 @@ class FAU_CRIS {
         $limit = ($limit != '' ? $limit : $items);
         $sc_param['limit'] = sanitize_text_field($limit);
         $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : '';
+        $sc_param['format'] = sanitize_text_field($format);
         $sc_param['showname'] = sanitize_text_field($showname);
         $sc_param['showyear'] = sanitize_text_field($showyear);
         $sc_param['showawardname'] = sanitize_text_field($showawardname);
