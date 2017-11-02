@@ -58,15 +58,9 @@ class Forschungsbereiche {
             return $output;
         }
         $hide = explode(',', $param['hide']);
-        if ($this->lang == 'en')
-            $order = $sortby . '_en';
-         else
-            $order = $sortby;
-
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+        $formatter = new CRIS_formatter(NULL, NULL, NULL, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
-        $fieldList = $res[$order];
-
+        $fieldList = $res[__('O.A.','fau-cris')];
         $output = '';
         $output .= $this->make_list($fieldList);
 
@@ -306,6 +300,8 @@ class Forschungsbereiche {
                 $page = get_page_by_title($title);
                 if ($page && !empty($page->guid)) {
                     $title = "<a href=\"" . $page->guid . "\">" . $title . "</a>";
+                } else {
+                    $title = "<a href=\"https://cris.fau.de/converis/publicweb/Forschungsbereich/" . $field['ID'] . "\">" . $title . "</a>";
                 }
             }
 
