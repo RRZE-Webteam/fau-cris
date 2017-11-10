@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.4.8
+ * Version: 3.5.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -740,6 +740,9 @@ class FAU_CRIS {
             if (strpos($parameter['order1'], 'year') !== false) {
                 return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role'], '', $parameter['current']);
             }
+            if (strpos($parameter['order1'], 'role') !== false) {
+                return $liste->projNachRolle($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role'], '', $parameter['current']);
+            }
             return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide'], $parameter['role'], $parameter['current']);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'awards') {
             // Awards
@@ -768,9 +771,9 @@ class FAU_CRIS {
                 return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['limit'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
+                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable'], $field = '', $parameter['format']);
             }
-            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
+            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable'], $field = '', $parameter['format']);
         }
 
         // nothing
@@ -831,6 +834,7 @@ class FAU_CRIS {
             'items' => '',
             'limit' => '',
             'sortby' => '',
+            'format' => '',
             'award' => '',
             'awardnameid' => '',
             'type' => '',
@@ -841,7 +845,7 @@ class FAU_CRIS {
             'display' => 'list',
             'project' => '',
             'hide' => '',
-            'role' => 'leader',
+            'role' => 'all',
             'patent' => '',
             'activity' => '',
             'field' => '',
@@ -882,6 +886,7 @@ class FAU_CRIS {
         $limit = ($limit != '' ? $limit : $items);
         $sc_param['limit'] = sanitize_text_field($limit);
         $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : '';
+        $sc_param['format'] = sanitize_text_field($format);
         $sc_param['showname'] = sanitize_text_field($showname);
         $sc_param['showyear'] = sanitize_text_field($showyear);
         $sc_param['showawardname'] = sanitize_text_field($showawardname);

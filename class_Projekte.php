@@ -50,7 +50,7 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($year = '', $start = '', $type = '', $limit = '', $hide = '', $role = 'leader', $current = '') {
+    public function projListe($year = '', $start = '', $type = '', $limit = '', $hide = '', $role = 'all', $current = '') {
         $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
@@ -75,6 +75,42 @@ class Projekte {
         return $output;
     }
 
+    /*
+     * Ausgabe aller Projekte nach Rolle (Leiter/Mitarbeit) gegliedert
+     */
+
+    public function projNachRolle($year = '', $start = '', $type = '', $hide = '', $role = 'all', $content = '', $current = '') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
+
+        if (!count($projArray)) {
+            $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
+            return $output;
+        }
+        $hide = explode(',', $hide);
+        foreach ($projArray as $id) {
+            if (strpos($id->attributes['relpersidlead'], $this->id) !== false) {
+                $id->attributes['role'] = 'leader';
+            } else if (strpos($id->attributes['relpersidcoll'], $this->id) !== false) {
+                $id->attributes['role'] = 'member';
+            }
+        }
+        // sortiere nach Rolle, innerhalb der Rolle nach Startdatum absteigend
+        $formatter = new CRIS_formatter("role", SORT_ASC, "cfstartdate", SORT_DESC);
+        $projList = $formatter->execute($projArray);
+
+        $output = '';
+        foreach ($projList as $array_role => $projects) {
+            $title = Tools::getTitle('projectroles', $array_role, get_locale());
+            $output .= '<h3>' . $title . '</h3>';
+            if ($content == '') {
+                $output .= $this->make_list($projects, $hide);
+            } else {
+                $output .= $this->make_custom_list($projects, $content);
+            }
+        }
+        return $output;
+    }
+    
     /*
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
@@ -207,7 +243,7 @@ class Projekte {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_projects($year = '', $start = '', $type = '', $role = 'leader', $current = '') {
+    private function fetch_projects($year = '', $start = '', $type = '', $role = 'all', $current = '') {
         $filter = Tools::project_filter($year, $start, $type, $current);
 
         $ws = new CRIS_projects();
@@ -775,7 +811,7 @@ class CRIS_projects extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null, $role = 'leader') {
+    public function by_pers_id($persID = null, &$filter = null, $role = 'all') {
         if ($persID === null || $persID === "0")
             throw new Exception('Please supply valid person ID');
 
@@ -786,7 +822,10 @@ class CRIS_projects extends CRIS_webservice {
         foreach ($persID as $_p) {
             if ($role == 'leader') {
                 $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
+            } elseif ($role == 'member') {
+                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
             } else {
+                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
                 $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
             }
         }
