@@ -76,6 +76,42 @@ class Projekte {
     }
 
     /*
+     * Ausgabe aller Projekte nach Rolle (Leiter/Mitarbeit) gegliedert
+     */
+
+    public function projNachRolle($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '', $current = '') {
+        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
+
+        if (!count($projArray)) {
+            $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
+            return $output;
+        }
+        $hide = explode(',', $hide);
+        foreach ($projArray as $id) {
+            if (strpos($id->attributes['relpersidlead'], $this->id) !== false) {
+                $id->attributes['role'] = 'leader';
+            } else if (strpos($id->attributes['relpersidcoll'], $this->id) !== false) {
+                $id->attributes['role'] = 'member';
+            }
+        }
+        // sortiere nach Rolle, innerhalb der Rolle nach Startdatum absteigend
+        $formatter = new CRIS_formatter("role", SORT_ASC, "cfstartdate", SORT_DESC);
+        $projList = $formatter->execute($projArray);
+
+        $output = '';
+        foreach ($projList as $array_role => $projects) {
+            $title = Tools::getTitle('projectroles', $array_role, get_locale());
+            $output .= '<h3>' . $title . '</h3>';
+            if ($content == '') {
+                $output .= $this->make_list($projects, $hide);
+            } else {
+                $output .= $this->make_custom_list($projects, $content);
+            }
+        }
+        return $output;
+    }
+    
+    /*
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
 
@@ -786,7 +822,10 @@ class CRIS_projects extends CRIS_webservice {
         foreach ($persID as $_p) {
             if ($role == 'leader') {
                 $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
+            } elseif ($role == 'member') {
+                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
             } else {
+                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
                 $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
             }
         }

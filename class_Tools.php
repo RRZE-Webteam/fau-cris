@@ -152,6 +152,9 @@ class Tools {
             case 'pubothersubtypes':
                 $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
+            case 'projectroles':
+                $search = CRIS_Dicts::$projectRoles;
+                break;
         }
         if (isset($search[$name][$lang]['title']))
             return $search[$name][$lang]['title'];

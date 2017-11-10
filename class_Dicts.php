@@ -617,4 +617,31 @@ class CRIS_Dicts {
             )        
         ),
     );    
+    
+    public static $projectRoles = array(
+        'leader' => array(
+            'order' => 1,
+            'short' => 'leader',
+            'de' => array(
+                'name' => 'Projektleiter',
+                'title' => 'Projektleitung'
+            ),
+            'en' => array(
+                'name' => 'Project leader',
+                'title' => 'Project Management'
+            )
+        ),
+        'member' => array(
+            'order' => 2,
+            'short' => 'member',
+            'de' => array(
+                'name' => 'Projektmitarbeiter',
+                'title' => 'Projektmitarbeit'
+            ),
+            'en' => array(
+                'name' => 'Project member',
+                'title' => 'Project Membership'
+            )
+        ),
+    );
 }
