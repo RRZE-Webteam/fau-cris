@@ -50,7 +50,7 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($year = '', $start = '', $type = '', $limit = '', $hide = '', $role = 'leader', $current = '') {
+    public function projListe($year = '', $start = '', $type = '', $limit = '', $hide = '', $role = 'all', $current = '') {
         $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
@@ -79,7 +79,7 @@ class Projekte {
      * Ausgabe aller Projekte nach Rolle (Leiter/Mitarbeit) gegliedert
      */
 
-    public function projNachRolle($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '', $current = '') {
+    public function projNachRolle($year = '', $start = '', $type = '', $hide = '', $role = 'all', $content = '', $current = '') {
         $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
 
         if (!count($projArray)) {
@@ -243,7 +243,7 @@ class Projekte {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_projects($year = '', $start = '', $type = '', $role = 'leader', $current = '') {
+    private function fetch_projects($year = '', $start = '', $type = '', $role = 'all', $current = '') {
         $filter = Tools::project_filter($year, $start, $type, $current);
 
         $ws = new CRIS_projects();
@@ -811,7 +811,7 @@ class CRIS_projects extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null, $role = 'leader') {
+    public function by_pers_id($persID = null, &$filter = null, $role = 'all') {
         if ($persID === null || $persID === "0")
             throw new Exception('Please supply valid person ID');
 

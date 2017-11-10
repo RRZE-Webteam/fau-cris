@@ -845,7 +845,7 @@ class FAU_CRIS {
             'display' => 'list',
             'project' => '',
             'hide' => '',
-            'role' => 'leader',
+            'role' => 'all',
             'patent' => '',
             'activity' => '',
             'field' => '',
