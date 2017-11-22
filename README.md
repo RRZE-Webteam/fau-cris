@@ -12,5 +12,9 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 - Patente
 - Forschungsaktivitäten
 
+## Benötigte PHP-Module
+
+* php-curl
+
 
 Detaillierte Dokumentation unter https://www.wordpress.rrze.fau.de/plugins/fau-cris/
