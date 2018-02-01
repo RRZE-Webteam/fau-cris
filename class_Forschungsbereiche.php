@@ -182,7 +182,8 @@ class Forschungsbereiche {
             $id = $field['ID'];
             $title = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
             $description = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
-
+            $description = strip_tags($description);
+            
             if (!in_array('title', $hide))
                 $singlefield .= "<h2>" . $title . "</h2>";
 
@@ -246,7 +247,8 @@ class Forschungsbereiche {
             $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
             $field_details['#title#'] = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
-            $field_details['#description#'] = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
+            $description = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
+            $field_details['#description#'] = strip_tags($description);
             $field_details['#projects#'] = $this->get_field_projects($id);
             $field_details['#persons#'] = '';
             $persons = $this->get_field_persons($id);
