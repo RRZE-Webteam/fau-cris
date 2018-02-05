@@ -856,6 +856,7 @@ class CRIS_projects extends CRIS_webservice {
         $requests = array();
         foreach ($fieldID as $_f) {
             $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_has_proj', $_f);
+            $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_fac_has_proj', $_f);
         }
         return $this->retrieve($requests);
     }
