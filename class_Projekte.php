@@ -30,7 +30,7 @@ class Projekte {
         if ($this->cms == 'wbk' && $this->cris_project_link == 'person') {
             $this->univis = Tools::get_univis();
         }
-        
+
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
             return;
@@ -110,7 +110,7 @@ class Projekte {
         }
         return $output;
     }
-    
+
     /*
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
@@ -361,7 +361,7 @@ class Projekte {
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a>');
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
                 $i = 1;
@@ -605,7 +605,7 @@ class Projekte {
             if (mb_strlen($description) > 500) {
                 $pos = strpos($description, ' ', 500);
                 $description = mb_substr($description, 0, $pos) . '&hellip;';
-            } 
+            }
             if (!empty($project['kurzbeschreibung'.$lang_key])) {
                 $description = $project['kurzbeschreibung'.$lang_key];
             }
