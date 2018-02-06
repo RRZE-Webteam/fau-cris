@@ -256,6 +256,8 @@ class Auszeichnungen {
                 $organisation = $award['award_organisation'];
             } elseif (!empty($award['award_organisation_manual'])) {
                 $organisation = $award['award_organisation_manual'];
+            } else {
+                $organisation = null;
             }
             $award_year = $award['year award'];
 
@@ -319,6 +321,8 @@ class Auszeichnungen {
                 $organisation = $award['award_organisation'];
             } elseif (!empty($award['award_organisation_manual'])) {
                 $organisation = $award['award_organisation_manual'];
+            } else {
+                $organisation = null;
             }
             $award_year = $award['year award'];
             $award_pic = self::get_pic($award['ID']);
