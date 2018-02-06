@@ -72,6 +72,8 @@ class FAU_CRIS {
         add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2 );
         add_action('cris_auto_update', array(__CLASS__, 'cris_auto_sync'));
 
+        add_action('wp_head', array(__CLASS__, 'cris_customize_css'));
+
     }
 
     /**
@@ -978,8 +980,8 @@ class FAU_CRIS {
         $plugin_url = plugin_dir_url(__FILE__);
         if ($post && has_shortcode($post->post_content, 'cris')
                 || $post && has_shortcode($post->post_content, 'cris-custom')) {
-            wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
-            wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array ( 'jquery' ));
+            wp_enqueue_style('cris', plugins_url('css/cris.css', __FILE__), array(), self::version);
+            wp_enqueue_script('cris', plugins_url('js/cris.js', __FILE__), array(), self::version);
         }
     }
 
@@ -1084,6 +1086,42 @@ class FAU_CRIS {
             $screen->add_help_tab($helptext);
         }
         //$screen->set_help_sidebar($help_sidebar);
+    }
+
+    public static function cris_customize_css() {
+
+        $css_content = 'Forschungsbereiche';
+        if (strpos(get_locale(), 'de') === 0) {
+            $css_content = 'Forschungsbereiche';
+        } else {
+            $css_content = 'Research Areas';
+        }
+        ?>
+        <style type="text/css">
+            #nav .level2 li.cris-last {
+                border-bottom: 1px solid #aaa;
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
+
+            #nav .level2 li.cris-first {
+                border-top: 1px solid #aaa;
+                padding-top: 10px;
+            }
+
+            #nav .level2 li.cris-first:before {
+                content: '<?php echo $css_content; ?>';
+                display:block;
+                color: #fff;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            #nav .level2 li.cris-last a {
+                border-bottom-color: transparent;
+            }
+        </style>
+        <?php
     }
 
 }
