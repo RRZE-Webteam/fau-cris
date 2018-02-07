@@ -60,7 +60,10 @@ class Forschungsbereiche {
         $hide = explode(',', $param['hide']);
         $formatter = new CRIS_formatter(NULL, NULL, NULL, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
-        $fieldList = $res[__('O.A.','fau-cris')];
+        if ($param['limit'] != '')
+            $fieldList = array_slice($res[__('O.A.','fau-cris')], 0, $param['limit']);
+        else
+            $fieldList = $res[__('O.A.','fau-cris')];
         $output = '';
         $output .= $this->make_list($fieldList);
 

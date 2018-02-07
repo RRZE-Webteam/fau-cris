@@ -760,7 +760,7 @@ class FAU_CRIS {
             if (strpos($parameter['order1'], 'year') !== false) {
                 return $liste->awardsNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], 0, $parameter['showawardname'], $parameter['display'], $parameter['order2']);
             }
-            return $liste->awardsListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display']);
+            return $liste->awardsListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display'], $parameter['limit']);
         } else {
             // Publications
             require_once('class_Publikationen.php');

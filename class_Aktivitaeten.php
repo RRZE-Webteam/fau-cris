@@ -61,7 +61,10 @@ class Aktivitaeten {
         $order = "sortdate";
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($activityArray);
-        $activityList = $res[$order];
+        if ($limit != '')
+            $activityList = array_slice($res[$order], 0, $limit);
+        else
+            $activityList = $res[$order];
 
         $output = $this->make_list($activityList, $showname, $showyear, $showactivityname);
 

@@ -49,7 +49,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen ohne Gliederung
      */
 
-    public function awardsListe($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 1, $showawardname = 1, $display = 'list') {
+    public function awardsListe($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 1, $showawardname = 1, $display = 'list', $limit='') {
         $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
 
         if (!count($awardArray)) {
@@ -60,8 +60,11 @@ class Auszeichnungen {
         $order = "year award";
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($awardArray);
-        $awardList = $res[$order];
-
+        if ($limit != '')
+            $awardList = array_slice($res[$order], 0, $limit);
+        else
+            $awardList = $res[$order];
+        
         $output = '';
 
         if ($display == 'gallery') {
