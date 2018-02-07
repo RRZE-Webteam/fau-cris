@@ -230,6 +230,16 @@ class CRIS_Dicts {
                 'name' => 'Own Funds',
                 'title' => 'Own Funds')
         ),
+        'Fremdprojekt' => array(
+            'order' => 5,
+            'short' => 'fremdprojekt',
+            'de' => array(
+                'name' => 'FAU-externes Projekt',
+                'title' => 'FAU-externe Projekte'),
+            'en'  => array(
+                'name' => 'Non-FAU Project',
+                'title' => 'Non-FAU Projects')
+        ),
     );
 
     public static $patents = array(
@@ -518,7 +528,7 @@ class CRIS_Dicts {
             )
         ),
     );
-    
+
     public static $pubThesisSubtypes = array(
         'Habilitationsschrift' => array(
             'order' => 1,
@@ -614,10 +624,10 @@ class CRIS_Dicts {
             'en' => array(
                 'name' => 'Mid-study thesis',
                 'title' => 'Mid-study Theses'
-            )        
+            )
         ),
-    );    
-    
+    );
+
     public static $projectRoles = array(
         'leader' => array(
             'order' => 1,
