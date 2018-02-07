@@ -554,24 +554,7 @@ class Projekte {
                         . '</div>';
             }
             if (!in_array('link', $hide) && !empty($id)) {
-                $link = "https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1');
-                if ($this->cms == 'wp') {
-                    $proj_pages = get_pages(array('child_of' => $post->ID, 'post_status' => 'publish'));
-                    $page_proj = array();
-                    foreach ($proj_pages as $proj_page) {
-                        if ($proj_page->post_title == $title && !empty($proj_page->guid)) {
-                            $page_proj[] = $proj_page;
-                        }
-                    }
-                    if (count($page_proj)) {
-                        $link = $page_proj[0]->guid;
-                    } else {
-                        $page = get_page_by_title($title);
-                        if ($page && !empty($page->guid)) {
-                            $link = $page->guid;
-                        }
-                    }
-                }
+                $link = Tools::get_item_url("project", $title, $id, $post->ID, $lang);
                 $projlist .= "<div>" . "<a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> &#8594; </div>";
             }
             $projlist .= "</li>";
@@ -617,24 +600,7 @@ class Projekte {
                 $projlist .= "<p class=\"abstract\">" . $description . '</p>';
             }
             if (!in_array('link', $hide) && !empty($id))
-                $link = "https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1');
-                if ($this->cms == 'wp') {
-                    $proj_pages = get_pages(array('child_of' => $post->ID, 'post_status' => 'publish'));
-                    $page_proj = array();
-                    foreach ($proj_pages as $proj_page) {
-                        if ($proj_page->post_title == $title && !empty($proj_page->guid)) {
-                            $page_proj[] = $proj_page;
-                        }
-                    }
-                    if (count($page_proj)) {
-                        $link = $page_proj[0]->guid;
-                    } else {
-                        $page = get_page_by_title($title);
-                        if ($page && !empty($page->guid)) {
-                            $link = $page->guid;
-                        }
-                    }
-                }
+                $link = Tools::get_item_url("project", $title, $id, $post->ID, $lang);
                 $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
             $projlist .= "[/collapse]";
         }

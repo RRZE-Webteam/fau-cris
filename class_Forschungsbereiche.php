@@ -301,14 +301,8 @@ class Forschungsbereiche {
 
             $title = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
 
-            if ($this->cms == 'wp') {
-                $page = get_page_by_title($title);
-                if ($page && !empty($page->guid)) {
-                    $title = "<a href=\"" . $page->guid . "\">" . $title . "</a>";
-                } else {
-                    $title = "<a href=\"https://cris.fau.de/converis/publicweb/Forschungsbereich/" . $field['ID'] . "\">" . $title . "</a>";
-                }
-            }
+            global $post;
+            $title = "<a href=\"" . Tools::get_item_url("forschungsbereich", $title, $field['ID'], $post->ID) . "\">" . $title . "</a>";
 
             $fieldslist .= "<li>" . $title . "</li>";
         }

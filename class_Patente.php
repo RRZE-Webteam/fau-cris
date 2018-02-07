@@ -203,6 +203,7 @@ class Patente {
      */
 
     private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1) {
+        global $post;
         $patentlist = "<ul class=\"cris-patents\">";
 
         foreach ($patents as $patent) {
@@ -245,7 +246,7 @@ class Patente {
             $patentlist .= "<li>";
 
             if (!empty($patent_name))
-                $patentlist .= "<strong><a href=\"https://cris.fau.de/converis/publicweb/cfrespat/" . $patent_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
+                $patentlist .= "<strong><a href=\"" . Tools::get_item_url("cfrespat", $patent_name, $patent_id, $post->ID) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
             if (!empty($patent_type) || !empty($patent_number))
                 $patentlist .= " (";
             if (!empty($patent_type) & $showtype != 0)

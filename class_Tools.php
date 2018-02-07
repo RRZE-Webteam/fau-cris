@@ -606,7 +606,7 @@ class Tools {
         switch ($target) {
             case 'cris' :
                 if (is_numeric($id)) {
-                    $link_pre = "<a href=\"https://cris.fau.de/converis/publicweb/Person/" . $id . "\" class=\"extern\">";
+                    $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "Person/" . $id . "\" class=\"extern\">";
                     $link_post = "</a>";
                 } else {
                     $link_pre = '';
@@ -666,6 +666,23 @@ class Tools {
             $date = __('bis', 'fau-cris') . " " . $end;
         }
         return $date;
+    }
+
+    public static function get_item_url($item, $title, $cris_id, $page_id = '', $lang = 'de') {
+        // First search in subpages
+        $pages = get_pages(array('child_of' => $page_id, 'post_status' => 'publish'));
+        foreach ($pages as $page) {
+            if ($page->post_title == $title && !empty($page->guid)) {
+                return get_permalink($page->ID);
+            }
+        }
+        // No subpage -> search all pages
+        $page = get_page_by_title($title);
+        if ($page && !empty($page->ID)) {
+            return get_permalink($page->ID);
+        } else {
+            return FAU_CRIS::cris_publicweb . $item . "/" . $cris_id . ($lang == 'de' ? '?lang=2' : '?lang=1');
+        }
     }
 
     public static function numeric_xml_encode($text, $double_encode=true){
