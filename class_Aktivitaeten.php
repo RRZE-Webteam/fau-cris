@@ -61,7 +61,10 @@ class Aktivitaeten {
         $order = "sortdate";
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($activityArray);
-        $activityList = $res[$order];
+        if ($limit != '')
+            $activityList = array_slice($res[$order], 0, $limit);
+        else
+            $activityList = $res[$order];
 
         $output = $this->make_list($activityList, $showname, $showyear, $showactivityname);
 
@@ -376,7 +379,8 @@ class Aktivitaeten {
             if (!empty($activity_type) & $showtype != 0)
                 $activitylist .= $activity_type;
             if (!empty($activity_name))
-                $activitylist .= " <strong><a href=\"https://cris.fau.de/converis/publicweb/activity/" . $activity_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
+                global $post;
+                $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
             if (!empty($activity_detail))
                 $activitylist .= " (" . $activity_detail . ")";
             if (!empty($activity_date))

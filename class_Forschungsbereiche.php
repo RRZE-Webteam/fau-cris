@@ -60,7 +60,10 @@ class Forschungsbereiche {
         $hide = explode(',', $param['hide']);
         $formatter = new CRIS_formatter(NULL, NULL, NULL, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
-        $fieldList = $res[__('O.A.','fau-cris')];
+        if ($param['limit'] != '')
+            $fieldList = array_slice($res[__('O.A.','fau-cris')], 0, $param['limit']);
+        else
+            $fieldList = $res[__('O.A.','fau-cris')];
         $output = '';
         $output .= $this->make_list($fieldList);
 
@@ -182,8 +185,8 @@ class Forschungsbereiche {
             $id = $field['ID'];
             $title = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
             $description = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
-            $description = strip_tags($description);
-            
+            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+
             if (!in_array('title', $hide))
                 $singlefield .= "<h2>" . $title . "</h2>";
 
@@ -248,7 +251,7 @@ class Forschungsbereiche {
             $id = $field['ID'];
             $field_details['#title#'] = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
             $description = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
-            $field_details['#description#'] = strip_tags($description);
+            $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = $this->get_field_projects($id);
             $field_details['#persons#'] = '';
             $persons = $this->get_field_persons($id);
@@ -298,14 +301,8 @@ class Forschungsbereiche {
 
             $title = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
 
-            if ($this->cms == 'wp') {
-                $page = get_page_by_title($title);
-                if ($page && !empty($page->guid)) {
-                    $title = "<a href=\"" . $page->guid . "\">" . $title . "</a>";
-                } else {
-                    $title = "<a href=\"https://cris.fau.de/converis/publicweb/Forschungsbereich/" . $field['ID'] . "\">" . $title . "</a>";
-                }
-            }
+            global $post;
+            $title = "<a href=\"" . Tools::get_item_url("forschungsbereich", $title, $field['ID'], $post->ID) . "\">" . $title . "</a>";
 
             $fieldslist .= "<li>" . $title . "</li>";
         }

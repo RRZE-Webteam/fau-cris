@@ -50,7 +50,7 @@ class Patente {
      * Ausgabe aller Patente ohne Gliederung
      */
 
-    public function patListe($year = '', $start = '', $type = '', $showname = 1, $showyear = 1, $showpatentname = 1) {
+    public function patListe($year = '', $start = '', $type = '', $limit = '', $hide = '', $showname = 1, $showyear = 1, $showpatentname = 1) {
         $patentArray = $this->fetch_patents($year, $start, $type);
 
         if (!count($patentArray)) {
@@ -61,7 +61,10 @@ class Patente {
         $order = "year patent";
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($patentArray);
-        $patentList = $res[$order];
+        if ($limit != '')
+            $patentList = array_slice($res[$order], 0, $limit);
+        else
+            $patentList = $res[$order];
 
         $output = $this->make_list($patentList, $showname, $showyear, $showpatentname);
 
@@ -72,7 +75,7 @@ class Patente {
      * Ausgabe aller Patente nach Jahren gegliedert
      */
 
-    public function patNachJahr($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
+    public function patNachJahr($year = '', $start = '', $type = '', $hide='', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
         $patentArray = $this->fetch_patents($year, $start, $type);
 
         if (!count($patentArray)) {
@@ -105,7 +108,7 @@ class Patente {
      * Ausgabe aller Patente nach Patenttypen gegliedert
      */
 
-    public function patNachTyp($year = '', $start = '', $type = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
+    public function patNachTyp($year = '', $start = '', $type = '', $hide = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
         $patentArray = $this->fetch_patents($year, $start, $type);
 
         if (!count($patentArray)) {
@@ -149,7 +152,7 @@ class Patente {
      * Ausgabe eines einzelnen Patents
      */
 
-    public function singlePatent($showname = 1, $showyear = 0, $showpatentname = 1) {
+    public function singlePatent($hide = '', $showname = 1, $showyear = 0, $showpatentname = 1) {
         $ws = new CRIS_patents();
 
         try {
@@ -200,6 +203,7 @@ class Patente {
      */
 
     private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1) {
+        global $post;
         $patentlist = "<ul class=\"cris-patents\">";
 
         foreach ($patents as $patent) {
@@ -242,7 +246,7 @@ class Patente {
             $patentlist .= "<li>";
 
             if (!empty($patent_name))
-                $patentlist .= "<strong><a href=\"https://cris.fau.de/converis/publicweb/cfrespat/" . $patent_id . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
+                $patentlist .= "<strong><a href=\"" . Tools::get_item_url("cfrespat", $patent_name, $patent_id, $post->ID) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
             if (!empty($patent_type) || !empty($patent_number))
                 $patentlist .= " (";
             if (!empty($patent_type) & $showtype != 0)

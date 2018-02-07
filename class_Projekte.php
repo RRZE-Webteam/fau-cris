@@ -30,7 +30,7 @@ class Projekte {
         if ($this->cms == 'wbk' && $this->cris_project_link == 'person') {
             $this->univis = Tools::get_univis();
         }
-        
+
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
             return;
@@ -110,7 +110,7 @@ class Projekte {
         }
         return $output;
     }
-    
+
     /*
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
@@ -361,7 +361,7 @@ class Projekte {
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a>');
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
                 $i = 1;
@@ -554,24 +554,7 @@ class Projekte {
                         . '</div>';
             }
             if (!in_array('link', $hide) && !empty($id)) {
-                $link = "https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1');
-                if ($this->cms == 'wp') {
-                    $proj_pages = get_pages(array('child_of' => $post->ID, 'post_status' => 'publish'));
-                    $page_proj = array();
-                    foreach ($proj_pages as $proj_page) {
-                        if ($proj_page->post_title == $title && !empty($proj_page->guid)) {
-                            $page_proj[] = $proj_page;
-                        }
-                    }
-                    if (count($page_proj)) {
-                        $link = $page_proj[0]->guid;
-                    } else {
-                        $page = get_page_by_title($title);
-                        if ($page && !empty($page->guid)) {
-                            $link = $page->guid;
-                        }
-                    }
-                }
+                $link = Tools::get_item_url("project", $title, $id, $post->ID, $lang);
                 $projlist .= "<div>" . "<a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> &#8594; </div>";
             }
             $projlist .= "</li>";
@@ -599,13 +582,14 @@ class Projekte {
             $id = $project['ID'];
             $acronym = $project['cfacro'];
             $title = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+            $title = htmlentities($title, ENT_QUOTES);
             $type = Tools::getName('projects', $project['project type'], get_locale());
             $description = $project['cfabstr'.$lang_key];
             $description = strip_tags($description, '<br><br/><a>');
             if (mb_strlen($description) > 500) {
                 $pos = strpos($description, ' ', 500);
                 $description = mb_substr($description, 0, $pos) . '&hellip;';
-            } 
+            }
             if (!empty($project['kurzbeschreibung'.$lang_key])) {
                 $description = $project['kurzbeschreibung'.$lang_key];
             }
@@ -616,24 +600,7 @@ class Projekte {
                 $projlist .= "<p class=\"abstract\">" . $description . '</p>';
             }
             if (!in_array('link', $hide) && !empty($id))
-                $link = "https://cris.fau.de/converis/publicweb/Project/" . $id . ($lang == 'de' ? '?lang=2' : '?lang=1');
-                if ($this->cms == 'wp') {
-                    $proj_pages = get_pages(array('child_of' => $post->ID, 'post_status' => 'publish'));
-                    $page_proj = array();
-                    foreach ($proj_pages as $proj_page) {
-                        if ($proj_page->post_title == $title && !empty($proj_page->guid)) {
-                            $page_proj[] = $proj_page;
-                        }
-                    }
-                    if (count($page_proj)) {
-                        $link = $page_proj[0]->guid;
-                    } else {
-                        $page = get_page_by_title($title);
-                        if ($page && !empty($page->guid)) {
-                            $link = $page->guid;
-                        }
-                    }
-                }
+                $link = Tools::get_item_url("project", $title, $id, $post->ID, $lang);
                 $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
             $projlist .= "[/collapse]";
         }
@@ -807,6 +774,7 @@ class CRIS_projects extends CRIS_webservice {
         $requests = array();
         foreach ($orgaID as $_o) {
             $requests[] = sprintf("getautorelated/Organisation/%d/ORGA_2_PROJ_1", $_o);
+            $requests[] = sprintf("getrelated/Organisation/%d/PROJ_has_int_ORGA", $_o);
         }
         return $this->retrieve($requests, $filter);
     }
@@ -856,6 +824,7 @@ class CRIS_projects extends CRIS_webservice {
         $requests = array();
         foreach ($fieldID as $_f) {
             $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_has_proj', $_f);
+            $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_fac_has_proj', $_f);
         }
         return $this->retrieve($requests);
     }

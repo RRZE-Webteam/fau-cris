@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.5.1
+ * Version: 3.6.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -44,6 +44,7 @@ class FAU_CRIS {
     const textdomain = 'fau-cris';
     const php_version = '5.3'; // Minimal erforderliche PHP-Version
     const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
+    const cris_publicweb = 'https://cris.fau.de/converis/publicweb/';
 
     protected static $instance = null;
     private static $cris_option_page = null;
@@ -71,6 +72,8 @@ class FAU_CRIS {
 
         add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2 );
         add_action('cris_auto_update', array(__CLASS__, 'cris_auto_sync'));
+
+        add_action('wp_head', array(__CLASS__, 'cris_customize_css'));
 
     }
 
@@ -758,7 +761,7 @@ class FAU_CRIS {
             if (strpos($parameter['order1'], 'year') !== false) {
                 return $liste->awardsNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], 0, $parameter['showawardname'], $parameter['display'], $parameter['order2']);
             }
-            return $liste->awardsListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display']);
+            return $liste->awardsListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display'], $parameter['limit']);
         } else {
             // Publications
             require_once('class_Publikationen.php');
@@ -978,8 +981,8 @@ class FAU_CRIS {
         $plugin_url = plugin_dir_url(__FILE__);
         if ($post && has_shortcode($post->post_content, 'cris')
                 || $post && has_shortcode($post->post_content, 'cris-custom')) {
-            wp_enqueue_style('cris', $plugin_url . 'css/cris.css');
-            wp_enqueue_script('cris', $plugin_url . 'js/cris.js', array ( 'jquery' ));
+            wp_enqueue_style('cris', plugins_url('css/cris.css', __FILE__), array(), self::version);
+            wp_enqueue_script('cris', plugins_url('js/cris.js', __FILE__), array(), self::version);
         }
     }
 
@@ -1038,7 +1041,7 @@ class FAU_CRIS {
             . '<li>' . __('Auszeichnungen', 'fau-cris') . '</li>'
             . '</ul>'
             . '<p>' . __('Über den Shortcode lassen sich jeweils verschiedene Ausgabeformate einstellen.', 'fau-cris') . '</p>'
-            . '<p>' . __('<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. http://cris.fau.de/converis/publicweb/Organisation/<strong><em>141517</em></strong>.', 'fau-cris') . '</p>'
+            . '<p>' . __('<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. ' . FAU_CRIS::cris_publicweb . 'Organisation/<strong><em>141517</em></strong>.', 'fau-cris') . '</p>'
         );
 
         $content_shortcode_publikationen = array(
@@ -1084,6 +1087,42 @@ class FAU_CRIS {
             $screen->add_help_tab($helptext);
         }
         //$screen->set_help_sidebar($help_sidebar);
+    }
+
+    public static function cris_customize_css() {
+
+        $css_content = 'Forschungsbereiche';
+        if (strpos(get_locale(), 'de') === 0) {
+            $css_content = 'Forschungsbereiche';
+        } else {
+            $css_content = 'Research Areas';
+        }
+        ?>
+        <style type="text/css">
+            #nav .level2 li.cris-last {
+                border-bottom: 1px solid #aaa;
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
+
+            #nav .level2 li.cris-first {
+                border-top: 1px solid #aaa;
+                padding-top: 10px;
+            }
+
+            #nav .level2 li.cris-first:before {
+                content: '<?php echo $css_content; ?>';
+                display:block;
+                color: #fff;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            #nav .level2 li.cris-last a {
+                border-bottom-color: transparent;
+            }
+        </style>
+        <?php
     }
 
 }
