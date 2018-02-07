@@ -599,7 +599,7 @@ class Projekte {
             $id = $project['ID'];
             $acronym = $project['cfacro'];
             $title = ($lang == 'en' && !empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
-            $title = str_replace("\"", "&quot;",$title);
+            $title = htmlentities($title, ENT_QUOTES);
             $type = Tools::getName('projects', $project['project type'], get_locale());
             $description = $project['cfabstr'.$lang_key];
             $description = strip_tags($description, '<br><br/><a>');
