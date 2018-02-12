@@ -183,8 +183,18 @@ class Forschungsbereiche {
             unset($field['attributes']);
             $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
-            $title = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
-            $description = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
+            switch ($lang) {
+                case 'en':
+                    $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
+                    $description = (!empty($field['description_en'])) ? $field['description_en'] : $field['description'];
+                    break;
+                case 'de':
+                default:
+                    $title = (!empty($field['cfname'])) ? $field['cfname'] : $field['cfname_en'];
+                    $description = (!empty($field['description'])) ? $field['description'] : $field['description_en'];
+                    break;
+            }
+            $title = htmlentities($title, ENT_QUOTES);
             $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
 
             if (!in_array('title', $hide))
@@ -249,8 +259,18 @@ class Forschungsbereiche {
             unset($field['attributes']);
             $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
-            $field_details['#title#'] = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
-            $description = ($lang == 'en' && !empty($field['description_en'])) ? $field['description_en'] : $field['description'];
+            switch ($lang) {
+                case 'en':
+                    $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
+                    $description = (!empty($field['description_en'])) ? $field['description_en'] : $field['description'];
+                    break;
+                case 'de':
+                default:
+                    $title = (!empty($field['cfname'])) ? $field['cfname'] : $field['cfname_en'];
+                    $description = (!empty($field['description'])) ? $field['description'] : $field['description_en'];
+                    break;
+            }
+            $field_details['#title#'] = htmlentities($title, ENT_QUOTES);
             $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = $this->get_field_projects($id);
             $field_details['#persons#'] = '';
@@ -298,9 +318,16 @@ class Forschungsbereiche {
                 $field[$attribut] = $v;
             }
             unset($field['attributes']);
-
-            $title = ($lang == 'en' && !empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
-
+            switch ($lang) {
+                case 'en':
+                    $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
+                    break;
+                case 'de':
+                default:
+                    $title = (!empty($field['cfname'])) ? $field['cfname'] : $field['cfname_en'];
+                    break;
+            }
+            $title = htmlentities($title, ENT_QUOTES);
             global $post;
             $title = "<a href=\"" . Tools::get_item_url("forschungsbereich", $title, $field['ID'], $post->ID) . "\">" . $title . "</a>";
 

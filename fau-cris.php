@@ -2,13 +2,13 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.6.0
+ * Version: 3.6.1
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
  * Domain Path: /languages
  * Requires at least: 3.9.2
- * Tested up to: 4.8
+ * Tested up to: 4.9.4
  * License: GPLv2 or later
  * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris
  * GitHub Branch: master
@@ -45,6 +45,7 @@ class FAU_CRIS {
     const php_version = '5.3'; // Minimal erforderliche PHP-Version
     const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
     const cris_publicweb = 'https://cris.fau.de/converis/publicweb/';
+    const doi = 'http://dx.doi.org/';
 
     protected static $instance = null;
     private static $cris_option_page = null;
