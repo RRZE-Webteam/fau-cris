@@ -11,6 +11,7 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 - Projekte
 - Patente
 - Forschungsaktivitäten
+- Forschungsbereiche
 
 ## Benötigte PHP-Module
 
