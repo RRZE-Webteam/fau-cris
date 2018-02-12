@@ -812,7 +812,7 @@ class CRIS_publication extends CRIS_Entity {
         $doilink = preg_quote("https://dx.doi.org/", "/");
         $title = preg_quote(Tools::numeric_xml_encode($this->attributes["cftitle"]), "/");
 
-        $cristmpl = '<a href=' . FAU_CRIS::cris_publicweb . '%d" target="_blank">%s</a>';
+        $cristmpl = '<a href="' . FAU_CRIS::cris_publicweb . 'publication/%d" target="_blank">%s</a>';
 
         $apa = $this->attributes["quotationapa"];
         $mla = $this->attributes["quotationmla"];
@@ -849,7 +849,6 @@ class CRIS_publication extends CRIS_Entity {
 
         $this->attributes["quotationmlalink"] = $mlalink;
     }
-
 }
 
 # tests possible if called on command-line
