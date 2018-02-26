@@ -17,12 +17,11 @@ ul.cris-gallery {
 ul.cris-gallery li {
     float: left;
     width: 200px;
-    margin: 0 10px 10px 0;
+    padding: 0 10px 10px 0;
     font-size: 1em;
     list-style-type: none;
     min-height: 245px;
     background: none;
-    padding:0;
 }
 ul.cris-gallery li p {
     font-size: 1em;

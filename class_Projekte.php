@@ -286,14 +286,17 @@ class Projekte {
 
             switch ($lang) {
                 case 'en':
-                    $proj_details['#title#'] = (!empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+                    $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
+                    $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
                     break;
                 case 'de':
                 default:
-                    $proj_details['#title#'] = (!empty($project['cftitle'])) ? $project['cftitle'] : $project['cftitle_en'];
+                    $title = ($project['cftitle'] != '') ? $project['cftitle'] : $project['cftitle_en'];
+                    $description = ($project['cfabstr'] != '') ? $project['cfabstr'] : $project['cfabstr_en'];
                     break;
             }
-            $proj_details['#title#'] = htmlentities($proj_details['#title#'], ENT_QUOTES);
+            $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], get_locale());
             $proj_details['#parentprojecttitle#'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $leaderIDs = explode(",", $project['relpersidlead']);
@@ -319,7 +322,6 @@ class Projekte {
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#publications#'] = $this->get_project_publications($id, $quotation);
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
@@ -359,14 +361,17 @@ class Projekte {
             $proj_details = array();
             switch ($lang) {
                 case 'en':
-                    $proj_details['#title#'] = (!empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+                    $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
+                    $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
                     break;
                 case 'de':
                 default:
-                    $proj_details['#title#'] = (!empty($project['cftitle'])) ? $project['cftitle'] : $project['cftitle_en'];
+                    $title = ($project['cftitle'] != '') ? $project['cftitle'] : $project['cftitle_en'];
+                    $description = ($project['cfabstr'] != '') ? $project['cfabstr'] : $project['cfabstr_en'];
                     break;
             }
-            $proj_details['#title#'] = htmlentities($proj_details['#title#'], ENT_QUOTES);
+            $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
+            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], get_locale());
             $proj_details['#parentprojecttitle#'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             setlocale(LC_TIME, get_locale());
@@ -379,7 +384,6 @@ class Projekte {
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
                 $i = 1;
@@ -418,14 +422,17 @@ class Projekte {
             $id = $project['ID'];
             switch ($lang) {
                 case 'en':
-                    $title = (!empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+                    $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
+                    $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
                     break;
                 case 'de':
                 default:
-                    $title = (!empty($project['cftitle'])) ? $project['cftitle'] : $project['cftitle_en'];
+                    $title = ($project['cftitle'] != '') ? $project['cftitle'] : $project['cftitle_en'];
+                    $description = ($project['cfabstr'] != '') ? $project['cfabstr'] : $project['cfabstr_en'];
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
+            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $type = Tools::getName('projects', $project['project type'], get_locale());
             $imgs = self::get_project_images($project['ID']);
 
@@ -496,8 +503,6 @@ class Projekte {
             }
 
             if (!in_array('abstract', $hide)) {
-                $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-                $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
                 if ($description)
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
             }
@@ -528,14 +533,17 @@ class Projekte {
             $id = $project['ID'];
             switch ($lang) {
                 case 'en':
-                    $title = (!empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+                    $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
+                    $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
                     break;
                 case 'de':
                 default:
-                    $title = (!empty($project['cftitle'])) ? $project['cftitle'] : $project['cftitle_en'];
+                    $title = ($project['cftitle'] != '') ? $project['cftitle'] : $project['cftitle_en'];
+                    $description = ($project['cfabstr'] != '') ? $project['cfabstr'] : $project['cfabstr_en'];
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
+            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $type = Tools::getName('projects', $project['project type'], get_locale());
 
             $projlist .= "<li>";
@@ -581,9 +589,6 @@ class Projekte {
             }
 
             if (!in_array('abstract', $hide) && !empty($description)) {
-                $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-                $description = strip_tags($description, '<br><br/><a>');
-
                 $projlist .= "<div>"
                         . "<div class=\"abstract-title\"><a title=\"" . __('Abstract anzeigen', 'fau-cris') . "\">" . __('Abstract', 'fau-cris') . "</a> </div>"
                         . "<div class=\"abstract\">" . $description . '</div>'
@@ -619,17 +624,17 @@ class Projekte {
             $acronym = $project['cfacro'];
             switch ($lang) {
                 case 'en':
-                    $title = (!empty($project['cftitle_en'])) ? $project['cftitle_en'] : $project['cftitle'];
+                    $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
+                    $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
                     break;
                 case 'de':
                 default:
-                    $title = (!empty($project['cftitle'])) ? $project['cftitle'] : $project['cftitle_en'];
+                    $title = ($project['cftitle'] != '') ? $project['cftitle'] : $project['cftitle_en'];
+                    $description = ($project['cfabstr'] != '') ? $project['cfabstr'] : $project['cfabstr_en'];
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
-            $type = Tools::getName('projects', $project['project type'], get_locale());
-            $description = $project['cfabstr'.$lang_key];
-            $description = strip_tags($description, '<br><br/><a>');
+            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             if (mb_strlen($description) > 500) {
                 $pos = strpos($description, ' ', 500);
                 $description = mb_substr($description, 0, $pos) . '&hellip;';
@@ -637,6 +642,7 @@ class Projekte {
             if (!empty($project['kurzbeschreibung'.$lang_key])) {
                 $description = $project['kurzbeschreibung'.$lang_key];
             }
+            $type = Tools::getName('projects', $project['project type'], get_locale());
 
 
             $projlist .= "[collapse title=\"" . ((!empty($acronym)) ? $acronym . ": " : "") . $title . "\"]";
