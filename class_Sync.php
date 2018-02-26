@@ -26,7 +26,7 @@ class Sync {
             return;
         }
         $this->message = __('Synchronisierung abgeschlossen:', 'fau-cris') . '<ul style="list-style-type: disc; padding-left: 40px;">';
-        $lang = ($this->lang == 'en') ? '_en' : '';
+        $lang = ($this->lang == 'en') ? 'en' : '';
         $pages = array();
         $this->menu_position = $this->menu_position_start;
         $this->num_created_p = 0;
@@ -221,7 +221,16 @@ class Sync {
                 } else {
                     $field_content = "[cris show=fields field=$field->ID hide=\"title\"]";
                 }
-                $pages[$field->ID]['title'] = $field->attributes['cfname'.$lang];
+                switch ($lang) {
+                    case 'en':
+                        $field_title = ($field->attributes['cfname_en'] != '') ? $field->attributes['cfname_en'] : $field->attributes['cfname'];
+                        break;
+                    case 'de':
+                    default:
+                        $field_title = ($field->attributes['cfname'] !='') ? $field->attributes['cfname'] : $field->attributes['cfname_en'];
+                        break;
+                }
+                $pages[$field->ID]['title'] = htmlentities($field_title, ENT_QUOTES);
                 $pages[$field->ID]['position'] = $this->menu_position;
                 $pages[$field->ID]['content'] = $field_content;
                 $pages[$field->ID]['contact'] = $fcids;
@@ -252,7 +261,17 @@ class Sync {
                     } else {
                         $proj_content = "[cris show=projects project=$project->ID]";
                     }
-                    $pages[$field->ID]['projects'][$project->ID]['title'] = str_replace('"', '&quot;',$project->attributes['cftitle'.$lang]);
+                    switch ($lang) {
+                        case 'en':
+                            $proj_title = ($project->attributes['cftitle_en'] != '') ? $project->attributes['cftitle_en'] : $project->attributes['cftitle'];
+                            break;
+                        case 'de':
+                        default:
+                            $proj_title = ($project->attributes['cftitle'] !='') ? $project->attributes['cftitle'] : $project->attributes['cftitle_en'];
+                            break;
+                    }
+                    $pages[$field->ID]['projects'][$project->ID]['title'] = htmlentities($proj_title, ENT_QUOTES);
+
                     $pages[$field->ID]['projects'][$project->ID]['position'] = $this->menu_position;
                     $pages[$field->ID]['projects'][$project->ID]['content'] = $proj_content;
                     $pages[$field->ID]['projects'][$project->ID]['contact'] = array();
@@ -304,7 +323,16 @@ class Sync {
             } else {
                 $nf_proj_content = "[cris show=projects project=$a_p->ID]";
             }
-            $orga_projects[$a_p->ID]['title'] = $a_p->attributes['cftitle'.$lang];
+            switch ($lang) {
+                case 'en':
+                    $a_proj_title = ($a_p->attributes['cftitle_en'] != '') ? $a_p->attributes['cftitle_en'] : $a_p->attributes['cftitle'];
+                    break;
+                case 'de':
+                default:
+                    $a_proj_title = ($a_p->attributes['cftitle'] !='') ? $a_p->attributes['cftitle'] : $a_p->attributes['cftitle_en'];
+                    break;
+            }
+            $orga_projects[$a_p->ID]['title'] = htmlentities($a_proj_title, ENT_QUOTES);
             $orga_projects[$a_p->ID]['position'] = $this->menu_position;
             $orga_projects[$a_p->ID]['content'] = $nf_proj_content;
             $orga_projects[$a_p->ID]['contact'] = array();
@@ -395,7 +423,7 @@ class Sync {
     private function cris_menu_item_exists($menu, $title, $parent = 0) {
         if (!is_array($menu))
             return;
-        foreach ($menu as $menu_item) {        
+        foreach ($menu as $menu_item) {
             if (basename($menu_item->url) == sanitize_title($title)
                     && $menu_item->menu_item_parent == $parent
                     && !isset($menu_item->_invalid)) {
