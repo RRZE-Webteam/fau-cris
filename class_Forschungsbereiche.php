@@ -50,7 +50,7 @@ class Forschungsbereiche {
      */
 
     public function fieldListe($param = array()) {
-        $sortby = 'cfname';
+        $sortby = 'relation left seq';
         $fieldsArray = $this->fetch_fields();
 
         if (!count($fieldsArray)) {
@@ -58,12 +58,12 @@ class Forschungsbereiche {
             return $output;
         }
         $hide = explode(',', $param['hide']);
-        $formatter = new CRIS_formatter(NULL, NULL, NULL, SORT_ASC);
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
         if ($param['limit'] != '')
             $fieldList = array_slice($res[__('O.A.','fau-cris')], 0, $param['limit']);
         else
-            $fieldList = $res[__('O.A.','fau-cris')];
+            $fieldList = $res[$sortby];
         $output = '';
         $output .= $this->make_list($fieldList);
 
@@ -126,7 +126,7 @@ class Forschungsbereiche {
             else
                 $order = $sortby;
         } else {
-            $order = strtolower(__('O.A.', 'fau-cris'));
+            $order = strtolower('relation left seq');
         }
 
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_ASC);
@@ -204,7 +204,7 @@ class Forschungsbereiche {
                 $singlefield .= "<div class=\"cris-image\">";
                 foreach($imgs as $img) {
                     if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $singlefield .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                       $singlefield .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }
                 }
@@ -294,7 +294,7 @@ class Forschungsbereiche {
                 foreach($imgs as $img) {
                     $field_details['#image'.$i.'#'] = "<div class=\"cris-image\">";
                     if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $field_details['#image'.$i.'#'] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                       $field_details['#image'.$i.'#'] .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     $field_details['#image'.$i.'#'] .= "</div>";
                     }
@@ -479,7 +479,7 @@ class CRIS_fields extends CRIS_webservice {
         foreach ($data as $_d) {
             foreach ($_d as $field) {
                 $p = new CRIS_field($field);
-                if ($p->ID && ($filter === null || $filter->evaluate($p)))
+            if ($p->ID && ($filter === null || $filter->evaluate($p)))
                     $fields[$p->ID] = $p;
             }
         }

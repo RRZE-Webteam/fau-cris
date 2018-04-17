@@ -2,7 +2,8 @@
 
 class CRIS_Dicts {
 
-    public static $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+    //public static $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+    public static $base_uri = "https://cris-qa.zuv.uni-erlangen.de/ws-cached/1.0/public/infoobject/";
 
     public static $defaults = array(
         'show' => 'publications',

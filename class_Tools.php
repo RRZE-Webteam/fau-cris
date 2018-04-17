@@ -168,6 +168,7 @@ class Tools {
         curl_setopt($ch, CURLOPT_URL, $xml_url);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         $xml = curl_exec($ch);
         curl_close($ch);
 

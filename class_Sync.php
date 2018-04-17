@@ -478,7 +478,7 @@ class Sync {
                 'meta_input' => array(
                     'sidebar_personen' => $contact )
             );
-            if ($contact[0] != '-1') {
+            if (!empty($contact) && $contact[0] != '-1') {
                 $args['meta_input']['sidebar_title_personen'] = __('Kontakt', 'fau-cris');
             }
             $pid = wp_insert_post($args);

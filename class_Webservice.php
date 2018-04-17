@@ -12,7 +12,8 @@ class CRIS_webservice {
     /*
      * generic class for web service access.
      */
-    private $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+    //private $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+    private $base_uri = "https://cris-qa.zuv.uni-erlangen.de/ws-cached/1.0/public/infoobject/";
     private $cache = true;
 
     private function fetch($url) {
@@ -23,6 +24,7 @@ class CRIS_webservice {
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
         $xml = curl_exec($ch);
 
@@ -128,6 +130,18 @@ class CRIS_entity {
             }
             // any attribute name is forced to lower case
             $this->attributes[strtolower($attr_name)] = $attr_value;
+        }
+        foreach ($data->relation as $_r) {
+            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ")))
+                continue;
+            foreach($_r->attribute as $_ra) {
+                if ($_ra['name'] == 'Left seq') {
+                    $this->attributes["relation left seq"] = (string) $_ra->data;
+                }
+                if ($_ra['name'] == 'Right seq') {
+                    $this->attributes["relation right seq"] = (string) $_ra->data;
+                }
+            }
         }
     }
 }
