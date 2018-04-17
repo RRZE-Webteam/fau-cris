@@ -449,10 +449,10 @@ class Publikationen {
             }
             $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
-            $title_html = "<span class=\"title\" itemprop=\"name\" style=\"font-weight: bold;\">"
+            $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
                     . "<a href=\"" . Tools::get_item_url("publication", $title, $id, $post->ID) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                     . $title
-                    . "</a></span>";
+                    . "</a></strong></span>";
             // make array
             setlocale(LC_TIME, get_locale());
             $pubDetails = array(
@@ -529,7 +529,7 @@ class Publikationen {
                         if ($pubDetails['booktitle'] != '') {
                             $publist .= "<br /><span itemscope itemtype=\"http://schema.org/Book\">In: ";
                             $publist .= $pubDetails['editiors'] != '' ? "<span itemprop=\"author\">" . $pubDetails['editiors'] . " (" . __('Hrsg.', 'fau-cris') . "): </span>" : '';
-                            $publist .= "<span itemprop=\"name\" style=\"font-weight:bold;\">" . $pubDetails['booktitle'] . "</span>";
+                            $publist .= "<span itemprop=\"name\"><strong>" . $pubDetails['booktitle'] . "</strong></span>";
                             $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? ", <span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">" : '';
                             $publist .= $pubDetails['city'] != '' ? "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">"
                                     . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: " : '';
@@ -559,7 +559,7 @@ class Publikationen {
                     $publist .= $pubDetails['authors'] . ":";
                     $publist .= "<br />" . $pubDetails['title'];
                     $publist .= (($pubDetails['journaltitle'] != '') || ($pubDetails['volume'] != '') || ($pubDetails['year'] != '') || ($pubDetails['pagesRange'] != '')) ? "<br />" : '';
-                    $publist .= $pubDetails['journaltitle'] != '' ? "In: <span itemscope itemtype=\"http://schema.org/Periodical\" itemid=\"#periodical_" . $pubDetails['id'] . "\"><span itemprop=\"name\" style=\"font-weight: bold;\">" . $pubDetails['journaltitle'] . "</span></span>" : '';
+                    $publist .= $pubDetails['journaltitle'] != '' ? "In: <span itemscope itemtype=\"http://schema.org/Periodical\" itemid=\"#periodical_" . $pubDetails['id'] . "\"><span itemprop=\"name\"><strong>" . $pubDetails['journaltitle'] . "</strong></span></span>" : '';
                     $publist .= $pubDetails['seriesNumber'] != '' ? " <span itemprop=\"isPartOf\" itemscope itemtype=\"http://schema.org/PublicationVolume\"><link itemprop=\"isPartOf\" href=\"#periodical_" . $pubDetails['id'] . "\" /><span itemprop=\"volumeNumber\">" . $pubDetails['seriesNumber'] . "</span></span> " : '';
                     $publist .= $pubDetails['year'] != '' ? " (<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)" : '';
                     if ($pubDetails['pagesRange'] != '') {

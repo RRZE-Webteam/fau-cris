@@ -64,7 +64,7 @@ class Auszeichnungen {
             $awardList = array_slice($res[$order], 0, $limit);
         else
             $awardList = $res[$order];
-        
+
         $output = '';
 
         if ($display == 'gallery') {
