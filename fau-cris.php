@@ -983,7 +983,7 @@ class FAU_CRIS {
         if ($post && has_shortcode($post->post_content, 'cris')
                 || $post && has_shortcode($post->post_content, 'cris-custom')) {
             wp_enqueue_style('cris', plugins_url('css/cris.css', __FILE__), array(), self::version);
-            wp_enqueue_script('cris', plugins_url('js/cris.js', __FILE__), array(), self::version);
+            wp_enqueue_script('cris', plugins_url('js/cris.js', __FILE__), array('jquery'), self::version);
         }
     }
 
