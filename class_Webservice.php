@@ -14,8 +14,8 @@ class CRIS_webservice {
     /*
      * generic class for web service access.
      */
-    private $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
-//    private $base_uri = "https://cris-qa.zuv.uni-erlangen.de/ws-cached/1.0/public/infoobject/";
+    //private $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+    private $base_uri = "https://cris-qa.zuv.uni-erlangen.de/ws-cached/1.0/public/infoobject/";
     private $cache = true;
 
     private function fetch($url) {

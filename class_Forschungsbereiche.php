@@ -534,16 +534,13 @@ class CRIS_field_image extends CRIS_Entity {
 
 # tests possible if called on command-line
 if (!debug_backtrace()) {
-    function __($a, $b) {
-        return '';
+    $p = new CRIS_Publications();
+    $f = new CRIS_Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
+    $publs = $p->by_orga_id("142285", $f);
+    $order = "virtualdate";
+    $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+    $res = $formatter->execute($publs);
+    foreach ($res[$order] as $key => $value) {
+        echo sprintf("%s: %s\n", $key, $value->attributes[$order]);
     }
-    
-    $filter = Tools::field_filter();
-    $ws = new CRIS_fields();
-    $pubArray = $ws->by_orga_id(142503, $filter);
-    print_r($pubArray);
-    $sortby = "relation left seq";
-    $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
-    $res = $formatter->execute($pubArray);
-    print_r($res);
 }

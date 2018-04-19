@@ -51,13 +51,7 @@ class CRIS_formatter {
             } else {
                 # no grouping requested, we assume that sort is set in this case
                 # also the case if a maximum limit is set
-                if (array_key_exists($this->sort, $single_dataset->attributes)) {
-                    $group_key = $this->sort;
-                } else {
-                    # purpose: fall-back to NULL if attribute is not present 
-                    # support old and new version of web-service simultanously
-                    $group_key = NULL;
-                }
+                $group_key = $this->sort;
             }
 
             if ($this->group === null)
