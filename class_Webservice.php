@@ -8,6 +8,8 @@
  * @author Marcus Walther
  */
 
+require_once("class_Tools.php");
+
 class CRIS_webservice {
     /*
      * generic class for web service access.
@@ -81,7 +83,7 @@ class CRIS_webservice {
         }
 
         try {
-            $rawxml = $this->fetch($this->base_uri . $id . $seed);
+            $rawxml = $this->fetch(CRIS_Dicts::$base_uri . $id . $seed);
         } catch (Exception $ex) {
             $rawxml = null;
         }

@@ -50,20 +50,27 @@ class Forschungsbereiche {
      */
 
     public function fieldListe($param = array()) {
-        $sortby = 'relation left seq';
+
         $fieldsArray = $this->fetch_fields();
 
         if (!count($fieldsArray)) {
             $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
+        if (array_key_exists('relation left seq', reset($fieldsArray)->attributes)) {
+            $sortby = 'relation left seq';
+            $orderby = $sortby;
+        } else {
+            $sortby = NULL;
+            $orderby = __('O.A.','fau-cris');
+        }
         $hide = explode(',', $param['hide']);
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
         if ($param['limit'] != '')
-            $fieldList = array_slice($res[__('O.A.','fau-cris')], 0, $param['limit']);
+            $fieldList = array_slice($res[$orderby], 0, $param['limit']);
         else
-            $fieldList = $res[$sortby];
+            $fieldList = $res[$orderby];
         $output = '';
         $output .= $this->make_list($fieldList);
 
@@ -122,16 +129,21 @@ class Forschungsbereiche {
         }
         if ($sortby != NULL) {
             if ($this->lang == 'en')
-                $order = $sortby . '_en';
-            else
-                $order = $sortby;
+                $sortby = $sortby . '_en';
+                $orderby = $sortby;
         } else {
-            $order = strtolower('relation left seq');
+            if (array_key_exists('relation left seq', reset($fieldsArray)->attributes)) {
+                $sortby = 'relation left seq';
+                $orderby = $sortby;
+            } else {
+                $sortby = NULL;
+                $orderby = __('O.A.','fau-cris');
+            }
         }
 
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_ASC);
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
-        $fieldList = $res[$order];
+        $fieldList = $res[$orderby];
 
         return $fieldList;
     }

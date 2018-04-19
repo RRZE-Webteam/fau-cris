@@ -675,10 +675,16 @@ class Projekte {
             return $projArray;
 
         // sortiere nach Erscheinungsdatum
-        $order = "relation right seq";
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+        if (array_key_exists('relation right seq', reset($projArray)->attributes)) {
+            $sortby = 'relation right seq';
+            $orderby = $sortby;
+        } else {
+            $sortby = NULL;
+            $orderby = __('O.A.','fau-cris');
+        }
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_DESC);
         $res = $formatter->execute($projArray);
-        $projList = $res[$order];
+        $projList = $res[$orderby];
 
         if ( $this->cms == 'wp' && shortcode_exists( 'collapsibles' ) ) {
             $output = $this->make_accordion($projList);

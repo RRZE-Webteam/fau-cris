@@ -51,7 +51,7 @@ class Sync {
         $locations = get_nav_menu_locations();
         $menu_id = $locations[$menu_slug] ;
         $this->menu_items = array();
-        if ($menu_id == 0) {
+        if (is_wp_error( $menu_id ) || $menu_id == 0) {
             $this->menu_id = wp_create_nav_menu($menu_name);
             $menu[$menu_slug] = $this->menu_id;
             set_theme_mod('nav_menu_locations',$menu);
