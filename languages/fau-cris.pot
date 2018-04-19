@@ -3,18 +3,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FAU CRIS v3.31\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-14 13:18+0000\n"
+"POT-Creation-Date: 2018-04-17 14:48+0000\n"
 "POT-Revision-Date: Thu Aug 25 2016 14:01:16 GMT+0200 (CEST)\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: zo95zofo <barbara.bothe@fau.de>\n"
 "Language-Team: \n"
 "Language: \n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Loco - https://localise.biz/\n"
+"X-Generator: Loco https://localise.biz/\n"
 "X-Poedit-KeywordsList: _:1;gettext:1;dgettext:2;ngettext:1,2;dngettext:2,3;"
 "__:1;_e:1;_c:1;_n:1,2;_n_noop:1,2;_nc:1,2;__ngettext:1,2;__ngettext_noop:1,2;"
 "_x:1,2c;_ex:1,2c;_nx:1,2,4c;_nx_noop:1,2,3c;_n_js:1,2;_nx_js:1,2,3c;"
@@ -24,239 +24,66 @@ msgstr ""
 "X-Textdomain-Support: yes\n"
 "X-Poedit-SearchPath-0: ."
 
-#: class_Auszeichnungen.php:35
-msgid ""
-"Bitte geben Sie die CRIS-ID der Organisation, Person oder Auszeichnung an."
-msgstr ""
-
-# @ fau-cris
-#: class_Auszeichnungen.php:57 class_Auszeichnungen.php:85
-#: class_Auszeichnungen.php:124 class_Auszeichnungen.php:178
-msgid "Es wurden leider keine Auszeichnungen gefunden."
-msgstr ""
-
-#: class_Auszeichnungen.php:329
-msgctxt "Wird bei Galerien vor die Bildquelle geschrieben."
-msgid "Bild:"
-msgstr ""
-
-# @ fau-cris
-#: class_Publikationen.php:36 class_Projekte.php:35
-msgid ""
-"Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an."
-msgstr ""
-
-# @ fau-cris
-#: class_Publikationen.php:58 class_Publikationen.php:97
-#: class_Publikationen.php:132
-msgid "Es wurden leider keine Publikationen gefunden."
-msgstr ""
-
-#: class_Publikationen.php:335
-msgid "O.T."
-msgstr ""
-
-#: class_Publikationen.php:347
-msgid "O.O."
-msgstr ""
-
-#: class_Publikationen.php:348 class_Publikationen.php:350
-#: class_Publikationen.php:355 class_Publikationen.php:356
-#: class_Publikationen.php:358 class_Publikationen.php:359
-#: class_Publikationen.php:360 class_Publikationen.php:361
-#: class_Publikationen.php:362 class_Publikationen.php:363
-#: class_Publikationen.php:364 class_Publikationen.php:371
-#: class_Publikationen.php:372 class_Formatter.php:68
-msgid "O.A."
-msgstr ""
-
-#: class_Publikationen.php:349
-msgid "O.J."
-msgstr ""
-
-#: class_Publikationen.php:373
-msgid "Nicht verfügbar"
-msgstr ""
-
-#: class_Publikationen.php:397 class_Publikationen.php:426
-#: class_Publikationen.php:499 class_Publikationen.php:533
-msgctxt "Abkürzung für \"Band\" bei Publikationen"
-msgid "Bd."
-msgstr ""
-
-# @ fau-cris
-#: class_Publikationen.php:400 class_Publikationen.php:502
-#: class_Publikationen.php:534 class_Sync.php:352
-msgid "Seiten"
-msgstr ""
-
-#: class_Publikationen.php:414 class_Publikationen.php:469
-#: class_Publikationen.php:485
-msgid "Hrsg."
-msgstr ""
-
-#: class_Publikationen.php:422 class_Publikationen.php:444
-msgctxt "Abkürzung für \"Seite\" bei Publikationen"
-msgid "S."
-msgstr ""
-
-#: class_Publikationen.php:423 class_Publikationen.php:445
-msgctxt "Abkürzung für \"Spalte\" bei Lexikonartikeln"
-msgid "Sp."
-msgstr ""
-
-#: class_Publikationen.php:512
-msgid "Abschlussarbeit"
-msgstr ""
-
-# @ fau-cris
-#: class_Tools.php:171
-msgid "Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID."
-msgstr ""
-
-#: class_Tools.php:296
-msgid "Falscher Parameter für Publikationstyp"
-msgstr ""
-
-#: class_Tools.php:313
-msgid "Falscher Parameter für Publikationssubtyp"
-msgstr ""
-
-#: class_Tools.php:344
-msgid "Falscher Parameter für Auszeichnungstyp"
-msgstr ""
-
-#: class_Tools.php:383
-msgid "Falscher Parameter für Projekttyp"
-msgstr ""
-
-#: class_Tools.php:414
-msgid "Falscher Parameter für Patenttyp"
-msgstr ""
-
-#: class_Tools.php:445
-msgid "Falscher Parameter für Aktivitätstyp"
-msgstr ""
-
-#: class_Tools.php:599
-msgid "seit"
-msgstr ""
-
-#: class_Tools.php:601
-msgid "bis"
-msgstr ""
-
-#: class_Projekte.php:57 class_Projekte.php:86 class_Projekte.php:117
-#: class_Projekte.php:167 class_Projekte.php:194 class_Organisation.php:67
-msgid "Es wurden leider keine Projekte gefunden."
-msgstr ""
-
-#: class_Projekte.php:384 class_Projekte.php:468 class_Sync.php:221
-#: class_Sync.php:272
-msgid "Titel des Gesamtprojektes"
-msgstr ""
-
-#: class_Projekte.php:386 class_Projekte.php:470 class_Sync.php:222
-#: class_Sync.php:273
-msgid "Projektleitung"
-msgstr ""
-
-#: class_Projekte.php:390 class_Sync.php:223 class_Sync.php:274
-msgid "Projektbeteiligte"
-msgstr ""
-
-#: class_Projekte.php:394 class_Sync.php:224 class_Sync.php:275
-msgid "Projektstart"
-msgstr ""
-
-#: class_Projekte.php:396 class_Sync.php:225 class_Sync.php:276
-msgid "Projektende"
-msgstr ""
-
-#: class_Projekte.php:398 class_Sync.php:226 class_Sync.php:277
-msgid "Akronym"
-msgstr ""
-
-#: class_Projekte.php:400 class_Projekte.php:476 class_Sync.php:227
-#: class_Sync.php:278
-msgid "Mittelgeber"
-msgstr ""
-
-#: class_Projekte.php:404 class_Projekte.php:480 class_Sync.php:228
-#: class_Sync.php:279 fau-cris.php:295
-msgid "URL"
-msgstr ""
-
-#: class_Projekte.php:412 class_Projekte.php:489 class_Sync.php:230
-#: class_Sync.php:281
-msgid "Abstract"
-msgstr ""
-
-#. ID
-#: class_Projekte.php:417 class_Sync.php:232 class_Sync.php:283
-#: fau-cris.php:272 fau-cris.php:925
-msgid "Publikationen"
-msgstr ""
-
-#: class_Projekte.php:474
-msgid "Laufzeit"
-msgstr ""
-
-#: class_Projekte.php:489
-msgid "Abstract anzeigen"
-msgstr ""
-
-#: class_Projekte.php:512 class_Projekte.php:572
-msgid "Mehr Informationen"
-msgstr ""
-
-#: class_Patente.php:35
-msgid ""
-"Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an."
-msgstr ""
-
-#: class_Patente.php:57 class_Patente.php:79 class_Patente.php:112
-#: class_Patente.php:162
-msgid "Es wurden leider keine Patente gefunden."
-msgstr ""
-
-#: class_Patente.php:95 class_Aktivitaeten.php:101
-msgid "Ohne Jahr"
-msgstr ""
-
-#: class_Patente.php:245 class_Aktivitaeten.php:380
-msgid "Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen"
-msgstr ""
-
-#: class_Patente.php:252
-msgid "Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen"
-msgstr ""
-
-#: class_Patente.php:260
-msgid "Erfinder"
-msgstr ""
-
 #: class_Aktivitaeten.php:34
 msgid ""
 "Bitte geben Sie die CRIS-ID der Organisation, Person oder "
 "Forschungsaktivität an."
 msgstr ""
 
-#: class_Aktivitaeten.php:60 class_Aktivitaeten.php:85
-#: class_Aktivitaeten.php:123 class_Aktivitaeten.php:176
+#: class_Aktivitaeten.php:58 class_Aktivitaeten.php:86
+#: class_Aktivitaeten.php:124 class_Aktivitaeten.php:177
 msgid "Es wurden leider keine Aktivitäten gefunden."
 msgstr ""
 
-#: class_Aktivitaeten.php:386
+#: class_Aktivitaeten.php:102 class_Patente.php:98
+msgid "Ohne Jahr"
+msgstr ""
+
+#: class_Aktivitaeten.php:383 class_Patente.php:249
+msgid "Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen"
+msgstr ""
+
+#: class_Aktivitaeten.php:389
 msgid "Veranstaltung"
 msgstr ""
 
-#: class_Aktivitaeten.php:388
+#: class_Aktivitaeten.php:391
 msgid "In"
 msgstr ""
 
-#: class_Aktivitaeten.php:392
+#: class_Aktivitaeten.php:395
 msgid "Link in neuem Fenster &ouml;ffnen"
+msgstr ""
+
+#: class_Auszeichnungen.php:35
+msgid ""
+"Bitte geben Sie die CRIS-ID der Organisation, Person oder Auszeichnung an."
+msgstr ""
+
+# @ fau-cris
+#: class_Auszeichnungen.php:56 class_Auszeichnungen.php:87
+#: class_Auszeichnungen.php:126 class_Auszeichnungen.php:180
+msgid "Es wurden leider keine Auszeichnungen gefunden."
+msgstr ""
+
+#: class_Auszeichnungen.php:339
+msgctxt "Wird bei Galerien vor die Bildquelle geschrieben."
+msgid "Bild:"
+msgstr ""
+
+#: class_Formatter.php:68 class_Formatter.php:88
+#: class_Forschungsbereiche.php:64 class_Publikationen.php:463
+#: class_Publikationen.php:465 class_Publikationen.php:470
+#: class_Publikationen.php:471 class_Publikationen.php:473
+#: class_Publikationen.php:474 class_Publikationen.php:475
+#: class_Publikationen.php:476 class_Publikationen.php:477
+#: class_Publikationen.php:478 class_Publikationen.php:479
+#: class_Publikationen.php:486 class_Publikationen.php:487
+msgid "O.A."
+msgstr ""
+
+#: class_Formatter.php:88
+msgid "o.a."
 msgstr ""
 
 #: class_Forschungsbereiche.php:34
@@ -268,136 +95,335 @@ msgstr ""
 msgid "Es wurden leider keine Forschungsbereiche gefunden."
 msgstr ""
 
-#: class_Forschungsbereiche.php:207
+#: class_Forschungsbereiche.php:219 class_Sync.php:214
 msgid "Projekte"
 msgstr ""
 
-#: class_Forschungsbereiche.php:214
+#: class_Forschungsbereiche.php:226 class_Sync.php:216
 msgid "Beteiligte Wissenschaftler"
+msgstr ""
+
+#. ID
+#: class_Forschungsbereiche.php:239 class_Projekte.php:512 class_Sync.php:218
+#: class_Sync.php:258 class_Sync.php:320 fau-cris.php:287 fau-cris.php:1041
+msgid "Publikationen"
 msgstr ""
 
 #: class_Organisation.php:25
 msgid "Bitte geben Sie die CRIS-ID der Organisation an."
 msgstr ""
 
-#: class_Organisation.php:45 class_Organisation.php:82
+#: class_Organisation.php:45 class_Organisation.php:84
 msgid "Es wurden leider keine Informationen gefunden."
 msgstr ""
 
-#: class_Sync.php:21
+#: class_Organisation.php:67 class_Projekte.php:57 class_Projekte.php:86
+#: class_Projekte.php:122 class_Projekte.php:153 class_Projekte.php:203
+#: class_Projekte.php:230
+msgid "Es wurden leider keine Projekte gefunden."
+msgstr ""
+
+#: class_Patente.php:35
+msgid ""
+"Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an."
+msgstr ""
+
+#: class_Patente.php:57 class_Patente.php:82 class_Patente.php:115
+#: class_Patente.php:165
+msgid "Es wurden leider keine Patente gefunden."
+msgstr ""
+
+#: class_Patente.php:256
+msgid "Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen"
+msgstr ""
+
+#: class_Patente.php:264
+msgid "Erfinder"
+msgstr ""
+
+#: class_Projekte.php:35
+msgid ""
+"Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an."
+msgstr ""
+
+#: class_Projekte.php:481 class_Projekte.php:575 class_Sync.php:247
+#: class_Sync.php:309
+msgid "Titel des Gesamtprojektes"
+msgstr ""
+
+#: class_Projekte.php:483 class_Projekte.php:577 class_Sync.php:248
+#: class_Sync.php:310
+msgid "Projektleitung"
+msgstr ""
+
+#: class_Projekte.php:487 class_Sync.php:249 class_Sync.php:311
+msgid "Projektbeteiligte"
+msgstr ""
+
+#: class_Projekte.php:491 class_Sync.php:250 class_Sync.php:312
+msgid "Projektstart"
+msgstr ""
+
+#: class_Projekte.php:493 class_Sync.php:251 class_Sync.php:313
+msgid "Projektende"
+msgstr ""
+
+#: class_Projekte.php:495 class_Sync.php:252 class_Sync.php:314
+msgid "Akronym"
+msgstr ""
+
+#: class_Projekte.php:497 class_Projekte.php:583 class_Sync.php:253
+#: class_Sync.php:315
+msgid "Mittelgeber"
+msgstr ""
+
+#: class_Projekte.php:501 class_Projekte.php:587 class_Sync.php:254
+#: class_Sync.php:316 fau-cris.php:310
+msgid "URL"
+msgstr ""
+
+#: class_Projekte.php:507 class_Projekte.php:593 class_Sync.php:256
+#: class_Sync.php:318
+msgid "Abstract"
+msgstr ""
+
+#: class_Projekte.php:581
+msgid "Laufzeit"
+msgstr ""
+
+#: class_Projekte.php:593
+msgid "Abstract anzeigen"
+msgstr ""
+
+#: class_Projekte.php:599 class_Projekte.php:654
+msgid "Mehr Informationen"
+msgstr ""
+
+# @ fau-cris
+#: class_Publikationen.php:36
+msgid ""
+"Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an."
+msgstr ""
+
+# @ fau-cris
+#: class_Publikationen.php:61 class_Publikationen.php:100
+#: class_Publikationen.php:149
+msgid "Es wurden leider keine Publikationen gefunden."
+msgstr ""
+
+#: class_Publikationen.php:450
+msgid "O.T."
+msgstr ""
+
+#: class_Publikationen.php:462
+msgid "O.O."
+msgstr ""
+
+#: class_Publikationen.php:464
+msgid "O.J."
+msgstr ""
+
+#: class_Publikationen.php:488
+msgid "Nicht verfügbar"
+msgstr ""
+
+#: class_Publikationen.php:514 class_Publikationen.php:547
+#: class_Publikationen.php:625 class_Publikationen.php:659
+msgctxt "Abkürzung für \"Band\" bei Publikationen"
+msgid "Bd."
+msgstr ""
+
+# @ fau-cris
+#: class_Publikationen.php:517 class_Publikationen.php:628
+#: class_Publikationen.php:660 class_Sync.php:408
+msgid "Seiten"
+msgstr ""
+
+#: class_Publikationen.php:531 class_Publikationen.php:594
+#: class_Publikationen.php:611
+msgid "Hrsg."
+msgstr ""
+
+#: class_Publikationen.php:540 class_Publikationen.php:566
+msgctxt "Abkürzung für \"Seite\" bei Publikationen"
+msgid "S."
+msgstr ""
+
+#: class_Publikationen.php:542 class_Publikationen.php:568
+msgctxt "Abkürzung für \"Artikelnummer\" bei Publikationen"
+msgid "Art.Nr."
+msgstr ""
+
+#: class_Publikationen.php:544 class_Publikationen.php:570
+msgctxt "Abkürzung für \"Spalte\" bei Lexikonartikeln"
+msgid "Sp."
+msgstr ""
+
+#: class_Publikationen.php:638
+msgid "Abschlussarbeit"
+msgstr ""
+
+#: class_Sync.php:24
 msgid ""
 "Synchronisierung fehlgeschlagen!<br />Bitte geben Sie im Reiter "
 "\"Allgemein\" die CRIS-ID Ihrer Organisationseinheit an."
 msgstr ""
 
-#: class_Sync.php:25
+#: class_Sync.php:28
 msgid "Synchronisierung abgeschlossen:"
 msgstr ""
 
-#: class_Sync.php:39
+#: class_Sync.php:42
 msgid "Forschung"
 msgstr ""
 
-#: class_Sync.php:40
+#: class_Sync.php:43
 msgid "Weitere Projekte"
 msgstr ""
 
-#: class_Sync.php:49
+#: class_Sync.php:50
 msgid "Hauptnavigation"
 msgstr ""
 
-#: class_Sync.php:57
+#: class_Sync.php:58
 #, php-format
 msgid "Menü \"%s\" neu erstellt."
 msgstr ""
 
-#: class_Sync.php:72
+#: class_Sync.php:75
 #, php-format
 msgid "Portalmenü \"%s\" neu erstellt."
 msgstr ""
 
-#: class_Sync.php:120 class_Sync.php:425
+#: class_Sync.php:123 class_Sync.php:486
 #, php-format
 msgid "Seite \"%s\" wurde erstellt."
 msgstr ""
 
-#: class_Sync.php:352 class_Sync.php:353 class_Sync.php:354
+#: class_Sync.php:357
+msgid ""
+"Der Bereich \"Forschung\" konnte nicht erstellt werden: Es wurden keine "
+"Forschungsprojekte gefunden."
+msgstr ""
+
+#: class_Sync.php:408 class_Sync.php:409 class_Sync.php:410
 #, php-format
 msgid "%1d vorhanden, %2d aktualisiert, %3d neu"
 msgstr ""
 
-#: class_Sync.php:353
+#: class_Sync.php:409
 msgid "Menüeinträge"
 msgstr ""
 
-#: class_Sync.php:354
+#: class_Sync.php:410
 msgid "Portalmenüeinträge"
 msgstr ""
 
-#: class_Sync.php:356
+#: class_Sync.php:412
 #, php-format
 msgid "%d Seite(n) konnten nicht erstellt werden."
 msgstr ""
 
-#: class_Sync.php:428
+#: class_Sync.php:482
+msgid "Kontakt"
+msgstr ""
+
+#: class_Sync.php:489
 #, php-format
 msgid "Seite \"%s\" konnte nicht erstellt werden."
 msgstr ""
 
-#: fau-cris.php:89
+# @ fau-cris
+#: class_Tools.php:183
+msgid "Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID."
+msgstr ""
+
+#: class_Tools.php:308
+msgid "Falscher Parameter für Publikationstyp"
+msgstr ""
+
+#: class_Tools.php:325
+msgid "Falscher Parameter für Publikationssubtyp"
+msgstr ""
+
+#: class_Tools.php:370
+msgid "Falscher Parameter für Auszeichnungstyp"
+msgstr ""
+
+#: class_Tools.php:409
+msgid "Falscher Parameter für Projekttyp"
+msgstr ""
+
+#: class_Tools.php:445
+msgid "Falscher Parameter für Patenttyp"
+msgstr ""
+
+#: class_Tools.php:476
+msgid "Falscher Parameter für Aktivitätstyp"
+msgstr ""
+
+#: class_Tools.php:665
+msgid "seit"
+msgstr ""
+
+#: class_Tools.php:667
+msgid "bis"
+msgstr ""
+
+#: fau-cris.php:97
 #, php-format
 msgid ""
 "Ihre PHP-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die "
 "PHP-Version %s."
 msgstr ""
 
-#: fau-cris.php:93
+#: fau-cris.php:101
 #, php-format
 msgid ""
 "Ihre Wordpress-Version %s ist veraltet. Bitte aktualisieren Sie mindestens "
 "auf die Wordpress-Version %s."
 msgstr ""
 
-#: fau-cris.php:99
+#: fau-cris.php:107
 msgid "Fehler bei der Aktivierung des Plugins"
 msgstr ""
 
-#: fau-cris.php:117 fau-cris.php:209
+#: fau-cris.php:125 fau-cris.php:224
 msgid "Einstellungen"
 msgstr ""
 
-#: fau-cris.php:177
+#: fau-cris.php:192
 msgid "Allgemein"
 msgstr ""
 
-#: fau-cris.php:178
+#: fau-cris.php:193
 msgid "Darstellung"
 msgstr ""
 
-#: fau-cris.php:179
+#: fau-cris.php:194
 msgid "Synchronisierung"
 msgstr ""
 
-#: fau-cris.php:225
+#: fau-cris.php:240
 msgid "Jetzt synchronisieren"
 msgstr ""
 
 #. ID
-#: fau-cris.php:259
+#: fau-cris.php:274
 msgid "CRIS-OrgNr."
 msgstr ""
 
-#: fau-cris.php:265
+#: fau-cris.php:280
 msgid ""
 "Sie können auch mehrere Organisationsnummern &ndash; durch Komma getrennt "
 "&ndash; eingeben."
 msgstr ""
 
-#: fau-cris.php:277
+#: fau-cris.php:292
 msgid "Reihenfolge der Publikationen"
 msgstr ""
 
-#: fau-cris.php:279
+#: fau-cris.php:294
 msgid ""
 "Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, "
 "können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden."
@@ -405,248 +431,285 @@ msgid ""
 "Publikationen\". Ein Eintrag pro Zeile. "
 msgstr ""
 
-#: fau-cris.php:283
+#: fau-cris.php:298
 msgid "Reihenfolge der Publikationen-Subtypen unter \"Andere\""
 msgstr ""
 
-#: fau-cris.php:289
-msgid "BibTeX-Link"
+#: fau-cris.php:304
+msgid "DOI-Link"
 msgstr ""
 
-#: fau-cris.php:291
-msgid "Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?"
+#: fau-cris.php:306
+msgid ""
+"Soll auch im APA- und MLA-Zitierstil (wenn vorhanden) für jede Publikation "
+"ein DOI-Link angezeigt werden?"
 msgstr ""
 
-#: fau-cris.php:297
+#: fau-cris.php:312
 msgid ""
 "Soll auch im APA- und MLA-Zitierstil (wenn vorhanden) ein Link zu einer "
 "Website angezeigt werden?"
 msgstr ""
 
-#: fau-cris.php:301
-msgid "Autoren verlinken"
-msgstr ""
-
-#: fau-cris.php:304
-msgid "Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken"
-msgstr ""
-
-#: fau-cris.php:305
-msgid "Autoren mit ihrer Profilseite auf cris.fau.de verlinken"
-msgstr ""
-
-#: fau-cris.php:306 fau-cris.php:327 fau-cris.php:348 fau-cris.php:369
-#: fau-cris.php:390
-msgid "keinen Link setzen"
-msgstr ""
-
-#. ID
-#: fau-cris.php:311 fau-cris.php:926
-msgid "Auszeichnungen"
-msgstr ""
-
 #: fau-cris.php:316
-msgid "Reihenfolge der Auszeichnungen"
+msgid "BibTeX-Link"
 msgstr ""
 
 #: fau-cris.php:318
-msgid "Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen."
+msgid "Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?"
 msgstr ""
 
 #: fau-cris.php:322
-msgid "Preisträger verlinken"
+msgid "Autoren verlinken"
 msgstr ""
 
 #: fau-cris.php:325
+msgid "Autoren mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken"
+msgstr ""
+
+#: fau-cris.php:326
+msgid "Autoren mit ihrer Profilseite auf cris.fau.de verlinken"
+msgstr ""
+
+#: fau-cris.php:327 fau-cris.php:362 fau-cris.php:400 fau-cris.php:421
+#: fau-cris.php:442
+msgid "keinen Link setzen"
+msgstr ""
+
+#: fau-cris.php:332
+msgid "Namen im FAU-Person-Plugin"
+msgstr ""
+
+#: fau-cris.php:338
+msgid "In welcher Reihenfolge sind die Namen im FAU-Person-Plugin angelegt?"
+msgstr ""
+
+#: fau-cris.php:340
+msgid "Vorname Nachname"
+msgstr ""
+
+#: fau-cris.php:341
+msgid "Nachname, Vorname"
+msgstr ""
+
+#. ID
+#: fau-cris.php:346 fau-cris.php:1042
+msgid "Auszeichnungen"
+msgstr ""
+
+#: fau-cris.php:351
+msgid "Reihenfolge der Auszeichnungen"
+msgstr ""
+
+#: fau-cris.php:353
+msgid "Siehe Reihenfolge der Publikationen. Nur eben für die Auszeichnungen."
+msgstr ""
+
+#: fau-cris.php:357
+msgid "Preisträger verlinken"
+msgstr ""
+
+#: fau-cris.php:360
 msgid ""
 "Preisträger mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken"
 msgstr ""
 
-#: fau-cris.php:326
+#: fau-cris.php:361
 msgid "Preisträger mit ihrer Profilseite auf cris.fau.de verlinken"
 msgstr ""
 
 #. ID
-#: fau-cris.php:332
+#: fau-cris.php:367
+msgid "Forschungsbereiche"
+msgstr ""
+
+#. ID
+#: fau-cris.php:373
+msgid "Anzahl Publikationen"
+msgstr ""
+
+#: fau-cris.php:379
+msgid ""
+"Maximale Anzahl der Publikationen, die in der Detailansicht eines "
+"Forschungsbereichs angezeigt werden."
+msgstr ""
+
+#. ID
+#: fau-cris.php:384
 msgid "Forschungsprojekte"
 msgstr ""
 
-#: fau-cris.php:337
+#: fau-cris.php:389
 msgid "Reihenfolge der Forschungsprojekte"
 msgstr ""
 
-#: fau-cris.php:339
+#: fau-cris.php:391
 msgid ""
 "Siehe Reihenfolge der Publikationen. Nur eben für die Forschungsprojekte."
 msgstr ""
 
-#: fau-cris.php:343
+#: fau-cris.php:395
 msgid "Projektbeteiligte verlinken"
 msgstr ""
 
-#: fau-cris.php:346
+#: fau-cris.php:398
 msgid ""
 "Projektleiter und -beteiligte mit ihrer Personen-Detailansicht im FAU-Person-"
 "Plugin verlinken"
 msgstr ""
 
-#: fau-cris.php:347
+#: fau-cris.php:399
 msgid ""
 "Projektleiter und -beteiligte mit ihrer Profilseite auf cris.fau.de verlinken"
 msgstr ""
 
 #. ID
-#: fau-cris.php:353
+#: fau-cris.php:405
 msgid "Patente"
 msgstr ""
 
-#: fau-cris.php:358
+#: fau-cris.php:410
 msgid "Reihenfolge der Patente"
 msgstr ""
 
-#: fau-cris.php:360
+#: fau-cris.php:412
 msgid "Siehe Reihenfolge der Publikationen. Nur eben für die Patente."
 msgstr ""
 
-#: fau-cris.php:364
+#: fau-cris.php:416
 msgid "Patentinhaber verlinken"
 msgstr ""
 
-#: fau-cris.php:367
+#: fau-cris.php:419
 msgid ""
 "Patentinhaber mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken"
 msgstr ""
 
-#: fau-cris.php:368
+#: fau-cris.php:420
 msgid "Patentinhaber mit ihrer Profilseite auf cris.fau.de verlinken"
 msgstr ""
 
 #. ID
-#: fau-cris.php:374
+#: fau-cris.php:426
 msgid "Aktivitäten"
 msgstr ""
 
-#: fau-cris.php:379
+#: fau-cris.php:431
 msgid "Reihenfolge der Aktivitäten"
 msgstr ""
 
-#: fau-cris.php:381
+#: fau-cris.php:433
 msgid "Siehe Reihenfolge der Publikationen. Nur eben für die Aktivitäten."
 msgstr ""
 
-#: fau-cris.php:385
+#: fau-cris.php:437
 msgid "Personen verlinken"
 msgstr ""
 
-#: fau-cris.php:388
+#: fau-cris.php:440
 msgid ""
 "Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken"
 msgstr ""
 
-#: fau-cris.php:389
+#: fau-cris.php:441
 msgid "Personen mit ihrer Profilseite auf cris.fau.de verlinken"
 msgstr ""
 
-#: fau-cris.php:403
+#: fau-cris.php:455
 msgid "Automatische Synchronisierung"
 msgstr ""
 
-#: fau-cris.php:409
+#: fau-cris.php:461
 msgid ""
 "Sollen für neue Projekte und Forschungsbereiche automatisch Seiten und "
 "Menüeinträge generiert werden?"
 msgstr ""
 
-#: fau-cris.php:414
+#: fau-cris.php:466
 msgid "Shortcode-Format"
 msgstr ""
 
-#: fau-cris.php:420
+#: fau-cris.php:472
 msgid ""
 "Soll für die Shortcodes auf den automatisch erstellten Seiten das "
 "konfigurierbare Format \"[cris-custom]\" verwendet werden?"
 msgstr ""
 
-#: fau-cris.php:422
+#: fau-cris.php:474
 msgid "Custom-Shortcode für Seite Forschung"
 msgstr ""
 
-#: fau-cris.php:423
+#: fau-cris.php:475
 msgid "Custom-Shortcode für Forschungsbereiche"
 msgstr ""
 
-#: fau-cris.php:424
+#: fau-cris.php:476
 msgid "Custom-Shortcode für Forschungsprojekte"
 msgstr ""
 
-#: fau-cris.php:490
+#: fau-cris.php:546
 #, php-format
 msgid ""
 "%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in "
 "unserem %3s Benutzerhandbuch! %3s"
 msgstr ""
 
-#: fau-cris.php:904
+#: fau-cris.php:1020
 msgid "Einstellungen gespeichert"
 msgstr ""
 
-#: fau-cris.php:906
+#: fau-cris.php:1022
 msgid "Nächste automatische Synchronisierung:"
 msgstr ""
 
-#: fau-cris.php:922
+#: fau-cris.php:1038
 msgid ""
 "Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS (Currrent "
 "Research Information System)</strong> in Ihren Webauftritt ein. Das Plugin "
 "ermöglicht außerdem die Integration mit dem FAU-Person-Plugin."
 msgstr ""
 
-#: fau-cris.php:923
+#: fau-cris.php:1039
 msgid ""
 "Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:"
 msgstr ""
 
-#: fau-cris.php:928
+#: fau-cris.php:1044
 msgid ""
 "Über den Shortcode lassen sich jeweils verschiedene Ausgabeformate "
 "einstellen."
 msgstr ""
 
-#: fau-cris.php:929
-msgid ""
-"<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die "
-"Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn "
-"Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf "
-"http://cris.fau.de anzeigen lassen, in der URL: z.B. http://cris.fau."
-"de/converis/publicweb/Organisation/<strong><em>141517</em></strong>."
+#: fau-cris.php:1045
+msgid "Organisation/<strong><em>141517</em></strong>."
 msgstr ""
 
-#: fau-cris.php:938
+#: fau-cris.php:1054
 msgid "Mögliche Zusatzoptionen"
 msgstr ""
 
-#: fau-cris.php:944
+#: fau-cris.php:1060
 msgid ""
 "Wenn Sie das <strong>FAU-Person</strong>-Plugin verwenden, können Autoren "
 "mit ihrer FAU-Person-Kontaktseite verlinkt werden."
 msgstr ""
 
-#: fau-cris.php:945
+#: fau-cris.php:1061
 msgid ""
 "Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, "
 "überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt "
 "die entsprechenden Links."
 msgstr ""
 
-#: fau-cris.php:952
+#: fau-cris.php:1068
 msgid "Übersicht"
 msgstr ""
 
-#: fau-cris.php:957
+#: fau-cris.php:1073
 msgid "Shortcodes"
 msgstr ""
 
-#: fau-cris.php:962
+#: fau-cris.php:1078
 msgid "Integration \"FAU Person\""
 msgstr ""
 

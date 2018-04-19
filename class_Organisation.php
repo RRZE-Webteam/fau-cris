@@ -84,7 +84,7 @@ class Organisation {
             $output = '<p>' . __('Es wurden leider keine Informationen gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        $research_contacts = "";
+        $research_contacts = array();
         foreach ($orgaArray as $organisation) {
             $organisation = (array) $organisation;
             foreach ($organisation['attributes'] as $attribut => $v) {
@@ -148,7 +148,7 @@ class Organisation {
                 $output .= "<div class=\"cris-image\">";
                 foreach($research_imgs as $img) {
                     if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $output .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                       $output .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }
                 }
@@ -183,7 +183,7 @@ class Organisation {
                 $image = "<div class=\"cris-image\">";
                 foreach($research_imgs as $img) {
                     if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $image .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                       $image .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }
                 }

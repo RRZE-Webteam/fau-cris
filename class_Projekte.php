@@ -329,7 +329,7 @@ class Projekte {
                 foreach($imgs as $img) {
                     if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                         $proj_details["#image$i#"] = "<div class=\"cris-image\">";
-                        $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                        $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                         $proj_details["#image$i#"] .= "</div>";
                     }
@@ -390,7 +390,7 @@ class Projekte {
                 foreach($imgs as $img) {
                     $proj_details["#image$i#"] = "<div class=\"cris-image\">";
                     if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                       $proj_details["#image$i#"] .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     $proj_details["#image$i#"] .= "</div>";
                     }
@@ -440,7 +440,7 @@ class Projekte {
                 $projlist .= "<div class=\"cris-image\">";
                 foreach($imgs as $img) {
                     if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $projlist .= "<p><img alt=\"". $img->attributes['_short description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                       $projlist .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
                         . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
                     }
                 }
@@ -674,10 +674,22 @@ class Projekte {
         if ($return == 'array')
             return $projArray;
 
-        if ( $this->cms == 'wp' && shortcode_exists( 'collapsibles' ) ) {
-            $output = $this->make_accordion($projArray);
+        // sortiere nach Erscheinungsdatum
+        if (array_key_exists('relation right seq', reset($projArray)->attributes)) {
+            $sortby = 'relation right seq';
+            $orderby = $sortby;
         } else {
-            $output = $this->make_list($projArray);
+            $sortby = NULL;
+            $orderby = __('O.A.','fau-cris');
+        }
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_DESC);
+        $res = $formatter->execute($projArray);
+        $projList = $res[$orderby];
+
+        if ( $this->cms == 'wp' && shortcode_exists( 'collapsibles' ) ) {
+            $output = $this->make_accordion($projList);
+        } else {
+            $output = $this->make_list($projList);
         }
         return $output;
     }
@@ -691,6 +703,7 @@ class Projekte {
         }
         if (!count($projArray))
             return;
+        $persList = array();
         foreach ($projArray as $project) {
             $project = (array) $project;
             foreach ($project['attributes'] as $attribut => $v) {
