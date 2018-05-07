@@ -116,6 +116,10 @@ class CRIS_formatter {
 
     private function compare_attributes($a, $b) {
         # Compare data based on attribute specified in self::sortkey
-        return strcmp($a->attributes[$this->sortkey], $b->attributes[$this->sortkey]);
+        if (is_numeric($a->attributes[$this->sortkey]) && is_numeric($b->attributes[$this->sortkey])) {
+            return $a->attributes[$this->sortkey] - $b->attributes[$this->sortkey];
+        } else {
+            return strcmp($a->attributes[$this->sortkey], $b->attributes[$this->sortkey]);
+        }
     }
 }

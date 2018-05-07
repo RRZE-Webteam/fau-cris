@@ -682,7 +682,7 @@ class Projekte {
             $sortby = NULL;
             $orderby = __('O.A.','fau-cris');
         }
-        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_DESC);
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($projArray);
         $projList = $res[$orderby];
 
