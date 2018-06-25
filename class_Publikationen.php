@@ -28,6 +28,7 @@ class Publikationen {
         $this->subtypeorder = $this->options['cris_pub_subtypes_order'];
         $this->univisLink = isset($this->options['cris_univis']) ? $this->options['cris_univis'] : 'none';
         $this->bibtex = $this->options['cris_bibtex'];
+        $this->bibtexlink = "https://cris.fau.de/bibtex/publication/%s.bib";
         if ($this->cms == 'wbk' && $this->univisLink == 'person') {
             $this->univis = Tools::get_univis();
         }
@@ -399,7 +400,7 @@ class Publikationen {
                 $publist .= "<br />URL: <a href='" . $publication->attributes['cfuri'] . "' target='blank' itemprop=\"url\">" . $publication->attributes['cfuri'] . "</a>";
             }
             if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
-                $publist .= "<br />BibTeX: " . $publication->attributes['bibtex_link'];
+                $publist .= '<br />BibTeX: <a href="' . sprintf($this->bibtexlink, $publication->attributes['id_publ']) . '">Download</a>';
             }
             $publist .= "</li>";
         }
@@ -485,7 +486,7 @@ class Publikationen {
                 'eventend' => (!empty($publication['event end date']) ? strftime('%x', strtotime(strip_tags($publication['event end date']))) : ''),
                 'origTitle' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
                 'language' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
-                'bibtex_link' => (array_key_exists('bibtex_link', $publication) ? $publication['bibtex_link'] : __('Nicht verfügbar', 'fau-cris')),
+                'bibtex_link' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
                 'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
                 'thesisSubtype' => (array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
                 'articleNumber' => (array_key_exists('article number', $publication) ? $publication['article number'] : '')
