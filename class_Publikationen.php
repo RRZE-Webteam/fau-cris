@@ -308,11 +308,22 @@ class Publikationen {
 
         if (!count($pubArray))
             return;
+        
+        if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
+            $sortby = 'relation right seq';
+            $orderby = $sortby;
+        } else {
+            $sortby = NULL;
+            $orderby = __('O.A.','fau-cris');
+        }
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
+        $res = $formatter->execute($pubArray);
+        $pubList = $res[$orderby];
 
         if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubArray, $quotation);
+            $output = $this->make_quotation_list($pubList, $quotation);
         } else {
-            $output = $this->make_list($pubArray, 0, $this->nameorder);
+            $output = $this->make_list($pubList, 0, $this->nameorder);
         }
 
         return $output;
@@ -330,12 +341,22 @@ class Publikationen {
 
         if (!count($pubArray))
             return;
-        if ($publications_limit != '') {
-            $pubList = array_slice($pubArray, 0, $publications_limit, true);
+       
+        if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
+            $sortby = 'relation right seq';
+            $orderby = $sortby;
         } else {
-            $pubList = $pubArray;
+            $sortby = NULL;
+            $orderby = __('O.A.','fau-cris');
         }
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
+        $res = $formatter->execute($pubArray);
+        $pubList = $res[$orderby];
 
+        if ($publications_limit != '') {
+            $pubList = array_slice($pubList, 0, $publications_limit, true);
+        }
+        
         $output = '';
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output = $this->make_quotation_list($pubList, $quotation);

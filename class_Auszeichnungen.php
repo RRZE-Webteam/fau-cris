@@ -242,7 +242,7 @@ class Auszeichnungen {
                 $preistraegerArray[] = array(
                     'id' => $key,
                     'lastname' => $nameparts[0],
-                    'firstname' => $nameparts[1]);
+                    'firstname' => array_key_exists(1, $nameparts) ? $nameparts[1] : '');
             }
             $preistraegerList = array();
             foreach ($preistraegerArray as $pt) {
