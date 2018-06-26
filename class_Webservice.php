@@ -132,7 +132,7 @@ class CRIS_entity {
             $this->attributes[strtolower($attr_name)] = $attr_value;
         }
         foreach ($data->relation as $_r) {
-            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ")))
+            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ", "PROJ_has_PUBL", "FOBE_has_top_PUBL")))
                 continue;
             foreach($_r->attribute as $_ra) {
                 if ($_ra['name'] == 'Left seq') {

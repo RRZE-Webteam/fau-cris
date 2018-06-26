@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.7.1
+ * Version: 3.7.2
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -856,8 +856,8 @@ class FAU_CRIS {
             'fau' => '',
             'peerreviewed' => '',
             'current' => '',
-            'publications_limit' => isset($options['cris_fields_num_pub']) ? $options['cris_fields_num_pub'] : '5',
-            'name_order_plugin' => isset($options['cris_name_order_plugin']) ? $options['cris_name_order_plugin'] : 'firstname-lastname',
+            'publications_limit' => (isset($options['cris_fields_num_pub']) && !empty($options['cris_fields_num_pub'])) ? $options['cris_fields_num_pub'] : '5',
+            'name_order_plugin' => (isset($options['cris_name_order_plugin']) && !empty($options['cris_name_order_plugin'])) ? $options['cris_name_order_plugin'] : 'firstname-lastname',
             'notable' => '',
             'publications_year' => '',
             'publications_start' => '',
@@ -973,7 +973,7 @@ class FAU_CRIS {
                 $sc_param['order2'] = '';
             }
         }
-        //var_dump($sc_param);
+
         return $sc_param;
     }
 
