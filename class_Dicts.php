@@ -628,6 +628,153 @@ class CRIS_Dicts {
         ),
     );
 
+    public static $pubJournalSubtypes = array(
+        'Editorial' => array(
+            'order' => 1,
+            'short' => 'editorial',
+            'de' => array(
+                'name' => 'Editorial',
+                'title' => 'Editorials'
+            ),
+            'en' => array(
+                'name' => 'Editorial',
+                'title' => 'Editorials'
+            )
+        ),
+        'Erratum' => array(
+            'order' => 2,
+            'short' => 'erratum',
+            'de' => array(
+                'name' => 'Erratum',
+                'title' => 'Errata'
+            ),
+            'en' => array(
+                'name' => 'Erratum',
+                'title' => 'Errata'
+            )
+        ),
+        'Case study' => array(
+            'order' => 3,
+            'short' => 'fallstudie',
+            'de' => array(
+                'name' => 'Medizinische Fallstudie',
+                'title' => 'Medizinische Fallstudien'
+            ),
+            'en' => array(
+                'name' => 'Medical case study',
+                'title' => 'Medical Case Studies'
+            )
+        ),
+        'Letter' => array(
+            'order' => 4,
+            'short' => 'letter',
+            'de' => array(
+                'name' => 'Letter',
+                'title' => 'Letters'
+            ),
+            'en' => array(
+                'name' => 'Letter',
+                'title' => 'Letters'
+            )
+        ),
+        'Article in Journal' => array(
+            'order' => 5,
+            'short' => 'originalarbeit',
+            'de' => array(
+                'name' => 'Originalarbeit',
+                'title' => 'Originalarbeiten'
+            ),
+            'en' => array(
+                'name' => 'Original article',
+                'title' => 'Original Articles'
+            )
+        ),
+        'Report' => array(
+            'order' => 6,
+            'short' => 'report',
+            'de' => array(
+                'name' => 'Report',
+                'title' => 'Reports'
+            ),
+            'en' => array(
+                'name' => 'Report',
+                'title' => 'Reports'
+            )
+        ),
+        'Review article' => array(
+            'order' => 7,
+            'short' => 'reviewartikel',
+            'de' => array(
+                'name' => 'Review-Artikel',
+                'title' => 'Review-Artikel'
+            ),
+            'en' => array(
+                'name' => 'Review article',
+                'title' => 'Review Articles'
+            )
+        ),
+        'Short survey' => array(
+            'order' => 8,
+            'short' => 'shortsurvey',
+            'de' => array(
+                'name' => 'Short survey',
+                'title' => 'Short surveys'
+            ),
+            'en' => array(
+                'name' => 'Short survey',
+                'title' => 'Short Surveys'
+            )
+        ),
+        'Note' => array(
+            'order' => 9,
+            'short' => 'note',
+            'de' => array(
+                'name' => 'Note',
+                'title' => 'Notes'
+            ),
+            'en' => array(
+                'name' => 'Note',
+                'title' => 'Notes'
+            )
+        ),
+        'online publication' => array(
+            'order' => 10,
+            'short' => 'onlinepublication',
+            'de' => array(
+                'name' => 'Online-Publikation',
+                'title' => 'Online-Publikationen'
+            ),
+            'en' => array(
+                'name' => 'Online publication',
+                'title' => 'Online Publications'
+            )
+        ),
+        'Entscheidungsanmerkung' => array(
+            'order' => 11,
+            'short' => 'entscheidungsanmerkung',
+            'de' => array(
+                'name' => 'Entscheidungsanmerkung',
+                'title' => 'Entscheidungsanmerkungen'
+            ),
+            'en' => array(
+                'name' => 'Decision note',
+                'title' => 'Decision Notes'
+            )
+        ),
+        'undefined' => array(
+            'order' => 12,
+            'short' => 'andere',
+            'de' => array(
+                'name' => 'Anderer',
+                'title' => 'Andere'
+            ),
+            'en' => array(
+                'name' => 'Other',
+                'title' => 'Other'
+            )
+        ),
+    );
+
     public static $projectRoles = array(
         'leader' => array(
             'order' => 1,

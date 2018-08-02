@@ -35,6 +35,9 @@ class Tools {
             case 'pubothersubtypes':
                 $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
+            case 'pubjournalsubtypes':
+                $search = CRIS_Dicts::$pubJournalSubtypes;
+                break;
         }
         foreach ($search as $k => $v) {
             $order[$v['order']] = $k;
@@ -63,6 +66,9 @@ class Tools {
             case 'pubothersubtypes':
                 $search = CRIS_Dicts::$pubOtherSubtypes;
                 break;
+            case 'pubjournalsubtypes':
+                $search = CRIS_Dicts::$pubJournalSubtypes;
+                break;
         }
         $order_raw = self::getOrder($object);
         foreach ($order_raw as $k => $v) {
@@ -90,6 +96,9 @@ class Tools {
                 break;
             case 'pubothersubtypes':
                 $search = CRIS_Dicts::$pubOtherSubtypes;
+                break;
+            case 'pubjournalsubtypes':
+                $search = CRIS_Dicts::$pubJournalSubtypes;
                 break;
         }
         foreach ($search as $k => $v) {
@@ -124,6 +133,9 @@ class Tools {
             case 'pubthesissubtypes':
                 $search = CRIS_Dicts::$pubThesisSubtypes;
                 break;
+            case 'pubjournalsubtypes':
+                $search = CRIS_Dicts::$pubJournalSubtypes;
+                break;
         }
         if (array_key_exists($type, $search))
             return $search[$type][$lang]['name'];
@@ -151,6 +163,9 @@ class Tools {
                 break;
             case 'pubothersubtypes':
                 $search = CRIS_Dicts::$pubOtherSubtypes;
+                break;
+            case 'pubjournalsubtypes':
+                $search = CRIS_Dicts::$pubJournalSubtypes;
                 break;
             case 'projectroles':
                 $search = CRIS_Dicts::$projectRoles;
@@ -311,21 +326,26 @@ class Tools {
             $filter['publication type__eq'] = $pubTyp;
         }
         if ($subtype !== '' && $subtype !== NULL) {
+            $subtypestring = ($type == 'zeitschriftenartikel') ? 'pubjournalsubtypes' : 'pubothersubtypes';
             if (strpos($subtype, ',')) {
                 $subtype = str_replace(' ', '', $subtype);
                 $subtypes = explode(',', $subtype);
                 foreach($subtypes as $v) {
-                    $pubSubTyp[] = self::getType('pubothersubtypes', $v);
+                    $pubSubTyp[] = self::getType($subtypestring, $v);
                 }
                 //$pubTyp = implode(',', $pubTypes);
             } else {
-                $pubSubTyp = (array) self::getType('pubothersubtypes', $subtype);
+                $pubSubTyp = (array) self::getType($subtypestring, $subtype);
             }
             if (empty($pubSubTyp)) {
                 $output = '<p>' . __('Falscher Parameter für Publikationssubtyp', 'fau-cris') . '</p>';
                 return $output;
             }
-            $filter['type other subtype__eq'] = $pubSubTyp;
+            if (($type == 'zeitschriftenartikel')) {
+                $filter['publication journal subtype__eq'] = $pubSubTyp;
+            } else {
+                $filter['type other subtype__eq'] = $pubSubTyp;
+            }
         }
         if ($fau !== '') {
             if ($fau == 1) {

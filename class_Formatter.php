@@ -45,9 +45,12 @@ class CRIS_formatter {
         $final = array();
         foreach ($data as $single_dataset) {
             if ($this->group != null) {
-                if (!array_key_exists($this->group, $single_dataset->attributes))
-                        throw new Exception('attribute not found: '. $this->group);
-                $group_key = $this->group;
+                if (!array_key_exists($this->group, $single_dataset->attributes)) {
+                    trigger_error('Attribute not found: '. $this->group);
+                    $group_key = $this->sort;
+                } else {
+                    $group_key = $this->group;
+                }
             } else {
                 # no grouping requested, we assume that sort is set in this case
                 # also the case if a maximum limit is set
@@ -81,7 +84,7 @@ class CRIS_formatter {
         elseif ($this->group_order === SORT_DESC)
                 krsort($final);
         elseif ($this->group_order !== NULL)
-                throw new Exception('unknown sorting');
+                trigger_error('Unknown sorting');
 
         # sort data inside groups
         foreach ($final as $_k => $group) {
