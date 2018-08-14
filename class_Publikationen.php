@@ -454,7 +454,11 @@ class Publikationen {
                 }
                 $authors_html = implode(", ", $authorList);
             } else {
-                $authors_html = $publication['srcauthors'];
+                if($publication['publication type'] == "Editorial") {
+                    $authors_html = $publication['srceditors'];
+                } else {
+                    $authors_html = $publication['srcauthors'];
+                }
             }
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
