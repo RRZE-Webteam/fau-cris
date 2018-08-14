@@ -127,7 +127,7 @@ class Aktivitaeten {
 
         // Patenttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$activities, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['activities'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('activities', $value);
             }

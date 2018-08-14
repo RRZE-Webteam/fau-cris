@@ -118,7 +118,7 @@ class Patente {
 
         // Patenttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$publications, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('patents', $value);
             }

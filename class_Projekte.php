@@ -157,7 +157,7 @@ class Projekte {
 
         // Projekttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$projects, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['projects'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('projects', $value);
             }

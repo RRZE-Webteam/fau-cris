@@ -129,7 +129,7 @@ class Auszeichnungen {
 
         // Auszeichnungstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$awards, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['awards'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('awards', $value);
             }

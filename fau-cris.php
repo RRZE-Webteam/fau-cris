@@ -147,7 +147,7 @@ class FAU_CRIS {
             'cris_org_nr' => '',
             'cris_cache' => '18000',
             'cris_pub_order' => Tools::getOptionsOrder('publications'),
-            'cris_pub_subtypes_order' => Tools::getOptionsOrder('pubothersubtypes'),
+            'cris_pub_subtypes_order' => Tools::getOptionsOrder('publications', 'Other'),
             'cris_univis' => 'none',
             'cris_bibtex' => 0,
             'cris_url' => 0,

@@ -153,7 +153,7 @@ class Publikationen {
 
         // Publikationstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$publications, 'short')) !== false) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short')) !== false) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('publications', $value);
             }
@@ -177,28 +177,28 @@ class Publikationen {
             foreach ($pubList as $array_type => $publications) {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                 $title = Tools::getTitle('publications', $array_type, get_locale());
-                if ($array_type == 'Other') {
+                //if ($array_type == 'Other') {
                     $shortcode_data_other = '';
-                    // Weitrere Untergliederung für Publikationstyp "Other"
+                    // Weitrere Untergliederung für Subtypen
                     $subtypeorder = $this->subtypeorder;
-                    if ($subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(CRIS_Dicts::$pubOtherSubtypes, 'short'))) {
-                        foreach ($subtypeorder as $key => $value) {
-                            $subtypeorder[$key] = Tools::getType('pubothersubtypes', $value);
-                        }
-                    } else {
-                        $subtypeorder = Tools::getOrder('pubothersubtypes');
+                    if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
+                    foreach ($subtypeorder as $key => $value) {
+                        $subtypeorder[$key] = Tools::getType('publications', $value, $array_type);
                     }
+                } else {
+                    $subtypeorder = Tools::getOrder('publications', $array_type);
+                }
                     if ($order2 == 'author') {
-                        $subformatter = new CRIS_formatter("type other subtype", array_values($subtypeorder), "relauthors", SORT_ASC);
+                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "relauthors", SORT_ASC);
                     } else {
-                        $subformatter = new CRIS_formatter("type other subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
                     }
                     $pubOtherList = $subformatter->execute($publications);
 
                     foreach ($pubOtherList as $array_subtype => $publications_sub) {
                         // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                         if (empty($subtype)) {
-                            $title_sub = Tools::getTitle('pubothersubtypes', $array_subtype, get_locale());
+                            $title_sub = Tools::getTitle('publications', $array_subtype, get_locale(), $array_type);
                             $shortcode_data_other .= "<h4>";
                             $shortcode_data_other .= $title_sub;
                             $shortcode_data_other .= "</h4>";
@@ -209,16 +209,8 @@ class Publikationen {
                             $shortcode_data_other .= $this->make_list($publications_sub);
                         }
                     }
-                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
-                } else {
-                    if ($quotation == 'apa' || $quotation == 'mla') {
-                        $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_quotation_list($publications, $quotation) . '[/collapse]');
-                    } else {
-                        $showsubtype = 0;
-                        $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($publications, $showsubtype, $this->nameorder) . '[/collapse]');
-                    }
+                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');                    
                     $openfirst = '';
-                }
             }
             $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
         } else {
@@ -227,47 +219,47 @@ class Publikationen {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                 if (empty($type)) {
                     $title = Tools::getTitle('publications', $array_type, get_locale());
-                    $output .= "<h3>";
-                    $output .= $title;
-                    $output .= "</h3>";
+                    if (!shortcode_exists('collapsibles') || $format != 'accordion') {
+                        $output .= "<h3>";
+                        $output .= $title;
+                        $output .= "</h3>";
+                    }
                 }
-                if ($array_type == 'Other') {
-                    // Weitrere Untergliederung für Publikationstyp "Other"
-                    $subtypeorder = $this->subtypeorder;
-                    if ($subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(CRIS_Dicts::$pubOtherSubtypes, 'short'))) {
-                        foreach ($subtypeorder as $key => $value) {
-                            $subtypeorder[$key] = Tools::getType('pubothersubtypes', $value);
-                        }
-                    } else {
-                        $subtypeorder = Tools::getOrder('pubothersubtypes');
-                    }
-                    if ($order2 == 'author') {
-                        $subformatter = new CRIS_formatter("type other subtype", array_values($subtypeorder), "relauthors", SORT_ASC);
-                    } else {
-                        $subformatter = new CRIS_formatter("type other subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
-                    }
-                    $pubOtherList = $subformatter->execute($publications);
-
-                    foreach ($pubOtherList as $array_subtype => $publications_sub) {
-                        // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
-                        if (empty($subtype)) {
-                            $title_sub = Tools::getTitle('pubothersubtypes', $array_subtype, get_locale());
-                            $output .= "<h4>";
-                            $output .= $title_sub;
-                            $output .= "</h4>";
-                        }
-                        if ($quotation == 'apa' || $quotation == 'mla') {
-                            $output .= $this->make_quotation_list($publications_sub, $quotation);
-                        } else {
-                            $output .= $this->make_list($publications_sub);
-                        }
+                //var_dump($array_type);
+                // Weitrere Untergliederung (Subtypen)
+                $subtypeorder = $this->subtypeorder;
+                if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
+                    foreach ($subtypeorder as $key => $value) {
+                        $subtypeorder[$key] = Tools::getType('publications', $value, $array_type);
                     }
                 } else {
-                    if ($quotation == 'apa' || $quotation == 'mla') {
-                        $output .= $this->make_quotation_list($publications, $quotation);
-                    } else {
-                        $output .= $this->make_list($publications, 0, $this->nameorder);
+                    $subtypeorder = Tools::getOrder('publications', $array_type);
+                }
+                if ($order2 == 'author') {
+                    $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "relauthors", SORT_ASC);
+                } else {
+                    $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                }
+                $pubOtherList = $subformatter->execute($publications);
+
+                foreach ($pubOtherList as $array_subtype => $publications_sub) {
+                    // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
+                    if (empty($subtype)) {
+                        $title_sub = Tools::getTitle('publications', $array_subtype, get_locale(), $array_type);
+                        $output .= "<h4>";
+                        $output .= $title_sub;
+                        $output .= "</h4>";
                     }
+                    if ($quotation == 'apa' || $quotation == 'mla') {
+                        $output .= $this->make_quotation_list($publications_sub, $quotation);
+                    } else {
+                        $output .= $this->make_list($publications_sub);
+                    }
+                }
+                if ($quotation == 'apa' || $quotation == 'mla') {
+                    $output .= $this->make_quotation_list($publications, $quotation);
+                } else {
+                    $output .= $this->make_list($publications, 0, $this->nameorder);
                 }
             }
         }
@@ -466,7 +458,7 @@ class Publikationen {
             }
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
-            if (($publication['publication type'] == 'Translation' || $publication['type other subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
+            if (($publication['publication type'] == 'Translation' || $publication['subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
                 $title = strip_tags($publication['originalauthors']) . ': ';
             }
             $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
@@ -519,7 +511,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $pubDetails['pubType'], get_locale()) . ')' : '';
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], get_locale(), $pubDetails['pubType']) . ')' : '';
                     $publist .= (($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '';
                     $publist .= $pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '';
                     if (!empty($pubDetails['publisher'])) {
@@ -599,7 +591,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $pubDetails['pubType'], get_locale()) . (!empty($pubDetails['pubStatus']) ? ', ' . strtolower($pubDetails['pubStatus']) : '') . ')' : '';
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], get_locale(), $pubDetails['pubType']) . (!empty($pubDetails['pubStatus']) ? ', ' . strtolower($pubDetails['pubStatus']) : '') . ')' : '';
                     if ($pubDetails['eventtitle'] != '') {
                         $publist .= "<br /><span itemscope itemtype=\"http://schema.org/Event\" style=\"font-style:italic;\">";
                         $publist .= "<span itemprop=\"name\">" . $pubDetails['eventtitle'] . "</span>";
@@ -657,7 +649,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= " (" . ($pubDetails['thesisSubtype'] != '' ? Tools::getName('pubthesissubtypes', $pubDetails['thesisSubtype'], get_locale()) : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)";
+                    $publist .= " (" . ($pubDetails['thesisSubtype'] != '' ? Tools::getName('publications', 'Thesis', get_locale(), $pubDetails['thesisSubtype']) : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)";
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . FAU_CRIS::doi . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
