@@ -605,7 +605,7 @@ class Tools {
         if ($page && !empty($page->ID)) {
             return get_permalink($page->ID);
         } else {
-            return FAU_CRIS::cris_publicweb . $item . "/" . $cris_id . ($lang == 'de' ? '?lang=2' : '?lang=1');
+            return FAU_CRIS::cris_publicweb . $item . "/" . $cris_id . ($lang == 'de' ? '?lang=de_DE' : '?lang=en_GB');
         }
     }
 
