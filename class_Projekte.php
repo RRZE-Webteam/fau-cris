@@ -50,8 +50,17 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($year = '', $start = '', $type = '', $limit = '', $hide = '', $role = 'all', $current = '') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
+    public function projListe($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
+        $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
+
+        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -79,8 +88,16 @@ class Projekte {
      * Ausgabe aller Projekte nach Rolle (Leiter/Mitarbeit) gegliedert
      */
 
-    public function projNachRolle($year = '', $start = '', $type = '', $hide = '', $role = 'all', $content = '', $current = '') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
+    public function projNachRolle($param = array(), $content = '') {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
+        $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
+
+        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -115,8 +132,16 @@ class Projekte {
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
 
-    public function projNachJahr($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '', $current = '') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
+    public function projNachJahr($param = array(), $content = '') {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
+        $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
+
+        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -146,8 +171,16 @@ class Projekte {
      * Ausgabe aller Projekte nach Projekttypen gegliedert
      */
 
-    public function projNachTyp($year = '', $start = '', $type = '', $hide = '', $role = '', $content = '', $current = '') {
-        $projArray = $this->fetch_projects($year, $start, $type, $role, $current);
+    public function projNachTyp($param = array(), $content = '') {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
+        $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
+
+        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -243,8 +276,8 @@ class Projekte {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_projects($year = '', $start = '', $type = '', $role = 'all', $current = '') {
-        $filter = Tools::project_filter($year, $start, $type, $current);
+    private function fetch_projects($year = '', $start = '', $end = '', $type = '', $role = 'all', $current = '') {
+        $filter = Tools::project_filter($year, $start, $end, $type, $current);
 
         $ws = new CRIS_projects();
         $awardArray = array();

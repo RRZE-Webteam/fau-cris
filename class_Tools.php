@@ -216,12 +216,14 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '') {
+    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['publyear__eq'] = $year;
         if ($start !== '' && $start !== NULL)
             $filter['publyear__ge'] = $start;
+        if ($end !== '' && $end !== NULL)
+            $filter['publyear__le'] = $end;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
@@ -273,12 +275,14 @@ class Tools {
      * Array zur Definition des Filters für Awards
      */
 
-    public static function award_filter($year = '', $start = '', $type = '') {
+    public static function award_filter($year = '', $start = '', $end = '', $type = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['year award__eq'] = $year;
         if ($start !== '' && $start !== NULL)
             $filter['year award__ge'] = $start;
+        if ($end !== '' && $end !== NULL)
+            $filter['year award__le'] = $end;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
@@ -304,7 +308,7 @@ class Tools {
      * Array zur Definition des Filters für Projekte
      */
 
-    public static function project_filter($year = '', $start = '', $type = '', $current = '') {
+    public static function project_filter($year = '', $start = '', $end = '', $type = '', $current = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL) {
             if ($year == 'current') {
@@ -318,6 +322,8 @@ class Tools {
         }
         if ($start !== '' && $start !== NULL)
             $filter['startyear__ge'] = $start;
+        if ($end !== '' && $end !== NULL)
+            $filter['startyear__le'] = $end;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
@@ -348,12 +354,14 @@ class Tools {
      * Array zur Definition des Filters für Patente
      */
 
-    public static function patent_filter($year = '', $start = '', $type = '') {
+    public static function patent_filter($year = '', $start = '', $end = '', $type = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
-            $filter['startyear__eq'] = $year;
+            $filter['registryear__eq'] = $year;
         if ($start !== '' && $start !== NULL)
-            $filter['startyear__ge'] = $start;
+            $filter['registryear__ge'] = $start;
+        if ($end !== '' && $end !== NULL)
+            $filter['registryear__le'] = $end;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
@@ -379,12 +387,14 @@ class Tools {
      * Array zur Definition des Filters für Aktivitäten
      */
 
-    public static function activity_filter($year = '', $start = '', $type = '') {
+    public static function activity_filter($year = '', $start = '', $end = '', $type = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
-            $filter['startyear__eq'] = $year;
+            $filter['year__eq'] = $year;
         if ($start !== '' && $start !== NULL)
-            $filter['startyear__ge'] = $start;
+            $filter['year__ge'] = $start;
+        if ($end !== '' && $end !== NULL)
+            $filter['year__le'] = $end;
         if ($type !== '' && $type !== NULL) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);

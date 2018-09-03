@@ -55,8 +55,20 @@ class Publikationen {
      * Ausgabe aller Publikationen ohne Gliederung
      */
 
-    public function pubListe($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $limit = '', $sortby = 'virtualdate', $fau = '', $peerreviewed = '', $notable = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed, $notable);
+    public function pubListe($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $subtype = (isset($param['subtype']) && $param['subtype'] != '') ? $param['subtype'] : '';
+        $quotation = (isset($param['quotation']) && $param['quotation'] != '') ? $param['quotation'] : '';
+        $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
+        $sortby = (isset($param['sortby']) && $param['sortby'] != '') ? $param['sortby'] : 'virtualdate';
+        $fau = (isset($param['fau']) && $param['fau'] != '') ? $param['fau'] : '';
+        $peerreviewed = (isset($param['peerreviewed']) && $param['peerreviewed'] != '') ? $param['peerreviewed'] : '';
+        $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
+
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -95,8 +107,20 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'author', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $format = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed, $notable, $field);
+    public function pubNachJahr($param = array(), $field = '') {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $subtype = (isset($param['subtype']) && $param['subtype'] != '') ? $param['subtype'] : '';
+        $quotation = (isset($param['quotation']) && $param['quotation'] != '') ? $param['quotation'] : '';
+        $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'author';
+        $fau = (isset($param['fau']) && $param['fau'] != '') ? $param['fau'] : '';
+        $peerreviewed = (isset($param['peerreviewed']) && $param['peerreviewed'] != '') ? $param['peerreviewed'] : '';
+        $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
+
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field);
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
@@ -143,8 +167,20 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($year = '', $start = '', $type = '', $subtype = '', $quotation = '', $order2 = 'date', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $format = '') {
-        $pubArray = $this->fetch_publications($year, $start, $type, $subtype, $fau, $peerreviewed, $notable, $field);
+    public function pubNachTyp($param = array(), $field = '') {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $subtype = (isset($param['subtype']) && $param['subtype'] != '') ? $param['subtype'] : '';
+        $quotation = (isset($param['quotation']) && $param['quotation'] != '') ? $param['quotation'] : '';
+        $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'date';
+        $fau = (isset($param['fau']) && $param['fau'] != '') ? $param['fau'] : '';
+        $peerreviewed = (isset($param['peerreviewed']) && $param['peerreviewed'] != '') ? $param['peerreviewed'] : '';
+        $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
+
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -367,10 +403,10 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '') {
+    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '') {
         $filter = NULL;
 
-        $filter = Tools::publication_filter($year, $start, $type, $subtype, $fau, $peerreviewed);
+        $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed);
         $ws = new CRIS_publications();
 
         try {
