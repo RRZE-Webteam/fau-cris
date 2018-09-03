@@ -816,6 +816,13 @@ class FAU_CRIS {
                 return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'] = array(), $parameter['role'], $content);
             }
             return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide'], $parameter['role']);*/
+        } elseif ($parameter['show'] == 'publications') {
+        // Publikationen
+            require_once('class_Publikationen.php');
+            $liste = new Publikationen($parameter['entity'], $parameter['entity_id']);
+            if ($parameter['publication'] != '') {
+                return $liste->customPub($content, $parameter);
+            }
         }
     }
 

@@ -395,6 +395,29 @@ class Publikationen {
         return $output;
     }
 
+    /*
+     * Ausgabe einer Publikation per Custom-Shortcode
+     */
+
+    public function customPub($content = '') {
+        $ws = new CRIS_publications();
+        try {
+            $pubArray = $ws->by_id($this->id);
+        } catch (Exception $ex) {
+            return;
+        }
+
+        if (!count($pubArray)) {
+            $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
+            return $output;
+        }
+
+        $output = $this->make_custom_list($pubArray, $content);
+        return $output;
+    }
+
+
+
     /* =========================================================================
      * Private Functions
       ======================================================================== */
@@ -730,6 +753,105 @@ class Publikationen {
         }
         $publist .= "</ul>";
 
+        return $publist;
+    }
+
+    private function make_custom_list($publications, $custom_text, $nameorder = '') {
+        $publist = "<ul class=\"cris-publications\">";
+
+        foreach ($publications as $publObject) {
+            $publication = (array) $publObject;
+            foreach ($publication['attributes'] as $attribut => $v) {
+                $publication[$attribut] = $v;
+            }
+            unset($publication['attributes']);
+            $id = $publication['ID'];
+            // authors
+            if (strtolower($publication['complete author relations']) == 'yes') {
+                $authors = explode("|", $publication['exportauthors']);
+                $authorIDs = explode(",", $publication['relpersid']);
+                $authorsArray = array();
+                foreach ($authorIDs as $i => $key) {
+                    $nameparts = explode(":", $authors[$i]);
+                    $authorsArray[] = array(
+                        'id' => $key,
+                        'lastname' => $nameparts[0],
+                        'firstname' => $nameparts[1]);
+                }
+                $authorList = array();
+                foreach ($authorsArray as $author) {
+                    $authorList[] = Tools::get_person_link($author['id'], $author['firstname'], $author['lastname'], $this->univisLink, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 1, 1, $nameorder);
+                }
+                $authors_html = implode(", ", $authorList);
+            } else {
+                if($publication['publication type'] == "Editorial") {
+                    $authors_html = $publication['srceditors'];
+                } else {
+                    $authors_html = $publication['srcauthors'];
+                }
+            }
+            // title (bei Rezensionen mit Original-Autor davor)
+            $title = '';
+            if (($publication['publication type'] == 'Translation' || $publication['subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
+                $title = strip_tags($publication['originalauthors']) . ': ';
+            }
+            $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
+            global $post;
+            $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
+                    . "<a href=\"" . Tools::get_item_url("publication", $title, $id, $post->ID) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
+                    . $title
+                    . "</a></strong></span>";
+            //pubType
+            $pubTypeRaw = (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? strip_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? strip_tags($publication['publication type']) : __('O.A.', 'fau-cris'));
+
+            $pubType = Tools::getName('publications', $pubTypeRaw, get_locale());
+            // make array
+            setlocale(LC_TIME, get_locale());
+            $pubDetails = array(
+                '#id#' => $id,
+                '#authors#' => $authors_html,
+                '#title#' => $title,
+                '#url#' => Tools::get_item_url("publication", $title, $id, $post->ID),
+                '#city#' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
+                '#publisher#' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
+                '#year#' => (array_key_exists('publyear', $publication) ? strip_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
+                '#pubType#' => $pubType,
+                '#pubStatus#' => (array_key_exists('publstatus', $publication) ? strip_tags($publication['publstatus']) : ''),
+                '#pagesTotal#' => (array_key_exists('cftotalpages', $publication) ? strip_tags($publication['cftotalpages']) : ''),
+                '#pagesRange#' => (array_key_exists('pagesrange', $publication) ? strip_tags($publication['pagesrange']) : ''),
+                '#lexiconColumn#' => (array_key_exists('lexiconcolumn', $publication) ? strip_tags($publication['lexiconcolumn']) : ''),
+                '#volume#' => (array_key_exists('cfvol', $publication) ? strip_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
+                '#series#' => (array_key_exists('cfseries', $publication) ? strip_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
+                '#seriesNumber#' => !empty($publication['book volume']) ? strip_tags($publication['book volume']) : '',
+                '#ISBN#' => (array_key_exists('cfisbn', $publication) ? strip_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
+                '#ISSN#' => (array_key_exists('cfissn', $publication) ? strip_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
+                '#DOI#' => (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris')),
+                '#URI#' => (array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+                '#editors#' => (array_key_exists('editor', $publication) ? strip_tags($publication['editor']) : __('O.A.', 'fau-cris')),
+                '#bookTitle#' => (array_key_exists('edited volumes', $publication) ? strip_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
+                '#journalTitle#' => (array_key_exists('journalname', $publication) ? strip_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
+                '#eventTitle#' => (array_key_exists('event title', $publication) ? strip_tags($publication['event title']) : ''),
+                '#eventLocation#' => (array_key_exists('event location', $publication) ? strip_tags($publication['event location']) : ''),
+                '#eventstart_raw#' => !empty($publication['event start date']) ? $publication['event start date'] : (!empty($publication['publyear']) ? $publication['publyear'] : '-----'),
+                '#eventend_raw#' => (!empty($publication['event end date']) ? $publication['event end date'] : ''),
+                '#eventStart#' => !empty($publication['event start date']) ? strftime('%x', strtotime(strip_tags($publication['event start date']))) : '',
+                '#eventEnd#' => (!empty($publication['event end date']) ? strftime('%x', strtotime(strip_tags($publication['event end date']))) : ''),
+                '#originalTitle#' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
+                '#language#' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
+                '#bibtexLink#' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
+                '#otherSubtype#' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
+                '#thesisSubtype#' => (array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
+                '#articleNumber#' => (array_key_exists('article number', $publication) ? $publication['article number'] : '')
+            );
+
+            
+
+            
+            //$publist .= "<li>";
+            $publist .= strtr($custom_text, $pubDetails);
+            //$publist .= "</li>";
+        }
+        $publist .= "</ul>";
         return $publist;
     }
 
