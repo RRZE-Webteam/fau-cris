@@ -55,7 +55,7 @@ class Publikationen {
      * Ausgabe aller Publikationen ohne Gliederung
      */
 
-    public function pubListe($param = array()) {
+    public function pubListe($param = array(), $content = '') {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -97,7 +97,11 @@ class Publikationen {
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output .= $this->make_quotation_list($pubList, $quotation);
         } else {
-            $output .= $this->make_list($pubList, 1, $this->nameorder);
+            if ($param['sc_type'] == 'custom') {
+                $output .= $this->make_custom_list($pubList, $content);
+            } else {
+                $output .= $this->make_list($pubList, 1, $this->nameorder);
+            }
         }
 
         return $output;
@@ -107,7 +111,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($param = array(), $field = '') {
+    public function pubNachJahr($param = array(), $field = '', $content = '') {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -156,7 +160,11 @@ class Publikationen {
                 if ($quotation == 'apa' || $quotation == 'mla') {
                     $output .= $this->make_quotation_list($publications, $quotation);
                 } else {
-                    $output .= $this->make_list($publications, $showsubtype, $this->nameorder);
+                    if ($param['sc_type'] == 'custom') {
+                        $output .= $this->make_custom_list($publications, $content);
+                    } else {
+                        $output .= $this->make_list($publications, $showsubtype, $this->nameorder);
+                    }
                 }
             }
         }
@@ -167,7 +175,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($param = array(), $field = '') {
+    public function pubNachTyp($param = array(), $field = '', $content = '') {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -289,13 +297,21 @@ class Publikationen {
                     if ($quotation == 'apa' || $quotation == 'mla') {
                         $output .= $this->make_quotation_list($publications_sub, $quotation);
                     } else {
-                        $output .= $this->make_list($publications_sub);
+                        if ($param['sc_type'] == 'custom') {
+                            $output .= $this->make_custom_list($publications_sub, $content);
+                        } else {
+                            $output .= $this->make_list($publications_sub);
+                        }
                     }
                 }
                 if ($quotation == 'apa' || $quotation == 'mla') {
                     $output .= $this->make_quotation_list($publications, $quotation);
                 } else {
-                    $output .= $this->make_list($publications, 0, $this->nameorder);
+                    if ($param['sc_type'] == 'custom') {
+                        $output .= $this->make_custom_list($publications, $content);
+                    } else {
+                        $output .= $this->make_list($publications, 0, $this->nameorder);
+                    }
                 }
             }
         }
@@ -304,7 +320,7 @@ class Publikationen {
 
 // Ende pubNachTyp()
 
-    public function singlePub($quotation = '') {
+    public function singlePub($quotation = '', $content = '', $sc_type = 'default') {
         $ws = new CRIS_publications();
 
         try {
@@ -319,7 +335,11 @@ class Publikationen {
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output = $this->make_quotation_list($pubArray, $quotation);
         } else {
-            $output = $this->make_list($pubArray, 0, $this->nameorder);
+            if ($sc_type == 'custom') {
+                $output = $this->make_custom_list($pubArray, $content);
+            } else {
+                $output = $this->make_list($pubArray, 0, $this->nameorder);
+            }
         }
 
         return $output;
@@ -394,29 +414,6 @@ class Publikationen {
 
         return $output;
     }
-
-    /*
-     * Ausgabe einer Publikation per Custom-Shortcode
-     */
-
-    public function customPub($content = '') {
-        $ws = new CRIS_publications();
-        try {
-            $pubArray = $ws->by_id($this->id);
-        } catch (Exception $ex) {
-            return;
-        }
-
-        if (!count($pubArray)) {
-            $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
-            return $output;
-        }
-
-        $output = $this->make_custom_list($pubArray, $content);
-        return $output;
-    }
-
-
 
     /* =========================================================================
      * Private Functions
@@ -757,8 +754,13 @@ class Publikationen {
     }
 
     private function make_custom_list($publications, $custom_text, $nameorder = '') {
-        $publist = "<ul class=\"cris-publications\">";
-
+        $publist = '';
+        $list = (count($publications) > 1) ? true : false;
+        if ($list) {
+            $publist .= "<ul class=\"cris-publications\">";
+        } else {
+            $publist .= "<div class=\"cris-publications\">";
+        }
         foreach ($publications as $publObject) {
             $publication = (array) $publObject;
             foreach ($publication['attributes'] as $attribut => $v) {
@@ -809,7 +811,7 @@ class Publikationen {
             setlocale(LC_TIME, get_locale());
             $pubDetails = array(
                 '#id#' => $id,
-                '#authors#' => $authors_html,
+                '#author#' => $authors_html,
                 '#title#' => $title,
                 '#url#' => Tools::get_item_url("publication", $title, $id, $post->ID),
                 '#city#' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
@@ -839,19 +841,21 @@ class Publikationen {
                 '#originalTitle#' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
                 '#language#' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 '#bibtexLink#' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
-                '#otherSubtype#' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
-                '#thesisSubtype#' => (array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
+                '#subtype#' => (array_key_exists('subtype', $publication) ? $publication['subtype'] : ''),
                 '#articleNumber#' => (array_key_exists('article number', $publication) ? $publication['article number'] : '')
             );
 
-            
-
-            
-            //$publist .= "<li>";
+            if ($list) {
+                $publist .= "<li>"; }
             $publist .= strtr($custom_text, $pubDetails);
-            //$publist .= "</li>";
+            if ($list) {
+                $publist .= "</li>"; }
         }
-        $publist .= "</ul>";
+        if ($list) {
+            $publist .= "</ul>";
+        } else {
+            $publist .= "</div>";
+        }       
         return $publist;
     }
 

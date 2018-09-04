@@ -784,8 +784,8 @@ class FAU_CRIS {
         return '';
     }
 
-    public static function cris_custom_shortcode($atts, $content = null) {
-        $parameter = self::cris_shortcode_parameter($atts);
+    public static function cris_custom_shortcode($atts, $content = null, $tag) {
+        $parameter = self::cris_shortcode_parameter($atts, $content, $tag);
 
         if ($parameter['show'] == 'organisation') {
         // Forschung
@@ -820,14 +820,21 @@ class FAU_CRIS {
         // Publikationen
             require_once('class_Publikationen.php');
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id']);
-            if ($parameter['publication'] != '') {
-                return $liste->customPub($content, $parameter);
+            if ($parameter['publication'] != '' && $parameter['order1'] == '') {
+                return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type']);
             }
+            if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+                return $liste->pubListe($parameter, $content);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->pubNachTyp($parameter, $field = '', $content);
+            }
+            return $liste->pubNachJahr($parameter, $field = '', $content);
         }
     }
 
 
-    private static function cris_shortcode_parameter($atts) {
+    private static function cris_shortcode_parameter($atts, $content = '', $tag) {
         $options = self::get_options();
 
         // Attributes
@@ -981,6 +988,11 @@ class FAU_CRIS {
                 $sc_param['order1'] = $orderby;
                 $sc_param['order2'] = '';
             }
+        }
+        if ($tag == 'cris-custom') {
+            $sc_param['sc_type'] = 'custom';
+        } else {
+            $sc_param['sc_type'] = 'default';
         }
 
         return $sc_param;
