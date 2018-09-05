@@ -50,15 +50,25 @@ class Patente {
      * Ausgabe aller Patente ohne Gliederung
      */
 
-    public function patListe($year = '', $start = '', $type = '', $limit = '', $hide = '', $showname = 1, $showyear = 1, $showpatentname = 1) {
-        $patentArray = $this->fetch_patents($year, $start, $type);
+    public function patListe($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $showname = (isset($param['showname']) && $param['showname'] != '') ? $param['showname'] : 1;
+        $showyear = (isset($param['showyear']) && $param['showyear'] != '') ? $param['showyear'] : 1;
+        $showpatentname = (isset($param['showpatentname']) && $param['showpatentname'] != '') ? $param['showpatentname'] : 1;
+
+        $patentArray = $this->fetch_patents($year, $start, $end, $type);
 
         if (!count($patentArray)) {
             $output = '<p>' . __('Es wurden leider keine Patente gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
 
-        $order = "year patent";
+        $order = "registryear";
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
         $res = $formatter->execute($patentArray);
         if ($limit != '')
@@ -75,8 +85,18 @@ class Patente {
      * Ausgabe aller Patente nach Jahren gegliedert
      */
 
-    public function patNachJahr($year = '', $start = '', $type = '', $hide='', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
-        $patentArray = $this->fetch_patents($year, $start, $type);
+    public function patNachJahr($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $showname = (isset($param['showname']) && $param['showname'] != '') ? $param['showname'] : 1;
+        $showyear = (isset($param['showyear']) && $param['showyear'] != '') ? $param['showyear'] : 0;
+        $showpatentname = (isset($param['showpatentname']) && $param['showpatentname'] != '') ? $param['showpatentname'] : 1;
+        $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'year';
+
+        $patentArray = $this->fetch_patents($year, $start, $end, $type);
 
         if (!count($patentArray)) {
             $output = '<p>' . __('Es wurden leider keine Patente gefunden.', 'fau-cris') . '</p>';
@@ -108,8 +128,18 @@ class Patente {
      * Ausgabe aller Patente nach Patenttypen gegliedert
      */
 
-    public function patNachTyp($year = '', $start = '', $type = '', $hide = '', $showname = 1, $showyear = 0, $showpatentname = 1, $order2 = 'year') {
-        $patentArray = $this->fetch_patents($year, $start, $type);
+    public function patNachTyp($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $showname = (isset($param['showname']) && $param['showname'] != '') ? $param['showname'] : 1;
+        $showyear = (isset($param['showyear']) && $param['showyear'] != '') ? $param['showyear'] : 1;
+        $showpatentname = (isset($param['showpatentname']) && $param['showpatentname'] != '') ? $param['showpatentname'] : 1;
+        $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'year';
+
+        $patentArray = $this->fetch_patents($year, $start, $end, $type);
 
         if (!count($patentArray)) {
             $output = '<p>' . __('Es wurden leider keine Patente gefunden.', 'fau-cris') . '</p>';
@@ -118,7 +148,7 @@ class Patente {
 
         // Patenttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$publications, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('patents', $value);
             }
@@ -179,8 +209,8 @@ class Patente {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_patents($year = '', $start = '', $type = '') {
-        $filter = Tools::patent_filter($year, $start, $type);
+    private function fetch_patents($year = '', $start = '', $end = '', $type = '') {
+        $filter = Tools::patent_filter($year, $start, $end, $type);
 
         $ws = new CRIS_patents();
         $patentArray = array();

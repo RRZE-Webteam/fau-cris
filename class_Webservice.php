@@ -143,5 +143,40 @@ class CRIS_entity {
                 }
             }
         }
+        if (isset($this->attributes["publication type"])) {
+            switch ($this->attributes["publication type"]) {
+                case 'Book':
+                    $this->attributes['subtype'] = $this->attributes["publication book subtype"];
+                    break;
+                case 'Journal article':
+                    $this->attributes['subtype'] = $this->attributes["publication journal subtype"];
+                    break;
+                case 'Article in Edited Volumes':
+                    $this->attributes['subtype'] = $this->attributes["publicationtypeeditedvolumes"];
+                    break;
+                case 'Thesis':
+                    $this->attributes['subtype'] = $this->attributes["publication thesis subtype"];
+                    break;
+                case 'Editorial':
+                    $this->attributes['subtype'] = $this->attributes["publication editorship subtype"];
+                    break;
+                case 'Conference contribution':
+                    $this->attributes['subtype'] = $this->attributes["publication conference subtype"];
+                    break;
+                case 'Other':
+                    $this->attributes['subtype'] = $this->attributes["type other subtype"];
+                    break;
+                case 'Unpublished':
+                    $this->attributes['subtype'] = $this->attributes["futurepublicationtype"];
+                    break;
+                case 'Translation':
+                default:
+                    $this->attributes['subtype'] = 'undefined';
+                    break;
+            }
+            if ($this->attributes['subtype'] == '') {
+                $this->attributes['subtype'] = 'undefined';
+            }
+        }
     }
 }

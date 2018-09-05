@@ -49,8 +49,19 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen ohne Gliederung
      */
 
-    public function awardsListe($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 1, $showawardname = 1, $display = 'list', $limit='') {
-        $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
+    public function awardsListe($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $awardnameid = (isset($param['awardnameid']) && $param['awardnameid'] != '') ? $param['awardnameid'] : '';
+        $showname = (isset($param['showname']) && $param['showname'] != '') ? $param['showname'] : 1;
+        $showyear = (isset($param['showyear']) && $param['showyear'] != '') ? $param['showyear'] : 1;
+        $showawardname = (isset($param['showawardname']) && $param['showawardname'] != '') ? $param['showawardname'] : 1;
+        $display = (isset($param['display']) && $param['display'] != '') ? $param['display'] : 'list';
+        $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
+
+        $awardArray = $this->fetch_awards($year, $start, $end, $type, $awardnameid);
 
         if (!count($awardArray)) {
             $output = '<p>' . __('Es wurden leider keine Auszeichnungen gefunden.', 'fau-cris') . '</p>';
@@ -80,8 +91,19 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Jahren gegliedert
      */
 
-    public function awardsNachJahr($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = 'list', $order2 = 'name') {
-        $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
+    public function awardsNachJahr($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $awardnameid = (isset($param['awardnameid']) && $param['awardnameid'] != '') ? $param['awardnameid'] : '';
+        $showname = (isset($param['showname']) && $param['showname'] != '') ? $param['showname'] : 1;
+        $showyear = (isset($param['showyear']) && $param['showyear'] != '') ? $param['showyear'] : 0;
+        $showawardname = (isset($param['showawardname']) && $param['showawardname'] != '') ? $param['showawardname'] : 1;
+        $display = (isset($param['display']) && $param['display'] != '') ? $param['display'] : 'list';
+        $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'name';
+
+        $awardArray = $this->fetch_awards($year, $start, $end, $type, $awardnameid);
 
         if (!count($awardArray)) {
             $output = '<p>' . __('Es wurden leider keine Auszeichnungen gefunden.', 'fau-cris') . '</p>';
@@ -119,8 +141,19 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen nach Auszeichnungstypen gegliedert
      */
 
-    public function awardsNachTyp($year = '', $start = '', $type = '', $awardnameid = '', $showname = 1, $showyear = 0, $showawardname = 1, $display = '', $order2 = 'year') {
-        $awardArray = $this->fetch_awards($year, $start, $type, $awardnameid);
+    public function awardsNachTyp($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $awardnameid = (isset($param['awardnameid']) && $param['awardnameid'] != '') ? $param['awardnameid'] : '';
+        $showname = (isset($param['showname']) && $param['showname'] != '') ? $param['showname'] : 1;
+        $showyear = (isset($param['showyear']) && $param['showyear'] != '') ? $param['showyear'] : 0;
+        $showawardname = (isset($param['showawardname']) && $param['showawardname'] != '') ? $param['showawardname'] : 1;
+        $display = (isset($param['display']) && $param['display'] != '') ? $param['display'] : '';
+        $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'year';
+
+        $awardArray = $this->fetch_awards($year, $start, $end, $type, $awardnameid);
 
         if (!count($awardArray)) {
             $output = '<p>' . __('Es wurden leider keine Auszeichnungen gefunden.', 'fau-cris') . '</p>';
@@ -129,7 +162,7 @@ class Auszeichnungen {
 
         // Auszeichnungstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$awards, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['awards'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('awards', $value);
             }
@@ -198,8 +231,8 @@ class Auszeichnungen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_awards($year = '', $start = '', $type = '', $awardnameid = '') {
-        $filter = Tools::award_filter($year, $start, $type);
+    private function fetch_awards($year = '', $start = '', $end= '', $type = '', $awardnameid = '') {
+        $filter = Tools::award_filter($year, $start, $end, $type);
 
         $ws = new CRIS_awards();
         $awardArray = array();

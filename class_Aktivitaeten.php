@@ -47,12 +47,18 @@ class Aktivitaeten {
      * Ausgabe aller Aktivitäten ohne Gliederung
      */
 
-    public function actiListe($year = '', $start = '', $type = '', $limit='', $hide='') {
+    public function actiListe($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 1;
         $showactivityname = 1;
 
-        $activityArray = $this->fetch_activities($year, $start, $type);
+        $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
         if (!count($activityArray)) {
             $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
@@ -75,12 +81,18 @@ class Aktivitaeten {
      * Ausgabe aller Aktivitäten nach Jahren gegliedert
      */
 
-    public function actiNachJahr($year = '', $start = '', $type = '', $hide= '') {
+    public function actiNachJahr($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 0;
         $showactivityname = 1;
         $order2 = 'year';
-        $activityArray = $this->fetch_activities($year, $start, $type);
+
+        $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
         if (!count($activityArray)) {
             $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
@@ -112,13 +124,18 @@ class Aktivitaeten {
      * Ausgabe aller Aktivitäten nach Patenttypen gegliedert
      */
 
-    public function actiNachTyp($year = '', $start = '', $type = '', $hide ='') {
+    public function actiNachTyp($param = array()) {
+        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
+        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
+        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
+        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
+        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 0;
         $showactivityname = 1;
         $order2 = 'year';
 
-        $activityArray = $this->fetch_activities($year, $start, $type);
+        $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
         if (!count($activityArray)) {
             $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
@@ -127,7 +144,7 @@ class Aktivitaeten {
 
         // Patenttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$activities, 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['activities'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('activities', $value);
             }
@@ -191,8 +208,8 @@ class Aktivitaeten {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_activities($year = '', $start = '', $type = '') {
-        $filter = Tools::activity_filter($year, $start, $type);
+    private function fetch_activities($year = '', $start = '', $end = '', $type = '') {
+        $filter = Tools::activity_filter($year, $start, $end, $type);
 
         $ws = new CRIS_activities();
         $activityArray = array();

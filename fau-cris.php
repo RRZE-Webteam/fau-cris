@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.7.2
+ * Version: 3.8.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -44,7 +44,7 @@ class FAU_CRIS {
     const textdomain = 'fau-cris';
     const php_version = '5.3'; // Minimal erforderliche PHP-Version
     const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
-    const cris_publicweb = 'https://cris.fau.de/converis/publicweb/';
+    const cris_publicweb = 'https://cris.fau.de/converis/portal/';
     const doi = 'https://dx.doi.org/';
 
     protected static $instance = null;
@@ -147,7 +147,7 @@ class FAU_CRIS {
             'cris_org_nr' => '',
             'cris_cache' => '18000',
             'cris_pub_order' => Tools::getOptionsOrder('publications'),
-            'cris_pub_subtypes_order' => Tools::getOptionsOrder('pubothersubtypes'),
+            'cris_pub_subtypes_order' => Tools::getOptionsOrder('publications', 'Other'),
             'cris_univis' => 'none',
             'cris_bibtex' => 0,
             'cris_url' => 0,
@@ -700,15 +700,15 @@ class FAU_CRIS {
                 return $liste->singleActivity($parameter['hide']);
             }
             if ($parameter['limit'] != '' ) {
-                return $liste->actiListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide']);
+                return $liste->actiListe($parameter);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->actiNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
+                return $liste->actiNachTyp($parameter);
             }
             if (strpos($parameter['order1'], 'year') !== false) {
-                return $liste->actiNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
+                return $liste->actiNachJahr($parameter);
             }
-            return $liste->actiListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide']);
+            return $liste->actiListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'patents') {
             // Patente
             require_once('class_Patente.php');
@@ -718,15 +718,15 @@ class FAU_CRIS {
                 return $liste->singlePatent($parameter['hide']);
             }
             if (!empty($parameter['limit'])) {
-                return $liste->patListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide']);
+                return $liste->patListe($parameter);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->patNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
+                return $liste->patNachTyp($parameter);
             }
             if (strpos($parameter['order1'], 'year') !== false) {
-                return $liste->patNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide']);
+                return $liste->patNachJahr($parameter);
             }
-            return $liste->patListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide']);
+            return $liste->patListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
             // Projekte
             require_once('class_Projekte.php');
@@ -736,18 +736,18 @@ class FAU_CRIS {
                 return $liste->singleProj($parameter['hide'], $parameter['quotation']);
             }
             if (!empty($parameter['limit'])) {
-                return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide'], $parameter['role'], $parameter['current']);
+                return $liste->projListe($parameter);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->projNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role'], '', $parameter['current']);
+                return $liste->projNachTyp($parameter, '');
             }
             if (strpos($parameter['order1'], 'year') !== false) {
-                return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role'], '', $parameter['current']);
+                return $liste->projNachJahr($parameter, '');
             }
             if (strpos($parameter['order1'], 'role') !== false) {
-                return $liste->projNachRolle($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'], $parameter['role'], '', $parameter['current']);
+                return $liste->projNachRolle($parameter, '');
             }
-            return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide'], $parameter['role'], $parameter['current']);
+            return $liste->projListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'awards') {
             // Awards
             require_once('class_Auszeichnungen.php');
@@ -757,12 +757,12 @@ class FAU_CRIS {
                 return $liste->singleAward($parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display']);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->awardsNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display'], $parameter['order2']);
+                return $liste->awardsNachTyp($parameter);
             }
             if (strpos($parameter['order1'], 'year') !== false) {
-                return $liste->awardsNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], 0, $parameter['showawardname'], $parameter['display'], $parameter['order2']);
+                return $liste->awardsNachJahr($parameter);
             }
-            return $liste->awardsListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['awardnameid'], $parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display'], $parameter['limit']);
+            return $liste->awardsListe($parameter);
         } else {
             // Publications
             require_once('class_Publikationen.php');
@@ -772,20 +772,20 @@ class FAU_CRIS {
                 return $liste->singlePub($parameter['quotation']);
             }
             if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
-                return $liste->pubListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['limit'], $parameter['sortby'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable']);
+                return $liste->pubListe($parameter);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->pubNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable'], $field = '', $parameter['format']);
+                return $liste->pubNachTyp($parameter, $field = '');
             }
-            return $liste->pubNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['subtype'], $parameter['quotation'], $parameter['order2'], $parameter['fau'], $parameter['peerreviewed'], $parameter['notable'], $field = '', $parameter['format']);
+            return $liste->pubNachJahr($parameter, $field = '');
         }
 
         // nothing
         return '';
     }
 
-    public static function cris_custom_shortcode($atts, $content = null) {
-        $parameter = self::cris_shortcode_parameter($atts);
+    public static function cris_custom_shortcode($atts, $content = null, $tag) {
+        $parameter = self::cris_shortcode_parameter($atts, $content, $tag);
 
         if ($parameter['show'] == 'organisation') {
         // Forschung
@@ -816,11 +816,25 @@ class FAU_CRIS {
                 return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'] = array(), $parameter['role'], $content);
             }
             return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide'], $parameter['role']);*/
+        } elseif ($parameter['show'] == 'publications') {
+        // Publikationen
+            require_once('class_Publikationen.php');
+            $liste = new Publikationen($parameter['entity'], $parameter['entity_id']);
+            if ($parameter['publication'] != '' && $parameter['order1'] == '') {
+                return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type']);
+            }
+            if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+                return $liste->pubListe($parameter, $content);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->pubNachTyp($parameter, $field = '', $content);
+            }
+            return $liste->pubNachJahr($parameter, $field = '', $content);
         }
     }
 
 
-    private static function cris_shortcode_parameter($atts) {
+    private static function cris_shortcode_parameter($atts, $content = '', $tag) {
         $options = self::get_options();
 
         // Attributes
@@ -830,6 +844,7 @@ class FAU_CRIS {
             'orderby' => '',
             'year' => '',
             'start' => '',
+            'end' => '',
             'orgid' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
             'persid' => '',
             'publication' => '',
@@ -886,6 +901,7 @@ class FAU_CRIS {
         $sc_param['subtype'] = sanitize_text_field($subtype);
         $sc_param['year'] = sanitize_text_field($year);
         $sc_param['start'] = sanitize_text_field($start);
+        $sc_param['end'] = sanitize_text_field($end);
         $sc_param['quotation'] = sanitize_text_field($quotation);
         $limit = ($limit != '' ? $limit : $items);
         $sc_param['limit'] = sanitize_text_field($limit);
@@ -972,6 +988,11 @@ class FAU_CRIS {
                 $sc_param['order1'] = $orderby;
                 $sc_param['order2'] = '';
             }
+        }
+        if ($tag == 'cris-custom') {
+            $sc_param['sc_type'] = 'custom';
+        } else {
+            $sc_param['sc_type'] = 'default';
         }
 
         return $sc_param;

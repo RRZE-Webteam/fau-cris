@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FAU CRIS v3.31\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-17 14:48+0000\n"
+"POT-Creation-Date: 2018-06-28 08:22+0000\n"
 "POT-Revision-Date: Thu Aug 25 2016 14:01:16 GMT+0200 (CEST)\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: zo95zofo <barbara.bothe@fau.de>\n"
@@ -71,18 +71,20 @@ msgctxt "Wird bei Galerien vor die Bildquelle geschrieben."
 msgid "Bild:"
 msgstr ""
 
-#: class_Formatter.php:68 class_Formatter.php:88
-#: class_Forschungsbereiche.php:64 class_Publikationen.php:463
-#: class_Publikationen.php:465 class_Publikationen.php:470
-#: class_Publikationen.php:471 class_Publikationen.php:473
-#: class_Publikationen.php:474 class_Publikationen.php:475
-#: class_Publikationen.php:476 class_Publikationen.php:477
-#: class_Publikationen.php:478 class_Publikationen.php:479
-#: class_Publikationen.php:486 class_Publikationen.php:487
+#: class_Formatter.php:71 class_Formatter.php:91
+#: class_Forschungsbereiche.php:65 class_Forschungsbereiche.php:140
+#: class_Projekte.php:683 class_Publikationen.php:317
+#: class_Publikationen.php:350 class_Publikationen.php:485
+#: class_Publikationen.php:487 class_Publikationen.php:492
+#: class_Publikationen.php:493 class_Publikationen.php:495
+#: class_Publikationen.php:496 class_Publikationen.php:497
+#: class_Publikationen.php:498 class_Publikationen.php:499
+#: class_Publikationen.php:500 class_Publikationen.php:501
+#: class_Publikationen.php:508 class_Publikationen.php:509
 msgid "O.A."
 msgstr ""
 
-#: class_Formatter.php:88
+#: class_Formatter.php:91
 msgid "o.a."
 msgstr ""
 
@@ -95,16 +97,16 @@ msgstr ""
 msgid "Es wurden leider keine Forschungsbereiche gefunden."
 msgstr ""
 
-#: class_Forschungsbereiche.php:219 class_Sync.php:214
+#: class_Forschungsbereiche.php:231 class_Sync.php:214
 msgid "Projekte"
 msgstr ""
 
-#: class_Forschungsbereiche.php:226 class_Sync.php:216
+#: class_Forschungsbereiche.php:238 class_Sync.php:216
 msgid "Beteiligte Wissenschaftler"
 msgstr ""
 
 #. ID
-#: class_Forschungsbereiche.php:239 class_Projekte.php:512 class_Sync.php:218
+#: class_Forschungsbereiche.php:251 class_Projekte.php:512 class_Sync.php:218
 #: class_Sync.php:258 class_Sync.php:320 fau-cris.php:287 fau-cris.php:1041
 msgid "Publikationen"
 msgstr ""
@@ -200,66 +202,62 @@ msgid "Mehr Informationen"
 msgstr ""
 
 # @ fau-cris
-#: class_Publikationen.php:36
+#: class_Publikationen.php:37
 msgid ""
 "Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an."
 msgstr ""
 
 # @ fau-cris
-#: class_Publikationen.php:61 class_Publikationen.php:100
-#: class_Publikationen.php:149
+#: class_Publikationen.php:62 class_Publikationen.php:101
+#: class_Publikationen.php:150
 msgid "Es wurden leider keine Publikationen gefunden."
 msgstr ""
 
-#: class_Publikationen.php:450
+#: class_Publikationen.php:472
 msgid "O.T."
 msgstr ""
 
-#: class_Publikationen.php:462
+#: class_Publikationen.php:484
 msgid "O.O."
 msgstr ""
 
-#: class_Publikationen.php:464
+#: class_Publikationen.php:486
 msgid "O.J."
 msgstr ""
 
-#: class_Publikationen.php:488
-msgid "Nicht verfügbar"
-msgstr ""
-
-#: class_Publikationen.php:514 class_Publikationen.php:547
-#: class_Publikationen.php:625 class_Publikationen.php:659
+#: class_Publikationen.php:536 class_Publikationen.php:569
+#: class_Publikationen.php:647 class_Publikationen.php:681
 msgctxt "Abkürzung für \"Band\" bei Publikationen"
 msgid "Bd."
 msgstr ""
 
 # @ fau-cris
-#: class_Publikationen.php:517 class_Publikationen.php:628
-#: class_Publikationen.php:660 class_Sync.php:408
+#: class_Publikationen.php:539 class_Publikationen.php:650
+#: class_Publikationen.php:682 class_Sync.php:408
 msgid "Seiten"
 msgstr ""
 
-#: class_Publikationen.php:531 class_Publikationen.php:594
-#: class_Publikationen.php:611
+#: class_Publikationen.php:553 class_Publikationen.php:616
+#: class_Publikationen.php:633
 msgid "Hrsg."
 msgstr ""
 
-#: class_Publikationen.php:540 class_Publikationen.php:566
+#: class_Publikationen.php:562 class_Publikationen.php:588
 msgctxt "Abkürzung für \"Seite\" bei Publikationen"
 msgid "S."
 msgstr ""
 
-#: class_Publikationen.php:542 class_Publikationen.php:568
+#: class_Publikationen.php:564 class_Publikationen.php:590
 msgctxt "Abkürzung für \"Artikelnummer\" bei Publikationen"
 msgid "Art.Nr."
 msgstr ""
 
-#: class_Publikationen.php:544 class_Publikationen.php:570
+#: class_Publikationen.php:566 class_Publikationen.php:592
 msgctxt "Abkürzung für \"Spalte\" bei Lexikonartikeln"
 msgid "Sp."
 msgstr ""
 
-#: class_Publikationen.php:638
+#: class_Publikationen.php:660
 msgid "Abschlussarbeit"
 msgstr ""
 

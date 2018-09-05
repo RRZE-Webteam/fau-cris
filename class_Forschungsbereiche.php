@@ -361,7 +361,6 @@ class Forschungsbereiche {
         require_once('class_Projekte.php');
         $liste = new Projekte();
         return $liste->fieldPersons($field);
-        //var_dump($liste->fieldPersons($field));
     }
 
     private function get_field_publications($param = array()) {
