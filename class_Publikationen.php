@@ -222,39 +222,39 @@ class Publikationen {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                 $title = Tools::getTitle('publications', $array_type, get_locale());
                 //if ($array_type == 'Other') {
-                    $shortcode_data_other = '';
-                    // Weitrere Untergliederung für Subtypen
-                    $subtypeorder = $this->subtypeorder;
-                    if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
+                $shortcode_data_other = '';
+                // Weitrere Untergliederung für Subtypen
+                $subtypeorder = $this->subtypeorder;
+                if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
                     foreach ($subtypeorder as $key => $value) {
                         $subtypeorder[$key] = Tools::getType('publications', $value, $array_type);
                     }
                 } else {
                     $subtypeorder = Tools::getOrder('publications', $array_type);
                 }
-                    if ($order2 == 'author') {
-                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "relauthors", SORT_ASC);
-                    } else {
-                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
-                    }
-                    $pubOtherList = $subformatter->execute($publications);
+                if ($order2 == 'author') {
+                    $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "relauthors", SORT_ASC);
+                } else {
+                    $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                }
+                $pubOtherList = $subformatter->execute($publications);
 
-                    foreach ($pubOtherList as $array_subtype => $publications_sub) {
-                        // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
-                        if (empty($subtype)) {
-                            $title_sub = Tools::getTitle('publications', $array_subtype, get_locale(), $array_type);
-                            $shortcode_data_other .= "<h4>";
-                            $shortcode_data_other .= $title_sub;
-                            $shortcode_data_other .= "</h4>";
-                        }
-                        if ($quotation == 'apa' || $quotation == 'mla') {
-                            $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation);
-                        } else {
-                            $shortcode_data_other .= $this->make_list($publications_sub);
-                        }
+                foreach ($pubOtherList as $array_subtype => $publications_sub) {
+                    // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
+                    if (empty($subtype)) {
+                        $title_sub = Tools::getTitle('publications', $array_subtype, get_locale(), $array_type);
+                        $shortcode_data_other .= "<h4>";
+                        $shortcode_data_other .= $title_sub;
+                        $shortcode_data_other .= "</h4>";
                     }
-                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');                    
-                    $openfirst = '';
+                    if ($quotation == 'apa' || $quotation == 'mla') {
+                        $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation);
+                    } else {
+                        $shortcode_data_other .= $this->make_list($publications_sub);
+                    }
+                }
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
+                $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
         } else {
@@ -362,7 +362,7 @@ class Publikationen {
             $orderby = $sortby;
         } else {
             $sortby = NULL;
-            $orderby = __('O.A.','fau-cris');
+            $orderby = __('O.A.', 'fau-cris');
         }
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
@@ -389,13 +389,13 @@ class Publikationen {
 
         if (!count($pubArray))
             return;
-       
+        
         if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
             $sortby = NULL;
-            $orderby = __('O.A.','fau-cris');
+            $orderby = __('O.A.', 'fau-cris');
         }
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
@@ -510,7 +510,7 @@ class Publikationen {
                 }
                 $authors_html = implode(", ", $authorList);
             } else {
-                if($publication['publication type'] == "Editorial") {
+                if ($publication['publication type'] == "Editorial") {
                     $authors_html = $publication['srceditors'];
                 } else {
                     $authors_html = $publication['srcauthors'];
@@ -786,7 +786,7 @@ class Publikationen {
                 }
                 $authors_html = implode(", ", $authorList);
             } else {
-                if($publication['publication type'] == "Editorial") {
+                if ($publication['publication type'] == "Editorial") {
                     $authors_html = $publication['srceditors'];
                 } else {
                     $authors_html = $publication['srcauthors'];
@@ -842,7 +842,9 @@ class Publikationen {
                 '#language#' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 '#bibtexLink#' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
                 '#subtype#' => (array_key_exists('subtype', $publication) ? $publication['subtype'] : ''),
-                '#articleNumber#' => (array_key_exists('article number', $publication) ? $publication['article number'] : '')
+                '#articleNumber#' => (array_key_exists('article number', $publication) ? $publication['article number'] : ''),
+                '#projectTitle#' => $this->get_pub_projects($id, 'title'),
+                '#projectLink#' => $this->get_pub_projects($id, 'link')
             );
 
             if ($list) {
@@ -859,6 +861,12 @@ class Publikationen {
         return $publist;
     }
 
+    private function get_pub_projects($pub = NULL, $item = 'title') {
+        require_once('class_Projekte.php');
+        $liste = new Projekte();
+        $projects = $liste->pubProj($pub);
+        return $projects[$item];
+    }
 }
 
 class CRIS_publications extends CRIS_webservice {
