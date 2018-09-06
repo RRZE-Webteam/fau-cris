@@ -545,8 +545,12 @@ class Projekte {
                 setlocale(LC_TIME, get_locale());
                 $start = $project['cfstartdate'];
                 $start = strftime('%x', strtotime($start));
-                $end = $project['virtualenddate'];
-                $end = strftime('%x', strtotime($end));
+                if (!in_array('end', $hide)) {
+                    $end = $project['virtualenddate'];
+                    $end = strftime('%x', strtotime($end));
+                } else {
+                    $end = '';
+                }
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
                 $acronym = $project['cfacro'];
@@ -631,7 +635,7 @@ class Projekte {
                 $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
                 $acronym = $project['cfacro'];
                 $start = $project['cfstartdate'];
-                $end = $project['virtualenddate'];
+                $end = (!in_array('end', $hide)) ? $project['virtualenddate'] : '';
                 $date = Tools::make_date($start, $end);
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
