@@ -671,8 +671,8 @@ class FAU_CRIS {
     /**
      * Add Shortcodes
      */
-    public static function cris_shortcode($atts) {
-        $parameter = self::cris_shortcode_parameter($atts);
+    public static function cris_shortcode($atts, $content = null, $tag) {
+        $parameter = self::cris_shortcode_parameter($atts, $content = null, $tag);
 
         if (isset($parameter['show']) && $parameter['show'] == 'organisation') {
             // Forschung
