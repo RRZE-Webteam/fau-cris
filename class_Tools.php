@@ -48,6 +48,9 @@ class Tools {
             foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
                 if($v['short'] == $short)
                     return $k;
+                if (array_key_exists('short_alt', $v) && $v['short_alt'] == $short) {
+                    return $k;
+                }
             }
         } else {
             foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {

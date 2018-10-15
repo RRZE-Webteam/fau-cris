@@ -36,7 +36,8 @@ class CRIS_Dicts {
         'publications' => array(
             'Journal article' => array(
                 'order' => 2,
-                'short' => 'zeitschriftenartikel',
+                'short' => 'beitrag_fachzeitschrift',
+                'short_alt' => 'zeitschriftenartikel',
                 'de' => array(
                     'name' => 'Beitrag in einer Fachzeitschrift',
                     'title' => 'Beiträge in Fachzeitschriften'),
@@ -155,7 +156,7 @@ class CRIS_Dicts {
                     ),
                     'online publication' => array(
                         'order' => 10,
-                        'short' => 'onlinepublication',
+                        'short' => 'onlinepublikation',
                         'de' => array(
                             'name' => 'Online-Publikation',
                             'title' => 'Online-Publikationen'
@@ -194,10 +195,11 @@ class CRIS_Dicts {
             ),
             'Article in Edited Volumes' => array(
                 'order' => 3,
-                'short' => 'sammelbandbeitraege',
+                'short' => 'beitrag_sammelwerk',
+                'short_alt' => 'sammelbandbeitraege',
                 'de' => array(
-                    'name' => 'Beitrag in einem Sammelband',
-                    'title' => 'Beiträge in Sammelbänden'),
+                    'name' => 'Beitrag in einem Sammelwerk',
+                    'title' => 'Beiträge in Sammelwerken'),
                 'en' => array(
                     'name' => 'Book Contribution',
                     'title' => 'Book Contributions'),
@@ -205,7 +207,7 @@ class CRIS_Dicts {
                 'subtypes' => array(
                     'article' => array(
                         'order' => 1,
-                        'short' => 'originalarbeiten',
+                        'short' => 'originalarbeit',
                         'de' => array(
                             'name' => 'Originalarbeit',
                             'title' => 'Originalarbeiten'
@@ -217,7 +219,7 @@ class CRIS_Dicts {
                     ),
                     'Case study' => array(
                         'order' => 2,
-                        'short' => 'fallstudien',
+                        'short' => 'fallstudie',
                         'de' => array(
                             'name' => 'Fallstudie',
                             'title' => 'Fallstudien'
@@ -253,7 +255,7 @@ class CRIS_Dicts {
                     ),
                     'Ausstellungskatalogsbeitrag' => array(
                         'order' => 5,
-                        'short' => 'beitraegeausstellungskataloge',
+                        'short' => 'beitrag_ausstellungskatalog',
                         'de' => array(
                             'name' => 'Beitrag in Ausstellungskatalog',
                             'title' => 'Beitraege in Ausstellungskatalogen'
@@ -265,7 +267,7 @@ class CRIS_Dicts {
                     ),
                     'Beitrag in Festschrift' => array(
                         'order' => 6,
-                        'short' => 'beitraegefestschriften',
+                        'short' => 'beitrag_festschrift',
                         'de' => array(
                             'name' => 'Beitrag in einer Festschrift / Gedenkschrift',
                             'title' => 'Beitraege in Festschriften / Gedenkschriften'
@@ -277,7 +279,7 @@ class CRIS_Dicts {
                     ),
                     'Beitrag in Handbuch' => array(
                         'order' => 7,
-                        'short' => 'betraegehandbuecher',
+                        'short' => 'beitrag_handbuch',
                         'de' => array(
                             'name' => 'Beitrag in einem Handbuch',
                             'title' => 'Beitraege in Handbüchern'
@@ -289,7 +291,7 @@ class CRIS_Dicts {
                     ),
                     'Aufsatz' => array(
                         'order' => 8,
-                        'short' => 'ausaetze',
+                        'short' => 'aufsatz',
                         'de' => array(
                             'name' => 'Aufsatz',
                             'title' => 'Aufsätze'
@@ -301,10 +303,10 @@ class CRIS_Dicts {
                     ),
                     'Other' => array(
                         'order' => 9,
-                        'short' => '',
+                        'short' => 'andere',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Anderer',
+                            'title' => 'Andere'
                         ),
                         'en' => array(
                             'name' => 'Other',
@@ -313,7 +315,7 @@ class CRIS_Dicts {
                     ),
                     'online pub' => array(
                         'order' => 10,
-                        'short' => 'onlinepublikationen',
+                        'short' => 'onlinepublikation',
                         'de' => array(
                             'name' => 'Online-Publikation',
                             'title' => 'Online-Publikationen'
@@ -325,7 +327,7 @@ class CRIS_Dicts {
                     ),
                     'Entscheidungsanmerkung' => array(
                         'order' => 11,
-                        'short' => 'entscheidungsanmerkungen',
+                        'short' => 'entscheidungsanmerkung',
                         'de' => array(
                             'name' => 'Entscheidungsanmerkung',
                             'title' => 'Entscheidungsanmerkungen'
@@ -351,7 +353,8 @@ class CRIS_Dicts {
             ),
             'Book' => array(
                 'order' => 1,
-                'short' => 'buecher',
+                'short' => 'buch',
+                'short_alt' => 'buecher',
                 'de' => array(
                     'name' => 'Buch',
                     'title' => 'Bücher'),
@@ -363,6 +366,7 @@ class CRIS_Dicts {
                     'Monographie' => array(
                         'order' => 1,
                         'short' => 'mongraphien',
+                        'short_alt' => 'mongraphie',
                         'de' => array(
                             'name' => 'Monographie',
                             'title' => 'Monographien'
@@ -374,7 +378,8 @@ class CRIS_Dicts {
                     ),
                     'Band aus einer Reihe' => array(
                         'order' => 2,
-                        'short' => '',
+                        'short' => 'band_reihe',
+                        'short_alt' => 'bandausreihe',
                         'de' => array(
                             'name' => 'Band aus einer Reihe',
                             'title' => 'Bände aus einer Reihe'
@@ -386,7 +391,8 @@ class CRIS_Dicts {
                     ),
                     'Manual' => array(
                         'order' => 3,
-                        'short' => 'handbuecher',
+                        'short' => 'handbuch',
+                        'short_alt' => 'handbuecher',
                         'de' => array(
                             'name' => 'Handbuch',
                             'title' => 'Handbücher'
@@ -398,7 +404,8 @@ class CRIS_Dicts {
                     ),
                     'Lehrbuch' => array(
                         'order' => 4,
-                        'short' => 'lehrbuecher',
+                        'short' => 'lehrbuch',
+                        'short_alt' => 'lehrbuecher',
                         'de' => array(
                             'name' => 'Lehrbuch',
                             'title' => 'Lehrbücher'
@@ -425,7 +432,8 @@ class CRIS_Dicts {
             ),
             'Translation' => array(
                 'order' => 6,
-                'short' => 'uebersetzungen',
+                'short' => 'uebersetzung',
+                'short_alt' => 'uebersetzungen',
                 'de' => array(
                     'name' => 'Übersetzung',
                     'title' => 'Übersetzungen'),
@@ -435,7 +443,8 @@ class CRIS_Dicts {
             ),
             'Thesis' => array(
                 'order' => 7,
-                'short' => 'abschlussarbeiten',
+                'short' => 'abschlussarbeit',
+                'short_alt' => 'abschlussarbeiten',
                 'de' => array(
                     'name' => 'Abschlussarbeit',
                     'title' => 'Abschlussarbeiten'),
@@ -557,7 +566,8 @@ class CRIS_Dicts {
             ),
             'Editorial' => array(
                 'order' => 4,
-                'short' => 'herausgeberschaften',
+                'short' => 'herausgegebener_band',
+                'short_alt' => 'herausgeberschaften',
                 'de' => array(
                     'name' => 'Herausgegebener Band',
                     'title' => 'Herausgegebene Bände'),
@@ -568,10 +578,10 @@ class CRIS_Dicts {
                 'subtypes' => array(
                     'Buch' => array(
                         'order' => 1,
-                        'short' => '',
+                        'short' => 'buch',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Buch',
+                            'title' => 'Bücher'
                         ),
                         'en' => array(
                             'name' => 'Book',
@@ -580,22 +590,22 @@ class CRIS_Dicts {
                     ),
                     'Festschrift' => array(
                         'order' => 2,
-                        'short' => '',
+                        'short' => 'festschrift',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Festschrift',
+                            'title' => 'Festschriften'
                         ),
                         'en' => array(
-                            'name' => 'Festschrift / memorial volume',
-                            'title' => 'Festschriften / Memorial Volumes'
+                            'name' => 'Memorial Volume',
+                            'title' => 'Memorial Volumes'
                         )
                     ),
                     'Ausstellungskatalog' => array(
                         'order' => 3,
-                        'short' => '',
+                        'short' => 'ausstellungskatalog',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Ausstellungskatalog',
+                            'title' => 'Ausstellungskataloge'
                         ),
                         'en' => array(
                             'name' => 'Exhibition catalogue',
@@ -604,10 +614,10 @@ class CRIS_Dicts {
                     ),
                     'Quellenedition' => array(
                         'order' => 4,
-                        'short' => '',
+                        'short' => 'quellenedition',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Quellenedition',
+                            'title' => 'Quelleneditionen'
                         ),
                         'en' => array(
                             'name' => 'Source edition',
@@ -631,7 +641,8 @@ class CRIS_Dicts {
             ),
             'Conference contribution' => array(
                 'order' => 5,
-                'short' => 'konferenzbeitraege',
+                'short' => 'beitragtagung',
+                'short_alt' => 'konferenzbeitraege',
                 'de' => array(
                     'name' => 'Beitrag bei einer Tagung',
                     'title' => 'Beiträge bei Tagungen'),
@@ -642,10 +653,10 @@ class CRIS_Dicts {
                 'subtypes' => array(
                     'Journal Article' => array(
                         'order' => 1,
-                        'short' => '',
+                        'short' => 'originalarbeit',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Originalarbeit',
+                            'title' => 'Originalarbeiten'
                         ),
                         'en' => array(
                             'name' => 'Original article',
@@ -654,10 +665,10 @@ class CRIS_Dicts {
                     ),
                     'Konferenzschrift' => array(
                         'order' => 2,
-                        'short' => '',
+                        'short' => 'konferenzbeitrag',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Konferenzbeitrag',
+                            'title' => 'Konferenzbeiträge'
                         ),
                         'en' => array(
                             'name' => 'Conference contribution',
@@ -666,10 +677,10 @@ class CRIS_Dicts {
                     ),
                     'Abstract zum Vortrag' => array(
                         'order' => 3,
-                        'short' => '',
+                        'short' => 'abstract_vortrag',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Abstract zum Vortrag',
+                            'title' => 'Abstracts zu Vorträgen'
                         ),
                         'en' => array(
                             'name' => 'Abstract of lecture',
@@ -678,10 +689,10 @@ class CRIS_Dicts {
                     ),
                     'Abstract zum Poster' => array(
                         'order' => 4,
-                        'short' => '',
+                        'short' => 'abstract_poster',
                         'de' => array(
-                            'name' => '',
-                            'title' => ''
+                            'name' => 'Abstract zum Poster',
+                            'title' => 'Abstracts zu Postern'
                         ),
                         'en' => array(
                             'name' => 'Abstract of a poster',
@@ -811,7 +822,7 @@ class CRIS_Dicts {
                     ),
                     'anderer' => array(
                         'order' => 9,
-                        'short' => 'anderer',
+                        'short' => 'andere',
                         'de' => array(
                             'name' => 'Anderer',
                             'title' => 'Andere'
@@ -837,91 +848,91 @@ class CRIS_Dicts {
                 'subtypes' => array(
                     'Journal Article' => array(
                         'order' => 1,
-                        'short' => 'anderer',
+                        'short' => 'beitrag_fachzeitschrift',
                         'de' => array(
-                            'name' => 'Anderer',
-                            'title' => 'Andere'
+                            'name' => 'Beitrag in einer Fachzeitschrift',
+                            'title' => 'Beiträge in Fachzeitschriften'
                         ),
                         'en' => array(
-                            'name' => 'Other',
-                            'title' => 'Other'
+                            'name' => 'Journal Article',
+                            'title' => 'Journal Articles'
                         )
                     ),
                     'Article in Edited Volumes' => array(
                         'order' => 2,
-                        'short' => 'anderer',
+                        'short' => 'beitrag_sammelwerk',
                         'de' => array(
-                            'name' => 'Anderer',
-                            'title' => 'Andere'
+                            'name' => 'Beitrag in einem Sammelwerk',
+                            'title' => 'Beiträge in Sammelwerken'
                         ),
                         'en' => array(
-                            'name' => 'Other',
-                            'title' => 'Other'
+                            'name' => 'Article in Edited Volume',
+                            'title' => 'Articles in Edited Volumes'
                         )
                     ),
                     'Book' => array(
                         'order' => 3,
-                        'short' => 'anderer',
+                        'short' => 'buch',
                         'de' => array(
-                            'name' => 'Anderer',
-                            'title' => 'Andere'
+                            'name' => 'Buch',
+                            'title' => 'Bücher'
                         ),
                         'en' => array(
-                            'name' => 'Other',
-                            'title' => 'Other'
+                            'name' => 'Book',
+                            'title' => 'Books'
                         )
                     ),
                     'Translation' => array(
                         'order' => 4,
-                        'short' => 'anderer',
+                        'short' => 'uebersetzung',
                         'de' => array(
-                            'name' => 'Anderer',
-                            'title' => 'Andere'
+                            'name' => 'Übersetzung',
+                            'title' => 'Übersetzung'
                         ),
                         'en' => array(
-                            'name' => 'Other',
-                            'title' => 'Other'
+                            'name' => 'Translation',
+                            'title' => 'Translations'
                         )
                     ),
                     'Thesis' => array(
                         'order' => 5,
-                        'short' => 'anderer',
+                        'short' => 'abschlussarbeit',
                         'de' => array(
-                            'name' => 'Anderer',
-                            'title' => 'Andere'
+                            'name' => 'Abschlussarbeit',
+                            'title' => 'abschlussarbeiten'
                         ),
                         'en' => array(
-                            'name' => 'Other',
-                            'title' => 'Other'
+                            'name' => 'Thesis',
+                            'title' => 'Thesis'
                         )
                     ),
                     'Edited Volumes' => array(
                         'order' => 6,
-                        'short' => 'anderer',
+                        'short' => 'herausgegebener_band',
                         'de' => array(
-                            'name' => 'Anderer',
-                            'title' => 'Andere'
+                            'name' => 'Herausgegebener Band',
+                            'title' => 'Herausgegebene Bände'
                         ),
                         'en' => array(
-                            'name' => 'Other',
-                            'title' => 'Other'
+                            'name' => 'Edited Volume',
+                            'title' => 'Edited Volumes'
                         )
                     ),
                     'Conference contribution' => array(
                         'order' => 7,
-                        'short' => 'anderer',
+                        'short' => 'beitrag_tagung',
                         'de' => array(
-                            'name' => 'Anderer',
-                            'title' => 'Andere'
+                            'name' => 'Beitrag bei einer Tagung',
+                            'title' => 'Beiträge bei Tagungen'
                         ),
                         'en' => array(
-                            'name' => 'Other',
-                            'title' => 'Other'
+                            'name' => 'Conference contribution',
+                            'title' => 'Conference Contributions'
                         )
                     ),
                     'Other' => array(
                         'order' => 8,
-                        'short' => 'anderer',
+                        'short' => 'andere',
                         'de' => array(
                             'name' => 'Anderer',
                             'title' => 'Andere'
@@ -937,7 +948,8 @@ class CRIS_Dicts {
         'awards' => array(
             'Preis / Ehrung' => array(
                 'order' => 1,
-                'short' => 'preise',
+                'short' => 'preis',
+                'short_alt' => 'preise',
                 'de' => array(
                     'name' => 'Preis / Ehrung',
                     'title' => 'Preise / Ehrungen'),
@@ -947,7 +959,8 @@ class CRIS_Dicts {
             ),
             'Stipendium / Grant' => array(
                 'order' => 2,
-                'short' => 'stipendien',
+                'short' => 'stipendium',
+                'short_alt' => 'stipendien',
                 'de' => array(
                     'name' => 'Stipendium / Grant',
                     'title' => 'Stipendien / Grants'),
@@ -957,7 +970,8 @@ class CRIS_Dicts {
             ),
             'Akademie-Mitgliedschaft' => array(
                 'order' => 3,
-                'short' => 'mitgliedschaften',
+                'short' => 'akademiemitgliedschaft',
+                'short_alt' => 'mitgliedschaften',
                 'de' => array(
                     'name' => 'Akademie-Mitgliedschaft',
                     'title' => 'Akademie-Mitgliedschaften'),
