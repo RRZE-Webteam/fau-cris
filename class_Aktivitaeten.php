@@ -454,7 +454,7 @@ class CRIS_activities extends CRIS_webservice {
 
         $requests = array();
         foreach ($persID as $_p) {
-            $requests[] = sprintf('getrelated/Person/%d/acti_has_pers', $_p);
+            $requests[] = sprintf('getrelated/Person/%s/acti_has_pers', $_p);
         }
         return $this->retrieve($requests, $filter);
     }

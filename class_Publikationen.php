@@ -901,11 +901,11 @@ class CRIS_publications extends CRIS_webservice {
         $requests = array();
         if ($notable == 1) {
             foreach ($persID as $_p) {
-                $requests[] = sprintf('getrelated/Person/%d/PUBL_has_PERS', $_p);
+                $requests[] = sprintf('getrelated/Person/%s/PUBL_has_PERS', $_p);
             }
         } else {
             foreach ($persID as $_p) {
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PUBL_1', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PUBL_1', $_p);
             }
         }
         return $this->retrieve($requests, $filter);

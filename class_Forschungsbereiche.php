@@ -437,7 +437,7 @@ class CRIS_fields extends CRIS_webservice {
 
         $requests = array();
         foreach ($persID as $_p) {
-            $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PUBL_1', $_p);
+            $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PUBL_1', $_p);
         }
         return $this->retrieve($requests, $filter);
     }

@@ -436,7 +436,7 @@ class CRIS_awards extends CRIS_webservice {
 
         $requests = array();
         foreach ($persID as $_p) {
-            $requests[] = sprintf('getrelated/Person/%d/awar_has_pers', $_p);
+            $requests[] = sprintf('getrelated/Person/%s/awar_has_pers', $_p);
         }
         return $this->retrieve($requests, $filter);
     }

@@ -942,12 +942,12 @@ class CRIS_projects extends CRIS_webservice {
         $requests = array();
         foreach ($persID as $_p) {
             if ($role == 'leader') {
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PROJ_1', $_p);
             } elseif ($role == 'member') {
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PROJ_2', $_p);
             } else {
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PROJ_1', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PROJ_2', $_p);
             }
         }
         return $this->retrieve($requests, $filter);

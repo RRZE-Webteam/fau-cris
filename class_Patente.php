@@ -329,7 +329,7 @@ class CRIS_patents extends CRIS_webservice {
 
         $requests = array();
         foreach ($persID as $_p) {
-            $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PATE_1', $_p);
+            $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PATE_1', $_p);
         }
         return $this->retrieve($requests, $filter);
     }
