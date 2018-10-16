@@ -1264,4 +1264,30 @@ class CRIS_Dicts {
         ),
     );
 
+    public static $pubLanguages = array(
+        'German',
+        'English',
+        'Arabic',
+        'Chinese',
+        'Danish',
+        'Finnish',
+        'French',
+        'Greek',
+        'Italian',
+        'Japanese',
+        'Latin',
+        'Dutch',
+        'Norwegian',
+        'Polish',
+        'Portuguese',
+        'Russian',
+        'Swedish',
+        'Slovak',
+        'Slovenian',
+        'Spanish',
+        'Czech',
+        'Turkish',
+        'Ukrainian'
+    );
+
 }

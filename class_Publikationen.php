@@ -67,8 +67,9 @@ class Publikationen {
         $fau = (isset($param['fau']) && $param['fau'] != '') ? $param['fau'] : '';
         $peerreviewed = (isset($param['peerreviewed']) && $param['peerreviewed'] != '') ? $param['peerreviewed'] : '';
         $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
+        $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $language);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -123,8 +124,9 @@ class Publikationen {
         $peerreviewed = (isset($param['peerreviewed']) && $param['peerreviewed'] != '') ? $param['peerreviewed'] : '';
         $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
+        $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language);
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
@@ -187,8 +189,9 @@ class Publikationen {
         $peerreviewed = (isset($param['peerreviewed']) && $param['peerreviewed'] != '') ? $param['peerreviewed'] : '';
         $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
+        $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -423,10 +426,10 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '') {
+    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '') {
         $filter = NULL;
 
-        $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed);
+        $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
         $ws = new CRIS_publications();
 
         try {
