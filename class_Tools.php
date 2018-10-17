@@ -48,6 +48,9 @@ class Tools {
             foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
                 if($v['short'] == $short)
                     return $k;
+                if (array_key_exists('short_alt', $v) && $v['short_alt'] == $short) {
+                    return $k;
+                }
             }
         } else {
             foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
@@ -216,7 +219,7 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '') {
+    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['publyear__eq'] = $year;
@@ -265,6 +268,11 @@ class Tools {
             } elseif ($fau == 0) {
                 $filter['peerreviewed__eq'] = 'No';
             }
+        }
+        if ($language !== '' && $language !== NULL) {
+            $language = str_replace(' ', '', $language);
+            $pubLanguages = explode(',', $language);
+            $filter['language__eq'] = $pubLanguages;
         }
         if (count($filter))
             return $filter;

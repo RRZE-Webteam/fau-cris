@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.8.1
+ * Version: 3.9.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -850,6 +850,7 @@ class FAU_CRIS {
             'publication' => '',
             'pubtype' => '',
             'quotation' => '',
+            'language' => '',
             'items' => '',
             'limit' => '',
             'sortby' => '',
@@ -903,6 +904,8 @@ class FAU_CRIS {
         $sc_param['start'] = sanitize_text_field($start);
         $sc_param['end'] = sanitize_text_field($end);
         $sc_param['quotation'] = sanitize_text_field($quotation);
+        $language = sanitize_text_field($language);
+        $sc_param['language'] = in_array($language, CRIS_Dicts::$pubLanguages) ? $language : '';
         $limit = ($limit != '' ? $limit : $items);
         $sc_param['limit'] = sanitize_text_field($limit);
         $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : '';

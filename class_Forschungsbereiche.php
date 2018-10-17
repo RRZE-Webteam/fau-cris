@@ -232,6 +232,28 @@ class Forschungsbereiche {
                     $singlefield .= $projects;
                 }
             }
+            if (!in_array('contactpersons', $hide)) {
+                $contactsArray = array();
+                $contacts = explode("|", $field['contact_names']);
+                if (count($contacts) > 0) {
+                    foreach ($contacts as $i => $name) {
+                        $nameparts = explode(":", $name);
+                        $contactsArray[] = array(
+                            'lastname' => $nameparts[0],
+                            'firstname' => $nameparts[1]);
+                    }
+                    $singlefield .= "<h3>" . __('Kontaktpersonen', 'fau-cris') . ": </h3>";
+                    $singlefield .= "<ul>";
+                    foreach($contactsArray as $c_id => $contact) {
+                        $singlefield .= "<li>";
+                        $singlefield .= Tools::get_person_link($c_id, $contact['firstname'], $contact['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                        $singlefield .= "</li>";
+                    }
+                    $singlefield .= "</ul>";
+
+                }
+            }
+
             if (!in_array('persons', $hide)) {
                 $persons = $this->get_field_persons($id);
                 if ($persons) {
@@ -437,7 +459,7 @@ class CRIS_fields extends CRIS_webservice {
 
         $requests = array();
         foreach ($persID as $_p) {
-            $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PUBL_1', $_p);
+            $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PUBL_1', $_p);
         }
         return $this->retrieve($requests, $filter);
     }

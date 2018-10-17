@@ -95,6 +95,7 @@ class Patente {
         $showyear = (isset($param['showyear']) && $param['showyear'] != '') ? $param['showyear'] : 0;
         $showpatentname = (isset($param['showpatentname']) && $param['showpatentname'] != '') ? $param['showpatentname'] : 1;
         $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'year';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $patentArray = $this->fetch_patents($year, $start, $end, $type);
 
@@ -112,15 +113,24 @@ class Patente {
 
         $output = '';
 
-        foreach ($patentList as $array_year => $patents) {
-            if (empty($year)) {
-                $output .= '<h3 class="clearfix clear">';
-                $output .=!empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
-                $output .= '</h3>';
+        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($patentList as $array_year => $patents) {
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($patents, $showname, $showyear, $showpatentname) . '[/collapse]');
+                $openfirst = '';
             }
-            $output .= $this->make_list($patents, $showname, $showyear, $showpatentname);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+                foreach ($patentList as $array_year => $patents) {
+                if (empty($year)) {
+                    $output .= '<h3 class="clearfix clear">';
+                    $output .=!empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
+                    $output .= '</h3>';
+                }
+                $output .= $this->make_list($patents, $showname, $showyear, $showpatentname);
+            }
         }
-
         return $output;
     }
 
@@ -138,6 +148,7 @@ class Patente {
         $showyear = (isset($param['showyear']) && $param['showyear'] != '') ? $param['showyear'] : 1;
         $showpatentname = (isset($param['showpatentname']) && $param['showpatentname'] != '') ? $param['showpatentname'] : 1;
         $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'year';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $patentArray = $this->fetch_patents($year, $start, $end, $type);
 
@@ -165,16 +176,26 @@ class Patente {
         $patentList = $formatter->execute($patentArray);
         $output = '';
 
-        foreach ($patentList as $array_type => $patents) {
-            if (empty($type)) {
+        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($patentList as $array_type => $patents) {
                 $title = Tools::getTitle('patents', $array_type, get_locale());
-                $output .= '<h3 class="clearfix clear">';
-                $output .= $title;
-                $output .= "</h3>";
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($patents, $showname, $showyear, $showpatentname, 0) . '[/collapse]');
+                $openfirst = '';
             }
-            $output .= $this->make_list($patents, $showname, $showyear, $showpatentname, 0);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+                foreach ($patentList as $array_type => $patents) {
+                if (empty($type)) {
+                    $title = Tools::getTitle('patents', $array_type, get_locale());
+                    $output .= '<h3 class="clearfix clear">';
+                    $output .= $title;
+                    $output .= "</h3>";
+                }
+                $output .= $this->make_list($patents, $showname, $showyear, $showpatentname, 0);
+            }
         }
-
         return $output;
     }
 
@@ -329,7 +350,7 @@ class CRIS_patents extends CRIS_webservice {
 
         $requests = array();
         foreach ($persID as $_p) {
-            $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PATE_1', $_p);
+            $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PATE_1', $_p);
         }
         return $this->retrieve($requests, $filter);
     }

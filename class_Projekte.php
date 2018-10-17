@@ -43,7 +43,6 @@ class Projekte {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
-
     }
 
     /*
@@ -140,6 +139,7 @@ class Projekte {
         $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
         $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
 
@@ -154,14 +154,24 @@ class Projekte {
         $projList = $formatter->execute($projArray);
 
         $output = '';
-        foreach ($projList as $array_year => $projects) {
-            if (empty($year)) {
-                $output .= '<h3>' . $array_year . '</h3>';
+        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($projList as $array_year => $projects) {
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
+                $openfirst = '';
             }
-            if ($content == '') {
-                $output .= $this->make_list($projects, $hide);
-            } else {
-                $output .= $this->make_custom_list($projects, $content);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+            foreach ($projList as $array_year => $projects) {
+                if (empty($year)) {
+                    $output .= '<h3>' . $array_year . '</h3>';
+                }
+                if ($content == '') {
+                    $output .= $this->make_list($projects, $hide);
+                } else {
+                    $output .= $this->make_custom_list($projects, $content);
+                }
             }
         }
         return $output;
@@ -179,6 +189,7 @@ class Projekte {
         $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
         $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
 
@@ -203,18 +214,29 @@ class Projekte {
         $projList = $formatter->execute($projArray);
 
         $output = '';
-        foreach ($projList as $array_type => $projects) {
-            // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde
-            if (empty($type)) {
+        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($projList as $array_type => $projects) {
                 $title = Tools::getTitle('projects', $array_type, get_locale());
-                $output .= "<h3>";
-                $output .= $title;
-                $output .= "</h3>";
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($projects, $hide) . '[/collapse]');
+                $openfirst = '';
             }
-            if ($content == '') {
-                $output .= $this->make_list($projects, $hide, 0);
-            } else {
-                $output .= $this->make_custom_list($projects, $content);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+            foreach ($projList as $array_type => $projects) {
+                // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde
+                if (empty($type)) {
+                    $title = Tools::getTitle('projects', $array_type, get_locale());
+                    $output .= "<h3>";
+                    $output .= $title;
+                    $output .= "</h3>";
+                }
+                if ($content == '') {
+                    $output .= $this->make_list($projects, $hide, 0);
+                } else {
+                    $output .= $this->make_custom_list($projects, $content);
+                }
             }
         }
         return $output;
@@ -412,7 +434,6 @@ class Projekte {
                 }
             }
             $projlist .= strtr($custom_text, $proj_details);
-
         }
         $projlist .= "</div>";
         return $projlist;
@@ -642,12 +663,12 @@ class Projekte {
                 /*
                  * Erst umsetzen wenn Datendrehscheibe läuft
                  *
-                $leaderIDs = explode(",", $project['relpersidlead']);
-                $leaderArray = $this->get_project_leaders($id, $leaderIDs);
-                $leaders = array();
-                foreach ($leaderArray as $l_id => $l_names) {
+                  $leaderIDs = explode(",", $project['relpersidlead']);
+                  $leaderArray = $this->get_project_leaders($id, $leaderIDs);
+                  $leaders = array();
+                  foreach ($leaderArray as $l_id => $l_names) {
                   $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                }
+                  }
                  */
 
                 $projlist .= "<div class=\"project-details\">";
@@ -741,9 +762,9 @@ class Projekte {
             }
             if (!in_array('link', $hide) && !empty($id))
                 $link = Tools::get_item_url("project", $title, $id, $post->ID, $lang);
-                $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
-                $projlist .= "[/collapse]";
-            }
+            $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
+            $projlist .= "[/collapse]";
+        }
         $projlist .= "[/collapsibles]";
 
         return do_shortcode($projlist);
@@ -942,12 +963,12 @@ class CRIS_projects extends CRIS_webservice {
         $requests = array();
         foreach ($persID as $_p) {
             if ($role == 'leader') {
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PROJ_1', $_p);
             } elseif ($role == 'member') {
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PROJ_2', $_p);
             } else {
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_1', $_p);
-                $requests[] = sprintf('getautorelated/Person/%d/PERS_2_PROJ_2', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PROJ_1', $_p);
+                $requests[] = sprintf('getautorelated/Person/%s/PERS_2_PROJ_2', $_p);
             }
         }
         return $this->retrieve($requests, $filter);
@@ -1028,6 +1049,7 @@ class CRIS_projects extends CRIS_webservice {
 
         return $projects;
     }
+
 }
 
 class CRIS_project extends CRIS_Entity {
@@ -1038,6 +1060,7 @@ class CRIS_project extends CRIS_Entity {
     function __construct($data) {
         parent::__construct($data);
     }
+
 }
 
 class CRIS_project_image extends CRIS_Entity {
@@ -1058,4 +1081,5 @@ class CRIS_project_image extends CRIS_Entity {
             }
         }
     }
+
 }
