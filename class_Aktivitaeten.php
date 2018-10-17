@@ -91,6 +91,7 @@ class Aktivitaeten {
         $showyear = 0;
         $showactivityname = 1;
         $order2 = 'year';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
@@ -108,15 +109,24 @@ class Aktivitaeten {
 
         $output = '';
 
-        foreach ($activityList as $array_year => $activities) {
-            if (empty($year)) {
-                $output .= '<h3 class="clearfix clear">';
-                $output .=!empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
-                $output .= '</h3>';
+        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($activityList as $array_year => $activities) {
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($activities, $showname, $showyear, $showactivityname) . '[/collapse]');
+                $openfirst = '';
             }
-            $output .= $this->make_list($activities, $showname, $showyear, $showactivityname);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+            foreach ($activityList as $array_year => $activities) {
+                if (empty($year)) {
+                    $output .= '<h3 class="clearfix clear">';
+                    $output .= !empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
+                    $output .= '</h3>';
+                }
+                $output .= $this->make_list($activities, $showname, $showyear, $showactivityname);
+            }
         }
-
         return $output;
     }
 
@@ -134,6 +144,7 @@ class Aktivitaeten {
         $showyear = 0;
         $showactivityname = 1;
         $order2 = 'year';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
@@ -161,16 +172,26 @@ class Aktivitaeten {
         $activityList = $formatter->execute($activityArray);
         $output = '';
 
-        foreach ($activityList as $array_type => $activities) {
-            if (empty($type)) {
+        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($activityList as $array_type => $activities) {
                 $title = Tools::getTitle('activities', $array_type, get_locale());
-                $output .= '<h3 class="clearfix clear">';
-                $output .= $title;
-                $output .= "</h3>";
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
+                $openfirst = '';
             }
-            $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, 0);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+                foreach ($activityList as $array_type => $activities) {
+                if (empty($type)) {
+                    $title = Tools::getTitle('activities', $array_type, get_locale());
+                    $output .= '<h3 class="clearfix clear">';
+                    $output .= $title;
+                    $output .= "</h3>";
+                }
+                $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, 0);
+            }
         }
-
         return $output;
     }
 
@@ -397,7 +418,7 @@ class Aktivitaeten {
                 $activitylist .= $activity_type;
             if (!empty($activity_name))
                 global $post;
-                $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
+            $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
             if (!empty($activity_detail))
                 $activitylist .= " (" . $activity_detail . ")";
             if (!empty($activity_date))

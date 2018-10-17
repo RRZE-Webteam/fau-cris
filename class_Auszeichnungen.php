@@ -102,6 +102,7 @@ class Auszeichnungen {
         $showawardname = (isset($param['showawardname']) && $param['showawardname'] != '') ? $param['showawardname'] : 1;
         $display = (isset($param['display']) && $param['display'] != '') ? $param['display'] : 'list';
         $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'name';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $awardArray = $this->fetch_awards($year, $start, $end, $type, $awardnameid);
 
@@ -118,22 +119,34 @@ class Auszeichnungen {
         $awardList = $formatter->execute($awardArray);
 
         $output = '';
-
-        foreach ($awardList as $array_year => $awards) {
-            if (count($awards) < 1)
-                return $output;
-            if (empty($year)) {
-                $output .= '<h3 class="clearfix clear">';
-                $output .= $array_year;
-                $output .= '</h3>';
+        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($awardList as $array_year => $awards) {
+                if ($display == 'gallery') {
+                    $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_gallery($awards, $showname, $showyear, $showawardname) . '[/collapse]');
+                } else {
+                    $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($awards, $showname, $showyear, $showawardname) . '[/collapse]');
+                }
+                $openfirst = '';
             }
-            if ($display == 'gallery') {
-                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname);
-            } else {
-                $output .= $this->make_list($awards, $showname, $showyear, $showawardname);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+            foreach ($awardList as $array_year => $awards) {
+                if (count($awards) < 1)
+                    return $output;
+                if (empty($year)) {
+                    $output .= '<h3 class="clearfix clear">';
+                    $output .= $array_year;
+                    $output .= '</h3>';
+                }
+                if ($display == 'gallery') {
+                    $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname);
+                } else {
+                    $output .= $this->make_list($awards, $showname, $showyear, $showawardname);
+                }
             }
         }
-
         return $output;
     }
 
@@ -152,6 +165,7 @@ class Auszeichnungen {
         $showawardname = (isset($param['showawardname']) && $param['showawardname'] != '') ? $param['showawardname'] : 1;
         $display = (isset($param['display']) && $param['display'] != '') ? $param['display'] : '';
         $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'year';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $awardArray = $this->fetch_awards($year, $start, $end, $type, $awardnameid);
 
@@ -178,21 +192,34 @@ class Auszeichnungen {
         }
         $awardList = $formatter->execute($awardArray);
         $output = '';
-
-        foreach ($awardList as $array_type => $awards) {
-            if (empty($type)) {
+        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+            $shortcode_data = '';
+            $openfirst = ' load="open"';
+            foreach ($awardList as $array_type => $awards) {
                 $title = Tools::getTitle('awards', $array_type, get_locale());
-                $output .= '<h3 class="clearfix clear">';
-                $output .= $title;
-                $output .= "</h3>";
+                if ($display == 'gallery') {
+                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_gallery($awards, $showname, $showyear, $showawardname) . '[/collapse]');
+                } else {
+                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($awards, $showname, $showyear, $showawardname) . '[/collapse]');
+                }
+                $openfirst = '';
             }
-            if ($display == 'gallery') {
-                $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname);
-            } else {
-                $output .= $this->make_list($awards, $showname, $showyear, $showawardname);
+            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+        } else {
+            foreach ($awardList as $array_type => $awards) {
+                if (empty($type)) {
+                    $title = Tools::getTitle('awards', $array_type, get_locale());
+                    $output .= '<h3 class="clearfix clear">';
+                    $output .= $title;
+                    $output .= "</h3>";
+                }
+                if ($display == 'gallery') {
+                    $output .= $this->make_gallery($awards, $showname, $showyear, $showawardname);
+                } else {
+                    $output .= $this->make_list($awards, $showname, $showyear, $showawardname);
+                }
             }
         }
-
         return $output;
     }
 
@@ -231,7 +258,7 @@ class Auszeichnungen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_awards($year = '', $start = '', $end= '', $type = '', $awardnameid = '') {
+    private function fetch_awards($year = '', $start = '', $end = '', $type = '', $awardnameid = '') {
         $filter = Tools::award_filter($year, $start, $end, $type);
 
         $ws = new CRIS_awards();

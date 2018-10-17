@@ -256,7 +256,7 @@ class Publikationen {
                         $shortcode_data_other .= $this->make_list($publications_sub);
                     }
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $shortcode_data_other . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
