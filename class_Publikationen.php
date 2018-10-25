@@ -235,16 +235,22 @@ class Publikationen {
                 } else {
                     $subtypeorder = Tools::getOrder('publications', $array_type);
                 }
-                if ($order2 == 'author') {
-                    $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "relauthors", SORT_ASC);
-                } else {
-                    $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                switch ($order2) {
+                    case 'author':
+                        $subformatter = new CRIS_formatter(NULL, NULL, "relauthors", SORT_ASC);
+                        break;
+                    case 'subtype':
+                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                        break;
+                    default:
+                        $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
+                        break;
                 }
                 $pubOtherList = $subformatter->execute($publications);
 
                 foreach ($pubOtherList as $array_subtype => $publications_sub) {
                     // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
-                    if (empty($subtype)) {
+                    if ($order2 == 'subtype') {
                         $title_sub = Tools::getTitle('publications', $array_subtype, get_locale(), $array_type);
                         $shortcode_data_other .= "<h4>";
                         $shortcode_data_other .= $title_sub;
@@ -261,7 +267,6 @@ class Publikationen {
             }
             $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
         } else {
-
             foreach ($pubList as $array_type => $publications) {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                 if (empty($type)) {
@@ -282,16 +287,22 @@ class Publikationen {
                 } else {
                     $subtypeorder = Tools::getOrder('publications', $array_type);
                 }
-                if ($order2 == 'author') {
-                    $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "relauthors", SORT_ASC);
-                } else {
-                    $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                switch ($order2) {
+                    case 'author':
+                        $subformatter = new CRIS_formatter(NULL, NULL, "relauthors", SORT_ASC);
+                        break;
+                    case 'subtype':
+                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                        break;
+                    default:
+                        $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
+                        break;
                 }
                 $pubOtherList = $subformatter->execute($publications);
 
                 foreach ($pubOtherList as $array_subtype => $publications_sub) {
                     // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
-                    if (empty($subtype)) {
+                    if ($order2 == 'subtype') {
                         $title_sub = Tools::getTitle('publications', $array_subtype, get_locale(), $array_type);
                         $output .= "<h4>";
                         $output .= $title_sub;
@@ -305,15 +316,6 @@ class Publikationen {
                         } else {
                             $output .= $this->make_list($publications_sub);
                         }
-                    }
-                }
-                if ($quotation == 'apa' || $quotation == 'mla') {
-                    $output .= $this->make_quotation_list($publications, $quotation);
-                } else {
-                    if ($param['sc_type'] == 'custom') {
-                        $output .= $this->make_custom_list($publications, $content);
-                    } else {
-                        $output .= $this->make_list($publications, 0, $this->nameorder);
                     }
                 }
             }

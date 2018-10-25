@@ -372,8 +372,8 @@ class CRIS_Dicts {
                             'title' => 'Monographien'
                         ),
                         'en' => array(
-                            'name' => 'Monography',
-                            'title' => 'Monographies'
+                            'name' => 'Authored book',
+                            'title' => 'Authored Books'
                         )
                     ),
                     'Band aus einer Reihe' => array(
