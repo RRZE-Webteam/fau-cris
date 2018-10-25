@@ -235,10 +235,11 @@ class Forschungsbereiche {
             if (!in_array('contactpersons', $hide)) {
                 $contactsArray = array();
                 $contacts = explode("|", $field['contact_names']);
+                $contactIDs = explode(",", $field['contact_ids']);
                 if (count($contacts) > 0) {
                     foreach ($contacts as $i => $name) {
                         $nameparts = explode(":", $name);
-                        $contactsArray[] = array(
+                        $contactsArray[$contactIDs[$i]] = array(
                             'lastname' => $nameparts[0],
                             'firstname' => $nameparts[1]);
                     }

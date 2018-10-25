@@ -568,6 +568,10 @@ class Tools {
                 $link_pre = '';
                 $link_post = '';
         }
+        if ($id == 0) {
+            $link_pre = '';
+            $link_post = '';
+        }
         if ($shortfirst == 1) {
             if (strpos($firstname, ' ') !== false) {
                 $firstnames = explode(' ', $firstname);
