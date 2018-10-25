@@ -16,6 +16,7 @@ Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 ## Benötigte PHP-Module
 
 * php-curl
+* php7.2-intl
 
 
 Detaillierte Dokumentation unter https://www.wordpress.rrze.fau.de/plugins/fau-cris/
