@@ -200,7 +200,7 @@ class Publikationen {
 
         // Publikationstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short')) !== false) {
+        if ($order[0] != '' && ((array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short')) !== false) || array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short_alt')) !== false)) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('publications', $value);
             }
