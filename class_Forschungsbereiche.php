@@ -309,6 +309,7 @@ class Forschungsbereiche {
             $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = $this->get_field_projects($id);
             $field_details['#persons#'] = '';
+            $field_details['#contactpersons#'] = '';
             $persons = $this->get_field_persons($id);
             if ($persons) {
                 $field_details['#persons#'] .= "<ul>";
@@ -319,6 +320,26 @@ class Forschungsbereiche {
                     }
                 $field_details['#persons#'] .= "</ul>";
             }
+            $contactsArray = array();
+            $contacts = explode("|", $field['contact_names']);
+            $contactIDs = explode(",", $field['contact_ids']);
+            if (count($contacts) > 0) {
+                foreach ($contacts as $i => $name) {
+                    $nameparts = explode(":", $name);
+                    $contactsArray[$contactIDs[$i]] = array(
+                        'lastname' => $nameparts[0],
+                        'firstname' => $nameparts[1]);
+                }
+                $field_details['#contactpersons#'] .= "<ul>";
+                foreach($contactsArray as $c_id => $contact) {
+                    $field_details['#contactpersons#'] .= "<li>";
+                    $field_details['#contactpersons#'] .= Tools::get_person_link($c_id, $contact['firstname'], $contact['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                    $field_details['#contactpersons#'] .= "</li>";
+                }
+                $field_details['#contactpersons#'] .= "</ul>";
+
+            }
+
             $field_details['#publications#'] = '';
             $publications = $this->get_field_publications($param);
             if ($publications)
