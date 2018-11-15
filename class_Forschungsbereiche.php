@@ -411,30 +411,16 @@ class Forschungsbereiche {
 
         require_once('class_Publikationen.php');
         $liste = new Publikationen('field', $param['field']);
+        foreach ($param as $_k => $_v) {
+            if (substr($_k, 0, 13) == 'publications_') {
+                $args[substr($_k,13)] = $_v;
+            }
+        }
+        $args['sc_type'] = 'default';
         if ($param['publications_orderby'] == 'year')
-            return $liste->pubNachJahr (
-                    $param['publications_year'],
-                    $param['publications_start'],
-                    $param['publications_type'],
-                    $param['publications_subtype'],
-                    $param['quotation'],
-                    $param['publications_order2'] = '',
-                    $param['publications_fau'],
-                    $param['publications_peerreviewed'],
-                    $param['publications_notable'],
-                    $param['field']);
+            return $liste->pubNachJahr ($args, $param['field']);
         if ($param['publications_orderby'] == 'type')
-            return $liste->pubNachTyp (
-                    $param['publications_year'],
-                    $param['publications_start'],
-                    $param['publications_type'],
-                    $param['publications_subtype'],
-                    $param['quotation'],
-                    $param['publications_order2'] = '',
-                    $param['publications_fau'],
-                    $param['publications_peerreviewed'],
-                    $param['publications_notable'],
-                    $param['field']);
+            return $liste->pubNachTyp ($args, $param['field']);
         return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit']);
     }
 
