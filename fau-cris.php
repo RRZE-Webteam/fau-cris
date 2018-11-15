@@ -866,6 +866,7 @@ class FAU_CRIS {
             'project' => '',
             'hide' => '',
             'role' => 'all',
+            'status' => '',
             'patent' => '',
             'activity' => '',
             'field' => '',
@@ -918,7 +919,6 @@ class FAU_CRIS {
         $sc_param['hide'] = sanitize_text_field($hide);
         $sc_param['fau'] = sanitize_text_field($fau);
         $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
-        $sc_param['current'] = sanitize_text_field($current);
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
         $sc_param['notable'] = $notable == 1 ? 1 : 0;
         $sc_param['publications_limit'] = sanitize_text_field($publications_limit);
@@ -930,7 +930,11 @@ class FAU_CRIS {
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
-
+        if (sanitize_text_field($current) == "1" && sanitize_text_field($status) == '') { // Abwärtskompatibilität
+            $sc_param['status'] = 'current';
+        } else {
+            $sc_param['status'] = sanitize_text_field($status);
+        }
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {
