@@ -152,6 +152,7 @@ class FAU_CRIS {
             'cris_bibtex' => 0,
             'cris_url' => 0,
             'cris_doi' => 0,
+            'cris_oa' => 1,
             'cris_name_order_plugin' => 'firstname-lastname',
             'cris_award_order' => Tools::getOptionsOrder('awards'),
             'cris_award_link' => 'none',
@@ -310,6 +311,12 @@ class FAU_CRIS {
                         'cris_url', __('URL', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_url',
                     'description' => __('Soll auch im APA- und MLA-Zitierstil (wenn vorhanden) ein Link zu einer Website angezeigt werden?', 'fau-cris')
+                        )
+                );
+                add_settings_field(
+                        'cris_oa', __('OA-Icon', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'name' => 'cris_oa',
+                    'description' => __('Sollen Publikationen auch im APA- und MLA-Zitierstil als Open Access gekennzeichnet werden?', 'fau-cris')
                         )
                 );
                 add_settings_field(
@@ -504,6 +511,7 @@ class FAU_CRIS {
                 $new_input['cris_bibtex'] = isset($_POST[self::option_name]['cris_bibtex']) ? 1 : 0;
                 $new_input['cris_url'] = isset($_POST[self::option_name]['cris_url']) ? 1 : 0;
                 $new_input['cris_doi'] = isset($_POST[self::option_name]['cris_doi']) ? 1 : 0;
+                $new_input['cris_oa'] = isset($_POST[self::option_name]['cris_oa']) ? 1 : 0;
                 $new_input['cris_name_order_plugin'] = (isset($_POST[self::option_name]['cris_name_order_plugin'])
                         && $_POST[self::option_name]['cris_name_order_plugin'] == 'lastname-firstname') ? 'lastname-firstname' : 'firstname-lastname';
                 $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
