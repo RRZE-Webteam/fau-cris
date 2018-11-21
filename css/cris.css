@@ -93,29 +93,3 @@ ul.cris-activities li {
     position: relative;
     top: 2px;
 }
-
-#nav .level2 li.cris-last {
-    border-bottom: 1px solid #aaa;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-}
-
-#nav .level2 li.cris-first {
-    border-top: 1px solid #aaa;
-    padding-top: 10px;
-}
-
-#nav .level2 li.cris-first:before {
-    content: 'Research Areas';
-    display:block;
-    color: #fff;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-:lang(de-DE) #nav .level2 li.cris-first:before {
-    content: 'Forschungsbereiche';
-}
-
-#nav .level2 li.cris-last a {
-    border-bottom-color: transparent;
-}
