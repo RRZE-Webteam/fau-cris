@@ -393,7 +393,8 @@ class Projekte {
                     break;
             }
             $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $proj_details['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], get_locale());
             $proj_details['#parentprojecttitle#'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $leaderIDs = explode(",", $project['relpersidlead']);
@@ -528,7 +529,7 @@ class Projekte {
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
-            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $type = Tools::getName('projects', $project['project type'], get_locale());
             $imgs = self::get_project_images($project['ID']);
 
