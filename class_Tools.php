@@ -316,7 +316,7 @@ class Tools {
      * Array zur Definition des Filters für Projekte
      */
 
-    public static function project_filter($year = '', $start = '', $end = '', $type = '', $current = '') {
+    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL) {
             if ($year == 'current') {
@@ -348,10 +348,27 @@ class Tools {
             }
             $filter['project type__eq'] = $projTyp;
         }
-        if ($current == '1') {
+        if ($status !== '' && $status !== NULL) {
+            if (strpos($status, ',')) {
+                $status = str_replace(' ', '', $status);
+                $arrStatus = explode(',', $status);
+            } else {
+                $arrStatus = (array) $status;
+            }
             $today = date('Y-m-d');
-            $filter['cfstartdate__le'] = $today;
-            $filter['virtualenddate__ge'] = $today;
+            $statusSet = ['completed', 'current', 'future'];
+            if (array_intersect($arrStatus, $statusSet) == ['completed']) {
+                $filter['virtualenddate__lt'] = $today;
+            } elseif (array_intersect($arrStatus, $statusSet) == ['current']) {
+                $filter['cfstartdate__le'] = $today;
+                $filter['virtualenddate__ge'] = $today;
+            } elseif (array_intersect($arrStatus, $statusSet) == ['future']) {
+                $filter['cfstartdate__gt'] = $today;
+            } elseif (array_intersect($arrStatus, $statusSet) == ['completed', 'current']) {
+                $filter['cfstartdate__le'] = $today;
+            } elseif (array_intersect($arrStatus, $statusSet) == ['current', 'future']) {
+                $filter['virtualenddate__ge'] = $today;
+            }
         }
         if (count($filter))
             return $filter;

@@ -309,6 +309,7 @@ class Forschungsbereiche {
             $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = $this->get_field_projects($id);
             $field_details['#persons#'] = '';
+            $field_details['#contactpersons#'] = '';
             $persons = $this->get_field_persons($id);
             if ($persons) {
                 $field_details['#persons#'] .= "<ul>";
@@ -319,6 +320,26 @@ class Forschungsbereiche {
                     }
                 $field_details['#persons#'] .= "</ul>";
             }
+            $contactsArray = array();
+            $contacts = explode("|", $field['contact_names']);
+            $contactIDs = explode(",", $field['contact_ids']);
+            if (count($contacts) > 0) {
+                foreach ($contacts as $i => $name) {
+                    $nameparts = explode(":", $name);
+                    $contactsArray[$contactIDs[$i]] = array(
+                        'lastname' => $nameparts[0],
+                        'firstname' => $nameparts[1]);
+                }
+                $field_details['#contactpersons#'] .= "<ul>";
+                foreach($contactsArray as $c_id => $contact) {
+                    $field_details['#contactpersons#'] .= "<li>";
+                    $field_details['#contactpersons#'] .= Tools::get_person_link($c_id, $contact['firstname'], $contact['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                    $field_details['#contactpersons#'] .= "</li>";
+                }
+                $field_details['#contactpersons#'] .= "</ul>";
+
+            }
+
             $field_details['#publications#'] = '';
             $publications = $this->get_field_publications($param);
             if ($publications)
@@ -390,30 +411,16 @@ class Forschungsbereiche {
 
         require_once('class_Publikationen.php');
         $liste = new Publikationen('field', $param['field']);
+        foreach ($param as $_k => $_v) {
+            if (substr($_k, 0, 13) == 'publications_') {
+                $args[substr($_k,13)] = $_v;
+            }
+        }
+        $args['sc_type'] = 'default';
         if ($param['publications_orderby'] == 'year')
-            return $liste->pubNachJahr (
-                    $param['publications_year'],
-                    $param['publications_start'],
-                    $param['publications_type'],
-                    $param['publications_subtype'],
-                    $param['quotation'],
-                    $param['publications_order2'] = '',
-                    $param['publications_fau'],
-                    $param['publications_peerreviewed'],
-                    $param['publications_notable'],
-                    $param['field']);
+            return $liste->pubNachJahr ($args, $param['field']);
         if ($param['publications_orderby'] == 'type')
-            return $liste->pubNachTyp (
-                    $param['publications_year'],
-                    $param['publications_start'],
-                    $param['publications_type'],
-                    $param['publications_subtype'],
-                    $param['quotation'],
-                    $param['publications_order2'] = '',
-                    $param['publications_fau'],
-                    $param['publications_peerreviewed'],
-                    $param['publications_notable'],
-                    $param['field']);
+            return $liste->pubNachTyp ($args, $param['field']);
         return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit']);
     }
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.9.1
+ * Version: 3.10.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -152,6 +152,7 @@ class FAU_CRIS {
             'cris_bibtex' => 0,
             'cris_url' => 0,
             'cris_doi' => 0,
+            'cris_oa' => 1,
             'cris_name_order_plugin' => 'firstname-lastname',
             'cris_award_order' => Tools::getOptionsOrder('awards'),
             'cris_award_link' => 'none',
@@ -310,6 +311,12 @@ class FAU_CRIS {
                         'cris_url', __('URL', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
                     'name' => 'cris_url',
                     'description' => __('Soll auch im APA- und MLA-Zitierstil (wenn vorhanden) ein Link zu einer Website angezeigt werden?', 'fau-cris')
+                        )
+                );
+                add_settings_field(
+                        'cris_oa', __('OA-Icon', 'fau-cris'), array(__CLASS__, 'cris_check_callback'), 'fau_cris_options', 'cris_publications_section', array(
+                    'name' => 'cris_oa',
+                    'description' => __('Sollen Publikationen auch im APA- und MLA-Zitierstil als Open Access gekennzeichnet werden?', 'fau-cris')
                         )
                 );
                 add_settings_field(
@@ -504,6 +511,7 @@ class FAU_CRIS {
                 $new_input['cris_bibtex'] = isset($_POST[self::option_name]['cris_bibtex']) ? 1 : 0;
                 $new_input['cris_url'] = isset($_POST[self::option_name]['cris_url']) ? 1 : 0;
                 $new_input['cris_doi'] = isset($_POST[self::option_name]['cris_doi']) ? 1 : 0;
+                $new_input['cris_oa'] = isset($_POST[self::option_name]['cris_oa']) ? 1 : 0;
                 $new_input['cris_name_order_plugin'] = (isset($_POST[self::option_name]['cris_name_order_plugin'])
                         && $_POST[self::option_name]['cris_name_order_plugin'] == 'lastname-firstname') ? 'lastname-firstname' : 'firstname-lastname';
                 $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
@@ -866,6 +874,7 @@ class FAU_CRIS {
             'project' => '',
             'hide' => '',
             'role' => 'all',
+            'status' => '',
             'patent' => '',
             'activity' => '',
             'field' => '',
@@ -918,7 +927,6 @@ class FAU_CRIS {
         $sc_param['hide'] = sanitize_text_field($hide);
         $sc_param['fau'] = sanitize_text_field($fau);
         $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
-        $sc_param['current'] = sanitize_text_field($current);
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
         $sc_param['notable'] = $notable == 1 ? 1 : 0;
         $sc_param['publications_limit'] = sanitize_text_field($publications_limit);
@@ -930,7 +938,11 @@ class FAU_CRIS {
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
-
+        if (sanitize_text_field($current) == "1" && sanitize_text_field($status) == '') { // Abwärtskompatibilität
+            $sc_param['status'] = 'current';
+        } else {
+            $sc_param['status'] = sanitize_text_field($status);
+        }
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {

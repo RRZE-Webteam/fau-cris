@@ -57,9 +57,9 @@ class Projekte {
         $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
         $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
-        $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
+        $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
 
-        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
+        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $status);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -94,9 +94,9 @@ class Projekte {
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
         $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
-        $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
+        $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
 
-        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
+        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $status);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -138,10 +138,10 @@ class Projekte {
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
         $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
-        $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
+        $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
 
-        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
+        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $status);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -188,10 +188,10 @@ class Projekte {
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
         $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
-        $current = (isset($param['current']) && $param['current'] != '') ? $param['current'] : '';
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
+        $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
 
-        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $current);
+        $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $status);
 
         if (!count($projArray)) {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
@@ -340,8 +340,8 @@ class Projekte {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_projects($year = '', $start = '', $end = '', $type = '', $role = 'all', $current = '') {
-        $filter = Tools::project_filter($year, $start, $end, $type, $current);
+    private function fetch_projects($year = '', $start = '', $end = '', $type = '', $role = 'all', $status = '') {
+        $filter = Tools::project_filter($year, $start, $end, $type, $status);
 
         $ws = new CRIS_projects();
         $awardArray = array();
@@ -393,7 +393,8 @@ class Projekte {
                     break;
             }
             $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $proj_details['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], get_locale());
             $proj_details['#parentprojecttitle#'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $leaderIDs = explode(",", $project['relpersidlead']);
@@ -528,7 +529,7 @@ class Projekte {
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
-            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $type = Tools::getName('projects', $project['project type'], get_locale());
             $imgs = self::get_project_images($project['ID']);
 
