@@ -10,7 +10,7 @@ class Auszeichnungen {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -43,6 +43,7 @@ class Auszeichnungen {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
+        $this->page_lang = $page_lang;
     }
 
     /*
@@ -196,7 +197,7 @@ class Auszeichnungen {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($awardList as $array_type => $awards) {
-                $title = Tools::getTitle('awards', $array_type, get_locale());
+                $title = Tools::getTitle('awards', $array_type, $this->page_lang);
                 if ($display == 'gallery') {
                     $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_gallery($awards, $showname, $showyear, $showawardname) . '[/collapse]');
                 } else {
@@ -208,7 +209,7 @@ class Auszeichnungen {
         } else {
             foreach ($awardList as $array_type => $awards) {
                 if (empty($type)) {
-                    $title = Tools::getTitle('awards', $array_type, get_locale());
+                    $title = Tools::getTitle('awards', $array_type, $this->page_lang);
                     $output .= '<h3 class="clearfix clear">';
                     $output .= $title;
                     $output .= "</h3>";

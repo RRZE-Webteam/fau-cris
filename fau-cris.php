@@ -681,16 +681,18 @@ class FAU_CRIS {
      */
     public static function cris_shortcode($atts, $content = null, $tag) {
         $parameter = self::cris_shortcode_parameter($atts, $content = null, $tag);
-
+        global $post;
+        $page_lang = Tools::getPageLanguage($post->ID);
+        
         if (isset($parameter['show']) && $parameter['show'] == 'organisation') {
             // Forschung
             require_once('class_Organisation.php');
-            $liste = new Organisation($parameter['entity'], $parameter['entity_id']);
+            $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang);
             return $liste->singleOrganisation($parameter['hide']);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'fields') {
             // Forschungsbereiche
             require_once('class_Forschungsbereiche.php');
-            $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
+            $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id'], $page_lang);
 
             if ($parameter['field'] != '') {
                 return $liste->singleField($parameter);
@@ -702,7 +704,7 @@ class FAU_CRIS {
         } elseif (isset($parameter['show']) && $parameter['show'] == 'activities') {
             // Aktivitäten
             require_once('class_Aktivitaeten.php');
-            $liste = new Aktivitaeten($parameter['entity'], $parameter['entity_id']);
+            $liste = new Aktivitaeten($parameter['entity'], $parameter['entity_id'], $page_lang);
 
             if ($parameter['activity'] != '') {
                 return $liste->singleActivity($parameter['hide']);
@@ -720,7 +722,7 @@ class FAU_CRIS {
         } elseif (isset($parameter['show']) && $parameter['show'] == 'patents') {
             // Patente
             require_once('class_Patente.php');
-            $liste = new Patente($parameter['entity'], $parameter['entity_id']);
+            $liste = new Patente($parameter['entity'], $parameter['entity_id'], $page_lang);
 
             if ($parameter['patent'] != '') {
                 return $liste->singlePatent($parameter['hide']);
@@ -738,7 +740,7 @@ class FAU_CRIS {
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
             // Projekte
             require_once('class_Projekte.php');
-            $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
+            $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang);
 
             if ($parameter['project'] != '') {
                 return $liste->singleProj($parameter['hide'], $parameter['quotation']);
@@ -759,7 +761,7 @@ class FAU_CRIS {
         } elseif (isset($parameter['show']) && $parameter['show'] == 'awards') {
             // Awards
             require_once('class_Auszeichnungen.php');
-            $liste = new Auszeichnungen($parameter['entity'], $parameter['entity_id'], $parameter['display']);
+            $liste = new Auszeichnungen($parameter['entity'], $parameter['entity_id'], $parameter['display'], $page_lang);
 
             if ($parameter['award'] != '') {
                 return $liste->singleAward($parameter['showname'], $parameter['showyear'], $parameter['showawardname'], $parameter['display']);
@@ -774,7 +776,7 @@ class FAU_CRIS {
         } else {
             // Publications
             require_once('class_Publikationen.php');
-            $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], $parameter['name_order_plugin']);
+            $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], $parameter['name_order_plugin'], $page_lang);
 
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
                 return $liste->singlePub($parameter['quotation']);
@@ -794,23 +796,25 @@ class FAU_CRIS {
 
     public static function cris_custom_shortcode($atts, $content = null, $tag) {
         $parameter = self::cris_shortcode_parameter($atts, $content, $tag);
+        global $post;
+        $page_lang = Tools::getPageLanguage($post->ID);
 
         if ($parameter['show'] == 'organisation') {
         // Forschung
             require_once('class_Organisation.php');
-            $liste = new Organisation($parameter['entity'], $parameter['entity_id']);
+            $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang);
             return $liste->customOrganisation($content);
         } elseif ($parameter['show'] == 'fields') {
         // Forschungsbereiche
             require_once('class_Forschungsbereiche.php');
-            $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id']);
+            $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id'], $page_lang);
             if ($parameter['field'] != '') {
                 return $liste->customField($content, $parameter);
             }
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
         // Projekte
             require_once('class_Projekte.php');
-            $liste = new Projekte($parameter['entity'], $parameter['entity_id']);
+            $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang);
             if ($parameter['project'] != '') {
                 return $liste->customProj($content, $parameter['quotation']);
             }
@@ -827,9 +831,9 @@ class FAU_CRIS {
         } elseif ($parameter['show'] == 'publications') {
         // Publikationen
             require_once('class_Publikationen.php');
-            $liste = new Publikationen($parameter['entity'], $parameter['entity_id']);
+            $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], '', $page_lang);
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
-                return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type']);
+                return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type'], $page_lang);
             }
             if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
                 return $liste->pubListe($parameter, $content);
@@ -843,6 +847,7 @@ class FAU_CRIS {
 
 
     private static function cris_shortcode_parameter($atts, $content = '', $tag) {
+        global $post;
         $options = self::get_options();
 
         // Attributes
@@ -1029,7 +1034,9 @@ class FAU_CRIS {
 
     public static function cris_auto_sync() {
         include 'class_Sync.php';
-        $sync = new Sync();
+        global $post;
+        $page_lang = Tools::getPageLanguage($post->ID);
+        $sync = new Sync($page_lang);
         $sync->do_sync();
     }
 

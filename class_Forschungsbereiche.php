@@ -10,7 +10,7 @@ class Forschungsbereiche {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -23,8 +23,7 @@ class Forschungsbereiche {
         $this->orgNr = $this->options['cris_org_nr'];
         $this->suchstring = '';
         $this->univis = NULL;
-        $this->lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
-
+        
         $this->cris_project_link = isset($this->options['cris_project_link']) ? $this->options['cris_project_link'] : 'none';
         if ($this->cms == 'wbk' && $this->cris_project_link == 'person') {
             $this->univis = Tools::get_univis();
@@ -42,7 +41,7 @@ class Forschungsbereiche {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
-
+        $this->page_lang = $page_lang;
     }
 
     /*
@@ -128,7 +127,7 @@ class Forschungsbereiche {
             return false;
         }
         if ($sortby != NULL) {
-            if ($this->lang == 'en')
+            if ($this->page_lang == 'en')
                 $sortby = $sortby . '_en';
                 $orderby = $sortby;
         } else {
@@ -183,7 +182,6 @@ class Forschungsbereiche {
     private function make_single($fields, $param) {
         $hide = $hide = explode(',', $param['hide']);
 
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $singlefield = '';
         $singlefield .= "<div class=\"cris-fields\">";
 
@@ -195,7 +193,7 @@ class Forschungsbereiche {
             unset($field['attributes']);
             $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
-            switch ($lang) {
+            switch ($this->page_lang) {
                 case 'en':
                     $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
                     $description = (!empty($field['description_en'])) ? $field['description_en'] : $field['description'];
@@ -232,7 +230,7 @@ class Forschungsbereiche {
                     $singlefield .= $projects;
                 }
             }
-            if (!in_array('contactpersons', $hide)) {
+            if (!in_array('contactpersons', $hide) && $field['contact_names'] != '' && $field['contact_ids'] != '') {
                 $contactsArray = array();
                 $contacts = explode("|", $field['contact_names']);
                 $contactIDs = explode(",", $field['contact_ids']);
@@ -282,7 +280,6 @@ class Forschungsbereiche {
 
 
     private function make_custom_single($fields, $content, $param = array()) {
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $field_details = array();
         $output = "<div class=\"cris-fields\">";;
 
@@ -294,7 +291,7 @@ class Forschungsbereiche {
             unset($field['attributes']);
             $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
-            switch ($lang) {
+            switch ($this->page_lang) {
                 case 'en':
                     $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
                     $description = (!empty($field['description_en'])) ? $field['description_en'] : $field['description'];
@@ -364,8 +361,6 @@ class Forschungsbereiche {
     }
 
     private function make_list($fields) {
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
-
         $fieldslist = "<ul class=\"cris-fields\">";
 
         foreach ($fields as $field) {
@@ -374,7 +369,7 @@ class Forschungsbereiche {
                 $field[$attribut] = $v;
             }
             unset($field['attributes']);
-            switch ($lang) {
+            switch ($this->page_lang) {
                 case 'en':
                     $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
                     break;

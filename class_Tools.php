@@ -94,6 +94,16 @@ class Tools {
         return CRIS_Dicts::$typeinfos[$object][$type]['subtypeattribute'];
     }
 
+    public static function getPageLanguage($postID) {
+        $page_lang_meta = get_post_meta($postID, 'fauval_langcode', true);
+        if ($page_lang_meta != '') {
+            $page_lang = ($page_lang_meta == 'de') ? 'de' : 'en';
+        } else {
+            $page_lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
+        }
+        return $page_lang;
+    }
+
     public static function XML2obj($xml_url) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $xml_url);

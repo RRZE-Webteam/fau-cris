@@ -10,7 +10,7 @@ class Projekte {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
 
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
@@ -43,6 +43,7 @@ class Projekte {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
+        $this->page_lang = $page_lang;
     }
 
     /*
@@ -116,7 +117,7 @@ class Projekte {
 
         $output = '';
         foreach ($projList as $array_role => $projects) {
-            $title = Tools::getTitle('projectroles', $array_role, get_locale());
+            $title = Tools::getTitle('projectroles', $array_role, $this->page_lang);
             $output .= '<h3>' . $title . '</h3>';
             if ($content == '') {
                 $output .= $this->make_list($projects, $hide);
@@ -218,7 +219,7 @@ class Projekte {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($projList as $array_type => $projects) {
-                $title = Tools::getTitle('projects', $array_type, get_locale());
+                $title = Tools::getTitle('projects', $array_type, $this->page_lang);
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
@@ -227,7 +228,7 @@ class Projekte {
             foreach ($projList as $array_type => $projects) {
                 // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde
                 if (empty($type)) {
-                    $title = Tools::getTitle('projects', $array_type, get_locale());
+                    $title = Tools::getTitle('projects', $array_type, $this->page_lang);
                     $output .= "<h3>";
                     $output .= $title;
                     $output .= "</h3>";
@@ -364,7 +365,6 @@ class Projekte {
      */
 
     private function make_custom_single($projects, $custom_text, $quotation = '') {
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $proj_details = array();
         $projlist = "<div class=\"cris-projects\">";
 
@@ -381,7 +381,7 @@ class Projekte {
             $imgs = self::get_project_images($project['ID']);
             $proj_details = array();
 
-            switch ($lang) {
+            switch ($this->page_lang) {
                 case 'en':
                     $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
                     $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
@@ -395,8 +395,8 @@ class Projekte {
             $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
             $proj_details['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
 
-            $proj_details['#type#'] = Tools::getName('projects', $project['project type'], get_locale());
-            $proj_details['#parentprojecttitle#'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
+            $proj_details['#type#'] = Tools::getName('projects', $project['project type'], $this->page_lang);
+            $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $leaderIDs = explode(",", $project['relpersidlead']);
             $collIDs = explode(",", $project['relpersidcoll']);
             $persons = $this->get_project_persons($id, $leaderIDs, $collIDs);
@@ -419,7 +419,7 @@ class Projekte {
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
-            $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
+            $description = ($this->page_lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
             $proj_details['#publications#'] = $this->get_project_publications($id, $quotation);
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
@@ -441,7 +441,6 @@ class Projekte {
     }
 
     private function make_custom_list($projects, $custom_text) {
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $projlist = '';
         $projlist .= "<ul class=\"cris-projects\">";
 
@@ -456,7 +455,7 @@ class Projekte {
             $imgs = self::get_project_images($project['ID']);
 
             $proj_details = array();
-            switch ($lang) {
+            switch ($this->page_lang) {
                 case 'en':
                     $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
                     $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
@@ -469,8 +468,8 @@ class Projekte {
             }
             $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
             $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
-            $proj_details['#type#'] = Tools::getName('projects', $project['project type'], get_locale());
-            $proj_details['#parentprojecttitle#'] = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
+            $proj_details['#type#'] = Tools::getName('projects', $project['project type'], $this->page_lang);
+            $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             setlocale(LC_TIME, get_locale());
             $start = $project['cfstartdate'];
             $proj_details['#start#'] = strftime('%x', strtotime($start));
@@ -480,7 +479,7 @@ class Projekte {
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
-            $description = ($lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
+            $description = ($this->page_lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
                 $i = 1;
@@ -505,7 +504,6 @@ class Projekte {
 
     private function make_single($projects, $hide = array(), $quotation = '') {
 
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $projlist = '';
         $projlist .= "<div class=\"cris-projects\">";
 
@@ -517,7 +515,7 @@ class Projekte {
             unset($project['attributes']);
 
             $id = $project['ID'];
-            switch ($lang) {
+            switch ($this->page_lang) {
                 case 'en':
                     $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
                     $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
@@ -530,7 +528,7 @@ class Projekte {
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
-            $type = Tools::getName('projects', $project['project type'], get_locale());
+            $type = Tools::getName('projects', $project['project type'], $this->page_lang);
             $imgs = self::get_project_images($project['ID']);
 
             if (count($imgs)) {
@@ -552,7 +550,7 @@ class Projekte {
                 $projlist .= "<p class=\"project-type\">(" . $type . ")</p>";
 
             if (!in_array('details', $hide)) {
-                $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
+                $parentprojecttitle = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
                 $leaderIDs = explode(",", $project['relpersidlead']);
                 $collIDs = explode(",", $project['relpersidcoll']);
                 $persons = $this->get_project_persons($id, $leaderIDs, $collIDs);
@@ -620,7 +618,6 @@ class Projekte {
     private function make_list($projects, $hide = array(), $showtype = 1, $pubProj = 0) {
 
         global $post;
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $projlist = '';
         $projlist .= "<ul class=\"cris-projects\">";
 
@@ -632,7 +629,7 @@ class Projekte {
             unset($project['attributes']);
 
             $id = $project['ID'];
-            switch ($lang) {
+            switch ($this->page_lang) {
                 case 'en':
                     $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
                     $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
@@ -645,7 +642,7 @@ class Projekte {
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
-            $type = Tools::getName('projects', $project['project type'], get_locale());
+            $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
             $projlist .= "<li>";
             $projlist .= "<span class=\"project-title\">" . $title . "</span>";
@@ -654,7 +651,7 @@ class Projekte {
                 $projlist .= "<br />(" . $type . ")";
 
             if (!in_array('details', $hide)) {
-                $parentprojecttitle = ($lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
+                $parentprojecttitle = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
                 $acronym = $project['cfacro'];
                 $start = $project['cfstartdate'];
                 $end = (!in_array('end', $hide)) ? $project['virtualenddate'] : '';
@@ -697,7 +694,7 @@ class Projekte {
                         . '</div>';
             }
             if (!in_array('link', $hide) && !empty($id)) {
-                $link = Tools::get_item_url("project", $title, $id, $post->ID, $lang);
+                $link = Tools::get_item_url("project", $title, $id, $post->ID, $this->page_lang);
                 $projlist .= "<div>" . "<a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> &#8594; </div>";
             }
             $projlist .= "</li>";
@@ -720,8 +717,7 @@ class Projekte {
     private function make_accordion($projects, $hide = array(), $showtype = 1) {
         global $post;
 
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
-        $lang_key = ($lang == 'en') ? '_en' : '';
+        $lang_key = ($this->page_lang == 'en') ? '_en' : '';
         $projlist = '';
         $projlist .= '[collapsibles]';
 
@@ -734,7 +730,7 @@ class Projekte {
 
             $id = $project['ID'];
             $acronym = $project['cfacro'];
-            switch ($lang) {
+            switch ($this->page_lang) {
                 case 'en':
                     $title = ($project['cftitle_en'] != '') ? $project['cftitle_en'] : $project['cftitle'];
                     $description = ($project['cfabstr_en'] != '') ? $project['cfabstr_en'] : $project['cfabstr'];
@@ -754,7 +750,7 @@ class Projekte {
             if (!empty($project['kurzbeschreibung' . $lang_key])) {
                 $description = $project['kurzbeschreibung' . $lang_key];
             }
-            $type = Tools::getName('projects', $project['project type'], get_locale());
+            $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
 
             $projlist .= "[collapse title=\"" . ((!empty($acronym)) ? $acronym . ": " : "") . $title . "\"]";
@@ -762,7 +758,7 @@ class Projekte {
                 $projlist .= "<p class=\"abstract\">" . $description . '</p>';
             }
             if (!in_array('link', $hide) && !empty($id))
-                $link = Tools::get_item_url("project", $title, $id, $post->ID, $lang);
+                $link = Tools::get_item_url("project", $title, $id, $post->ID, $this->page_lang);
             $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
             $projlist .= "[/collapse]";
         }

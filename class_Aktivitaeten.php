@@ -10,7 +10,7 @@ class Aktivitaeten {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -41,6 +41,7 @@ class Aktivitaeten {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
+        $this->page_lang = $page_lang;
     }
 
     /*
@@ -176,7 +177,7 @@ class Aktivitaeten {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($activityList as $array_type => $activities) {
-                $title = Tools::getTitle('activities', $array_type, get_locale());
+                $title = Tools::getTitle('activities', $array_type, $this->page_lang);
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
                 $openfirst = '';
             }
@@ -184,7 +185,7 @@ class Aktivitaeten {
         } else {
                 foreach ($activityList as $array_type => $activities) {
                 if (empty($type)) {
-                    $title = Tools::getTitle('activities', $array_type, get_locale());
+                    $title = Tools::getTitle('activities', $array_type, $this->page_lang);
                     $output .= '<h3 class="clearfix clear">';
                     $output .= $title;
                     $output .= "</h3>";
@@ -281,8 +282,7 @@ class Aktivitaeten {
             $names_html = implode(", ", $namesList);
 
             $activity_id = $activity['ID'];
-            $activity_type = Tools::getName('activities', $activity['type of activity'], get_locale());
-            $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
+            $activity_type = Tools::getName('activities', $activity['type of activity'], $this->page_lang);
             setlocale(LC_TIME, get_locale());
 
             switch (strtolower($activity['type of activity'])) {
