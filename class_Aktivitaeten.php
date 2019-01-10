@@ -416,9 +416,10 @@ class Aktivitaeten {
                 $activitylist .= $names_html . ": ";
             if (!empty($activity_type) & $showtype != 0)
                 $activitylist .= $activity_type;
-            if (!empty($activity_name))
+            if (!empty($activity_name)) {
                 global $post;
-            $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
+                $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
+            }
             if (!empty($activity_detail))
                 $activitylist .= " (" . $activity_detail . ")";
             if (!empty($activity_date))
