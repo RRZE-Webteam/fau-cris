@@ -93,3 +93,18 @@ ul.cris-activities li {
     position: relative;
     top: 2px;
 }
+
+@media print {
+    .cris-activities a[href]::after,
+    .cris-awards a[href]::after,
+    .cris-fields a[href]::after, 
+    .cris-organisation a[href]::after,
+    .cris-patents a[href]::after, 
+    .cris-projects a[href]::after,
+    .cris-publications a[href]::after {
+        content: '' !important;
+    }
+    .wpel-icon {
+        display: none !important;
+    }
+}
