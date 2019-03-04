@@ -381,7 +381,7 @@ class Aktivitaeten {
                     $activity_eventname = $activity['event name'];
                     $activity_date = $activity['date'];
                     if ($activity_date != '')
-                        $activity_date = strftime('%x', strtotime($activity_date));
+                        $activity_date = date_i18n( get_option( 'date_format' ), strtotime($activity_date));
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
@@ -392,7 +392,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_date = $activity['date'];
                     if ($activity_date != '')
-                        $activity_date = strftime('%x', strtotime($activity_date));
+                        $activity_date = date_i18n( get_option( 'date_format' ), strtotime($activity_date));
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;

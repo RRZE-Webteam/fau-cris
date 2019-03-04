@@ -285,14 +285,10 @@ class Patente {
             $patent_abstract = $patent['cfabstr'];
             $patent_number = $patent['cfpatentnum'];
             $patent_link = $patent['patnrlink'];
-            setlocale(LC_TIME, get_locale());
-            $patent_registered = $patent['cfregistrdate'];
-            $patent_registered = strftime('%x', strtotime($patent_registered));
-            $patent_appproved = $patent['cfapprovdate'];
-            $patent_appproved = strftime('%x', strtotime($patent_appproved));
-            $patent_expiry = $patent['patexpirydate'];
-            $patent_expiry = strftime('%x', strtotime($patent_expiry));
-
+            $patent_registered = date_i18n(get_option('date_format'), strtotime($patent['cfregistrdate']));
+            $patent_appproved = date_i18n(get_option('date_format'), strtotime($patent['cfapprovdate']));
+            $patent_expiry = date_i18n( get_option( 'date_format' ), strtotime($patent['patexpirydate']));
+            
             $patentlist .= "<li>";
 
             if (!empty($patent_name))

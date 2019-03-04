@@ -618,22 +618,14 @@ class Tools {
     }
 
     public static function make_date ($start, $end) {
-        $fmt = datefmt_create(
-            get_locale(),
-            IntlDateFormatter::MEDIUM,
-            IntlDateFormatter::NONE,
-            date_default_timezone_get(),
-            IntlDateFormatter::GREGORIAN
-        );
-
         $date = '';
         if ($start != '')
-            $start = datefmt_format($fmt, strtotime($start));
+            $start = date_i18n( get_option( 'date_format' ), strtotime($start));
         if ($end != '')
-            $end = datefmt_format($fmt, strtotime($end));
-        if ($start !='' && $end != '') {
+            $end = date_i18n( get_option( 'date_format' ), strtotime($end));
+        if ($start != '' && $end != '') {
             $date = $start . " - " . $end;
-        } elseif ($start != '' && $end =='') {
+        } elseif ($start != '' && $end == '') {
             $date = __('seit', 'fau-cris') . " " . $start;
         } elseif ($start == '' && $end != '') {
             $date = __('bis', 'fau-cris') . " " . $end;

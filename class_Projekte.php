@@ -410,11 +410,10 @@ class Projekte {
                 $members[] = Tools::get_person_link($m_id, $m_names['firstname'], $m_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
             }
             $proj_details['#members#'] = implode(', ', $members);
-            setlocale(LC_TIME, get_locale());
             $start = $project['cfstartdate'];
-            $proj_details['#start#'] = strftime('%x', strtotime($start));
+            $proj_details['#start#'] = date_i18n( get_option( 'date_format' ), strtotime($start));
             $end = $project['virtualenddate'];
-            $proj_details['#end#'] = strftime('%x', strtotime($end));
+            $proj_details['#end#'] = date_i18n( get_option( 'date_format' ), strtotime($end));
             $funding = $this->get_project_funding($id);
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
@@ -470,11 +469,10 @@ class Projekte {
             $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], $this->page_lang);
             $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
-            setlocale(LC_TIME, get_locale());
             $start = $project['cfstartdate'];
-            $proj_details['#start#'] = strftime('%x', strtotime($start));
+            $proj_details['#start#'] = date_i18n( get_option( 'date_format' ), strtotime($start));
             $end = $project['virtualenddate'];
-            $proj_details['#end#'] = strftime('%x', strtotime($end));
+            $proj_details['#end#'] = date_i18n( get_option( 'date_format' ), strtotime($end));
             $funding = $this->get_project_funding($id);
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
@@ -562,12 +560,11 @@ class Projekte {
                 foreach ($persons['members'] as $m_id => $m_names) {
                     $members[] = Tools::get_person_link($m_id, $m_names['firstname'], $m_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                 }
-                setlocale(LC_TIME, get_locale());
                 $start = $project['cfstartdate'];
-                $start = strftime('%x', strtotime($start));
+                $start = date_i18n( get_option( 'date_format' ), strtotime($start));
                 if (!in_array('end', $hide)) {
                     $end = $project['virtualenddate'];
-                    $end = strftime('%x', strtotime($end));
+                    $end = date_i18n( get_option( 'date_format' ), strtotime($end));
                 } else {
                     $end = '';
                 }
