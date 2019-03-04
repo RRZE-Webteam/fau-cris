@@ -929,7 +929,6 @@ class FAU_CRIS {
         $sc_param['showawardname'] = sanitize_text_field($showawardname);
         $sc_param['display'] = sanitize_text_field($display);
         $sc_param['role'] = sanitize_text_field($role);
-        $sc_param['hide'] = sanitize_text_field($hide);
         $sc_param['fau'] = sanitize_text_field($fau);
         $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
@@ -948,6 +947,8 @@ class FAU_CRIS {
         } else {
             $sc_param['status'] = sanitize_text_field($status);
         }
+        $hide = str_replace(' ', '', sanitize_text_field($hide));
+        $sc_param['hide'] = explode(',', $hide);
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {

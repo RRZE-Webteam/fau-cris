@@ -54,7 +54,7 @@ class Aktivitaeten {
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
         $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 1;
         $showactivityname = 1;
@@ -87,7 +87,7 @@ class Aktivitaeten {
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 0;
         $showactivityname = 1;
@@ -140,7 +140,7 @@ class Aktivitaeten {
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 0;
         $showactivityname = 1;

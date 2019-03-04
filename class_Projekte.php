@@ -56,7 +56,7 @@ class Projekte {
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
         $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
         $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
 
@@ -66,8 +66,7 @@ class Projekte {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        $hide = explode(',', $hide);
-
+        
         // sortiere nach Erscheinungsdatum
         $order = "cfstartdate";
         $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
@@ -93,7 +92,7 @@ class Projekte {
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
         $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
 
@@ -103,7 +102,6 @@ class Projekte {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        $hide = explode(',', $hide);
         foreach ($projArray as $id) {
             if (strpos($id->attributes['relpersidlead'], $this->id) !== false) {
                 $id->attributes['role'] = 'leader';
@@ -137,7 +135,7 @@ class Projekte {
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
@@ -148,8 +146,7 @@ class Projekte {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        $hide = explode(',', $hide);
-
+        
         // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
         $formatter = new CRIS_formatter("startyear", SORT_DESC, "cftitle", SORT_ASC);
         $projList = $formatter->execute($projArray);
@@ -187,7 +184,7 @@ class Projekte {
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
@@ -198,8 +195,7 @@ class Projekte {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        $hide = explode(',', $hide);
-
+        
         // Projekttypen sortieren
         $order = $this->order;
         if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['projects'], 'short'))) {
@@ -247,7 +243,7 @@ class Projekte {
      * Ausgabe eines einzelnen Projektes
      */
 
-    public function singleProj($hide = '', $quotation = '') {
+    public function singleProj($hide = array(), $quotation = '') {
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -260,7 +256,6 @@ class Projekte {
             return $output;
         }
 
-        $hide = explode(',', $hide);
         if (is_array($this->id)) {
             $output = $this->make_list($projArray, $hide);
         } else {

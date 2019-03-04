@@ -63,7 +63,7 @@ class Forschungsbereiche {
             $sortby = NULL;
             $orderby = __('O.A.','fau-cris');
         }
-        $hide = explode(',', $param['hide']);
+        $hide = $param['hide'];
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
         if ($param['limit'] != '')
@@ -180,7 +180,7 @@ class Forschungsbereiche {
      */
 
     private function make_single($fields, $param) {
-        $hide = $hide = explode(',', $param['hide']);
+        $hide = $param['hide'];
 
         $singlefield = '';
         $singlefield .= "<div class=\"cris-fields\">";
