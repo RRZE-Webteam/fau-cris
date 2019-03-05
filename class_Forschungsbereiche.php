@@ -280,6 +280,7 @@ class Forschungsbereiche {
 
 
     private function make_custom_single($fields, $content, $param = array()) {
+        
         $field_details = array();
         $output = "<div class=\"cris-fields\">";;
 
@@ -289,7 +290,6 @@ class Forschungsbereiche {
                 $field[$attribut] = $v;
             }
             unset($field['attributes']);
-            $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
             switch ($this->page_lang) {
                 case 'en':
@@ -306,52 +306,64 @@ class Forschungsbereiche {
             $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = $this->get_field_projects($id);
             $field_details['#persons#'] = '';
+            if (strpos($content, '#persons#' ) !== false) {
+                $persons = $this->get_field_persons($id);
+                if ($persons) {
+                    $field_details['#persons#'] .= "<ul>";
+                    foreach ($persons as $p_id => $person) {
+                            $field_details['#persons#'] .= "<li>";
+                            $field_details['#persons#'] .= Tools::get_person_link($p_id, $person['firstname'], $person['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                            $field_details['#persons#'] .= "</li>";
+                        }
+                    $field_details['#persons#'] .= "</ul>";
+                }
+            }
             $field_details['#contactpersons#'] = '';
-            $persons = $this->get_field_persons($id);
-            if ($persons) {
-                $field_details['#persons#'] .= "<ul>";
-                foreach ($persons as $p_id => $person) {
-                        $field_details['#persons#'] .= "<li>";
-                        $field_details['#persons#'] .= Tools::get_person_link($p_id, $person['firstname'], $person['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                        $field_details['#persons#'] .= "</li>";
+            if (strpos($content, '#contactpersons#' ) !== false) {
+                $contactsArray = array();
+                $contacts = explode("|", $field['contact_names']);
+                $contactIDs = explode(",", $field['contact_ids']);
+                print "<pre>";
+                var_dump($field['contact_names']);
+                print "</pre>";
+                if ($field['contact_names'] !='' && count($contacts) > 0) {
+                    foreach ($contacts as $i => $name) {
+                        $nameparts = explode(":", $name);
+                        $contactsArray[$contactIDs[$i]] = array(
+                            'lastname' => $nameparts[0],
+                            'firstname' => $nameparts[1]);
                     }
-                $field_details['#persons#'] .= "</ul>";
-            }
-            $contactsArray = array();
-            $contacts = explode("|", $field['contact_names']);
-            $contactIDs = explode(",", $field['contact_ids']);
-            if (count($contacts) > 0) {
-                foreach ($contacts as $i => $name) {
-                    $nameparts = explode(":", $name);
-                    $contactsArray[$contactIDs[$i]] = array(
-                        'lastname' => $nameparts[0],
-                        'firstname' => $nameparts[1]);
+                    $field_details['#contactpersons#'] .= "<ul>";
+                    foreach($contactsArray as $c_id => $contact) {
+                        $field_details['#contactpersons#'] .= "<li>";
+                        $field_details['#contactpersons#'] .= Tools::get_person_link($c_id, $contact['firstname'], $contact['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                        $field_details['#contactpersons#'] .= "</li>";
+                    }
+                    $field_details['#contactpersons#'] .= "</ul>";
                 }
-                $field_details['#contactpersons#'] .= "<ul>";
-                foreach($contactsArray as $c_id => $contact) {
-                    $field_details['#contactpersons#'] .= "<li>";
-                    $field_details['#contactpersons#'] .= Tools::get_person_link($c_id, $contact['firstname'], $contact['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                    $field_details['#contactpersons#'] .= "</li>";
-                }
-                $field_details['#contactpersons#'] .= "</ul>";
-
             }
-
             $field_details['#publications#'] = '';
-            $publications = $this->get_field_publications($param);
-            if ($publications)
-                $field_details['#publications#'] = $publications;
+            if (strpos($content, '#publications#' ) !== false) {
+                $publications = $this->get_field_publications($param);
+                if ($publications) {
+                    $field_details['#publications#'] = $publications;
+                }
+            }
             $field_details['#image1#'] = '';
-            if (count($imgs)) {
-                $i = 1;
-                foreach($imgs as $img) {
-                    $field_details['#image'.$i.'#'] = "<div class=\"cris-image\">";
-                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $field_details['#image'.$i.'#'] .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
-                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
-                    $field_details['#image'.$i.'#'] .= "</div>";
+            if (strpos($content, '#image1#' ) !== false) {
+                $imgs = self::get_field_images($field['ID']);
+                $field_details['#image1#'] = '';
+                if (count($imgs)) {
+                    $i = 1;
+                    foreach($imgs as $img) {
+                        $field_details['#image'.$i.'#'] = "<div class=\"cris-image\">";
+                        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+                           $field_details['#image'.$i.'#'] .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+                            . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
+                        $field_details['#image'.$i.'#'] .= "</div>";
+                        }
+                        $i++;
                     }
-                    $i++;
                 }
             }
             $output .= strtr($content, $field_details);
@@ -412,6 +424,7 @@ class Forschungsbereiche {
             }
         }
         $args['sc_type'] = 'default';
+        $args['quotation'] = $param['quotation'];
         if ($param['publications_orderby'] == 'year')
             return $liste->pubNachJahr ($args, $param['field']);
         if ($param['publications_orderby'] == 'type')

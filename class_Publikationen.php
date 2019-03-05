@@ -383,7 +383,7 @@ class Publikationen {
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed = false, $publications_limit) {
+    public function fieldPub($field, $quotation = '', $seed = false, $publications_limit = '') {
         $ws = new CRIS_publications();
         if ($seed)
             $ws->disable_cache();

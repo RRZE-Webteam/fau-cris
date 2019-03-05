@@ -42,7 +42,7 @@ class FAU_CRIS {
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
-    const php_version = '5.3'; // Minimal erforderliche PHP-Version
+    const php_version = '7.1'; // Minimal erforderliche PHP-Version
     const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
     const cris_publicweb = 'https://cris.fau.de/converis/portal/';
     const doi = 'https://dx.doi.org/';
@@ -496,7 +496,7 @@ class FAU_CRIS {
         $default_options = self::default_options();
         $parts = parse_url($_POST['_wp_http_referer']);
         parse_str($parts['query'], $query);
-        $tab = $query['tab'];
+        $tab = (array_key_exists('tab', $query)) ? $query['tab'] : 'general';
 
         switch ($tab) {
             case 'general':
