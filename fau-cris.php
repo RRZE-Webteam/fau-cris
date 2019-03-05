@@ -683,8 +683,24 @@ class FAU_CRIS {
         $parameter = self::cris_shortcode_parameter($atts, $content = null, $tag);
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
-        
-        if (isset($parameter['show']) && $parameter['show'] == 'organisation') {
+        if (isset($parameter['show']) && $parameter['show'] == 'equipment') {
+            // Equipment
+            require_once('class_Equipment.php');
+            $liste = new Equipment($parameter['entity'], $parameter['entity_id'], $page_lang);
+            if ($parameter['equipment'] != '') {
+                return $liste->singleEquipment($parameter['hide'], $parameter['quotation']);
+            }
+            if ($parameter['limit'] != '' ) {
+                return $liste->equiListe($parameter);
+            }
+            if (strpos($parameter['order1'], 'type') !== false) {
+                return $liste->equiNachTyp($parameter);
+            }
+            if (strpos($parameter['order1'], 'year') !== false) {
+                return $liste->equiNachJahr($parameter);
+            }
+            return $liste->equiListe($parameter);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'organisation') {
             // Forschung
             require_once('class_Organisation.php');
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang);
@@ -884,6 +900,12 @@ class FAU_CRIS {
             'activity' => '',
             'field' => '',
             'fau' => '',
+            'equipment' => '',
+            'manufacturer' => '',
+            'constructionyear' => '',
+            'constructionyearstart' => '',
+            'constructionyearend' => '',
+            'location' => '',
             'peerreviewed' => '',
             'current' => '',
             'publications_limit' => (isset($options['cris_fields_num_pub']) && !empty($options['cris_fields_num_pub'])) ? $options['cris_fields_num_pub'] : '5',
@@ -930,6 +952,12 @@ class FAU_CRIS {
         $sc_param['display'] = sanitize_text_field($display);
         $sc_param['role'] = sanitize_text_field($role);
         $sc_param['fau'] = sanitize_text_field($fau);
+        $sc_param['equipment'] = sanitize_text_field($equipment);
+        $sc_param['manufacturer'] = sanitize_text_field($manufacturer);
+        $sc_param['constructionyear'] = sanitize_text_field($constructionyear);
+        $sc_param['constructionyearstart'] = sanitize_text_field($constructionyearstart);
+        $sc_param['constructionyearend'] = sanitize_text_field($constructionyearend);
+        $sc_param['location'] = sanitize_text_field($location);
         $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
         $sc_param['notable'] = $notable == 1 ? 1 : 0;
@@ -956,6 +984,9 @@ class FAU_CRIS {
                 $sc_param['publication'] = explode(',', $sc_param['publication']);
             }
             $sc_param['entity_id'] = $sc_param['publication'];
+        } elseif ($sc_param['equipment'] != '') {
+            $sc_param['entity'] = 'equipment';
+            $sc_param['entity_id'] = $sc_param['equipment'];
         } elseif ($sc_param['field'] != '') {
             $sc_param['entity'] = 'field';
             $sc_param['entity_id'] = $sc_param['field'];

@@ -78,6 +78,10 @@ ul.cris-activities li {
     list-style-type: circle;
 }
 
+ul.cris-equipment .equipment-name {
+    font-weight: bold;
+}
+
 .cris-image {
     float: right;
     margin: 0 0 10px 20px;

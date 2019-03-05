@@ -468,6 +468,42 @@ class Tools {
     }
 
     /*
+     * Array zur Definition des Filters für Equipment
+     */
+
+    public static function equipment_filter($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = '') {
+        $filter = array();
+        if ($manufacturer !== '' && $manufacturer !== NULL)
+            $filter['hersteller__eq'] = $manufacturer;
+        if ($location !== '' && $location !== NULL) {
+            if (strpos($location, ',')) {
+                $location = str_replace(' ', '', $location);
+                $locations = explode(',', $location);
+            } else {
+                $locations = (array) $location;
+            }
+            $filter['location__eq'] = $locations;
+        }
+        if ($constructionYear !== '' && $constructionYear !== NULL) {
+            if (strpos($constructionYear, ',')) {
+                $constructionYear = str_replace(' ', '', $constructionYear);
+                $constructionYear = explode(',', $constructionYear);
+            } else {
+                $constructionYears = (array) $constructionYear;
+            }
+            $filter['baujahr__eq'] = $constructionYear;
+        }
+        if ($constructionYearStart !== '' && $constructionYearStart !== NULL)
+            $filter['baujahr__ge'] = $constructionYearStart;
+        if ($constructionYearEnd !== '' && $constructionYearEnd !== NULL)
+            $filter['baujahr__le'] = $constructionYearEnd;
+
+        if (count($filter))
+            return $filter;
+        return null;
+    }
+
+    /*
      * Anbindung an UnivIS-/FAU-Person-Plugin
      */
 

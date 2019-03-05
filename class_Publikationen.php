@@ -421,6 +421,44 @@ class Publikationen {
         return $output;
     }
 
+    public function equiPub($equipment, $quotation = '', $seed = false, $publications_limit = '') {
+        $ws = new CRIS_publications();
+        if ($seed)
+            $ws->disable_cache();
+        try {
+            $pubArray = $ws->by_equipment($equipment);
+        } catch (Exception $ex) {
+            return;
+        }
+
+        if (!count($pubArray))
+            return;
+
+        if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
+            $sortby = 'relation right seq';
+            $orderby = $sortby;
+        } else {
+            $sortby = NULL;
+            $orderby = __('O.A.', 'fau-cris');
+        }
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
+        $res = $formatter->execute($pubArray);
+        $pubList = $res[$orderby];
+
+        if ($publications_limit != '') {
+            $pubList = array_slice($pubList, 0, $publications_limit, true);
+        }
+
+        $output = '';
+        if ($quotation == 'apa' || $quotation == 'mla') {
+            $output = $this->make_quotation_list($pubList, $quotation);
+        } else {
+            $output = $this->make_list($pubList, 0, $this->nameorder, $this->page_lang);
+        }
+
+        return $output;
+    }
+
     /* =========================================================================
      * Private Functions
       ======================================================================== */
@@ -973,6 +1011,21 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
+    public function by_equipment($equiID = null, &$filter = null) {
+        if ($equiID === null || $equiID === "0")
+            throw new Exception('Please supply valid equipment ID');
+
+        if (!is_array($equiID))
+            $equiID = array($equiID);
+
+        $requests = array();
+        foreach ($equiID as $_p) {
+            $requests[] = sprintf('getrelated/equipment/%d/PUBL_has_EQUI', $_p);
+        }
+        return $this->retrieve($requests, $filter);
+    }
+
+    
     private function retrieve($reqs, &$filter = null) {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
