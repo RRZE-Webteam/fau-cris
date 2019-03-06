@@ -180,8 +180,6 @@ class Publikationen {
                         if ($param['sc_type'] == 'custom') {
                             $shortcode_data_inner .= $this->make_custom_list($publications_sub, $content, '', $this->page_lang);
                         } else {
-                            var_dump($this->nameorder);
-                            exit;
                             $shortcode_data_inner .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $this->page_lang);
                         }
                     }
