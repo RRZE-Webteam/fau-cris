@@ -58,6 +58,7 @@ class Aktivitaeten {
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 1;
         $showactivityname = 1;
+        $showtype = in_array('type', $hide) ? 0 : 1;
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
@@ -73,7 +74,7 @@ class Aktivitaeten {
         else
             $activityList = $res[$order];
 
-        $output = $this->make_list($activityList, $showname, $showyear, $showactivityname);
+        $output = $this->make_list($activityList, $showname, $showyear, $showactivityname, $showtype);
 
         return $output;
     }
@@ -93,6 +94,7 @@ class Aktivitaeten {
         $showactivityname = 1;
         $order2 = 'year';
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
+        $showtype = in_array('type', $hide) ? 0 : 1;
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
@@ -125,7 +127,7 @@ class Aktivitaeten {
                     $output .= !empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
                     $output .= '</h3>';
                 }
-                $output .= $this->make_list($activities, $showname, $showyear, $showactivityname);
+                $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, $showtype);
             }
         }
         return $output;
