@@ -128,31 +128,65 @@ class Publikationen {
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language);
+
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
 
-        // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
-        if ($order2 == 'author') {
-            $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
+        // Sortierreihenfolge
+        $typeorder = $this->order;
+        if ($typeorder[0] != '' && ((array_search($typeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short')) !== false) || array_search($typeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short_alt')) !== false)) {
+            foreach ($typeorder as $key => $value) {
+                $typeorder[$key] = Tools::getType('publications', $value);
+            }
         } else {
-            $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+            $typeorder = Tools::getOrder('publications');
+        }
+        switch ($order2) {
+            case 'author':
+                $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
+                $subformatter = new CRIS_formatter(NULL, NULL, "relauthors", SORT_ASC);
+                break;
+            case 'type':
+                $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                $subformatter = new CRIS_formatter("publication type", array_values($typeorder), "virtualdate", SORT_DESC);
+                break;
+            default:
+                $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
+                break;
         }
         $pubList = $formatter->execute($pubArray);
 
         $output = '';
         $showsubtype = ($subtype == '') ? 1 : 0;
+
         if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($pubList as $array_year => $publications) {
-                if ($quotation == 'apa' || $quotation == 'mla') {
-                    $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_quotation_list($publications, $quotation) . '[/collapse]');
-                } else {
-                    $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($publications, $showsubtype, $this->nameorder, $this->page_lang) . '[/collapse]');
+                $shortcode_data_inner = '';
+                $pubSubList = $subformatter->execute($publications);
+                foreach ($pubSubList as $array_subtype => $publications_sub) {
+                    if ($order2 == 'type') {
+                        $shortcode_data_inner .= "<h4>";
+                        $shortcode_data_inner .= Tools::getTitle('publications', $array_subtype, $this->page_lang);;
+                        $shortcode_data_inner .= "</h4>";
+                    }
+                    if ($quotation == 'apa' || $quotation == 'mla') {
+                        $shortcode_data_inner .= $this->make_quotation_list($publications_sub, $quotation);
+                    } else {
+                        if ($param['sc_type'] == 'custom') {
+                            $shortcode_data_inner .= $this->make_custom_list($publications_sub, $content, '', $this->page_lang);
+                        } else {
+                            var_dump($this->nameorder);
+                            exit;
+                            $shortcode_data_inner .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $this->page_lang);
+                        }
+                    }
                 }
-                $openfirst = '';
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"]' . $shortcode_data_inner . '[/collapse]');
             }
             $openfirst = '';
             $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
@@ -161,13 +195,22 @@ class Publikationen {
                 if (empty($year)) {
                     $output .= '<h3>' . $array_year . '</h3>';
                 }
-                if ($quotation == 'apa' || $quotation == 'mla') {
-                    $output .= $this->make_quotation_list($publications, $quotation);
-                } else {
-                    if ($param['sc_type'] == 'custom') {
-                        $output .= $this->make_custom_list($publications, $content, '', $this->page_lang);
+                $pubSubList = $subformatter->execute($publications);
+                foreach ($pubSubList as $array_subtype => $publications_sub) {
+                    // Zwischenüberschrift
+                    if ($order2 == 'type') {
+                        $output .= "<h4>";
+                        $output .= Tools::getTitle('publications', $array_subtype, $this->page_lang);;
+                        $output .= "</h4>";
+                    }
+                    if ($quotation == 'apa' || $quotation == 'mla') {
+                        $output .= $this->make_quotation_list($publications_sub, $quotation);
                     } else {
-                        $output .= $this->make_list($publications, $showsubtype, $this->nameorder, $this->page_lang);
+                        if ($param['sc_type'] == 'custom') {
+                            $output .= $this->make_custom_list($publications_sub, $content, '', $this->page_lang);
+                        } else {
+                            $output .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $this->page_lang);
+                        }
                     }
                 }
             }
@@ -244,6 +287,9 @@ class Publikationen {
                     case 'subtype':
                         $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
                         break;
+                    case 'year':
+                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                        break;
                     default:
                         $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
                         break;
@@ -256,6 +302,11 @@ class Publikationen {
                         $title_sub = Tools::getTitle('publications', $array_subtype, $this->page_lang, $array_type);
                         $shortcode_data_other .= "<h4>";
                         $shortcode_data_other .= $title_sub;
+                        $shortcode_data_other .= "</h4>";
+                    }
+                    if ($order2 == 'year') {
+                        $shortcode_data_other .= "<h4>";
+                        $shortcode_data_other .= $array_subtype;
                         $shortcode_data_other .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
@@ -296,6 +347,9 @@ class Publikationen {
                     case 'subtype':
                         $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
                         break;
+                    case 'year':
+                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                        break;
                     default:
                         $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
                         break;
@@ -308,6 +362,11 @@ class Publikationen {
                         $title_sub = Tools::getTitle('publications', $array_subtype, $this->page_lang, $array_type);
                         $output .= "<h4>";
                         $output .= $title_sub;
+                        $output .= "</h4>";
+                    }
+                    if ($order2 == 'year') {
+                        $output .= "<h4>";
+                        $output .= $array_subtype;
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
