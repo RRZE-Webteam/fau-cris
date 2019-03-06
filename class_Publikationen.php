@@ -113,7 +113,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($param = array(), $field = '', $content = '') {
+    public function pubNachJahr($param = array(), $field = '', $content = '', $fsp = false) {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -127,7 +127,7 @@ class Publikationen {
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -220,7 +220,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($param = array(), $field = '', $content = '') {
+    public function pubNachTyp($param = array(), $field = '', $content = '', $fsp = false) {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -234,7 +234,7 @@ class Publikationen {
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -441,12 +441,13 @@ class Publikationen {
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed = false, $publications_limit = '') {
+    public function fieldPub($field, $quotation = '', $seed = false, $publications_limit = '', $fsp = false) {
         $ws = new CRIS_publications();
         if ($seed)
             $ws->disable_cache();
         try {
-            $pubArray = $ws->by_field($field);
+            $filter = null;
+            $pubArray = $ws->by_field($field, $filter, $fsp);
         } catch (Exception $ex) {
             return;
         }
@@ -468,7 +469,7 @@ class Publikationen {
         if ($publications_limit != '') {
             $pubList = array_slice($pubList, 0, $publications_limit, true);
         }
-        
+
         $output = '';
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output = $this->make_quotation_list($pubList, $quotation);
@@ -525,7 +526,7 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '') {
+    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false) {
         $filter = NULL;
 
         $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
@@ -539,7 +540,7 @@ class Publikationen {
                 $pubArray = $ws->by_pers_id($this->id, $filter, $notable);
             }
             if ($this->einheit === "field") {
-                $pubArray = $ws->by_field($field, $filter);
+                $pubArray = $ws->by_field($field, $filter, $fsp);
             }
             if ($this->einheit === "publication") {
                 $pubArray = $ws->by_id($this->id);
@@ -1061,7 +1062,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    public function by_field($fieldID = null, &$filter = null) {
+    public function by_field($fieldID = null, &$filter = null, $fsp = false) {
         if ($fieldID === null || $fieldID === "0")
             throw new Exception('Please supply valid research field ID');
 
@@ -1069,8 +1070,9 @@ class CRIS_publications extends CRIS_webservice {
             $fieldID = array($fieldID);
 
         $requests = array();
+        $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
         foreach ($fieldID as $_p) {
-            $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_has_top_publ', $_p);
+            $requests[] = sprintf('getrelated/Forschungsbereich/%d/', $_p) . $relation;
         }
         return $this->retrieve($requests, $filter);
     }

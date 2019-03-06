@@ -302,6 +302,8 @@ class Forschungsbereiche {
                     $description = (!empty($field['description'])) ? $field['description'] : $field['description_en'];
                     break;
             }
+            $param['fsp'] = ($field['selektion'] == 'Forschungsschwerpunkt') ? true : false;
+            
             $field_details['#title#'] = htmlentities($title, ENT_QUOTES);
             $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = $this->get_field_projects($id);
@@ -323,9 +325,6 @@ class Forschungsbereiche {
                 $contactsArray = array();
                 $contacts = explode("|", $field['contact_names']);
                 $contactIDs = explode(",", $field['contact_ids']);
-                print "<pre>";
-                var_dump($field['contact_names']);
-                print "</pre>";
                 if ($field['contact_names'] !='' && count($contacts) > 0) {
                     foreach ($contacts as $i => $name) {
                         $nameparts = explode(":", $name);
@@ -415,7 +414,6 @@ class Forschungsbereiche {
     }
 
     private function get_field_publications($param = array()) {
-
         require_once('class_Publikationen.php');
         $liste = new Publikationen('field', $param['field']);
         foreach ($param as $_k => $_v) {
@@ -426,10 +424,10 @@ class Forschungsbereiche {
         $args['sc_type'] = 'default';
         $args['quotation'] = $param['quotation'];
         if ($param['publications_orderby'] == 'year')
-            return $liste->pubNachJahr ($args, $param['field']);
+            return $liste->pubNachJahr ($args, $param['field'], '', $param['fsp']);
         if ($param['publications_orderby'] == 'type')
-            return $liste->pubNachTyp ($args, $param['field']);
-        return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit']);
+            return $liste->pubNachTyp ($args, $param['field'], '', $param['fsp']);
+        return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit'], $param['fsp']);
     }
 
     private function get_field_images($field) {
