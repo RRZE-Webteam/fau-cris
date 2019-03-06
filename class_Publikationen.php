@@ -739,16 +739,22 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= $pubDetails['volume'] != '' ? "<br /><span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. <br />" : '';
+                    $publist .= $pubDetails['volume'] != '' ? "<br /><span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. " : '';
                     if (!empty($pubDetails['publisher'])) {
                         $publist .= "<br /><span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">";
-                        $publist .= $pubDetails['city'] != '' ? "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">"
-                                . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: " : '';
-                        $publist .= "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span></span>, ";
-                    } else {
-                        $publist .= $pubDetails['city'] != '' ? $pubDetails['city'] . ", " : '';
                     }
-                    $publist .= $pubDetails['year'] != '' ? "<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
+                    if (!empty( $pubDetails['city'])) {
+                        if (empty($pubDetails['publisher'])) {
+                            $publist .= "<br />";
+                        }
+                        $publist .= "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">" . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: ";
+                    }
+                    if($pubDetails['year'] != '') {
+                        if (empty($pubDetails['publisher']) && empty($pubDetails['city'])) {
+                            $publist .= "<br />";
+                        }
+                        $publist .= "<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>";
+                    }
                     if (!empty($pubDetails['series'])) {
                         $publist .= $pubDetails['series'] != '' ? "<br />(" . $pubDetails['series'] : '';
                         $publist .= $pubDetails['seriesNumber'] != '' ? ", " . _x('Bd.', 'Abkürzung für "Band" bei Publikationen', 'fau-cris') . " " . $pubDetails['seriesNumber'] : '';
