@@ -839,9 +839,19 @@ class Projekte {
                         $leaders[$i]['firstname'] = (string) $persAttribut->data;
                     }
                 }
+                foreach ($person->relation as $persRel) {
+                    foreach ($persRel->attribute as $persRelAttribute) {
+                        if ($persRelAttribute['name'] == 'Right seq') {
+                            $leaders[$i]['order'] = (string) $persRelAttribute->data;
+                        }
+                    }
+                }
                 $i++;
             }
         }
+        usort($leaders, function($a, $b) {
+            return $a['order'] <=> $b['order'];
+        });
         if (count($leadIDs) == count($leaders)) {
             $leaders = array_combine($leadIDs, $leaders);
         } else {
@@ -865,8 +875,18 @@ class Projekte {
                         $members[$i]['firstname'] = (string) $persAttribut->data;
                     }
                 }
+                foreach ($person->relation as $persRel) {
+                    foreach ($persRel->attribute as $persRelAttribute) {
+                        if ($persRelAttribute['name'] == 'Right seq') {
+                            $members[$i]['order'] = (string) $persRelAttribute->data;
+                        }
+                    }
+                }
                 $i++;
             }
+            usort($members, function($a, $b) {
+                return $a['order'] <=> $b['order'];
+            });
         }
         if (count($collIDs) == count($members)) {
             $members = array_combine($collIDs, $members);
