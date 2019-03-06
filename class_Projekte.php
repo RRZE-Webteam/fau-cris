@@ -159,7 +159,7 @@ class Projekte {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_year => $projects) {
                 if (empty($year)) {
@@ -219,7 +219,7 @@ class Projekte {
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_type => $projects) {
                 // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde

@@ -119,7 +119,7 @@ class Aktivitaeten {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($activities, $showname, $showyear, $showactivityname) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($activityList as $array_year => $activities) {
                 if (empty($year)) {
@@ -183,7 +183,7 @@ class Aktivitaeten {
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($activityList as $array_type => $activities) {
                 if (empty($type)) {

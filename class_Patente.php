@@ -120,7 +120,7 @@ class Patente {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($patents, $showname, $showyear, $showpatentname) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($patentList as $array_year => $patents) {
                 if (empty($year)) {
@@ -184,7 +184,7 @@ class Patente {
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($patents, $showname, $showyear, $showpatentname, 0) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($patentList as $array_type => $patents) {
                 if (empty($type)) {

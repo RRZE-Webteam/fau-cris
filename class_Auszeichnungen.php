@@ -131,7 +131,7 @@ class Auszeichnungen {
                 }
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($awardList as $array_year => $awards) {
                 if (count($awards) < 1)
@@ -205,7 +205,7 @@ class Auszeichnungen {
                 }
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($awardList as $array_type => $awards) {
                 if (empty($type)) {

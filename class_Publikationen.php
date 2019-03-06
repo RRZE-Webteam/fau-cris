@@ -154,7 +154,8 @@ class Publikationen {
                 }
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $openfirst = '';
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($pubList as $array_year => $publications) {
                 if (empty($year)) {
@@ -266,7 +267,7 @@ class Publikationen {
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $shortcode_data_other . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($pubList as $array_type => $publications) {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
