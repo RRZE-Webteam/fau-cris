@@ -10,7 +10,7 @@ class Organisation {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
 
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
@@ -27,6 +27,7 @@ class Organisation {
         }
         $this->id = ($id != '' ? $id : $this->orgNr);
         $this->einheit = "orga";
+        $this->page_lang = $page_lang;
     }
 
     /*
@@ -131,8 +132,6 @@ class Organisation {
      */
 
     private function make_single($organisations) {
-
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $output = '';
         $output .= "<div class=\"cris-organisation\">";
 
@@ -156,7 +155,7 @@ class Organisation {
             }
 
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
-                $research = ($lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
+                $research = ($this->page_lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
                 $output .= "<p class=\"cris-research\">" . $research . "</p>";
             }
         }
@@ -166,7 +165,6 @@ class Organisation {
     }
 
     private function make_custom_single($organisations, $custom_text) {
-        $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
         $output = '';
         $output .= "<div class=\"cris-organisation\">";
 
@@ -193,7 +191,7 @@ class Organisation {
             }
             $details['#description#'] = '';
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
-                $research = ($lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
+                $research = ($this->page_lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
                 $details['#description#'] .= "<p class=\"cris-research\">" . $research . "</p>";
             }
             $output .= strtr($custom_text, $details);

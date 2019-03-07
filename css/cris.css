@@ -78,6 +78,10 @@ ul.cris-activities li {
     list-style-type: circle;
 }
 
+ul.cris-equipment .equipment-name {
+    font-weight: bold;
+}
+
 .cris-image {
     float: right;
     margin: 0 0 10px 20px;
@@ -92,4 +96,19 @@ ul.cris-activities li {
     background-image: url(../img/OpenAccess16px.png);
     position: relative;
     top: 2px;
+}
+
+@media print {
+    .cris-activities a[href]::after,
+    .cris-awards a[href]::after,
+    .cris-fields a[href]::after, 
+    .cris-organisation a[href]::after,
+    .cris-patents a[href]::after, 
+    .cris-projects a[href]::after,
+    .cris-publications a[href]::after {
+        content: '' !important;
+    }
+    .wpel-icon {
+        display: none !important;
+    }
 }

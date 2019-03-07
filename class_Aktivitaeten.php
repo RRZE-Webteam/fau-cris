@@ -10,7 +10,7 @@ class Aktivitaeten {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -41,6 +41,7 @@ class Aktivitaeten {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
+        $this->page_lang = $page_lang;
     }
 
     /*
@@ -53,10 +54,11 @@ class Aktivitaeten {
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
         $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 1;
         $showactivityname = 1;
+        $showtype = in_array('type', $hide) ? 0 : 1;
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
@@ -72,7 +74,7 @@ class Aktivitaeten {
         else
             $activityList = $res[$order];
 
-        $output = $this->make_list($activityList, $showname, $showyear, $showactivityname);
+        $output = $this->make_list($activityList, $showname, $showyear, $showactivityname, $showtype);
 
         return $output;
     }
@@ -86,12 +88,13 @@ class Aktivitaeten {
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 0;
         $showactivityname = 1;
         $order2 = 'year';
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
+        $showtype = in_array('type', $hide) ? 0 : 1;
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
@@ -116,7 +119,7 @@ class Aktivitaeten {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($activities, $showname, $showyear, $showactivityname) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($activityList as $array_year => $activities) {
                 if (empty($year)) {
@@ -124,7 +127,7 @@ class Aktivitaeten {
                     $output .= !empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
                     $output .= '</h3>';
                 }
-                $output .= $this->make_list($activities, $showname, $showyear, $showactivityname);
+                $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, $showtype);
             }
         }
         return $output;
@@ -139,7 +142,7 @@ class Aktivitaeten {
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
         $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $hide = (isset($param['hide']) && $param['hide'] != '') ? $param['hide'] : '';
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $showname = $this->einheit == 'person' ? 0 : 1;
         $showyear = 0;
         $showactivityname = 1;
@@ -176,15 +179,15 @@ class Aktivitaeten {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($activityList as $array_type => $activities) {
-                $title = Tools::getTitle('activities', $array_type, get_locale());
+                $title = Tools::getTitle('activities', $array_type, $this->page_lang);
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($activityList as $array_type => $activities) {
                 if (empty($type)) {
-                    $title = Tools::getTitle('activities', $array_type, get_locale());
+                    $title = Tools::getTitle('activities', $array_type, $this->page_lang);
                     $output .= '<h3 class="clearfix clear">';
                     $output .= $title;
                     $output .= "</h3>";
@@ -281,8 +284,7 @@ class Aktivitaeten {
             $names_html = implode(", ", $namesList);
 
             $activity_id = $activity['ID'];
-            $activity_type = Tools::getName('activities', $activity['type of activity'], get_locale());
-            $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
+            $activity_type = Tools::getName('activities', $activity['type of activity'], $this->page_lang);
             setlocale(LC_TIME, get_locale());
 
             switch (strtolower($activity['type of activity'])) {
@@ -381,7 +383,7 @@ class Aktivitaeten {
                     $activity_eventname = $activity['event name'];
                     $activity_date = $activity['date'];
                     if ($activity_date != '')
-                        $activity_date = strftime('%x', strtotime($activity_date));
+                        $activity_date = date_i18n( get_option( 'date_format' ), strtotime($activity_date));
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
@@ -392,7 +394,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_date = $activity['date'];
                     if ($activity_date != '')
-                        $activity_date = strftime('%x', strtotime($activity_date));
+                        $activity_date = date_i18n( get_option( 'date_format' ), strtotime($activity_date));
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -416,9 +418,10 @@ class Aktivitaeten {
                 $activitylist .= $names_html . ": ";
             if (!empty($activity_type) & $showtype != 0)
                 $activitylist .= $activity_type;
-            if (!empty($activity_name))
+            if (!empty($activity_name)) {
                 global $post;
-            $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
+                $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
+            }
             if (!empty($activity_detail))
                 $activitylist .= " (" . $activity_detail . ")";
             if (!empty($activity_date))

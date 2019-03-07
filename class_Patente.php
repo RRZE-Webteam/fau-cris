@@ -10,7 +10,7 @@ class Patente {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
 
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
@@ -43,8 +43,8 @@ class Patente {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
-
-            }
+        $this->page_lang = $page_lang;
+    }
 
     /*
      * Ausgabe aller Patente ohne Gliederung
@@ -120,7 +120,7 @@ class Patente {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($patents, $showname, $showyear, $showpatentname) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($patentList as $array_year => $patents) {
                 if (empty($year)) {
@@ -180,15 +180,15 @@ class Patente {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($patentList as $array_type => $patents) {
-                $title = Tools::getTitle('patents', $array_type, get_locale());
+                $title = Tools::getTitle('patents', $array_type, $this->page_lang);
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($patents, $showname, $showyear, $showpatentname, 0) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($patentList as $array_type => $patents) {
                 if (empty($type)) {
-                    $title = Tools::getTitle('patents', $array_type, get_locale());
+                    $title = Tools::getTitle('patents', $array_type, $this->page_lang);
                     $output .= '<h3 class="clearfix clear">';
                     $output .= $title;
                     $output .= "</h3>";
@@ -280,20 +280,15 @@ class Patente {
             $inventors_html = implode(", ", $inventorsList);
 
             $patent_id = $patent['ID'];
-            $lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
-            $patent_name = ($lang == 'de') ? $patent['cftitle'] : $patent['cftitle_en'];
-            $patent_type = Tools::getName('patents', $patent['patenttype'], get_locale());
+            $patent_name = ($this->page_lang == 'de') ? $patent['cftitle'] : $patent['cftitle_en'];
+            $patent_type = Tools::getName('patents', $patent['patenttype'], $this->page_lang);
             $patent_abstract = $patent['cfabstr'];
             $patent_number = $patent['cfpatentnum'];
             $patent_link = $patent['patnrlink'];
-            setlocale(LC_TIME, get_locale());
-            $patent_registered = $patent['cfregistrdate'];
-            $patent_registered = strftime('%x', strtotime($patent_registered));
-            $patent_appproved = $patent['cfapprovdate'];
-            $patent_appproved = strftime('%x', strtotime($patent_appproved));
-            $patent_expiry = $patent['patexpirydate'];
-            $patent_expiry = strftime('%x', strtotime($patent_expiry));
-
+            $patent_registered = date_i18n(get_option('date_format'), strtotime($patent['cfregistrdate']));
+            $patent_appproved = date_i18n(get_option('date_format'), strtotime($patent['cfapprovdate']));
+            $patent_expiry = date_i18n( get_option( 'date_format' ), strtotime($patent['patexpirydate']));
+            
             $patentlist .= "<li>";
 
             if (!empty($patent_name))

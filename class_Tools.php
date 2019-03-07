@@ -94,6 +94,16 @@ class Tools {
         return CRIS_Dicts::$typeinfos[$object][$type]['subtypeattribute'];
     }
 
+    public static function getPageLanguage($postID) {
+        $page_lang_meta = get_post_meta($postID, 'fauval_langcode', true);
+        if ($page_lang_meta != '') {
+            $page_lang = ($page_lang_meta == 'de') ? 'de' : 'en';
+        } else {
+            $page_lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
+        }
+        return $page_lang;
+    }
+
     public static function XML2obj($xml_url) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $xml_url);
@@ -458,6 +468,42 @@ class Tools {
     }
 
     /*
+     * Array zur Definition des Filters für Equipment
+     */
+
+    public static function equipment_filter($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = '') {
+        $filter = array();
+        if ($manufacturer !== '' && $manufacturer !== NULL)
+            $filter['hersteller__eq'] = $manufacturer;
+        if ($location !== '' && $location !== NULL) {
+            if (strpos($location, ',')) {
+                $location = str_replace(' ', '', $location);
+                $locations = explode(',', $location);
+            } else {
+                $locations = (array) $location;
+            }
+            $filter['location__eq'] = $locations;
+        }
+        if ($constructionYear !== '' && $constructionYear !== NULL) {
+            if (strpos($constructionYear, ',')) {
+                $constructionYear = str_replace(' ', '', $constructionYear);
+                $constructionYear = explode(',', $constructionYear);
+            } else {
+                $constructionYears = (array) $constructionYear;
+            }
+            $filter['baujahr__eq'] = $constructionYear;
+        }
+        if ($constructionYearStart !== '' && $constructionYearStart !== NULL)
+            $filter['baujahr__ge'] = $constructionYearStart;
+        if ($constructionYearEnd !== '' && $constructionYearEnd !== NULL)
+            $filter['baujahr__le'] = $constructionYearEnd;
+
+        if (count($filter))
+            return $filter;
+        return null;
+    }
+
+    /*
      * Anbindung an UnivIS-/FAU-Person-Plugin
      */
 
@@ -608,22 +654,14 @@ class Tools {
     }
 
     public static function make_date ($start, $end) {
-        $fmt = datefmt_create(
-            get_locale(),
-            IntlDateFormatter::MEDIUM,
-            IntlDateFormatter::NONE,
-            date_default_timezone_get(),
-            IntlDateFormatter::GREGORIAN
-        );
-
         $date = '';
         if ($start != '')
-            $start = datefmt_format($fmt, strtotime($start));
+            $start = date_i18n( get_option( 'date_format' ), strtotime($start));
         if ($end != '')
-            $end = datefmt_format($fmt, strtotime($end));
-        if ($start !='' && $end != '') {
+            $end = date_i18n( get_option( 'date_format' ), strtotime($end));
+        if ($start != '' && $end != '') {
             $date = $start . " - " . $end;
-        } elseif ($start != '' && $end =='') {
+        } elseif ($start != '' && $end == '') {
             $date = __('seit', 'fau-cris') . " " . $start;
         } elseif ($start == '' && $end != '') {
             $date = __('bis', 'fau-cris') . " " . $end;

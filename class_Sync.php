@@ -8,10 +8,10 @@ class Sync {
 
     private $menu_position_start = 2;
 
-    public function __construct() {
+    public function __construct($page_lang = 'de') {
         $this->options = (array) get_option('_fau_cris');
         $this->orgNr = $this->options['cris_org_nr'];
-        $this->lang = strpos(get_locale(), 'de') === 0 ? 'de' : 'en';
+        $this->page_lang = $page_lang;
         $this->menu_items = array();
         $this->menu_id = '';
         $this->portal_items = array();
@@ -26,7 +26,7 @@ class Sync {
             return;
         }
         $this->message = __('Synchronisierung abgeschlossen:', 'fau-cris') . '<ul style="list-style-type: disc; padding-left: 40px;">';
-        $lang = ($this->lang == 'en') ? 'en' : '';
+        $lang = ($this->page_lang == 'en') ? 'en' : '';
         $pages = array();
         $this->menu_position = $this->menu_position_start;
         $this->num_created_p = 0;

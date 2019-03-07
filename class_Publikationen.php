@@ -10,7 +10,7 @@ class Publikationen {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $nameorder = '') {
+    public function __construct($einheit = '', $id = '', $nameorder = '', $page_lang = 'de') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -49,6 +49,7 @@ class Publikationen {
         } else {
             $this->nameorder = $this->options['cris_name_order_plugin'];
         }
+        $this->page_lang = $page_lang;
     }
 
     /*
@@ -99,9 +100,9 @@ class Publikationen {
             $output .= $this->make_quotation_list($pubList, $quotation);
         } else {
             if ($param['sc_type'] == 'custom') {
-                $output .= $this->make_custom_list($pubList, $content);
+                $output .= $this->make_custom_list($pubList, $content, '', $this->page_lang);
             } else {
-                $output .= $this->make_list($pubList, 1, $this->nameorder);
+                $output .= $this->make_list($pubList, 1, $this->nameorder, $this->page_lang);
             }
         }
 
@@ -112,7 +113,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($param = array(), $field = '', $content = '') {
+    public function pubNachJahr($param = array(), $field = '', $content = '', $fsp = false) {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -126,46 +127,88 @@ class Publikationen {
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp);
+
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
 
-        // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
-        if ($order2 == 'author') {
-            $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
+        // Sortierreihenfolge
+        $typeorder = $this->order;
+        if ($typeorder[0] != '' && ((array_search($typeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short')) !== false) || array_search($typeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short_alt')) !== false)) {
+            foreach ($typeorder as $key => $value) {
+                $typeorder[$key] = Tools::getType('publications', $value);
+            }
         } else {
-            $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+            $typeorder = Tools::getOrder('publications');
+        }
+        switch ($order2) {
+            case 'author':
+                $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
+                $subformatter = new CRIS_formatter(NULL, NULL, "relauthors", SORT_ASC);
+                break;
+            case 'type':
+                $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                $subformatter = new CRIS_formatter("publication type", array_values($typeorder), "virtualdate", SORT_DESC);
+                break;
+            default:
+                $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
+                break;
         }
         $pubList = $formatter->execute($pubArray);
 
         $output = '';
         $showsubtype = ($subtype == '') ? 1 : 0;
+
         if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($pubList as $array_year => $publications) {
-                if ($quotation == 'apa' || $quotation == 'mla') {
-                    $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_quotation_list($publications, $quotation) . '[/collapse]');
-                } else {
-                    $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($publications, $showsubtype, $this->nameorder) . '[/collapse]');
+                $shortcode_data_inner = '';
+                $pubSubList = $subformatter->execute($publications);
+                foreach ($pubSubList as $array_subtype => $publications_sub) {
+                    if ($order2 == 'type') {
+                        $shortcode_data_inner .= "<h4>";
+                        $shortcode_data_inner .= Tools::getTitle('publications', $array_subtype, $this->page_lang);;
+                        $shortcode_data_inner .= "</h4>";
+                    }
+                    if ($quotation == 'apa' || $quotation == 'mla') {
+                        $shortcode_data_inner .= $this->make_quotation_list($publications_sub, $quotation);
+                    } else {
+                        if ($param['sc_type'] == 'custom') {
+                            $shortcode_data_inner .= $this->make_custom_list($publications_sub, $content, '', $this->page_lang);
+                        } else {
+                            $shortcode_data_inner .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $this->page_lang);
+                        }
+                    }
                 }
-                $openfirst = '';
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"]' . $shortcode_data_inner . '[/collapse]');
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $openfirst = '';
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($pubList as $array_year => $publications) {
                 if (empty($year)) {
                     $output .= '<h3>' . $array_year . '</h3>';
                 }
-                if ($quotation == 'apa' || $quotation == 'mla') {
-                    $output .= $this->make_quotation_list($publications, $quotation);
-                } else {
-                    if ($param['sc_type'] == 'custom') {
-                        $output .= $this->make_custom_list($publications, $content);
+                $pubSubList = $subformatter->execute($publications);
+                foreach ($pubSubList as $array_subtype => $publications_sub) {
+                    // Zwischenüberschrift
+                    if ($order2 == 'type') {
+                        $output .= "<h4>";
+                        $output .= Tools::getTitle('publications', $array_subtype, $this->page_lang);;
+                        $output .= "</h4>";
+                    }
+                    if ($quotation == 'apa' || $quotation == 'mla') {
+                        $output .= $this->make_quotation_list($publications_sub, $quotation);
                     } else {
-                        $output .= $this->make_list($publications, $showsubtype, $this->nameorder);
+                        if ($param['sc_type'] == 'custom') {
+                            $output .= $this->make_custom_list($publications_sub, $content, '', $this->page_lang);
+                        } else {
+                            $output .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $this->page_lang);
+                        }
                     }
                 }
             }
@@ -177,7 +220,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($param = array(), $field = '', $content = '') {
+    public function pubNachTyp($param = array(), $field = '', $content = '', $fsp = false) {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -191,7 +234,7 @@ class Publikationen {
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -223,7 +266,7 @@ class Publikationen {
             $openfirst = ' load="open"';
             foreach ($pubList as $array_type => $publications) {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
-                $title = Tools::getTitle('publications', $array_type, get_locale());
+                $title = Tools::getTitle('publications', $array_type, $this->page_lang);
                 //if ($array_type == 'Other') {
                 $shortcode_data_other = '';
                 // Weitrere Untergliederung für Subtypen
@@ -242,6 +285,9 @@ class Publikationen {
                     case 'subtype':
                         $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
                         break;
+                    case 'year':
+                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                        break;
                     default:
                         $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
                         break;
@@ -251,26 +297,31 @@ class Publikationen {
                 foreach ($pubOtherList as $array_subtype => $publications_sub) {
                     // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                     if ($order2 == 'subtype') {
-                        $title_sub = Tools::getTitle('publications', $array_subtype, get_locale(), $array_type);
+                        $title_sub = Tools::getTitle('publications', $array_subtype, $this->page_lang, $array_type);
                         $shortcode_data_other .= "<h4>";
                         $shortcode_data_other .= $title_sub;
+                        $shortcode_data_other .= "</h4>";
+                    }
+                    if ($order2 == 'year') {
+                        $shortcode_data_other .= "<h4>";
+                        $shortcode_data_other .= $array_subtype;
                         $shortcode_data_other .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
                         $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation);
                     } else {
-                        $shortcode_data_other .= $this->make_list($publications_sub);
+                        $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $this->page_lang);
                     }
                 }
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $shortcode_data_other . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($pubList as $array_type => $publications) {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                 if (empty($type)) {
-                    $title = Tools::getTitle('publications', $array_type, get_locale());
+                    $title = Tools::getTitle('publications', $array_type, $this->page_lang);
                     if (!shortcode_exists('collapsibles') || $format != 'accordion') {
                         $output .= "<h3>";
                         $output .= $title;
@@ -294,6 +345,9 @@ class Publikationen {
                     case 'subtype':
                         $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
                         break;
+                    case 'year':
+                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                        break;
                     default:
                         $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
                         break;
@@ -303,18 +357,23 @@ class Publikationen {
                 foreach ($pubOtherList as $array_subtype => $publications_sub) {
                     // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                     if ($order2 == 'subtype') {
-                        $title_sub = Tools::getTitle('publications', $array_subtype, get_locale(), $array_type);
+                        $title_sub = Tools::getTitle('publications', $array_subtype, $this->page_lang, $array_type);
                         $output .= "<h4>";
                         $output .= $title_sub;
+                        $output .= "</h4>";
+                    }
+                    if ($order2 == 'year') {
+                        $output .= "<h4>";
+                        $output .= $array_subtype;
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
                         $output .= $this->make_quotation_list($publications_sub, $quotation);
                     } else {
                         if ($param['sc_type'] == 'custom') {
-                            $output .= $this->make_custom_list($publications_sub, $content);
+                            $output .= $this->make_custom_list($publications_sub, $content, '', $this->page_lang);
                         } else {
-                            $output .= $this->make_list($publications_sub);
+                            $output .= $this->make_list($publications_sub, 0, $this->nameorder, $this->page_lang);
                         }
                     }
                 }
@@ -341,9 +400,9 @@ class Publikationen {
             $output = $this->make_quotation_list($pubArray, $quotation);
         } else {
             if ($sc_type == 'custom') {
-                $output = $this->make_custom_list($pubArray, $content);
+                $output = $this->make_custom_list($pubArray, $content, '', $this->page_lang);
             } else {
-                $output = $this->make_list($pubArray, 0, $this->nameorder);
+                $output = $this->make_list($pubArray, 0, $this->nameorder, $this->page_lang);
             }
         }
 
@@ -376,18 +435,19 @@ class Publikationen {
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output = $this->make_quotation_list($pubList, $quotation);
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $this->page_lang);
         }
 
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed = false, $publications_limit) {
+    public function fieldPub($field, $quotation = '', $seed = false, $publications_limit = '', $fsp = false) {
         $ws = new CRIS_publications();
         if ($seed)
             $ws->disable_cache();
         try {
-            $pubArray = $ws->by_field($field);
+            $filter = null;
+            $pubArray = $ws->by_field($field, $filter, $fsp);
         } catch (Exception $ex) {
             return;
         }
@@ -409,12 +469,50 @@ class Publikationen {
         if ($publications_limit != '') {
             $pubList = array_slice($pubList, 0, $publications_limit, true);
         }
-        
+
         $output = '';
         if ($quotation == 'apa' || $quotation == 'mla') {
             $output = $this->make_quotation_list($pubList, $quotation);
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $this->page_lang);
+        }
+
+        return $output;
+    }
+
+    public function equiPub($equipment, $quotation = '', $seed = false, $publications_limit = '') {
+        $ws = new CRIS_publications();
+        if ($seed)
+            $ws->disable_cache();
+        try {
+            $pubArray = $ws->by_equipment($equipment);
+        } catch (Exception $ex) {
+            return;
+        }
+
+        if (!count($pubArray))
+            return;
+
+        if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
+            $sortby = 'relation right seq';
+            $orderby = $sortby;
+        } else {
+            $sortby = NULL;
+            $orderby = __('O.A.', 'fau-cris');
+        }
+        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
+        $res = $formatter->execute($pubArray);
+        $pubList = $res[$orderby];
+
+        if ($publications_limit != '') {
+            $pubList = array_slice($pubList, 0, $publications_limit, true);
+        }
+
+        $output = '';
+        if ($quotation == 'apa' || $quotation == 'mla') {
+            $output = $this->make_quotation_list($pubList, $quotation);
+        } else {
+            $output = $this->make_list($pubList, 0, $this->nameorder, $this->page_lang);
         }
 
         return $output;
@@ -428,7 +526,7 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '') {
+    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false) {
         $filter = NULL;
 
         $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
@@ -442,7 +540,7 @@ class Publikationen {
                 $pubArray = $ws->by_pers_id($this->id, $filter, $notable);
             }
             if ($this->einheit === "field") {
-                $pubArray = $ws->by_field($field, $filter);
+                $pubArray = $ws->by_field($field, $filter, $fsp);
             }
             if ($this->einheit === "publication") {
                 $pubArray = $ws->by_id($this->id);
@@ -539,7 +637,6 @@ class Publikationen {
                 $title_html .= "<span aria-hidden class=\"oa-icon\" title=\"Open-Access-Publikation\"></span>";
             }
             // make array
-            setlocale(LC_TIME, get_locale());
             $pubDetails = array(
                 'id' => $id,
                 'authors' => $authors_html,
@@ -568,8 +665,8 @@ class Publikationen {
                 'eventlocation' => (array_key_exists('event location', $publication) ? strip_tags($publication['event location']) : ''),
                 'eventstart_raw' => !empty($publication['event start date']) ? $publication['event start date'] : (!empty($publication['publyear']) ? $publication['publyear'] : '-----'),
                 'eventend_raw' => (!empty($publication['event end date']) ? $publication['event end date'] : ''),
-                'eventstart' => !empty($publication['event start date']) ? strftime('%x', strtotime(strip_tags($publication['event start date']))) : '',
-                'eventend' => (!empty($publication['event end date']) ? strftime('%x', strtotime(strip_tags($publication['event end date']))) : ''),
+                'eventstart' => !empty($publication['event start date']) ? date_i18n( get_option( 'date_format' ), strtotime(strip_tags($publication['event start date']))) : '',
+                'eventend' => (!empty($publication['event end date']) ? date_i18n( get_option( 'date_format' ), strtotime(strip_tags($publication['event end date']))) : ''),
                 'origTitle' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
                 'language' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 'bibtex_link' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
@@ -584,7 +681,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], get_locale(), $pubDetails['pubType']) . ')' : '';
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], $this->page_lang, $pubDetails['pubType']) . ')' : '';
                     $publist .= (($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '';
                     $publist .= $pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '';
                     if (!empty($pubDetails['publisher'])) {
@@ -667,7 +764,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], get_locale(), $pubDetails['pubType']) . (!empty($pubDetails['pubStatus']) ? ', ' . strtolower($pubDetails['pubStatus']) : '') . ')' : '';
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], $this->page_lang, $pubDetails['pubType']) . (!empty($pubDetails['pubStatus']) ? ', ' . strtolower($pubDetails['pubStatus']) : '') . ')' : '';
                     if ($pubDetails['eventtitle'] != '') {
                         $publist .= "<br /><span itemscope itemtype=\"http://schema.org/Event\" style=\"font-style:italic;\">";
                         $publist .= "<span itemprop=\"name\">" . $pubDetails['eventtitle'] . "</span>";
@@ -701,16 +798,22 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     $publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= $pubDetails['volume'] != '' ? "<br /><span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. <br />" : '';
+                    $publist .= $pubDetails['volume'] != '' ? "<br /><span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. " : '';
                     if (!empty($pubDetails['publisher'])) {
                         $publist .= "<br /><span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">";
-                        $publist .= $pubDetails['city'] != '' ? "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">"
-                                . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: " : '';
-                        $publist .= "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span></span>, ";
-                    } else {
-                        $publist .= $pubDetails['city'] != '' ? $pubDetails['city'] . ", " : '';
                     }
-                    $publist .= $pubDetails['year'] != '' ? "<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
+                    if (!empty( $pubDetails['city'])) {
+                        if (empty($pubDetails['publisher'])) {
+                            $publist .= "<br />";
+                        }
+                        $publist .= "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">" . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: ";
+                    }
+                    if($pubDetails['year'] != '') {
+                        if (empty($pubDetails['publisher']) && empty($pubDetails['city'])) {
+                            $publist .= "<br />";
+                        }
+                        $publist .= "<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>";
+                    }
                     if (!empty($pubDetails['series'])) {
                         $publist .= $pubDetails['series'] != '' ? "<br />(" . $pubDetails['series'] : '';
                         $publist .= $pubDetails['seriesNumber'] != '' ? ", " . _x('Bd.', 'Abkürzung für "Band" bei Publikationen', 'fau-cris') . " " . $pubDetails['seriesNumber'] : '';
@@ -727,7 +830,7 @@ class Publikationen {
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= " (" . ($pubDetails['thesisSubtype'] != '' ? Tools::getName('publications', 'Thesis', get_locale(), $pubDetails['thesisSubtype']) : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)";
+                    $publist .= " (" . ($pubDetails['thesisSubtype'] != '' ? Tools::getName('publications', 'Thesis', $this->page_lang, $pubDetails['thesisSubtype']) : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)";
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . FAU_CRIS::doi . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
                     $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                     break;
@@ -772,7 +875,7 @@ class Publikationen {
         return $publist;
     }
 
-    private function make_custom_list($publications, $custom_text, $nameorder = '') {
+    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de') {
         $publist = '';
         $list = (count($publications) > 1) ? true : false;
         if ($list) {
@@ -825,7 +928,7 @@ class Publikationen {
             //pubType
             $pubTypeRaw = (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? strip_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? strip_tags($publication['publication type']) : __('O.A.', 'fau-cris'));
 
-            $pubType = Tools::getName('publications', $pubTypeRaw, get_locale());
+            $pubType = Tools::getName('publications', $pubTypeRaw, $lang);
             // make array
             setlocale(LC_TIME, get_locale());
             $pubDetails = array(
@@ -855,8 +958,8 @@ class Publikationen {
                 '#eventLocation#' => (array_key_exists('event location', $publication) ? strip_tags($publication['event location']) : ''),
                 '#eventstart_raw#' => !empty($publication['event start date']) ? $publication['event start date'] : (!empty($publication['publyear']) ? $publication['publyear'] : '-----'),
                 '#eventend_raw#' => (!empty($publication['event end date']) ? $publication['event end date'] : ''),
-                '#eventStart#' => !empty($publication['event start date']) ? strftime('%x', strtotime(strip_tags($publication['event start date']))) : '',
-                '#eventEnd#' => (!empty($publication['event end date']) ? strftime('%x', strtotime(strip_tags($publication['event end date']))) : ''),
+                '#eventStart#' => !empty($publication['event start date']) ? date_i18n( get_option( 'date_format' ), strtotime(strip_tags($publication['event start date']))) : '',
+                '#eventEnd#' => (!empty($publication['event end date']) ? date_i18n( get_option( 'date_format' ), strtotime(strip_tags($publication['event end date']))) : ''),
                 '#originalTitle#' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
                 '#language#' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 '#bibtexLink#' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
@@ -959,7 +1062,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    public function by_field($fieldID = null, &$filter = null) {
+    public function by_field($fieldID = null, &$filter = null, $fsp = false) {
         if ($fieldID === null || $fieldID === "0")
             throw new Exception('Please supply valid research field ID');
 
@@ -967,12 +1070,28 @@ class CRIS_publications extends CRIS_webservice {
             $fieldID = array($fieldID);
 
         $requests = array();
+        $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
         foreach ($fieldID as $_p) {
-            $requests[] = sprintf('getrelated/Forschungsbereich/%d/fobe_has_top_publ', $_p);
+            $requests[] = sprintf('getrelated/Forschungsbereich/%d/', $_p) . $relation;
         }
         return $this->retrieve($requests, $filter);
     }
 
+    public function by_equipment($equiID = null, &$filter = null) {
+        if ($equiID === null || $equiID === "0")
+            throw new Exception('Please supply valid equipment ID');
+
+        if (!is_array($equiID))
+            $equiID = array($equiID);
+
+        $requests = array();
+        foreach ($equiID as $_p) {
+            $requests[] = sprintf('getrelated/equipment/%d/PUBL_has_EQUI', $_p);
+        }
+        return $this->retrieve($requests, $filter);
+    }
+
+    
     private function retrieve($reqs, &$filter = null) {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
