@@ -206,7 +206,8 @@ class Forschungsbereiche {
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
-
+            $param['fsp'] = ($field['selektion'] == 'Forschungsschwerpunkt') ? true : false;
+            
             if (!in_array('title', $hide))
                 $singlefield .= "<h2>" . $title . "</h2>";
 
