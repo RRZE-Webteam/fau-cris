@@ -333,8 +333,8 @@ class Aktivitaeten {
                     $activity_location = '';
                     break;
                 case "gutachtertätigkeit für förderorganisation":
-                    $activity_name = $activity['type of expert activity'];
-                    $activity_detail = $activity['mirror_fund'];
+                    $activity_name = $activity['mirror_fund'];
+                    $activity_detail = $activity['type of expert activity'];
                     $activity_nameofshow = '';
                     $activity_eventname = '';
                     $activity_startdate = $activity['start date'];
@@ -416,16 +416,16 @@ class Aktivitaeten {
 
             if ($name == 1 && !empty($names_html))
                 $activitylist .= $names_html . ": ";
-            if (!empty($activity_type) & $showtype != 0)
-                $activitylist .= $activity_type;
             if (!empty($activity_name)) {
                 global $post;
-                $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">\"" . $activity_name . "\"</a></strong>";
+                $activitylist .= " <strong><a href=\"" . Tools::get_item_url("activity", $activity_name, $activity_id, $post->ID) . "\" target=\"blank\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_name . "</a></strong>";
             }
             if (!empty($activity_detail))
                 $activitylist .= " (" . $activity_detail . ")";
+            if (!empty($activity_type) && $showtype != 0)
+                $activitylist .= '<br />(' . $activity_type . ') ';
             if (!empty($activity_date))
-                $activitylist .= " (" . $activity_date . ")";
+                $activitylist .= '<br />' . $activity_date;
             if (!empty($activity_eventname))
                 $activitylist .= ", " . __('Veranstaltung', 'fau-cris') . ": " . $activity_eventname;
             if (!empty($activity_nameofshow))

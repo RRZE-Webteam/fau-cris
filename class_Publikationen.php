@@ -965,10 +965,16 @@ class Publikationen {
                 '#bibtexLink#' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
                 '#subtype#' => (array_key_exists('subtype', $publication) ? $publication['subtype'] : ''),
                 '#articleNumber#' => (array_key_exists('article number', $publication) ? $publication['article number'] : ''),
-                '#projectTitle#' => $this->get_pub_projects($id, 'title'),
-                '#projectLink#' => $this->get_pub_projects($id, 'link'),
+                '#projectTitle#' => '',
+                '#projectLink#' => '',
                 '#oaIcon#' => ($publication['openaccess'] == "Ja") ? "<span aria-hidden class=\"oa-icon\" title=\"Open-Access-Publikation\"></span>" : '',
             );
+            if (strpos($custom_text, '#projectTitle#' ) !== false) {
+                $pubDetails['#projectTitle#'] = $this->get_pub_projects($id, 'title');
+            }
+            if (strpos($custom_text, '#projectLink#' ) !== false) {
+                $pubDetails['#projectLink#'] = $this->get_pub_projects($id, 'link');
+            }
 
             if ($list) {
                 $publist .= "<li>"; }
