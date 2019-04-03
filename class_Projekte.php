@@ -11,8 +11,7 @@ class Projekte {
     public $output;
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de') {
-
-        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+	    if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
@@ -30,7 +29,8 @@ class Projekte {
         if ($this->cms == 'wbk' && $this->cris_project_link == 'person') {
             $this->univis = Tools::get_univis();
         }
-
+	    $this->page_lang = $page_lang;
+	 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
             return;
@@ -43,7 +43,6 @@ class Projekte {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
-        $this->page_lang = $page_lang;
     }
 
     /*
@@ -760,7 +759,7 @@ class Projekte {
     }
 
     public function fieldProj($field, $return = 'list', $seed = false) {
-        $ws = new CRIS_projects();
+    	$ws = new CRIS_projects();
         if ($seed)
             $ws->disable_cache();
         try {

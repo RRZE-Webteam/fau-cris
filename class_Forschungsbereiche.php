@@ -225,7 +225,7 @@ class Forschungsbereiche {
             $singlefield .= $description;
 
             if (!in_array('projects', $hide)) {
-                $projects = $this->get_field_projects($id);
+            	$projects = $this->get_field_projects($id);
                     if ($projects) {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
                     $singlefield .= $projects;
@@ -307,7 +307,10 @@ class Forschungsbereiche {
             
             $field_details['#title#'] = htmlentities($title, ENT_QUOTES);
             $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
-            $field_details['#projects#'] = $this->get_field_projects($id);
+            $field_details['#projects#'] = '';
+            if (strpos($content, '#projects#' ) !== false) {
+                $field_details['#projects#'] = $this->get_field_projects($id);
+            }
             $field_details['#persons#'] = '';
             if (strpos($content, '#persons#' ) !== false) {
                 $persons = $this->get_field_persons($id);
@@ -403,8 +406,8 @@ class Forschungsbereiche {
     }
 
     private function get_field_projects($field = NULL) {
-        require_once('class_Projekte.php');
-        $liste = new Projekte();
+    	require_once('class_Projekte.php');
+        $liste = new Projekte('field', '211141398', $this->page_lang);
         return $liste->fieldProj($field);
     }
 
