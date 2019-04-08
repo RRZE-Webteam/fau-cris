@@ -607,7 +607,7 @@ class Tools {
     }
 
     public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = '') {
-        $person = '';
+    	$person = '';
         switch ($target) {
             case 'cris' :
                 if (is_numeric($id)) {

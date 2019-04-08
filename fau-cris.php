@@ -167,7 +167,8 @@ class FAU_CRIS {
                 'fields' => 0,
                 'projects' => 0,
             ),
-            'cris_fields_num_pub' => 5
+            'cris_fields_num_pub' => 5,
+            'cris_field_link' => 'none'
         );
         return $options;
     }
@@ -383,7 +384,16 @@ class FAU_CRIS {
                             'description' => __('Maximale Anzahl der Publikationen, die in der Detailansicht eines Forschungsbereichs angezeigt werden.', 'fau-cris')
                         )
                 );
-                add_settings_section(
+	            add_settings_field(
+		            'cris_field_link', __('Kontaktpersonen verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_fields_section', array(
+			            'name' => 'cris_field_link',
+			            'options' => array(
+				            'person' => __('Kontaktpersonen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
+				            'cris' => __('Kontaktpersonen mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+				            'none' => __('keinen Link setzen', 'fau-cris'))
+		            )
+	            );
+	            add_settings_section(
                         'cris_projects_section', // ID
                         __('Forschungsprojekte', 'fau-cris'), // Title
                         '__return_false', // Callback
@@ -514,7 +524,8 @@ class FAU_CRIS {
                 $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
                 $new_input['cris_award_link'] = in_array($_POST[self::option_name]['cris_award_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_award_link'] : $default_options['cris_award_link'];
                 $new_input['cris_fields_num_pub'] = isset($_POST[self::option_name]['cris_fields_num_pub']) ? sanitize_text_field($_POST[self::option_name]['cris_fields_num_pub']) : 0;
-                $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_project_order'])) : $default_options['cris_project_order'];
+	            $new_input['cris_field_link'] = in_array($_POST[self::option_name]['cris_field_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_field_link'] : $default_options['cris_field_link'];
+	            $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_project_order'])) : $default_options['cris_project_order'];
                 $new_input['cris_project_link'] = in_array($_POST[self::option_name]['cris_project_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_project_link'] : $default_options['cris_project_link'];
                 $new_input['cris_patent_order'] = isset($_POST[self::option_name]['cris_patent_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_patent_order'])) : $default_options['cris_patent_order'];
                 $new_input['cris_patent_link'] = in_array($_POST[self::option_name]['cris_patent_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_patent_link'] : $default_options['cris_patent_link'];
