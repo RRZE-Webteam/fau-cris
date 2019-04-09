@@ -997,7 +997,11 @@ class FAU_CRIS {
             $sc_param['entity_id'] = $sc_param['equipment'];
         } elseif ($sc_param['field'] != '') {
             $sc_param['entity'] = 'field';
-            $sc_param['entity_id'] = $sc_param['field'];
+	        if (strpos($sc_param['field'], ',') !== false) {
+		        $sc_param['field'] = str_replace(' ', '', $sc_param['field']);
+		        $sc_param['field'] = explode(',', $sc_param['field']);
+	        }
+	        $sc_param['entity_id'] = $sc_param['field'];
         } elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
             $sc_param['entity'] = 'activity';
             $sc_param['entity_id'] = $sc_param['activity'];

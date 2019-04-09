@@ -179,7 +179,13 @@ class Forschungsbereiche {
      * Ausgabe der Forschungsbereiche
      */
 
-    private function make_single($fields, $param) {
+	/**
+	 * @param $fields
+	 * @param $param
+	 *
+	 * @return string
+	 */
+	private function make_single($fields, $param) {
         $hide = $param['hide'];
 
         $singlefield = '';
@@ -224,14 +230,18 @@ class Forschungsbereiche {
 
             $singlefield .= $description;
 
-            if (!in_array('projects', $hide)) {
+            if (!in_array('projects', $hide)
+                && !is_array($param['field'])) {
             	$projects = $this->get_field_projects($id);
                     if ($projects) {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
                     $singlefield .= $projects;
                 }
             }
-            if (!in_array('contactpersons', $hide) && $field['contact_names'] != '' && $field['contact_ids'] != '') {
+            if (!in_array('contactpersons', $hide)
+                && !is_array($param['field'])
+                && $field['contact_names'] != ''
+                && $field['contact_ids'] != '') {
                 $contactsArray = array();
                 $contacts = explode("|", $field['contact_names']);
                 $contactIDs = explode(",", $field['contact_ids']);
@@ -254,7 +264,8 @@ class Forschungsbereiche {
                 }
             }
 
-            if (!in_array('persons', $hide)) {
+            if (!in_array('persons', $hide)
+                && !is_array($param['field'])) {
                 $persons = $this->get_field_persons($id);
                 if ($persons) {
                     $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
@@ -267,14 +278,19 @@ class Forschungsbereiche {
                     $singlefield .= "</ul>";
                 }
             }
-            if (!in_array('publications', $hide)) {
+            if (!in_array('publications', $hide)
+                && !is_array($param['field'])) {
                 $publications = $this->get_field_publications($param);
                 if ($publications) {
                     $singlefield .= "<h3>" . __('Publikationen', 'fau-cris') . ": </h3>";
                     $singlefield .= $publications;
                 }
             }
-        }
+			if (is_array($param['field'])) {
+				global $post;
+				$singlefield .= "<p></p><a href=\"" . Tools::get_item_url( "forschungsbereich", $title, $field['ID'], $post->ID ) . "\">" . __('Mehr Informationen', 'fau-cris') . " &#8594;</a></p>";
+			}
+		}
         $singlefield .= "</div>";
         return $singlefield;
     }
@@ -407,13 +423,13 @@ class Forschungsbereiche {
 
     private function get_field_projects($field = NULL) {
     	require_once('class_Projekte.php');
-        $liste = new Projekte('field', '211141398', $this->page_lang);
+        $liste = new Projekte('field', $field, $this->page_lang);
         return $liste->fieldProj($field);
     }
 
     private function get_field_persons($field = NULL) {
         require_once('class_Projekte.php');
-        $liste = new Projekte();
+        $liste = new Projekte('field', $field, $this->page_lang);
         return $liste->fieldPersons($field);
     }
 
