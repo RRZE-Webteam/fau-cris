@@ -31,11 +31,7 @@ class Projekte {
         }
 	    $this->page_lang = $page_lang;
 	 
-        if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
-            return;
-        }
-        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project"))) {
+        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field"))) {
             $this->id = $id;
             $this->einheit = $einheit;
         } else {
@@ -43,6 +39,11 @@ class Projekte {
             $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
+        if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
+		    print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
+		    return;
+	    }
+
     }
 
     /*
@@ -686,7 +687,7 @@ class Projekte {
             }
             if (!in_array('link', $hide) && !empty($id)) {
                 $link = Tools::get_item_url("project", $title, $id, $post->ID, $this->page_lang);
-                $projlist .= "<div>" . "<a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> &#8594; </div>";
+                $projlist .= "<div>" . " &#8594;<a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </div>";
             }
             $projlist .= "</li>";
             if ($pubProj == 1) {
