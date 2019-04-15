@@ -641,7 +641,7 @@ class CRIS_Dicts {
             ),
             'Conference contribution' => array(
                 'order' => 5,
-                'short' => 'beitragtagung',
+                'short' => 'beitrag_tagung',
                 'short_alt' => 'konferenzbeitraege',
                 'de' => array(
                     'name' => 'Beitrag bei einer Tagung',
