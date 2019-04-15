@@ -631,7 +631,7 @@ class Tools {
                 $link_pre = '';
                 $link_post = '';
         }
-        if ($id == 0) {
+        if ($id == 0 && $target == 'cris') {
             $link_pre = '';
             $link_post = '';
         }
