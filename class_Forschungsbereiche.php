@@ -368,7 +368,14 @@ class Forschungsbereiche {
                     $field_details['#publications#'] = $publications;
                 }
             }
-            $field_details['#image1#'] = '';
+	        $field_details['#project_publications#'] = '';
+	        if (strpos($content, '#project_publications#' ) !== false) {
+		        $project_publications = $this->get_field_proj_publications($param);
+		        if ($project_publications) {
+			        $field_details['#project_publications#'] = $project_publications;
+		        }
+	        }
+	        $field_details['#image1#'] = '';
             if (strpos($content, '#image1#' ) !== false) {
                 $imgs = self::get_field_images($field['ID']);
                 $field_details['#image1#'] = '';
@@ -449,6 +456,23 @@ class Forschungsbereiche {
             return $liste->pubNachTyp ($args, $param['field'], '', $param['fsp']);
         return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit'], $param['fsp']);
     }
+
+	private function get_field_proj_publications($param = array()) {
+		require_once('class_Publikationen.php');
+		$liste = new Publikationen('field_proj', $param['field']);
+		foreach ($param as $_k => $_v) {
+			if (substr($_k, 0, 13) == 'publications_') {
+				$args[substr($_k,13)] = $_v;
+			}
+		}
+		$args['sc_type'] = 'default';
+		$args['quotation'] = $param['quotation'];
+		if ($param['publications_orderby'] == 'year')
+			return $liste->pubNachJahr ($args, $param['field'], '', $param['fsp'],true);
+		if ($param['publications_orderby'] == 'type')
+			return $liste->pubNachTyp ($args, $param['field'], '', $param['fsp']);
+		return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit'], $param['fsp']);
+	}
 
     private function get_field_images($field) {
         $images = array();
