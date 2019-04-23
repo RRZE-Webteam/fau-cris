@@ -624,8 +624,20 @@ class CRIS_Dicts {
                             'title' => 'Source Editions'
                         )
                     ),
+                    'Themenheft einer Zeitschrift' => array(
+	                    'order' => 5,
+	                    'short' => 'themenheft_zeitschrift',
+	                    'de' => array(
+		                    'name' => 'Themenheft einer Zeitschrift',
+		                    'title' => 'Themenhefte von Zeitschriften'
+	                    ),
+	                    'en' => array(
+		                    'name' => 'Special issue of a journal',
+		                    'title' => 'Special Issues of Journals'
+	                    )
+                    ),
                     'undefined' => array(
-                        'order' => 5,
+                        'order' => 6,
                         'short' => 'andere',
                         'de' => array(
                             'name' => 'Anderer / O.A.',
