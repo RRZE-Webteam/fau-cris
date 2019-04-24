@@ -624,7 +624,7 @@ class CRIS_Dicts {
                             'title' => 'Source Editions'
                         )
                     ),
-                    'Themenheft einer Zeitschrift' => array(
+                    'specialissue' => array(
 	                    'order' => 5,
 	                    'short' => 'themenheft_zeitschrift',
 	                    'de' => array(
