@@ -1004,7 +1004,7 @@ class CRIS_publications extends CRIS_webservice {
      */
 
     public function by_orga_id($orgaID = null, &$filter = null) {
-        if ($orgaID === null || $orgaID === "0")
+        if ($orgaID === null || $orgaID === "0" || $orgaID === "")
             throw new Exception('Please supply valid organisation ID');
 
         if (!is_array($orgaID))
