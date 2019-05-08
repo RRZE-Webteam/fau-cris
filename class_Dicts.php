@@ -624,8 +624,20 @@ class CRIS_Dicts {
                             'title' => 'Source Editions'
                         )
                     ),
+                    'specialissue' => array(
+	                    'order' => 5,
+	                    'short' => 'themenheft_zeitschrift',
+	                    'de' => array(
+		                    'name' => 'Themenheft einer Zeitschrift',
+		                    'title' => 'Themenhefte von Zeitschriften'
+	                    ),
+	                    'en' => array(
+		                    'name' => 'Special issue of a journal',
+		                    'title' => 'Special Issues of Journals'
+	                    )
+                    ),
                     'undefined' => array(
-                        'order' => 5,
+                        'order' => 6,
                         'short' => 'andere',
                         'de' => array(
                             'name' => 'Anderer / O.A.',
@@ -641,7 +653,7 @@ class CRIS_Dicts {
             ),
             'Conference contribution' => array(
                 'order' => 5,
-                'short' => 'beitragtagung',
+                'short' => 'beitrag_tagung',
                 'short_alt' => 'konferenzbeitraege',
                 'de' => array(
                     'name' => 'Beitrag bei einer Tagung',

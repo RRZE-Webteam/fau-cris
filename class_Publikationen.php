@@ -36,7 +36,7 @@ class Publikationen {
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
         }
-        if (in_array($einheit, array("person", "orga", "publication", "project", "field"))) {
+        if (in_array($einheit, array("person", "orga", "publication", "project", "field", "field_proj"))) {
             $this->id = $id;
             $this->einheit = $einheit;
         } else {
@@ -539,8 +539,8 @@ class Publikationen {
             if ($this->einheit === "person") {
                 $pubArray = $ws->by_pers_id($this->id, $filter, $notable);
             }
-            if ($this->einheit === "field") {
-                $pubArray = $ws->by_field($field, $filter, $fsp);
+            if ($this->einheit === "field" || $this->einheit === "field_proj") {
+                $pubArray = $ws->by_field($field, $filter, $fsp, $this->einheit);
             }
             if ($this->einheit === "publication") {
                 $pubArray = $ws->by_id($this->id);
@@ -1004,7 +1004,7 @@ class CRIS_publications extends CRIS_webservice {
      */
 
     public function by_orga_id($orgaID = null, &$filter = null) {
-        if ($orgaID === null || $orgaID === "0")
+        if ($orgaID === null || $orgaID === "0" || $orgaID === "")
             throw new Exception('Please supply valid organisation ID');
 
         if (!is_array($orgaID))
@@ -1068,7 +1068,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    public function by_field($fieldID = null, &$filter = null, $fsp = false) {
+    public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field') {
         if ($fieldID === null || $fieldID === "0")
             throw new Exception('Please supply valid research field ID');
 
@@ -1076,8 +1076,16 @@ class CRIS_publications extends CRIS_webservice {
             $fieldID = array($fieldID);
 
         $requests = array();
-        $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
-        foreach ($fieldID as $_p) {
+        switch ($entity) {
+	        case 'field_proj':
+		        $relation = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
+		        break;
+	        case 'field':
+	        default:
+	            $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
+        }
+
+	    foreach ($fieldID as $_p) {
             $requests[] = sprintf('getrelated/Forschungsbereich/%d/', $_p) . $relation;
         }
         return $this->retrieve($requests, $filter);
