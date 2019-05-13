@@ -447,7 +447,7 @@ class Publikationen {
             $ws->disable_cache();
         try {
             $filter = null;
-            $pubArray = $ws->by_field($field, $filter, $fsp);
+            $pubArray = $ws->by_field($field, $filter, $fsp, $this->einheit);
         } catch (Exception $ex) {
             return;
         }
