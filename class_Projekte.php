@@ -243,7 +243,7 @@ class Projekte {
      * Ausgabe eines einzelnen Projektes
      */
 
-    public function singleProj($hide = array(), $quotation = '') {
+    public function singleProj($param = array()) {
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -257,9 +257,9 @@ class Projekte {
         }
 
         if (is_array($this->id)) {
-            $output = $this->make_list($projArray, $hide);
+            $output = $this->make_list($projArray, $param['hide']);
         } else {
-            $output = $this->make_single($projArray, $hide, $quotation);
+            $output = $this->make_single($projArray, $param);
         }
 
         return $output;
@@ -269,7 +269,7 @@ class Projekte {
      * Ausgabe eines Projektes per Custom-Shortcode
      */
 
-    public function customProj($content = '', $quotation = '') {
+    public function customProj($content = '', $param = array()) {
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -282,7 +282,7 @@ class Projekte {
             return $output;
         }
 
-        $output = $this->make_custom_single($projArray, $content, $quotation);
+        $output = $this->make_custom_single($projArray, $content, $param);
         return $output;
     }
 
@@ -359,7 +359,7 @@ class Projekte {
      * Ausgabe der Projekte
      */
 
-    private function make_custom_single($projects, $custom_text, $quotation = '') {
+    private function make_custom_single($projects, $custom_text, $param = array()) {
         $proj_details = array();
         $projlist = "<div class=\"cris-projects\">";
 
@@ -414,7 +414,7 @@ class Projekte {
             $proj_details['#url#'] = $project['cfuri'];
             $proj_details['#acronym#'] = $project['cfacro'];
             $description = ($this->page_lang == 'en' && !empty($project['cfabstr_en'])) ? $project['cfabstr_en'] : $project['cfabstr'];
-            $proj_details['#publications#'] = $this->get_project_publications($id, $quotation);
+            $proj_details['#publications#'] = $this->get_project_publications($id, $param);
             $proj_details['#image1#'] = '';
             if (count($imgs)) {
                 $i = 1;
@@ -495,7 +495,7 @@ class Projekte {
         return $projlist;
     }
 
-    private function make_single($projects, $hide = array(), $quotation = '') {
+    private function make_single($projects, $param = array()) {
 
         $projlist = '';
         $projlist .= "<div class=\"cris-projects\">";
@@ -535,14 +535,14 @@ class Projekte {
                 $projlist .= "</div>";
             }
 
-            if (!in_array('title', $hide)) {
+            if (!in_array('title', $param['hide'])) {
                 $projlist .= "<h3>" . $title . "</h3>";
             }
 
             if (!empty($type))
                 $projlist .= "<p class=\"project-type\">(" . $type . ")</p>";
 
-            if (!in_array('details', $hide)) {
+            if (!in_array('details', $param['hide'])) {
                 $parentprojecttitle = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
                 $leaderIDs = explode(",", $project['relpersidlead']);
                 $collIDs = explode(",", $project['relpersidcoll']);
@@ -557,7 +557,7 @@ class Projekte {
                 }
                 $start = $project['cfstartdate'];
                 $start = date_i18n( get_option( 'date_format' ), strtotime($start));
-                if (!in_array('end', $hide)) {
+                if (!in_array('end', $param['hide'])) {
                     $end = $project['virtualenddate'];
                     $end = date_i18n( get_option( 'date_format' ), strtotime($end));
                 } else {
@@ -593,12 +593,12 @@ class Projekte {
                 $projlist .= "</p>";
             }
 
-            if (!in_array('abstract', $hide)) {
+            if (!in_array('abstract', $param['hide'])) {
                 if ($description)
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
             }
-            if (!in_array('publications', $hide)) {
-                $publications = $this->get_project_publications($id, $quotation);
+            if (!in_array('publications', $param['hide'])) {
+                $publications = $this->get_project_publications($id, $param);
                 if ($publications)
                     $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
             }
@@ -920,10 +920,22 @@ class Projekte {
         return $funding;
     }
 
-    private function get_project_publications($project = NULL, $quotation = '') {
+    private function get_project_publications($project = NULL, $param = array()) {
         require_once('class_Publikationen.php');
         $liste = new Publikationen('project', $project);
-        return $liste->projectPub($project, $quotation);
+		$args = array();
+	    foreach ($param as $_k => $_v) {
+		    if (substr($_k, 0, 13) == 'publications_') {
+			    $args[substr($_k,13)] = $_v;
+		    }
+	    }
+	    $args['sc_type'] = 'default';
+	    $args['quotation'] = $param['quotation'];
+	    if ($param['publications_orderby'] == 'year')
+		    return $liste->pubNachJahr ($args, $param['project'], '', false,$param['project']);
+	    if ($param['publications_orderby'] == 'type')
+		    return $liste->pubNachTyp ($args, $param['project'], '', false,$param['project']);
+	    return $liste->projectPub($param['project'], $param['quotation'], false, $param['publications_limit']);
     }
 
     private function get_project_images($project) {

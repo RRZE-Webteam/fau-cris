@@ -767,7 +767,7 @@ class FAU_CRIS {
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang);
 
             if ($parameter['project'] != '') {
-                return $liste->singleProj($parameter['hide'], $parameter['quotation']);
+                return $liste->singleProj($parameter);
             }
             if (!empty($parameter['limit'])) {
                 return $liste->projListe($parameter);
@@ -840,7 +840,7 @@ class FAU_CRIS {
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang);
             if ($parameter['project'] != '') {
-                return $liste->customProj($content, $parameter['quotation']);
+                return $liste->customProj($content, $parameter);
             }
             /*if (!empty($parameter['limit'])) {
                 return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide'], $parameter['role']);
