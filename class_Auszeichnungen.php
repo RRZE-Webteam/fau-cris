@@ -50,7 +50,7 @@ class Auszeichnungen {
      * Ausgabe aller Auszeichnungen ohne Gliederung
      */
 
-    public function awardsListe($param = array()) {
+    public function awardsListe($param = array(), $content = '') {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -63,7 +63,6 @@ class Auszeichnungen {
         $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
 
         $awardArray = $this->fetch_awards($year, $start, $end, $type, $awardnameid);
-
         if (!count($awardArray)) {
             $output = '<p>' . __('Es wurden leider keine Auszeichnungen gefunden.', 'fau-cris') . '</p>';
             return $output;
@@ -79,11 +78,15 @@ class Auszeichnungen {
 
         $output = '';
 
-        if ($display == 'gallery') {
-            $output .= $this->make_gallery($awardList, $showname, $showyear, $showawardname);
-        } else {
-            $output .= $this->make_list($awardList, $showname, $showyear, $showawardname);
-        }
+	    if ($content == '') {
+		    if ($display == 'gallery') {
+			    $output .= $this->make_gallery($awardList, $showname, $showyear, $showawardname);
+		    } else {
+			    $output .= $this->make_list($awardList, $showname, $showyear, $showawardname);
+		    }
+	    } else {
+		    $output .= $this->make_custom_list($awardList, $content, $param);
+	    }
 
         return $output;
     }
@@ -251,7 +254,28 @@ class Auszeichnungen {
         return $output;
     }
 
-    /* =========================================================================
+	/*
+	 * Ausgabe eines Awards per Custom-Shortcode
+	 */
+
+	public function customAward($content = '', $param = array()) {
+		$ws = new CRIS_awards();
+		try {
+			$awardArray = $ws->by_id($this->id);
+		} catch (Exception $ex) {
+			return;
+		}
+
+		if (!count($awardArray)) {
+			$output = '<p>' . __('Es wurden leider keine Auszeichnungen gefunden.', 'fau-cris') . '</p>';
+			return $output;
+		}
+
+		$output = $this->make_custom_list($awardArray, $content, $param);
+		return $output;
+	}
+
+	/* =========================================================================
      * Private Functions
       ======================================================================== */
 
@@ -278,7 +302,7 @@ class Auszeichnungen {
         } catch (Exception $ex) {
             $awardArray = array();
         }
-        return $awardArray;
+	    return $awardArray;
     }
 
     /*
@@ -350,6 +374,119 @@ class Auszeichnungen {
         return $awardlist;
     }
 
+	private function make_custom_list($awards, $custom_text = '', $param = array()) {
+
+		switch ($param['display']) {
+			case 'accordion':
+				$tag_open = '[collapsibles expand-all-link="true"]';
+				$tag_close= '[/collapsibles]';
+				$item_open = '[collapse title="%1s" color="%2s" name="%3s"]';
+				$item_close = '[/collapse]';
+				break;
+			case 'no-list':
+				$tag_open = '<div class="cris-awards">';
+				$tag_close= '</div>';
+				$item_open = '<div class="cris-award">';
+				$item_close = '</div>';
+				break;
+			case 'list':
+			default:
+				$tag_open = '<ul class="cris-awards">';
+				$tag_close= '</ul>';
+				$item_open = '<li>';
+				$item_close = '</li>';
+		}
+
+    	$awardlist = $tag_open;
+
+		foreach ($awards as $award) {
+			$award = (array) $award;
+			foreach ($award['attributes'] as $attribut => $v) {
+				$award[$attribut] = $v;
+			}
+			unset($award['attributes']);
+
+			$preistraeger = explode("|", $award['exportnames']);
+			$preistraegerIDs = explode(",", $award['relpersid']);
+			$preistraegerArray = array();
+			foreach ($preistraegerIDs as $i => $key) {
+				$nameparts = explode(":", $preistraeger[$i]);
+				$preistraegerArray[] = array(
+					'id' => $key,
+					'lastname' => $nameparts[0],
+					'firstname' => array_key_exists(1, $nameparts) ? $nameparts[1] : '');
+			}
+			$preistraegerList = array();
+			foreach ($preistraegerArray as $pt) {
+				$preistraegerList[] = Tools::get_person_link($pt['id'], $pt['firstname'], $pt['lastname'], $this->cris_award_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
+			}
+			$preistraeger_html = implode(", ", $preistraegerList);
+
+			$award_details = array();
+			switch ($this->page_lang) {
+				case 'en':
+					$subtitle = ($award['description_subtitle_en'] != '') ? $award['description_subtitle_en'] : $award['description_subtitle'];
+					$description = ($award['reasonforaward_en'] != '') ? $award['reasonforaward_en'] : $award['reasonforaward'];
+					break;
+				case 'de':
+				default:
+				$subtitle = ($award['description_subtitle'] != '') ? $award['description_subtitle'] : $award['description_subtitle_en'];
+					$description = ($award['reasonforaward'] != '') ? $award['reasonforaward'] : $award['reasonforaward_en'];
+					break;
+			}
+
+			if (!empty($award['award_name'])) {
+				$award_name = $award['award_name'];
+			} elseif (!empty($award['award_name_manual'])) {
+				$award_name = $award['award_name_manual'];
+			}
+			if (!empty($award['award_organisation'])) {
+				$organisation = $award['award_organisation'];
+			} elseif (!empty($award['award_organisation_manual'])) {
+				$organisation = $award['award_organisation_manual'];
+			} else {
+				$organisation = null;
+			}
+
+			$award_details['#name#'] = $award['award_preistraeger'];
+			$award_details['#year#'] = $award['year award'];
+			$award_details['#subtitle#'] = htmlentities($subtitle, ENT_QUOTES);
+			$award_details['#description#'] = $description;
+			//$award_details['#description#'] = strip_tags($description);
+			$award_details['#url_pressrelease#'] = $award['url_pressrelease'];
+			$award_details['#title_pressrelease#'] = $award['url_pressrelease_title'];
+			$award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "Person/" . $award['relpersid'];
+
+			if (strpos($custom_text, '#image') !== false) {
+				$imgs = self::get_pic($award['ID']);
+				$award_details['#image1#'] = '';
+				if (count($imgs)) {
+					$i = 1;
+					foreach($imgs as $img) {
+						if (isset($img['png180']) && mb_strlen($img['png180']) > 30) {
+							$award_details['#image'.$i.'#'] = "<div class='wp-caption align" . $param['image_align'] . "'><img alt=\"". $award_details['#name#'] ."\" src=\"" . $img['png180'] . "\"><br />"
+							     . "<span class=\"wp-caption-text\">" . (($img['desc'] !='') ? $img['desc'] : "") . "</span>";
+							$award_details['#image'.$i.'#'] .= "</div>";
+						}
+						$i++;
+					}
+				}
+				$award_details['#image#'] = $award_details['#image1#'];
+			}
+			$award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "Person/" . $award['relpersid'];
+
+			if ($param['display'] == 'accordion') {
+				$item_open = sprintf($item_open, $param['accordion_title'],$param['accordion_color'], sanitize_title($award_details['#name#']));
+			}
+
+			$awardlist .= do_shortcode(strtr($item_open . $custom_text . $item_close, $award_details));
+		}
+
+		$awardlist .= $tag_close;
+
+		return $awardlist;
+	}
+
     private function make_gallery($awards, $name = 1, $year = 1, $awardname = 1) {
         $awardlist = "<ul class=\"cris-awards cris-gallery clear clearfix\">";
 
@@ -392,8 +529,8 @@ class Auszeichnungen {
             $award_pic = self::get_pic($award['ID']);
 
             $awardlist .= "<li>";
-            $awardlist .= (isset($award_pic['png']) && mb_strlen($award_pic['png']) > 30) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic['png'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
-            $awardlist .= $name == 1 ? $preistraeger_html . ': ' : '';
+            $awardlist .= (isset($award_pic[1]['png180']) && mb_strlen($award_pic[1]['png180']) > 30) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic[1]['png180'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
+	        $awardlist .= $name == 1 ? $preistraeger_html . ': ' : '';
             $awardlist .= (($awardname == 1) ? " <strong>" . $award_name . "</strong> "
                     . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             $awardlist .= ($year == 1 && !empty($award_year)) ? "<br />" . $award_year : '';
@@ -408,30 +545,26 @@ class Auszeichnungen {
 
     private function get_pic($award) {
 
-        $pic = array();
+	    $images = array();
         $picString = CRIS_Dicts::$base_uri . "getrelated/Award/" . $award . "/awar_has_pict";
         $picXml = Tools::XML2obj($picString);
-
+		$i = 1;
         if ($picXml['size'] != 0) {
-            foreach ($picXml->infoObject->attribute as $picAttribut) {
-                if ($picAttribut['name'] == 'png180') {
-                    if (!empty($picAttribut->data)) {
-                        $pic['png'] = 'data:image/PNG;base64,' . $picAttribut->data;
-                    } else {
-                        // Wenn es kein Bild gibt, braucht er auch die Quelle nicht auslesen
-                        return $pic;
-                    }
-                }
-            }
-            foreach ($picXml->infoObject->relation->attribute as $picRelAttribut) {
-                if ($picRelAttribut['name'] == 'description') {
-                    if (!empty($picRelAttribut->data)) {
-                        $pic['desc'] = (string) $picRelAttribut->data;
-                    }
-                }
-            }
+        	foreach ($picXml->infoObject as $pic) {
+		        foreach ($pic->attribute as $picAttribut) {
+			        if ($picAttribut['name'] == 'png180') {
+			        	$images[$i]['png180'] = (!empty($picAttribut->data)) ? 'data:image/PNG;base64,' . (string) $picAttribut->data : '';
+			        }
+		        }
+		        foreach ($pic->relation->attribute as $picRelAttribut) {
+		        	if ($picRelAttribut['name'] == 'description') {
+				        $images[$i]['desc'] = (!empty($picRelAttribut->data)) ? (string) $picRelAttribut->data : '';
+				        			        }
+		        }
+        		$i ++;
+	        }
         }
-        return $pic;
+	    return $images;
     }
 
 }
@@ -511,8 +644,7 @@ class CRIS_awards extends CRIS_webservice {
                 continue;
             }
         }
-
-        $awards = array();
+	    $awards = array();
 
         foreach ($data as $_d) {
             foreach ($_d as $award) {
@@ -521,8 +653,7 @@ class CRIS_awards extends CRIS_webservice {
                     $awards[$a->ID] = $a;
             }
         }
-
-        return $awards;
+	    return $awards;
     }
 
 }
