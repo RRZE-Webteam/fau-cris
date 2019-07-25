@@ -479,12 +479,12 @@ class Auszeichnungen {
 				$item_open = sprintf($item_open, $param['accordion_title'],$param['accordion_color'], sanitize_title($award_details['#name#']));
 			}
 
-			$awardlist .= do_shortcode(strtr($item_open . $custom_text . $item_close, $award_details));
+			$awardlist .= strtr($item_open . $custom_text . $item_close, $award_details);
 		}
 
 		$awardlist .= $tag_close;
 
-		return $awardlist;
+		return do_shortcode($awardlist);
 	}
 
     private function make_gallery($awards, $name = 1, $year = 1, $awardname = 1) {
