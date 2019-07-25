@@ -828,6 +828,12 @@ class FAU_CRIS {
             require_once('class_Organisation.php');
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang);
             return $liste->customOrganisation($content);
+        } elseif ($parameter['show'] == 'equipment') {
+        // Forschungsinfrastruktur
+	        require_once('class_Equipment.php');
+	        $liste = new Equipment($parameter['entity'], $parameter['entity_id'], $page_lang);
+	        return $liste->customEquipment($content, $parameter);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
         } elseif ($parameter['show'] == 'fields') {
         // Forschungsbereiche
             require_once('class_Forschungsbereiche.php');

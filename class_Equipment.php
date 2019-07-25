@@ -55,7 +55,45 @@ class Equipment {
         return $output;
     }
 
-    public function equiListe($param = array()) {
+	public function customEquipment($content = '', $param = array()) {
+    	//var_dump($param['entity_id']);
+		if ($param['entity'] == 'equipment') {
+			$ws = new CRIS_equipments();
+			//var_dump($ws);
+			try {
+				$equiArray = $ws->by_id($this->id);
+			} catch (Exception $ex) {
+				return;
+			}
+		} else {
+			$constructionYearStart = ( isset( $param['constructionyearstart'] ) && $param['constructionyearstart'] != '' ) ? $param['constructionyearstart'] : '';
+			$constructionYearEnd   = ( isset( $param['constructionyearend'] ) && $param['constructionyearend'] != '' ) ? $param['constructionyearend'] : '';
+			$constructionYear      = ( isset( $param['constructionyear'] ) && $param['constructionyear'] != '' ) ? $param['constructionyear'] : '';
+			//$limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
+			$manufacturer = ( isset( $param['manufacturer'] ) && $param['manufacturer'] != '' ) ? $param['manufacturer'] : '';
+			$location     = ( isset( $param['location'] ) && $param['location'] != '' ) ? $param['location'] : '';
+			$hide         = ( isset( $param['hide'] ) && ! empty( $param['hide'] ) ) ? $param['hide'] : array();
+
+			$equiArray = $this->fetch_equipments( $manufacturer, $location, $constructionYear, $constructionYearStart, $constructionYearEnd );
+		}
+
+		if (!count($equiArray)) {
+			$output = '<p>' . __('Es wurden leider kein Equipment gefunden.', 'fau-cris') . '</p>';
+			return $output;
+		}
+
+		// sortiere nach Erscheinungsdatum
+		$order = "cfname";
+		$formatter = new CRIS_formatter(NULL, NULL, $order, SORT_ASC);
+		$res = $formatter->execute($equiArray);
+		$equiList = $res[$order];
+
+		$output =  $this->make_custom($equiList, $content, $param);
+
+		return $output;
+	}
+
+	public function equiListe($param = array()) {
         $constructionYearStart = (isset($param['constructionyearstart']) && $param['constructionyearstart'] != '') ? $param['constructionyearstart'] : '';
         $constructionYearEnd = (isset($param['constructionyearend']) && $param['constructionyearend'] != '') ? $param['constructionyearend'] : '';
         $constructionYear = (isset($param['constructionyear']) && $param['constructionyear'] != '') ? $param['constructionyear'] : '';
@@ -95,7 +133,7 @@ class Equipment {
                 $equipment[$attribut] = $v;
             }
             unset($equipment['attributes']);
-            
+
             switch ($this->page_lang) {
                 case 'en':
                     $name = ($equipment['cfname_en'] != '') ? $equipment['cfname_en'] : $equipment['cfname'];
@@ -180,39 +218,41 @@ class Equipment {
             $location = $equipment['standort'];
             $url = $equipment['url'];
             $year = $equipment['year'];
-            $imgs = self::get_equipment_images($id);
 
-            if (count($imgs)) {
-                $equilist .= "<div class=\"cris-image\">";
-                foreach ($imgs as $img) {
-                    //var_dump($img->attributes);
-                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                        $equilist .= "<p><img alt=\"" . $img->attributes['description'] . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
-                                . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] != '') ? $img->attributes['description'] : "") . "</span></p>";
-                    }
-                }
-                $equilist .= "</div>";
+	        if (!in_array('image', (array)$hide)) {
+	            $imgs = self::get_equipment_images($id);
+	            if (count($imgs)) {
+		            $equilist .= "<div class=\"cris-image\">";
+		            foreach ( $imgs as $img ) {
+			            //var_dump($img->attributes);
+			            if ( isset( $img->attributes['png180'] ) && mb_strlen( $img->attributes['png180'] ) > 30 ) {
+				            $equilist .= "<p><img alt=\"" . $img->attributes['description'] . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
+				                         . "<span class=\"wp-caption-text\">" . ( ( $img->attributes['description'] != '' ) ? $img->attributes['description'] : "" ) . "</span></p>";
+			            }
+		            }
+		            $equilist .= "</div>";
+	            }
             }
 
             if (!in_array('name', (array)$hide)) {
                 $equilist .= "<h3>" . $name . "</h3>";
             }
-            if ($description) {
+            if ($description && !in_array('description', (array)$hide)) {
                 $equilist .= "<p class=\"equipment-description\">" . $description . '</p>';
             }
             if (!in_array('details', $hide)) {
                 $equilist .= "<p class=\"equipment-details\">";
-                if (!empty($manufacturer))
+                if (!in_array('manufacturer', (array)$hide) && !empty($manufacturer))
                     $equilist .= "<b>" . __('Hersteller', 'fau-cris') . ': </b>' . $manufacturer;
-                if (!empty($model))
+                if (!in_array('model', (array)$hide) && !empty($model))
                     $equilist .= "<br /><b>" . __('Modell', 'fau-cris') . ': </b>' . $model;
-                if (!empty($constructionYear))
+                if (!in_array('constructionYear', (array)$hide) && !empty($constructionYear))
                     $equilist .= "<br /><b>" . __('Baujahr', 'fau-cris') . ': </b>' . $constructionYear;
-                if (!empty($location))
+                if (!in_array('location', (array)$hide) && !empty($location))
                     $equilist .= "<br /><b>" . __('Standort', 'fau-cris') . ': </b>' . $location;
-                if (!empty($url))
+                if (!in_array('url', (array)$hide) && !empty($url))
                     $equilist .= "<br /><b>" . __('URL', 'fau-cris') . ': </b>' . $url;
-                if (!empty($year))
+                if (!in_array('year', (array)$hide) && !empty($year))
                     $equilist .= "<br /><b>" . __('Jahr', 'fau-cris') . ': </b>' . $year;
             }
             if (!in_array('funding', $hide)) {
@@ -283,23 +323,186 @@ class Equipment {
             }
         }
 
-        $equilist . "</div>";
+        $equilist .= "</div>";
         return $equilist;
 
     }
+
+	private function make_custom($equipments, $custom_text = '', $param = array()) {
+
+		switch ($param['display']) {
+			case 'accordion':
+				$tag_open = '[collapsibles expand-all-link="true"]';
+				$tag_close= '[/collapsibles]';
+				$item_open = '[collapse title="%1s" color="%2s" name="%3s"]';
+				$item_close = '[/collapse]';
+				break;
+			case 'no-list':
+				$tag_open = '<div class="cris-equipments">';
+				$tag_close= '</div>';
+				$item_open = '<div class="cris-equipment">';
+				$item_close = '</div>';
+				break;
+			case 'list':
+			default:
+				$tag_open = '<ul class="cris-equipments">';
+				$tag_close= '</ul>';
+				$item_open = '<li>';
+				$item_close = '</li>';
+		}
+
+		$equipmentlist = $tag_open;
+
+		foreach ($equipments as $equipment) {
+
+			$equipment = (array) $equipment;
+			foreach ($equipment['attributes'] as $attribut => $v) {
+				$equipment[$attribut] = $v;
+			}
+			unset($equipment['attributes']);
+
+			$id = $equipment['ID'];
+			switch ($this->page_lang) {
+				case 'en':
+					$name = ($equipment['cfname_en'] != '') ? $equipment['cfname_en'] : $equipment['cfname'];
+					$description = ($equipment['description_en'] != '') ? $equipment['description_en'] : $equipment['description'];
+					break;
+				case 'de':
+				default:
+					$name = ($equipment['cfname'] != '') ? $equipment['cfname'] : $equipment['cfname_en'];
+					$description = ($equipment['description'] != '') ? $equipment['description'] : $equipment['description_en'];
+					break;
+			}
+			$equipment_details['#name#'] =  htmlentities($name, ENT_QUOTES);
+			$equipment_details['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+			$equipment_details['#manufacturer#']  = $equipment['hersteller'];
+			$equipment_details['#model#'] = $equipment['modell'];
+			$equipment_details['#constructionYear#'] = $equipment['baujahr'];
+			$equipment_details['#location#'] = $equipment['standort'];
+			$equipment_details['#url#'] = $equipment['url'];
+			$equipment_details['#year#'] = $equipment['year'];
+
+			if (strpos($custom_text, '#image') !== false) {
+				$imgs = self::get_equipment_images($id);
+				var_dump($imgs);
+
+				$equipment_details['#image1#'] = '';
+				if (count($imgs)) {
+					$i = 1;
+					foreach($imgs as $img) {
+						if (isset($img['png180']) && mb_strlen($img['png180']) > 30) {
+							$equipment_details['#image'.$i.'#'] = "<div class='wp-caption align" . $param['image_align'] . "'><img alt=\"". $equipment_details['#name#'] ."\" src=\"" . $img['png180'] . "\"><br />"
+							                                  . "<span class=\"wp-caption-text\">" . (($img['desc'] !='') ? $img['desc'] : "") . "</span>";
+							$equipment_details['#image'.$i.'#'] .= "</div>";
+						}
+						$i++;
+					}
+				}
+				$equipment_details['#image#'] = $equipment_details['#image1#'];
+			}
+
+			if (strpos($custom_text, '#funding#') !== false) {
+				$equipment_details['#funding#'] = '-/-';
+				$funding = $this->get_equipment_funding($id);
+				if ($funding)
+					$equipment_details['#funding#'] = implode(', ', $funding);
+			}
+
+			if (strpos($custom_text, '#fields#') !== false) {
+				$equipment_details['#fields#'] = '-/-';
+				$fields = $this->get_equipment_fields($id);
+				if ($fields) {
+					$equipment_details['#fields#'] = "<ul>";
+					foreach ($fields as $_k => $field) {
+						switch ($this->page_lang) {
+							case 'en':
+								if (!empty($field['cfname_en'])) {
+									$equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname_en']);
+								} else {
+									$equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname']);
+								}
+								break;
+							case 'de':
+							default:
+								if (!empty($field['cfname'])) {
+									$equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s">%s</a></li>', $_k, $field['cfname']);
+								} else {
+									$equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s">%s</a></li>', $_k, $field['cfname_en']);
+								}
+								break;
+						}
+					}
+					$equipment_details['#fields#'] .= "</ul>";
+				}
+			}
+
+			if (strpos($custom_text, '#projects#') !== false) {
+				$equipment_details['#projects#'] = '-/-';
+				$projects = $this->get_equipment_projects($id);
+				if ($projects) {
+					$equipment_details['#projects#'] = "<ul>";
+					foreach ($projects as $_k => $project) {
+						switch ($this->page_lang) {
+							case 'en':
+								if (!empty($project['cfTitle_en'])) {
+									$equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle_en']);
+								} else {
+									$equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle']);
+								}
+								break;
+							case 'de':
+							default:
+								if (!empty($project['cfTitle'])) {
+									$equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s">%s</a></li>', $_k, $project['cfTitle']);
+								} else {
+									$equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s">%s</a></li>', $_k, $project['cfTitle_en']);
+								}
+								break;
+						}
+					}
+					$equipment_details['#projects#'] .= "</ul>";
+				}
+			}
+
+			if (strpos($custom_text, '#publications#') !== false) {
+				$equipment_details['#publications#'] = '-/-';
+				$publications = $this->get_equipment_publications($id, $param['quotation']);
+				if ($publications)
+					$equipment_details['#publications#'] = $publications;
+			}
+
+			if ($param['display'] == 'accordion') {
+				$item_open = sprintf($item_open, $param['accordion_title'],$param['accordion_color'], sanitize_title($equipment_details['#name#']));
+			}
+
+			$equipmentlist .= strtr($item_open . $custom_text . $item_close, $equipment_details);
+		}
+
+		$equipmentlist .= $tag_close;
+
+		return do_shortcode($equipmentlist);
+	}
 
     private function get_equipment_images($equipment) {
         $images = array();
         $imgString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/equi_has_pict";
         $imgXml = Tools::XML2obj($imgString);
-
-        if ($imgXml['size'] != 0) {
-            foreach ($imgXml as $img) {
-                $_i = new CRIS_equipment_image($img);
-                $images[$_i->ID] = $_i;
-            }
-        }
-        //var_dump($images);
+	    $i = 1;
+	    if ($imgXml['size'] != 0) {
+		    foreach ($imgXml->infoObject as $img) {
+			    foreach ($img->attribute as $imgAttribut) {
+				    if ($imgAttribut['name'] == 'png180') {
+					    $images[$i]['png180'] = (!empty($imgAttribut->data)) ? 'data:image/PNG;base64,' . (string) $imgAttribut->data : '';
+				    }
+			    }
+			    foreach ($img->relation->attribute as $imgRelAttribut) {
+				    if ($imgRelAttribut['name'] == 'description') {
+					    $images[$i]['desc'] = (!empty($imgRelAttribut->data)) ? (string) $imgRelAttribut->data : '';
+				    }
+			    }
+			    $i ++;
+		    }
+	    }
         return $images;
     }
 
