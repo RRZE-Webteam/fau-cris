@@ -284,6 +284,9 @@ class Auszeichnungen {
      */
 
     private function fetch_awards($year = '', $start = '', $end = '', $type = '', $awardnameid = '') {
+    	if (!isset($this->einheit) || !isset($this->id))
+    		return array();
+
         $filter = Tools::award_filter($year, $start, $end, $type);
 
         $ws = new CRIS_awards();

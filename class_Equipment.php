@@ -384,7 +384,6 @@ class Equipment {
 
 			if (strpos($custom_text, '#image') !== false) {
 				$imgs = self::get_equipment_images($id);
-				var_dump($imgs);
 
 				$equipment_details['#image1#'] = '';
 				if (count($imgs)) {
