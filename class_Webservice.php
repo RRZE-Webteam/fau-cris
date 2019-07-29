@@ -100,9 +100,9 @@ class CRIS_webservice {
             throw new Exception(implode('\n', $error_message));
         }
 
-        # build envelope array if necessary
+	    # build envelope array if necessary
         if (empty($xmlobj->infoObject))
-            return array($xmlobj);
+        	return array($xmlobj);
         return $xmlobj->infoObject;
     }
 }
@@ -132,7 +132,7 @@ class CRIS_entity {
             $this->attributes[strtolower($attr_name)] = $attr_value;
         }
         foreach ($data->relation as $_r) {
-            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ", "PROJ_has_PUBL", "FOBE_has_top_PUBL")))
+            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ", "PROJ_has_PUBL", "FOBE_has_top_PUBL", "FOBE_has_cur_PUBL")))
                 continue;
             foreach($_r->attribute as $_ra) {
                 if ($_ra['name'] == 'Left seq') {
@@ -141,6 +141,9 @@ class CRIS_entity {
                 if ($_ra['name'] == 'Right seq') {
                     $this->attributes["relation right seq"] = (string) $_ra->data;
                 }
+	            if ($_ra['name'] == 'curationsetting') {
+		            $this->attributes["relation curationsetting"] = (string) $_ra->additionalInfo;
+	            }
             }
         }
         if (isset($this->attributes["publication type"])) {

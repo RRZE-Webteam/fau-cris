@@ -363,14 +363,14 @@ class Forschungsbereiche {
             }
             $field_details['#publications#'] = '';
             if (strpos($content, '#publications#' ) !== false) {
-                $publications = $this->get_field_publications($param);
+            	$publications = $this->get_field_publications($param);
                 if ($publications) {
                     $field_details['#publications#'] = $publications;
                 }
             }
 	        $field_details['#project_publications#'] = '';
 	        if (strpos($content, '#project_publications#' ) !== false) {
-		        $project_publications = $this->get_field_proj_publications($param);
+		        $project_publications = $this->get_field_publications($param, 'field_proj');
 		        if ($project_publications) {
 			        $field_details['#project_publications#'] = $project_publications;
 		        }
@@ -440,9 +440,12 @@ class Forschungsbereiche {
         return $liste->fieldPersons($field);
     }
 
-    private function get_field_publications($param = array()) {
-        require_once('class_Publikationen.php');
-        $liste = new Publikationen('field', $param['field']);
+    private function get_field_publications($param = array(), $entity = 'field') {
+		require_once('class_Publikationen.php');
+		if ($param['publications_notable'] == '1') {
+			$entity = 'field_notable';
+		}
+        $liste = new Publikationen($entity, $param['field']);
         foreach ($param as $_k => $_v) {
             if (substr($_k, 0, 13) == 'publications_') {
                 $args[substr($_k,13)] = $_v;
@@ -454,25 +457,8 @@ class Forschungsbereiche {
             return $liste->pubNachJahr ($args, $param['field'], '', $param['fsp']);
         if ($param['publications_orderby'] == 'type')
             return $liste->pubNachTyp ($args, $param['field'], '', $param['fsp']);
-        return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit'], $param['fsp']);
+        return $liste->fieldPub($param, false);
     }
-
-	private function get_field_proj_publications($param = array()) {
-		require_once('class_Publikationen.php');
-		$liste = new Publikationen('field_proj', $param['field']);
-		foreach ($param as $_k => $_v) {
-			if (substr($_k, 0, 13) == 'publications_') {
-				$args[substr($_k,13)] = $_v;
-			}
-		}
-		$args['sc_type'] = 'default';
-		$args['quotation'] = $param['quotation'];
-		if ($param['publications_orderby'] == 'year')
-			return $liste->pubNachJahr ($args, $param['field'], '', $param['fsp'],true);
-		if ($param['publications_orderby'] == 'type')
-			return $liste->pubNachTyp ($args, $param['field'], '', $param['fsp']);
-		return $liste->fieldPub($param['field'], $param['quotation'], false, $param['publications_limit'], $param['fsp']);
-	}
 
     private function get_field_images($field) {
         $images = array();

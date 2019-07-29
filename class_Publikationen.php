@@ -36,7 +36,7 @@ class Publikationen {
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
         }
-        if (in_array($einheit, array("person", "orga", "publication", "project", "field", "field_proj"))) {
+        if (in_array($einheit, array("person", "orga", "publication", "project", "field", "field_proj", "field_notable"))) {
             $this->id = $id;
             $this->einheit = $einheit;
         } else {
@@ -441,13 +441,19 @@ class Publikationen {
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed = false, $publications_limit = '', $fsp = false) {
+    public function fieldPub($param = array(), $seed = false) {
+
         $ws = new CRIS_publications();
         if ($seed)
             $ws->disable_cache();
         try {
             $filter = null;
-            $pubArray = $ws->by_field($field, $filter, $fsp, $this->einheit);
+            if ($param['publications_notable'] == '1') {
+            	//$filter = array();
+	            $filter = Tools::publication_filter('', '', '', '', '', '', '', '', '1');
+
+            }
+            $pubArray = $ws->by_field($param['field'], $filter, $param['fsp'], $this->einheit);
         } catch (Exception $ex) {
             return;
         }
@@ -466,13 +472,13 @@ class Publikationen {
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby];
 
-        if ($publications_limit != '') {
-            $pubList = array_slice($pubList, 0, $publications_limit, true);
+        if ($param['publications_limit'] != '') {
+            $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
         }
 
         $output = '';
-        if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubList, $quotation);
+        if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
+            $output = $this->make_quotation_list($pubList, $param['quotation']);
         } else {
             $output = $this->make_list($pubList, 0, $this->nameorder, $this->page_lang);
         }
@@ -1083,7 +1089,10 @@ class CRIS_publications extends CRIS_webservice {
 	        case 'field_proj':
 		        $relation = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
 		        break;
-	        case 'field':
+	        case 'field_notable':
+	        	$relation = 'FOBE_has_cur_PUBL';
+	        	break;
+		    case 'field':
 	        default:
 	            $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
         }
@@ -1129,11 +1138,11 @@ class CRIS_publications extends CRIS_webservice {
         foreach ($data as $_d) {
             foreach ($_d as $publ) {
                 $p = new CRIS_publication($publ);
-                if ($p->ID && ($filter === null || $filter->evaluate($p)))
+	        if ($p->ID && ($filter === null || $filter->evaluate($p)))
                     $publs[$p->ID] = $p;
             }
         }
-        return $publs;
+	    return $publs;
     }
 
 }
