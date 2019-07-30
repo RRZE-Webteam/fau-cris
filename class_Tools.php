@@ -229,7 +229,7 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '') {
+    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = '') {
         $filter = array();
         if ($year !== '' && $year !== NULL)
             $filter['publyear__eq'] = $year;
@@ -284,8 +284,11 @@ class Tools {
             $pubLanguages = explode(',', $language);
             $filter['language__eq'] = $pubLanguages;
         }
-        if (count($filter))
-            return $filter;
+	    if ($curation == 1) {
+		    $filter['relation curationsetting__eq'] = 'curation_accepted';
+	    }
+	    if (count($filter))
+	    	return $filter;
         return null;
     }
 

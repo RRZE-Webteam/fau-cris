@@ -36,7 +36,7 @@ class Publikationen {
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
         }
-        if (in_array($einheit, array("person", "orga", "publication", "project", "field", "field_proj"))) {
+        if (in_array($einheit, array("person", "orga", "publication", "project", "field", "field_proj", "field_notable"))) {
             $this->id = $id;
             $this->einheit = $einheit;
         } else {
@@ -113,7 +113,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Jahren gegliedert
      */
 
-    public function pubNachJahr($param = array(), $field = '', $content = '', $fsp = false) {
+    public function pubNachJahr($param = array(), $field = '', $content = '', $fsp = false, $project = '') {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -127,7 +127,7 @@ class Publikationen {
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -220,7 +220,7 @@ class Publikationen {
      * Ausgabe aller Publikationen nach Publikationstypen gegliedert
      */
 
-    public function pubNachTyp($param = array(), $field = '', $content = '', $fsp = false) {
+    public function pubNachTyp($param = array(), $field = '', $content = '', $fsp = false, $project = '') {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -234,7 +234,7 @@ class Publikationen {
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -441,13 +441,19 @@ class Publikationen {
         return $output;
     }
 
-    public function fieldPub($field, $quotation = '', $seed = false, $publications_limit = '', $fsp = false) {
+    public function fieldPub($param = array(), $seed = false) {
+
         $ws = new CRIS_publications();
         if ($seed)
             $ws->disable_cache();
         try {
             $filter = null;
-            $pubArray = $ws->by_field($field, $filter, $fsp, $this->einheit);
+            if ($param['publications_notable'] == '1') {
+            	//$filter = array();
+	            $filter = Tools::publication_filter('', '', '', '', '', '', '', '', '1');
+
+            }
+            $pubArray = $ws->by_field($param['field'], $filter, $param['fsp'], $this->einheit);
         } catch (Exception $ex) {
             return;
         }
@@ -466,13 +472,13 @@ class Publikationen {
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby];
 
-        if ($publications_limit != '') {
-            $pubList = array_slice($pubList, 0, $publications_limit, true);
+        if ($param['publications_limit'] != '') {
+            $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
         }
 
         $output = '';
-        if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubList, $quotation);
+        if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
+            $output = $this->make_quotation_list($pubList, $param['quotation']);
         } else {
             $output = $this->make_list($pubList, 0, $this->nameorder, $this->page_lang);
         }
@@ -526,7 +532,7 @@ class Publikationen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false) {
+    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = '') {
         $filter = NULL;
 
         $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
@@ -537,9 +543,12 @@ class Publikationen {
                 $pubArray = $ws->by_orga_id($this->id, $filter);
             }
             if ($this->einheit === "person") {
-                $pubArray = $ws->by_pers_id($this->id, $filter, $notable);
-            }
-            if ($this->einheit === "field" || $this->einheit === "field_proj") {
+		        $pubArray = $ws->by_pers_id($this->id, $filter, $notable);
+	        }
+	        if ($this->einheit === "project") {
+		        $pubArray = $ws->by_project($this->id, $filter, $notable);
+	        }
+	        if ($this->einheit === "field" || $this->einheit === "field_proj") {
                 $pubArray = $ws->by_field($field, $filter, $fsp, $this->einheit);
             }
             if ($this->einheit === "publication") {
@@ -672,7 +681,8 @@ class Publikationen {
                 'bibtex_link' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
                 'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
                 'thesisSubtype' => (array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
-                'articleNumber' => (array_key_exists('article number', $publication) ? $publication['article number'] : '')
+                'articleNumber' => (array_key_exists('article number', $publication) ? $publication['article number'] : ''),
+	            'conferenceProceedingsTitle' => (array_key_exists('conference proceedings title', $publication) ? $publication['conference proceedings title'] : '')
             );
 
             switch (strtolower($pubDetails['pubType'])) {
@@ -776,16 +786,15 @@ class Publikationen {
                         $publist .= ($pubDetails['eventlocation'] != '' || $pubDetails['eventstart'] != '' || $pubDetails['eventend'] != '') ? ")" : '';
                         $publist .= "</span>";
                     }
-                    if ($pubDetails['booktitle'] != '') {
+                    if ($pubDetails['conferenceProceedingsTitle'] != '') {
                         $publist .= "<br /><span itemscope itemtype=\"http://schema.org/Book\">In: ";
                         $publist .= $pubDetails['editiors'] != '' ? "<span itemprop=\"author\">" . $pubDetails['editiors'] . " (" . __('Hrsg.', 'fau-cris') . "): </span>" : '';
-                        $publist .= "<span itemprop=\"name\" style=\"font-weight:bold;\">" . $pubDetails['booktitle'] . "</span>";
-                        $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? ", <span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">" : '';
+                        $publist .= "<span itemprop=\"name\" style=\"font-weight:bold;\">" . $pubDetails['conferenceProceedingsTitle'] . "</span>";
+                        $publist .= ($pubDetails['city'] != '') ? ", <span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">" : '';
                         $publist .= $pubDetails['city'] != '' ? "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">"
                                 . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: " : '';
-                        $publist .= $pubDetails['publisher'] != '' ? "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span>" : '';
-                        $publist .= ($pubDetails['city'] != '' || $pubDetails['publisher'] != '') ? "</span>" : '';
-                        $publist .= $pubDetails['year'] != '' ? ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
+                        $publist .= ($pubDetails['city'] != '') ? "</span>" : '';
+                        $publist .= $pubDetails['year'] != '' ? " <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
                         $publist .= "</span>";
                     }
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . FAU_CRIS::doi . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
@@ -1080,7 +1089,10 @@ class CRIS_publications extends CRIS_webservice {
 	        case 'field_proj':
 		        $relation = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
 		        break;
-	        case 'field':
+	        case 'field_notable':
+	        	$relation = 'FOBE_has_cur_PUBL';
+	        	break;
+		    case 'field':
 	        default:
 	            $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
         }
@@ -1126,11 +1138,11 @@ class CRIS_publications extends CRIS_webservice {
         foreach ($data as $_d) {
             foreach ($_d as $publ) {
                 $p = new CRIS_publication($publ);
-                if ($p->ID && ($filter === null || $filter->evaluate($p)))
+	        if ($p->ID && ($filter === null || $filter->evaluate($p)))
                     $publs[$p->ID] = $p;
             }
         }
-        return $publs;
+	    return $publs;
     }
 
 }

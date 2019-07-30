@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.12.1
+ * Version: 3.13.1
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -767,7 +767,7 @@ class FAU_CRIS {
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang);
 
             if ($parameter['project'] != '') {
-                return $liste->singleProj($parameter['hide'], $parameter['quotation']);
+                return $liste->singleProj($parameter);
             }
             if (!empty($parameter['limit'])) {
                 return $liste->projListe($parameter);
@@ -796,7 +796,7 @@ class FAU_CRIS {
             if (strpos($parameter['order1'], 'year') !== false) {
                 return $liste->awardsNachJahr($parameter);
             }
-            return $liste->awardsListe($parameter);
+            return $liste->awardsListe($parameter, '');
         } else {
             // Publications
             require_once('class_Publikationen.php');
@@ -828,6 +828,12 @@ class FAU_CRIS {
             require_once('class_Organisation.php');
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang);
             return $liste->customOrganisation($content);
+        } elseif ($parameter['show'] == 'equipment') {
+        // Forschungsinfrastruktur
+	        require_once('class_Equipment.php');
+	        $liste = new Equipment($parameter['entity'], $parameter['entity_id'], $page_lang);
+	        return $liste->customEquipment($content, $parameter);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
         } elseif ($parameter['show'] == 'fields') {
         // Forschungsbereiche
             require_once('class_Forschungsbereiche.php');
@@ -840,18 +846,18 @@ class FAU_CRIS {
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang);
             if ($parameter['project'] != '') {
-                return $liste->customProj($content, $parameter['quotation']);
+                return $liste->customProj($content, $parameter);
             }
-            /*if (!empty($parameter['limit'])) {
-                return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide'], $parameter['role']);
-            }
-            if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->projNachTyp($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'] = array(), $parameter['role'], $content);
-            }
-            if (strpos($parameter['order1'], 'year') !== false) {
-                return $liste->projNachJahr($parameter['year'], $parameter['start'], $parameter['type'], $parameter['hide'] = array(), $parameter['role'], $content);
-            }
-            return $liste->projListe($parameter['year'], $parameter['start'], $parameter['type'], $parameter['limit'], $parameter['hide'], $parameter['role']);*/
+        } elseif ($parameter['show'] == 'awards') {
+        // Auszeichnungen
+	        require_once('class_Auszeichnungen.php');
+	        $liste = new Auszeichnungen($parameter['entity'], $parameter['entity_id'], $page_lang);
+	        if ($parameter['award'] != '') {
+		        return $liste->customAward( $content, $parameter );
+	        }
+//var_dump($liste->awardsListe($parameter, $content));
+//exit;
+	        return $liste->awardsListe($parameter, $content);
         } elseif ($parameter['show'] == 'publications') {
         // Publikationen
             require_once('class_Publikationen.php');
@@ -926,10 +932,13 @@ class FAU_CRIS {
             'publications_fau' => '',
             'publications_peerreviewed' => '',
             'publications_orderby' => '',
-            'publications_notable' => ''
+            'publications_notable' => '',
+            'image_align' => 'left',
+            'accordion_title' => '',
+            'accordion_color' => '',
                         ), $atts));
 
-        $sc_param['orderby'] = sanitize_text_field($orderby);
+	    $sc_param['orderby'] = sanitize_text_field($orderby);
         $sc_param['orgid'] = sanitize_text_field($orgid);
         $sc_param['persid'] = sanitize_text_field($persid);
         $sc_param['publication'] = sanitize_text_field($publication);
@@ -978,7 +987,10 @@ class FAU_CRIS {
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
-        if (sanitize_text_field($current) == "1" && sanitize_text_field($status) == '') { // Abwärtskompatibilität
+	    $sc_param['image_align'] = (in_array($image_align, array('left', 'right', 'none'))) ? sanitize_text_field($image_align) : 'left';
+	    $sc_param['accordion_title'] = sanitize_text_field($accordion_title);
+	    $sc_param['accordion_color'] = sanitize_text_field($accordion_color);
+	    if (sanitize_text_field($current) == "1" && sanitize_text_field($status) == '') { // Abwärtskompatibilität
             $sc_param['status'] = 'current';
         } else {
             $sc_param['status'] = sanitize_text_field($status);
