@@ -219,24 +219,24 @@ class Equipment {
             $url = $equipment['url'];
             $year = $equipment['year'];
 
+	        if (!in_array('name', (array)$hide)) {
+		        $equilist .= "<h3>" . $name . "</h3>";
+	        }
+
 	        if (!in_array('image', (array)$hide)) {
 	            $imgs = self::get_equipment_images($id);
-	            if (count($imgs)) {
+		        if (count($imgs)) {
 		            $equilist .= "<div class=\"cris-image\">";
 		            foreach ( $imgs as $img ) {
-			            //var_dump($img->attributes);
-			            if ( isset( $img->attributes['png180'] ) && mb_strlen( $img->attributes['png180'] ) > 30 ) {
-				            $equilist .= "<p><img alt=\"" . $img->attributes['description'] . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
-				                         . "<span class=\"wp-caption-text\">" . ( ( $img->attributes['description'] != '' ) ? $img->attributes['description'] : "" ) . "</span></p>";
+			            if ( isset( $img['png180'] ) && mb_strlen( $img['png180'] ) > 30 ) {
+				            $equilist .= "<p><img alt=\"" . $img['desc'] . "\" src=\"" . $img['png180'] . "\" width=\"180\" height=\"180\"><br />"
+				                         . "<span class=\"wp-caption-text\">" . ( ( $img['desc'] != '' ) ? $img['desc'] : "" ) . "</span></p>";
 			            }
 		            }
 		            $equilist .= "</div>";
 	            }
             }
 
-            if (!in_array('name', (array)$hide)) {
-                $equilist .= "<h3>" . $name . "</h3>";
-            }
             if ($description && !in_array('description', (array)$hide)) {
                 $equilist .= "<p class=\"equipment-description\">" . $description . '</p>';
             }

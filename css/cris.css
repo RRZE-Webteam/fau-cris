@@ -98,6 +98,18 @@ ul.cris-equipment .equipment-name {
     top: 2px;
 }
 
+.cris-award div[class*="-columns-"] {
+    margin-bottom: 10px;
+}
+.cris-award button.standard-btn,
+.cris-award a.standard-btn {
+    margin-bottom: 10px;
+}
+.cris-award .elements-divider {
+    padding-top: 3px;
+    margin-bottom: 3px;
+}
+
 @media print {
     .cris-activities a[href]::after,
     .cris-awards a[href]::after,
