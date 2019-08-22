@@ -10,7 +10,7 @@ class Aktivitaeten {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -42,6 +42,12 @@ class Aktivitaeten {
             $this->einheit = "orga";
         }
         $this->page_lang = $page_lang;
+	    $this->sc_lang = $sc_lang;
+	    $this->langdiv_open = '<div class="cris">';
+	    $this->langdiv_close = '</div>';
+	    if ($sc_lang != $this->page_lang) {
+		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+	    }
     }
 
     /*
@@ -74,9 +80,9 @@ class Aktivitaeten {
         else
             $activityList = $res[$order];
 
-        $output = $this->make_list($activityList, $showname, $showyear, $showactivityname, $showtype);
+        $output = $this->langdiv_open . $this->make_list($activityList, $showname, $showyear, $showactivityname, $showtype) . $this->langdiv_close;
 
-        return $output;
+	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -130,7 +136,7 @@ class Aktivitaeten {
                 $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, $showtype);
             }
         }
-        return $output;
+	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -175,11 +181,11 @@ class Aktivitaeten {
         $activityList = $formatter->execute($activityArray);
         $output = '';
 
-        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+		if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($activityList as $array_type => $activities) {
-                $title = Tools::getTitle('activities', $array_type, $this->page_lang);
+                $title = Tools::getTitle('activities', $array_type, $param['display_language']);
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
                 $openfirst = '';
             }
@@ -187,7 +193,7 @@ class Aktivitaeten {
         } else {
                 foreach ($activityList as $array_type => $activities) {
                 if (empty($type)) {
-                    $title = Tools::getTitle('activities', $array_type, $this->page_lang);
+                    $title = Tools::getTitle('activities', $array_type, $this->sc_lang);
                     $output .= '<h3 class="clearfix clear">';
                     $output .= $title;
                     $output .= "</h3>";
@@ -195,7 +201,7 @@ class Aktivitaeten {
                 $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, 0);
             }
         }
-        return $output;
+	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -219,9 +225,9 @@ class Aktivitaeten {
             return $output;
         }
 
-        $output = $this->make_list($activityArray, $showname, $showyear, $showactivityname);
+        $output = $this->langdiv_open . $this->make_list($activityArray, $showname, $showyear, $showactivityname) . $this->langdiv_close;
 
-        return $output;
+	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /* =========================================================================
@@ -284,7 +290,7 @@ class Aktivitaeten {
             $names_html = implode(", ", $namesList);
 
             $activity_id = $activity['ID'];
-            $activity_type = Tools::getName('activities', $activity['type of activity'], $this->page_lang);
+            $activity_type = Tools::getName('activities', $activity['type of activity'], $this->sc_lang);
             setlocale(LC_TIME, get_locale());
 
             switch (strtolower($activity['type of activity'])) {

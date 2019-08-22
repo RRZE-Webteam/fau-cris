@@ -9,7 +9,7 @@ class Equipment {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
         $this->options = (array) get_option('_fau_cris');
         $this->pathPersonenseiteUnivis = '/person/';
         $this->orgNr = $this->options['cris_org_nr'];
@@ -30,6 +30,15 @@ class Equipment {
             $this->einheit = "orga";
         }
         $this->page_lang = $page_lang;
+	    $this->sc_lang = $sc_lang;
+	    $this->langdiv_open = '<div class="cris">';
+	    $this->langdiv_close = '</div>';
+	    if ($sc_lang != $this->page_lang) {
+		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+	    }
+	    //var_dump($this->sc_lang);
+	    //var_dump($this->page_lang);
+
     }
 
     /*
@@ -52,7 +61,7 @@ class Equipment {
 
         $output = $this->make_single($equiArray, $hide, $quotation);
         
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
 	public function customEquipment($content = '', $param = array()) {
@@ -90,11 +99,11 @@ class Equipment {
 
 		$output =  $this->make_custom($equiList, $content, $param);
 
-		return $output;
+		return $this->langdiv_open . $output . $this->langdiv_close;
 	}
 
 	public function equiListe($param = array()) {
-        $constructionYearStart = (isset($param['constructionyearstart']) && $param['constructionyearstart'] != '') ? $param['constructionyearstart'] : '';
+		$constructionYearStart = (isset($param['constructionyearstart']) && $param['constructionyearstart'] != '') ? $param['constructionyearstart'] : '';
         $constructionYearEnd = (isset($param['constructionyearend']) && $param['constructionyearend'] != '') ? $param['constructionyearend'] : '';
         $constructionYear = (isset($param['constructionyear']) && $param['constructionyear'] != '') ? $param['constructionyear'] : '';
         //$limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
@@ -117,7 +126,7 @@ class Equipment {
 
         $output =  $this->make_list($equiList, $hide);
 
-        return $output;
+		return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     public function equiNachTyp($parameter) {}
@@ -125,7 +134,7 @@ class Equipment {
     public function equiNachJahr($parameter) {}
 
     private function make_list($equipments, $hide = array()) {
-        $equilist = '';
+    	$equilist = '';
         $equilist .= "<ul class=\"cris-equipment\">";
         foreach($equipments as $equipment) {
             $equipment = (array) $equipment;
@@ -134,7 +143,7 @@ class Equipment {
             }
             unset($equipment['attributes']);
 
-            switch ($this->page_lang) {
+            switch ($this->sc_lang) {
                 case 'en':
                     $name = ($equipment['cfname_en'] != '') ? $equipment['cfname_en'] : $equipment['cfname'];
                     break;
@@ -199,7 +208,7 @@ class Equipment {
             unset($equipment['attributes']);
 
             $id = $equipment['ID'];
-            switch ($this->page_lang) {
+            switch ($this->sc_lang) {
                 case 'en':
                     $name = ($equipment['cfname_en'] != '') ? $equipment['cfname_en'] : $equipment['cfname'];
                     $description = ($equipment['description_en'] != '') ? $equipment['description_en'] : $equipment['description'];
@@ -266,7 +275,7 @@ class Equipment {
                     $equilist .= "<h4>" . __('Einsatz in Forschungsbereichen', 'fau-cris') . ': </h4>';
                     $equilist .= "<ul>";
                     foreach ($fields as $_k => $field) {
-                        switch ($this->page_lang) {
+                        switch ($this->sc_lang) {
                             case 'en':
                                 if (!empty($field['cfname_en'])) {
                                     $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname_en']);
@@ -294,7 +303,7 @@ class Equipment {
                     $equilist .= "<h4>" . __('Einsatz in Forschungsprojekten', 'fau-cris') . ': </h4>';
                     $equilist .= "<ul>";
                     foreach ($projects as $_k => $project) {
-                        switch ($this->page_lang) {
+                        switch ($this->sc_lang) {
                             case 'en':
                                 if (!empty($project['cfTitle_en'])) {
                                     $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle_en']);
@@ -362,7 +371,7 @@ class Equipment {
 			unset($equipment['attributes']);
 
 			$id = $equipment['ID'];
-			switch ($this->page_lang) {
+			switch ($this->sc_lang) {
 				case 'en':
 					$name = ($equipment['cfname_en'] != '') ? $equipment['cfname_en'] : $equipment['cfname'];
 					$description = ($equipment['description_en'] != '') ? $equipment['description_en'] : $equipment['description'];
@@ -413,7 +422,7 @@ class Equipment {
 				if ($fields) {
 					$equipment_details['#fields#'] = "<ul>";
 					foreach ($fields as $_k => $field) {
-						switch ($this->page_lang) {
+						switch ($this->sc_lang) {
 							case 'en':
 								if (!empty($field['cfname_en'])) {
 									$equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname_en']);
@@ -441,7 +450,7 @@ class Equipment {
 				if ($projects) {
 					$equipment_details['#projects#'] = "<ul>";
 					foreach ($projects as $_k => $project) {
-						switch ($this->page_lang) {
+						switch ($this->sc_lang) {
 							case 'en':
 								if (!empty($project['cfTitle_en'])) {
 									$equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle_en']);
