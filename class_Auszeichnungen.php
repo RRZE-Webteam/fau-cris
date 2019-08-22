@@ -10,7 +10,7 @@ class Auszeichnungen {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -44,6 +44,12 @@ class Auszeichnungen {
             $this->einheit = "orga";
         }
         $this->page_lang = $page_lang;
+	    $this->sc_lang = $sc_lang;
+	    $this->langdiv_open = '<div class="cris">';
+	    $this->langdiv_close = '</div>';
+	    if ($sc_lang != $this->page_lang) {
+		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+	    }
     }
 
     /*
@@ -63,7 +69,7 @@ class Auszeichnungen {
         $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
 
         $awardArray = $this->fetch_awards($year, $start, $end, $type, $awardnameid);
-        if (!count($awardArray)) {
+	    if (!count($awardArray)) {
             $output = '<p>' . __('Es wurden leider keine Auszeichnungen gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
@@ -78,7 +84,7 @@ class Auszeichnungen {
 
         $output = '';
 
-	    if ($content == '') {
+        if ($content == '') {
 		    if ($display == 'gallery') {
 			    $output .= $this->make_gallery($awardList, $showname, $showyear, $showawardname);
 		    } else {
@@ -88,7 +94,7 @@ class Auszeichnungen {
 		    $output .= $this->make_custom_list($awardList, $content, $param);
 	    }
 
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -151,7 +157,7 @@ class Auszeichnungen {
                 }
             }
         }
-        return $output;
+	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -224,7 +230,7 @@ class Auszeichnungen {
                 }
             }
         }
-        return $output;
+	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -251,7 +257,7 @@ class Auszeichnungen {
             $output = $this->make_list($awardArray, $showname, $showyear, $showawardname);
         }
 
-        return $output;
+	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
 	/*
@@ -272,7 +278,7 @@ class Auszeichnungen {
 		}
 
 		$output = $this->make_custom_list($awardArray, $content, $param);
-		return $output;
+		return $this->langdiv_open . $output . $this->langdiv_close;
 	}
 
 	/* =========================================================================
@@ -378,7 +384,6 @@ class Auszeichnungen {
     }
 
 	private function make_custom_list($awards, $custom_text = '', $param = array()) {
-
 		switch ($param['display']) {
 			case 'accordion':
 				$tag_open = '[collapsibles expand-all-link="true"]';

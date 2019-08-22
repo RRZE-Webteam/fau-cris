@@ -10,7 +10,7 @@ class Forschungsbereiche {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -42,6 +42,12 @@ class Forschungsbereiche {
             $this->einheit = "orga";
         }
         $this->page_lang = $page_lang;
+	    $this->sc_lang = $sc_lang;
+	    $this->langdiv_open = '<div class="cris">';
+	    $this->langdiv_close = '</div>';
+	    if ($sc_lang != $this->page_lang) {
+		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+	    }
     }
 
     /*
@@ -73,7 +79,7 @@ class Forschungsbereiche {
         $output = '';
         $output .= $this->make_list($fieldList);
 
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -92,7 +98,7 @@ class Forschungsbereiche {
 
         $output = $this->make_single($fieldsArray, $param);
 
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -113,7 +119,7 @@ class Forschungsbereiche {
 
         $output = $this->make_custom_single($fieldsArray, $content, $param);
 
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -127,7 +133,7 @@ class Forschungsbereiche {
             return false;
         }
         if ($sortby != NULL) {
-            if ($this->page_lang == 'en')
+            if ($this->sc_lang == 'en')
                 $sortby = $sortby . '_en';
                 $orderby = $sortby;
         } else {
@@ -199,7 +205,7 @@ class Forschungsbereiche {
             unset($field['attributes']);
             $imgs = self::get_field_images($field['ID']);
             $id = $field['ID'];
-            switch ($this->page_lang) {
+            switch ($this->sc_lang) {
                 case 'en':
                     $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
                     $description = (!empty($field['description_en'])) ? $field['description_en'] : $field['description'];
@@ -308,7 +314,7 @@ class Forschungsbereiche {
             }
             unset($field['attributes']);
             $id = $field['ID'];
-            switch ($this->page_lang) {
+            switch ($this->sc_lang) {
                 case 'en':
                     $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
                     $description = (!empty($field['description_en'])) ? $field['description_en'] : $field['description'];
@@ -407,7 +413,7 @@ class Forschungsbereiche {
                 $field[$attribut] = $v;
             }
             unset($field['attributes']);
-            switch ($this->page_lang) {
+            switch ($this->sc_lang) {
                 case 'en':
                     $title = (!empty($field['cfname_en'])) ? $field['cfname_en'] : $field['cfname'];
                     break;
@@ -430,13 +436,13 @@ class Forschungsbereiche {
 
     private function get_field_projects($field = NULL) {
     	require_once('class_Projekte.php');
-        $liste = new Projekte('field', $field, $this->page_lang);
+        $liste = new Projekte('field', $field, $this->sc_lang);
         return $liste->fieldProj($field);
     }
 
     private function get_field_persons($field = NULL) {
         require_once('class_Projekte.php');
-        $liste = new Projekte('field', $field, $this->page_lang);
+        $liste = new Projekte('field', $field, $this->sc_lang);
         return $liste->fieldPersons($field);
     }
 
@@ -445,14 +451,15 @@ class Forschungsbereiche {
 		if ($param['publications_notable'] == '1') {
 			$entity = 'field_notable';
 		}
-        $liste = new Publikationen($entity, $param['field']);
-        foreach ($param as $_k => $_v) {
+        $liste = new Publikationen($entity, $param['field'], '', $this->page_lang, $this->sc_lang);
+		foreach ($param as $_k => $_v) {
             if (substr($_k, 0, 13) == 'publications_') {
                 $args[substr($_k,13)] = $_v;
             }
         }
         $args['sc_type'] = 'default';
         $args['quotation'] = $param['quotation'];
+        $args['display_language'] = $this->sc_lang;
         if ($param['publications_orderby'] == 'year')
             return $liste->pubNachJahr ($args, $param['field'], '', $param['fsp']);
         if ($param['publications_orderby'] == 'type')

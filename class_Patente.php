@@ -10,7 +10,7 @@ class Patente {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
 
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
@@ -44,6 +44,12 @@ class Patente {
             $this->einheit = "orga";
         }
         $this->page_lang = $page_lang;
+	    $this->sc_lang = $sc_lang;
+	    $this->langdiv_open = '<div class="cris">';
+	    $this->langdiv_close = '</div>';
+	    if ($sc_lang != $this->page_lang) {
+		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+	    }
     }
 
     /*
@@ -78,7 +84,7 @@ class Patente {
 
         $output = $this->make_list($patentList, $showname, $showyear, $showpatentname);
 
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -131,7 +137,7 @@ class Patente {
                 $output .= $this->make_list($patents, $showname, $showyear, $showpatentname);
             }
         }
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -180,7 +186,7 @@ class Patente {
             $shortcode_data = '';
             $openfirst = ' load="open"';
             foreach ($patentList as $array_type => $patents) {
-                $title = Tools::getTitle('patents', $array_type, $this->page_lang);
+                $title = Tools::getTitle('patents', $array_type, $this->sc_lang);
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($patents, $showname, $showyear, $showpatentname, 0) . '[/collapse]');
                 $openfirst = '';
             }
@@ -188,7 +194,7 @@ class Patente {
         } else {
                 foreach ($patentList as $array_type => $patents) {
                 if (empty($type)) {
-                    $title = Tools::getTitle('patents', $array_type, $this->page_lang);
+                    $title = Tools::getTitle('patents', $array_type, $this->sc_lang);
                     $output .= '<h3 class="clearfix clear">';
                     $output .= $title;
                     $output .= "</h3>";
@@ -196,7 +202,7 @@ class Patente {
                 $output .= $this->make_list($patents, $showname, $showyear, $showpatentname, 0);
             }
         }
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -219,7 +225,7 @@ class Patente {
 
         $output = $this->make_list($patentArray, $showname, $showyear, $showpatentname);
 
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /* =========================================================================
@@ -280,8 +286,8 @@ class Patente {
             $inventors_html = implode(", ", $inventorsList);
 
             $patent_id = $patent['ID'];
-            $patent_name = ($this->page_lang == 'de') ? $patent['cftitle'] : $patent['cftitle_en'];
-            $patent_type = Tools::getName('patents', $patent['patenttype'], $this->page_lang);
+            $patent_name = ($this->sc_lang == 'de') ? $patent['cftitle'] : $patent['cftitle_en'];
+            $patent_type = Tools::getName('patents', $patent['patenttype'], $this->sc_lang);
             $patent_abstract = $patent['cfabstr'];
             $patent_number = $patent['cfpatentnum'];
             $patent_link = $patent['patnrlink'];

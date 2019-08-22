@@ -10,7 +10,7 @@ class Organisation {
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de') {
+    public function __construct($einheit = 'orga', $id = '', $page_lang = 'de', $sc_lang = 'de') {
 
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
@@ -25,9 +25,16 @@ class Organisation {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation an.', 'fau-cris') . '</strong></p>';
             return;
         }
+
         $this->id = ($id != '' ? $id : $this->orgNr);
         $this->einheit = "orga";
         $this->page_lang = $page_lang;
+	    $this->sc_lang = $sc_lang;
+	    $this->langdiv_open = '<div class="cris">';
+	    $this->langdiv_close = '</div>';
+	    if ($sc_lang != $this->page_lang) {
+		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+	    }
     }
 
     /*
@@ -49,7 +56,7 @@ class Organisation {
 
         $output = $this->make_single($orgaArray, $hide);
 
-        return $output;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
@@ -69,7 +76,7 @@ class Organisation {
             return $output;
         }
         $output = $this->make_custom_single($orgaArray, $content);
-        return $output;
+	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     public function researchContacts($seed=false) {

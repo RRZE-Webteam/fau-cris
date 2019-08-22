@@ -931,11 +931,12 @@ class Projekte {
 	    }
 	    $args['sc_type'] = 'default';
 	    $args['quotation'] = $param['quotation'];
+	    $args['display_language'] = $param['display_language'];
 	    if ($param['publications_orderby'] == 'year')
 		    return $liste->pubNachJahr ($args, $param['project'], '', false,$param['project']);
 	    if ($param['publications_orderby'] == 'type')
 		    return $liste->pubNachTyp ($args, $param['project'], '', false,$param['project']);
-	    return $liste->projectPub($param['project'], $param['quotation'], false, $param['publications_limit']);
+	    return $liste->projectPub($param['project'], $param['quotation'], false, $param['publications_limit'], $param['display_language']);
     }
 
     private function get_project_images($project) {
