@@ -127,7 +127,7 @@ class FAU_CRIS {
     /**
      * Get Options
      */
-    private static function get_options() {
+    public static function get_options() {
         $defaults = self::default_options();
         $options = (array) get_option(self::option_name);
         $options = wp_parse_args($options, $defaults);

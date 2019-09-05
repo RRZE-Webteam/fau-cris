@@ -17,7 +17,7 @@ class Publikationen {
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
         } else {
             $this->cms = 'wp';
-            $this->options = (array) get_option('_fau_cris');
+            $this->options = (array) FAU_CRIS::get_options();
             $this->pathPersonenseiteUnivis = '/person/';
         }
         $this->orgNr = $this->options['cris_org_nr'];
