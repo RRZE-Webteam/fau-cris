@@ -10,7 +10,7 @@ class Equipment {
     public $output;
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
-        $this->options = (array) get_option('_fau_cris');
+	    $this->options = (array) FAU_CRIS::get_options();
         $this->pathPersonenseiteUnivis = '/person/';
         $this->orgNr = $this->options['cris_org_nr'];
         $this->suchstring = '';

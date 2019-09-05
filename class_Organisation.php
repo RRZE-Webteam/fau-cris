@@ -17,7 +17,7 @@ class Organisation {
             $this->options = CRIS::ladeConf();
         } else {
             $this->cms = 'wp';
-            $this->options = (array) get_option('_fau_cris');
+	        $this->options = (array) FAU_CRIS::get_options();
         }
         $this->orgNr = $this->options['cris_org_nr'];
 

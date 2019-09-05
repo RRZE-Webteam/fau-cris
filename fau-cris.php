@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.14.1
+ * Version: 3.14.2
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -127,7 +127,7 @@ class FAU_CRIS {
     /**
      * Get Options
      */
-    private static function get_options() {
+    public static function get_options() {
         $defaults = self::default_options();
         $options = (array) get_option(self::option_name);
         $options = wp_parse_args($options, $defaults);
@@ -937,8 +937,8 @@ class FAU_CRIS {
             'organisation' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
                             ), $atts));
 	    $sc_param['orderby'] = sanitize_text_field($orderby);
-	    $sc_param['orgid'] = ($organisation != '' ? sanitize_text_field($organisation) : sanitize_text_field($orgid));
-        $sc_param['persid'] = sanitize_text_field($persid);
+	    $sc_param['orgid'] = ($orgid != '' ? sanitize_text_field($orgid) : sanitize_text_field($organisation));
+	    $sc_param['persid'] = sanitize_text_field($persid);
         $sc_param['publication'] = sanitize_text_field($publication);
         $sc_param['award'] = sanitize_text_field($award);
         $sc_param['awardnameid'] = sanitize_text_field($awardnameid);
