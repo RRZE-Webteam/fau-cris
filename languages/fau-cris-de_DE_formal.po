@@ -1,13 +1,12 @@
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: FAU-CRIS\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-08-30 07:39+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: \n"
-"Language-Team: RRZE-Webteam <webmaster@rrze.fau.de>\n"
-"Language: \n"
+"PO-Revision-Date: 2019-08-30 08:10+0000\n"
+"Last-Translator: RRZE Webteam <webmaster@fau.de>\n"
+"Language-Team: Deutsch (Sie)\n"
+"Language: de_DE_formal\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,10 +15,12 @@ msgstr ""
 "esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPath-1: .."
+"X-Poedit-SearchPath-1: ..\n"
+"X-Loco-Version: 2.3.0; wp-5.2.2\n"
+"X-Loco-Template: languages/fau-cris-de_DE.po"
 
 #: fau-cris.php:75
 #, php-format
@@ -27,6 +28,8 @@ msgid ""
 "The server is running PHP version %1$s. The Plugin requires at least PHP "
 "version %2$s."
 msgstr ""
+"Auf dem Server läuft PHP Version %1$s. Das Plugin benötigt mindestens PHP "
+"Version %2$s."
 
 #: fau-cris.php:78
 #, php-format
@@ -34,180 +37,182 @@ msgid ""
 "The server is running WordPress version %1$s. The Plugin requires at least "
 "WordPress version %2$s."
 msgstr ""
+"Auf dem Server läuft WordPress Version %1$s. Das Plugin benötigt mindestens "
+"WordPress Version %2$s."
 
 #: fau-cris.php:132
 #, php-format
 msgid "Plugins: %1$s: %2$s"
-msgstr ""
+msgstr "Plugins: %1$s: %2$s"
 
 #: includes/Settings.php:255
 msgid "CRIS Settings"
-msgstr ""
+msgstr "Einstellungen &rsaquo; CRIS"
 
 #: includes/Config/settings.php:15 includes/Config/settings.php:16
 msgid "CRIS"
-msgstr ""
+msgstr "CRIS"
 
 #: includes/Config/settings.php:32
 msgid "Here comes the Context Help content."
-msgstr ""
+msgstr "Hier kommt der Inhalt der Kontexthilfe."
 
 #: includes/Config/settings.php:34
 msgid "Overview"
-msgstr ""
+msgstr "Übersicht"
 
 #: includes/Config/settings.php:35
 msgid "For more information"
-msgstr ""
+msgstr "Für mehr Information"
 
 #: includes/Config/settings.php:35
 msgid "RRZE Webteam on Github"
-msgstr ""
+msgstr "RRZE-Webteam in Github"
 
 #: includes/Config/settings.php:49
 msgid "Basic Settings"
-msgstr ""
+msgstr "Grundeinstellungen"
 
 #: includes/Config/settings.php:53
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Erweiterte Einstellungen"
 
 #: includes/Config/settings.php:68
 msgid "Text Input"
-msgstr ""
+msgstr "Texteingabe"
 
 #: includes/Config/settings.php:69
 msgid "Text input description."
-msgstr ""
+msgstr "Beschreibung der Texteingabe."
 
 #: includes/Config/settings.php:70
 msgid "Text Input placeholder"
-msgstr ""
+msgstr "Texteingabe-Platzhalter"
 
 #: includes/Config/settings.php:77
 msgid "Number Input"
-msgstr ""
+msgstr "Zahleneingabe"
 
 #: includes/Config/settings.php:78
 msgid "Number input description."
-msgstr ""
+msgstr "Beschreibung der Zahleneingabe."
 
 #: includes/Config/settings.php:89
 msgid "Textarea Input"
-msgstr ""
+msgstr "Textarea-Eingabe"
 
 #: includes/Config/settings.php:90
 msgid "Textarea description"
-msgstr ""
+msgstr "Beschreibung der Textarea-Eingabe."
 
 #: includes/Config/settings.php:91
 msgid "Textarea placeholder"
-msgstr ""
+msgstr "Textarea-Platzhalter"
 
 #: includes/Config/settings.php:96
 msgid "Checkbox"
-msgstr ""
+msgstr "Kontrollkästchen"
 
 #: includes/Config/settings.php:97
 msgid "Checkbox description"
-msgstr ""
+msgstr "Beschreibung des Kontrollkästchens."
 
 #: includes/Config/settings.php:102
 msgid "Multiple checkbox"
-msgstr ""
+msgstr "Mehrfaches Kontrollkästchen"
 
 #: includes/Config/settings.php:103
 msgid "Multiple checkbox description."
-msgstr ""
+msgstr "Beschreibung der mehrfaches Kontrollkästchen."
 
 #: includes/Config/settings.php:110
 msgid "One"
-msgstr ""
+msgstr "Eins"
 
 #: includes/Config/settings.php:111
 msgid "Two"
-msgstr ""
+msgstr "Zwei"
 
 #: includes/Config/settings.php:112
 msgid "Three"
-msgstr ""
+msgstr "Drei"
 
 #: includes/Config/settings.php:113
 msgid "Four"
-msgstr ""
+msgstr "Vier"
 
 #: includes/Config/settings.php:118
 msgid "Radio Button"
-msgstr ""
+msgstr "Optionsschaltfläche"
 
 #: includes/Config/settings.php:119
 msgid "Radio button description."
-msgstr ""
+msgstr "Beschreibung der Optionsschaltfläche."
 
 #: includes/Config/settings.php:122 includes/Config/settings.php:133
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: includes/Config/settings.php:123 includes/Config/settings.php:134
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #: includes/Config/settings.php:128
 msgid "Dropdown"
-msgstr ""
+msgstr "Auswahlliste"
 
 #: includes/Config/settings.php:129
 msgid "Dropdown description."
-msgstr ""
+msgstr "Beschreibung der Auswahlliste."
 
 #: includes/Config/settings.php:141
 msgid "Color"
-msgstr ""
+msgstr "Farbe"
 
 #: includes/Config/settings.php:142
 msgid "Color description."
-msgstr ""
+msgstr "Beschreibung des Farbfeldes."
 
 #: includes/Config/settings.php:148
 msgid "Password"
-msgstr ""
+msgstr "Passwort"
 
 #: includes/Config/settings.php:149
 msgid "Password description."
-msgstr ""
+msgstr "Beschreibung des Passwortes."
 
 #: includes/Config/settings.php:155
 msgid "Advanced Editor"
-msgstr ""
+msgstr "Erweiterter Editor"
 
 #: includes/Config/settings.php:156
 msgid "Advanced Editor description."
-msgstr ""
+msgstr "Beschreibung des erweiterten Editors."
 
 #: includes/Config/settings.php:162
 msgid "File"
-msgstr ""
+msgstr "Datei"
 
 #: includes/Config/settings.php:163
 msgid "File description."
-msgstr ""
+msgstr "Beschreibung des Dateifeldes."
 
 #: includes/Config/settings.php:167
 msgid "Choose an Image"
-msgstr ""
+msgstr "Ein Bild auswählen"
 
 #. Description of the plugin
 msgid "Basic template for all WordPress CMS plugins."
-msgstr ""
+msgstr "Grundlegende Vorlage für alle WordPress-CMS-Plugins."
 
 #. URI of the plugin
 msgid "https://gitlab.rrze.fau.de/rrze-webteam/fau-cris"
-msgstr ""
+msgstr "https://gitlab.rrze.fau.de/rrze-webteam/fau-cris"
 
 #. Author of the plugin
 msgid "RRZE Webteam"
-msgstr ""
+msgstr "RRZE-Webteam"
 
 #. Author URI of the plugin
 msgid "https://blogs.fau.de/webworking/"
-msgstr ""
+msgstr "https://blogs.fau.de/webworking/"
