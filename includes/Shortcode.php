@@ -4,8 +4,6 @@ namespace FAU\CRIS;
 
 defined('ABSPATH') || exit;
 
-include_once ("tools.php");
-
 /**
  * Shortcode
  */
@@ -43,6 +41,8 @@ class Shortcode
     {
         add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
         add_shortcode('cris', [$this, 'crisShortcode'], 10, 2);
+	    //add_shortcode('cris-custom', [$this, 'crisCustomShortcode']);
+	    add_shortcode('cris-custom', [$this, 'crisShortcode']);
     }
 
     /**
@@ -55,39 +55,61 @@ class Shortcode
     }
 
     /**
-     * Generieren Sie die Shortcode-Ausgabe
-     * @param  array   $atts Shortcode-Attribute
-     * @param  string  $content Beiliegender Inhalt
+     * Shortcode cris (standard)
+     * @param  array   $atts    Shortcode-Attribute
+     * @param  string  $content Umgebender Seiten-/Beitragsinhalt
+     * @param  string  $tag     Shortcode-Tag (cris oder cris-custom)
      * @return string Gib den Inhalt zurück
      */
     public function crisShortcode($atts, $content = '', $tag)
     {
-	    wp_enqueue_style('basis-shortcode');
-	    wp_enqueue_script('basis-shortcode');
-	    $parameter = self::crisShortcodeParameter($atts, $content = null, $tag);
-
-	    $output = '';
-	    if (isset($parameter['show']) && $parameter['show'] == 'publications') {
-		    $output = new Entities\Publications($parameter);
-		    /*if ($parameter['publication'] != '' && $parameter['order1'] == '') {
-			    return $output->singlePub($parameter['quotation']);
+	    wp_enqueue_style('fau-cris-shortcode');
+	    wp_enqueue_script('fau-cris-shortcode');
+	    $parameter = self::crisShortcodeParameter($atts, $content, $tag);
+		if (isset($parameter['show']) && $parameter['show'] == 'publications') {
+	    	$output = new Entities\Publications($parameter, $content, $tag, $this->settings);
+		    if ($parameter['publication'] != '' && !strpos($parameter['publication'], ',')) {
+		    	return $output->singlePublication();
 		    }
-		    if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
-			    return $output->pubListe($parameter);
+		    if (empty($parameter['order']) && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+			    return $output->flatList();
 		    }
-		    if (strpos($parameter['order1'], 'type') !== false) {
-			    return $output->pubNachTyp($parameter, $field = '');
-		    }*/
-		    return $output->publicationsByYear();
+		    return $output->orderedList();
 	    }
-
-
-
-
     }
+
+	/**
+	 * Shortcode cris-custom (personalisierte Ausgabe)
+	 * @param  array   $atts    Shortcode-Attribute
+	 * @param  string  $content Umgebender Seiten-/Beitragsinhalt
+	 * @param  string  $tag     Shortcode-Tag (cris oder cris-custom)
+	 * @return string Gib den Inhalt zurück
+	 */
+	/*public static function crisCustomShortcode($atts, $content = null, $tag) {
+		wp_enqueue_style('fau-cris-shortcode');
+		wp_enqueue_script('fau-cris-shortcode');
+		$parameter = self::crisShortcodeParameter($atts, $content = null, $tag);
+		if ($parameter['show'] == 'publications') {
+			// Publikationen
+			require_once('class_Publikationen.php');
+			$liste = new Publikationen($parameter['entity'], $parameter['entity_id'], '', $page_lang);
+			if ($parameter['publication'] != '' && $parameter['order1'] == '') {
+				return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type'], $page_lang, $parameter['display_language']);
+			}
+			if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+				return $liste->pubListe($parameter, $content);
+			}
+			if (strpos($parameter['order1'], 'type') !== false) {
+				return $liste->pubNachTyp($parameter, $field = '', $content);
+			}
+			return $liste->pubNachJahr($parameter, $field = '', $content);
+		}
+
+	}*/
 
 	private function crisShortcodeParameter($atts, $content = '', $tag) {
 		global $post;
+		$tools = new Tools();
 
 		$shortcode_atts = shortcode_atts([
 			'show' => 'publications',
@@ -105,7 +127,7 @@ class Shortcode
 			'items' => '',
 			'limit' => '',
 			'sortby' => '',
-			'format' => '',
+			'format' => 'default',
 			'award' => '',
 			'awardnameid' => '',
 			'type' => '',
@@ -131,7 +153,6 @@ class Shortcode
 			'peerreviewed' => '',
 			'current' => '',
 			'publications_limit' => $this->settings->getOption('cris_layout','cris_fields_num_pub', '5'),
-			'name_order_plugin' => $this->settings->getOption('cris_layout','cris_name_order_plugin', 'firstname-lastname'),
 			'notable' => '',
 			'publications_year' => '',
 			'publications_start' => '',
@@ -144,12 +165,85 @@ class Shortcode
 			'image_align' => 'left',
 			'accordion_title' => '#name# (#year#)',
 			'accordion_color' => '',
-			'display_language' => getPageLanguage($post->ID),
+			'display_language' => $tools->getPageLanguage($post->ID),
+			'page_language' => $tools->getPageLanguage($post->ID),
+			'curation' => 0,
 		], $atts, $tag);
 		$shortcode_atts = array_map('sanitize_text_field', $shortcode_atts);
 
 		$shortcode_atts['sc_type'] = $tag;
+		$shortcode_atts['nameorder'] = $this->settings->getOption('cris_layout','cris_name_order_plugin', 'firstname-lastname');
 
+		if ($shortcode_atts['publication'] != '') {
+			$shortcode_atts['entity'] = 'publication';
+			if (strpos($shortcode_atts['publication'], ',')) {
+				$shortcode_atts['publication'] = str_replace(' ', '', $shortcode_atts['publication']);
+				$shortcode_atts['publication'] = explode(',', $shortcode_atts['publication']);
+			}
+			$shortcode_atts['entity_id'] = $shortcode_atts['publication'];
+		} elseif ($shortcode_atts['equipment'] != '') {
+			$shortcode_atts['entity'] = 'equipment';
+			$shortcode_atts['entity_id'] = $shortcode_atts['equipment'];
+		} elseif ($shortcode_atts['field'] != '') {
+			$shortcode_atts['entity'] = 'field';
+			if (strpos($shortcode_atts['field'], ',') !== false) {
+				$shortcode_atts['field'] = str_replace(' ', '', $shortcode_atts['field']);
+				$shortcode_atts['field'] = explode(',', $shortcode_atts['field']);
+			}
+			$shortcode_atts['entity_id'] = $shortcode_atts['field'];
+		} elseif (isset($shortcode_atts['activity']) && $shortcode_atts['activity'] != '') {
+			$shortcode_atts['entity'] = 'activity';
+			$shortcode_atts['entity_id'] = $shortcode_atts['activity'];
+		} elseif (isset($shortcode_atts['patent']) && $shortcode_atts['patent'] != '') {
+			$shortcode_atts['entity'] = 'patent';
+			$shortcode_atts['entity_id'] = $shortcode_atts['patent'];
+		} elseif (isset($shortcode_atts['award']) && $shortcode_atts['award'] != '') {
+			$shortcode_atts['entity'] = 'award';
+			$shortcode_atts['entity_id'] = $shortcode_atts['award'];
+		} elseif (isset($shortcode_atts['project']) && $shortcode_atts['project'] != '') {
+			$shortcode_atts['entity'] = 'project';
+			if (strpos($shortcode_atts['project'], ',') !== false) {
+				$shortcode_atts['project'] = str_replace(' ', '', $shortcode_atts['project']);
+				$shortcode_atts['project'] = explode(',', $shortcode_atts['project']);
+			}
+			$shortcode_atts['entity_id'] = $shortcode_atts['project'];
+		} elseif (isset($shortcode_atts['awardnameid']) && $shortcode_atts['awardnameid'] != '') {
+			$shortcode_atts['entity'] = 'awardnameid';
+			$shortcode_atts['entity_id'] = $shortcode_atts['awardnameid'];
+		} elseif (isset($shortcode_atts['persid']) && $shortcode_atts['persid'] != '') {
+			$shortcode_atts['entity'] = 'person';
+			if (strpos($shortcode_atts['persid'], ',') !== false) {
+				$shortcode_atts['persid'] = str_replace(' ', '', $shortcode_atts['persid']);
+				$shortcode_atts['persid'] = explode(',', $shortcode_atts['persid']);
+			}
+			$shortcode_atts['entity_id'] = $shortcode_atts['persid'];
+		} elseif (isset($shortcode_atts['orgid']) && $shortcode_atts['orgid'] != '') {
+			$shortcode_atts['entity'] = 'orga';
+			if (strpos($shortcode_atts['orgid'], ',') !== false) {
+				$shortcode_atts['orgid'] = str_replace(' ', '', $shortcode_atts['orgid']);
+				$shortcode_atts['orgid'] = explode(',', $shortcode_atts['orgid']);
+			}
+			$shortcode_atts['entity_id'] = $shortcode_atts['orgid'];
+		} else {
+			$shortcode_atts['entity'] = '';
+			$shortcode_atts['entity_id'] = '';
+		}
+
+		$shortcode_atts['order'] = [];
+		if (!empty($shortcode_atts['orderby'])) {
+			$orderby = explode(',', $shortcode_atts['orderby'] );
+			$shortcode_atts['order'] = array_map( 'trim', $orderby );
+			array_splice($shortcode_atts['order'],2);
+			if (!in_array($shortcode_atts['order'][0],['year','type','author']))
+				$shortcode_atts['order'][0] = 'year';
+			if (!isset($shortcode_atts['order'][1])
+			    || !in_array($shortcode_atts['order'][1],['year','type','subtype','author'])
+				|| $shortcode_atts['order'][1] == $shortcode_atts['order'][0])
+				unset($shortcode_atts['order'][1]);
+		}
+
+		if ($shortcode_atts['format'] == 'accordion' && !shortcode_exists('collapsibles'))
+			$shortcode_atts['format'] == 'default';
 		return $shortcode_atts;
     }
 }
