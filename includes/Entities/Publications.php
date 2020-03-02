@@ -6,6 +6,8 @@ use FAU\CRIS\Entity;
 use FAU\CRIS\Formatter;
 use FAU\CRIS\Webservice;
 use FAU\CRIS\Tools;
+use const FAU\CRIS\FAU_CRIS_CLOSE;
+use const FAU\CRIS\FAU_CRIS_OPEN;
 
 
 class Publications {
@@ -15,10 +17,10 @@ class Publications {
 		$this->content = $content;
 		$this->tag = $tag;
 		$this->settings = $settings;
-		$this->langdiv_open = '<div class="cris">';
-		$this->langdiv_close = '</div>';
+		$this->langdiv_open = FAU_CRIS_OPEN;
+		$this->langdiv_close = FAU_CRIS_CLOSE;
 		if ($parameter['display_language'] != $parameter['page_language']) {
-			$this->langdiv_open = '<div class="cris" lang="' . $parameter['display_language'] . '">';
+			$this->langdiv_open = str_replace('">', '" lang="' . $parameter['display_language'] . '">', FAU_CRIS_OPEN);
 		}
 	}
 
@@ -36,12 +38,12 @@ class Publications {
 			return;
 
 		if (in_array($this->parameter['quotation'],['apa', 'mla'])) {
-			$output = $this->make_quotation_list($pubArray, $this->parameter['quotation']);
+			$output = $this->make_quotation_list($pubArray, $this->parameter['quotation'], true);
 		} else {
 			if ($this->tag == 'cris-custom') {
-				$output = $this->make_custom_list($pubArray, $this->content, $this->parameter['display_language']);
+				$output = $this->make_custom_list($pubArray, $this->content, $this->parameter['display_language'], true);
 			} else {
-				$output = $this->make_list($pubArray, 0, $this->parameter['nameorder'], $this->parameter['display_language']);
+				$output = $this->make_list($pubArray, 0, $this->parameter['nameorder'], $this->parameter['display_language'], true);
 			}
 		}
 
@@ -51,25 +53,35 @@ class Publications {
 	public function flatList() {
 		$pubArray = $this->fetch_publications();
 		if (!count($pubArray)) {
-			$output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
+			$output = '<p>' . __('No publications found', 'fau-cris') . '</p>';
 			return $output;
 		}
 		switch ($this->parameter['sortby']) {
 			case 'created':
-				$order = 'createdon';
+				$sort = 'createdon';
+				$sort_order = SORT_DESC;
 				break;
 			case 'updated':
-				$order = 'updatedon';
+				$sort = 'updatedon';
+				$sort_order = SORT_DESC;
 				break;
 			default:
-				$order = 'virtualdate';
+				$sort = 'virtualdate';
+				$sort_order = SORT_DESC;
 		}
-		$formatter = new Formatter(NULL, NULL, $order, SORT_DESC);
-		$res = $formatter->execute($pubArray);
+		if ($this->parameter['publication'] != '') {
+			$sort = NULL;
+			$sort_order = NULL;
+		}
+		$formatter = new Formatter(NULL, NULL, $sort, $sort_order);
+		$res = $formatter->execute( $pubArray );
+		if ($sort == NULL) {
+			$sort = __('O.A.','fau-cris');
+		}
 		if ($this->parameter['limit'] != '')
-			$pubList = array_slice($res[$order], 0, $this->parameter['limit']);
+			$pubList = array_slice($res[$sort], 0, $this->parameter['limit']);
 		else
-			$pubList = $res[$order];
+			$pubList = $res[$sort];
 		$output = '';
 		if ($this->parameter['quotation'] == 'apa' || $this->parameter['quotation'] == 'mla') {
 			$output .= $this->make_quotation_list($pubList, $this->parameter['quotation']);
@@ -156,7 +168,9 @@ class Publications {
 				} else {
 					$title_sub = '';
 				}
-				$subtitle = "<h4>" . $title_sub . "</h4>";
+				if ($title_sub != '') {
+					$subtitle = "<h4>" . $title_sub . "</h4>";
+				}
 				if ( $this->parameter['quotation'] == 'apa' || $this->parameter['quotation'] == 'mla' ) {
 					$sublists[$subtitle] = $this->make_quotation_list($publications_sub);
 				} else {
@@ -186,7 +200,7 @@ class Publications {
 			$output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
 		}
 
-		return $output;
+		return $this->langdiv_open . $output . $this->langdiv_close;
 	}
 
 
@@ -234,9 +248,15 @@ class Publications {
      * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
      */
 
-	private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de') {
+	private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $single = false) {
 		$tools = new Tools();
-		$publist = "<ul class=\"cris-publications\" lang=\"" . $lang . "\">";
+		if (!$single) {
+			$publist = "<ul class=\"publications\" lang=\"" . $lang . "\">";
+			$item_wrap = 'li';
+		} else {
+			$publist = '';
+			$item_wrap = 'div';
+		}
 		foreach ($publications as $publicationObject) {
 			$publication = $publicationObject->attributes;
 			// id
@@ -320,7 +340,9 @@ class Publications {
 			);
 			switch (strtolower($pubDetails['pubType'])) {
 				case "book": // OK
-					$publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
+					if ($single == false) {
+						$publist .= "<$item_wrap class=\"cris-publication\" itemscope itemtype=\"http://schema.org/Book\">";
+					}
 					$publist .= $pubDetails['authors'] . ':';
 					$publist .= "<br />" . $pubDetails['title'];
 					$publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], $lang, $pubDetails['pubType']) . ')' : '';
@@ -349,7 +371,7 @@ class Publications {
 				case "other":
 				case "article in edited volumes":
 					if (($pubDetails['pubType'] == 'Other' && $pubDetails['booktitle'] != '') || $pubDetails['pubType'] == 'Article in Edited Volumes') {
-						$publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
+						$publist .= "<$item_wrap itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
 						$publist .= $pubDetails['authors'] . ':';
 						$publist .= "<br />" . $pubDetails['title'];
 						if ($pubDetails['booktitle'] != '') {
@@ -382,7 +404,7 @@ class Publications {
 						break;
 					}
 				case "journal article":
-					$publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
+					$publist .= "<$item_wrap itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
 					$publist .= $pubDetails['authors'] . ":";
 					$publist .= "<br />" . $pubDetails['title'];
 					$publist .= (($pubDetails['journaltitle'] != '') || ($pubDetails['volume'] != '') || ($pubDetails['year'] != '') || ($pubDetails['pagesRange'] != '')) ? "<br />" : '';
@@ -401,7 +423,7 @@ class Publications {
 					$publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
 					break;
 				case "conference contribution": // OK
-					$publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
+					$publist .= "<$item_wrap itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
 					$publist .= $pubDetails['authors'] . ':';
 					$publist .= "<br />" . $pubDetails['title'];
 					$publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], $lang, $pubDetails['pubType']) . (!empty($pubDetails['pubStatus']) ? ', ' . strtolower($pubDetails['pubStatus']) : '') . ')' : '';
@@ -433,7 +455,7 @@ class Publications {
 					break;
 				case "editorial":
 				case "edited volumes":
-					$publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
+					$publist .= "<$item_wrap itemscope itemtype=\"http://schema.org/Book\">";
 					$publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
 					$publist .= "<br />" . $pubDetails['title'];
 					$publist .= $pubDetails['volume'] != '' ? "<br /><span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. " : '';
@@ -464,7 +486,7 @@ class Publications {
 					$publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
 					break;
 				case "thesis":
-					$publist .= "<li itemscope itemtype=\"http://schema.org/Thesis\">";
+					$publist .= "<$item_wrap itemscope itemtype=\"http://schema.org/Thesis\">";
 					$publist .= $pubDetails['authors'] . ':';
 					$publist .= "<br />" . $pubDetails['title'];
 					$publist .= " (" . ($pubDetails['thesisSubtype'] != '' ? Tools::getName('publications', 'Thesis', $lang, $pubDetails['thesisSubtype']) : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)";
@@ -472,7 +494,7 @@ class Publications {
 					$publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
 					break;
 				case "translation":
-					$publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
+					$publist .= "<$item_wrap itemscope itemtype=\"http://schema.org/Book\">";
 					$publist .= $pubDetails['authors'] . ':';
 					$publist .= $pubDetails['title'];
 					$publist .= (($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '';
@@ -504,9 +526,11 @@ class Publications {
 			if ($showsubtype == 1 && $pubDetails['otherSubtype'] != '') {
 				$publist .= "<br />(" . $pubDetails['otherSubtype'] . ")";
 			}
-			$publist .= "</li>";
+			$publist .= "</$item_wrap>";
 		}
-		$publist .= "</ul>";
+		if (!$single) {
+			$publist .= "</ul>";
+		}
 		return $publist;
 	}
 
@@ -514,13 +538,19 @@ class Publications {
 	 * Ausgabe der Publikationsdetails in Zitierweise (MLA/APA)
 	 */
 
-	private function make_quotation_list($publications) {
+	private function make_quotation_list($publications, $lang = 'de', $single = false) {
 		$tools = new Tools();
 		$quotation = strtolower($this->parameter['quotation']);
-		$publist = "<ul class=\"cris-publications\">";
+		if (!$single) {
+			$publist = "<ul class=\"cris-publications\" lang=\"" . $lang . "\">";
+			$item_wrap = 'li';
+		} else {
+			$publist = '';
+			$item_wrap = 'div';
+		}
 		foreach ($publications as $publication) {
 			$publication->insert_quotation_links();
-			$publist .= "<li>";
+			$publist .= "<$item_wrap>";
 			$publist .= $publication->attributes['quotation' . $quotation . 'link'];
 			if ($publication->attributes['openaccess'] == "Ja" && isset($this->options['cris_oa']) && $this->options['cris_oa'] == 1) {
 				$publist .= "<span aria-hidden class=\"oa-icon\" title=\"Open-Access-Publikation\"></span>";
@@ -534,9 +564,11 @@ class Publications {
 			if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
 				$publist .= '<br />BibTeX: <a href="' . sprintf($this->bibtexlink, $publication->attributes['id_publ']) . '">Download</a>';
 			}
-			$publist .= "</li>";
+			$publist .= "</$item_wrap>";
 		}
-		$publist .= "</ul>";
+		if (!$single) {
+			$publist .= "</ul>";
+		}
 		return $publist;
 	}
 

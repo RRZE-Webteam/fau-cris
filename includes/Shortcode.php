@@ -40,7 +40,7 @@ class Shortcode
     public function onLoaded()
     {
         add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
-        add_shortcode('cris', [$this, 'crisShortcode'], 10, 2);
+        add_shortcode('cris', [$this, 'crisShortcode']);
 	    //add_shortcode('cris-custom', [$this, 'crisCustomShortcode']);
 	    add_shortcode('cris-custom', [$this, 'crisShortcode']);
     }
@@ -50,8 +50,9 @@ class Shortcode
      */
     public function enqueueScripts()
     {
-        wp_register_style('basis-shortcode', plugins_url('assets/css/shortcodes/basis-shortcode.min.css', plugin_basename($this->pluginFile)));
-        wp_register_script('basis-shortcode', plugins_url('assets/js/shortcodes/basis-shortcode.min.js', plugin_basename($this->pluginFile)));
+        //wp_register_style('basis-shortcode', plugins_url('assets/css/shortcodes/basis-shortcode.min.css', plugin_basename($this->pluginFile)));
+        //wp_register_script('basis-shortcode', plugins_url('assets/js/shortcodes/basis-shortcode.min.js', plugin_basename($this->pluginFile)));
+	    wp_enqueue_style('fau-cris');
     }
 
     /**
@@ -66,10 +67,15 @@ class Shortcode
 	    wp_enqueue_style('fau-cris-shortcode');
 	    wp_enqueue_script('fau-cris-shortcode');
 	    $parameter = self::crisShortcodeParameter($atts, $content, $tag);
-		if (isset($parameter['show']) && $parameter['show'] == 'publications') {
+		//Publications
+	    if (isset($parameter['show']) && $parameter['show'] == 'publications') {
 	    	$output = new Entities\Publications($parameter, $content, $tag, $this->settings);
-		    if ($parameter['publication'] != '' && !strpos($parameter['publication'], ',')) {
-		    	return $output->singlePublication();
+		    if ($parameter['publication'] != '') {
+		    	if (!is_array($parameter['publication'])) {
+				    return $output->singlePublication();
+			    } else {
+				    return $output->flatList();
+			    }
 		    }
 		    if (empty($parameter['order']) && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
 			    return $output->flatList();
