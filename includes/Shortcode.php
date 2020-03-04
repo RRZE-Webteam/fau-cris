@@ -69,10 +69,25 @@ class Shortcode
 	    $parameter = self::crisShortcodeParameter($atts, $content, $tag);
 		//Publications
 	    if (isset($parameter['show']) && $parameter['show'] == 'publications') {
-	    	$output = new Entities\Publications($parameter, $content, $tag, $this->settings);
+	    	$output = new Entities\Publications($parameter, $content, $tag, $this->options);
 		    if ($parameter['publication'] != '') {
 		    	if (!is_array($parameter['publication'])) {
 				    return $output->singlePublication();
+			    } else {
+				    return $output->flatList();
+			    }
+		    }
+		    if (empty($parameter['order']) && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+			    return $output->flatList();
+		    }
+		    return $output->orderedList();
+	    }
+	    //Projects
+	    if (isset($parameter['show']) && $parameter['show'] == 'projects') {
+		    $output = new Entities\Projects($parameter, $content, $tag, $this->options);
+		    if ($parameter['project'] != '') {
+			    if (!is_array($parameter['project'])) {
+				    return $output->singleProject();
 			    } else {
 				    return $output->flatList();
 			    }
@@ -248,8 +263,12 @@ class Shortcode
 				unset($shortcode_atts['order'][1]);
 		}
 
+		$shortcode_atts['hide'] = str_replace(' ', '', $shortcode_atts['hide']);
+		$shortcode_atts['hide'] = explode(',', $shortcode_atts['hide']);
+
 		if ($shortcode_atts['format'] == 'accordion' && !shortcode_exists('collapsibles'))
 			$shortcode_atts['format'] == 'default';
+
 		return $shortcode_atts;
     }
 }

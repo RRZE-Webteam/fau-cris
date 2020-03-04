@@ -12,11 +12,11 @@ use const FAU\CRIS\FAU_CRIS_OPEN;
 
 class Publications {
 
-	public function __construct($parameter, $content, $tag, $settings) {
+	public function __construct($parameter, $content, $tag='', $options) {
 		$this->parameter = $parameter;
 		$this->content = $content;
 		$this->tag = $tag;
-		$this->settings = $settings;
+		$this->options = $options;
 		$this->langdiv_open = FAU_CRIS_OPEN;
 		$this->langdiv_close = FAU_CRIS_CLOSE;
 		if ($parameter['display_language'] != $parameter['page_language']) {
@@ -106,7 +106,7 @@ class Publications {
 			$this->parameter['order'][0] = 'year';
 		$typeorder = $tools->getOrder('publications');
 		if (in_array('type', $this->parameter['order'] )) {
-			$typeorder_raw = $this->settings->getOption('cris_layout', 'cris_pub_order');
+			$typeorder_raw = $this->options['cris_layout_cris_pub_order'];
 			$typeorder = explode("\n", str_replace("\r", "", $typeorder_raw));
 
 			if ($typeorder[0] != '' && ((array_search($typeorder[0], array_column($tools->typeinfos['publications'], 'short')) !== false) || array_search($typeorder[0], array_column($tools->typeinfos['publications'], 'short_alt')) !== false)) {
@@ -275,7 +275,7 @@ class Publications {
 				}
 				$authorList = array();
 				foreach ($authorsArray as $author) {
-					$authorList[] = $tools->getPersonLink($author['id'], $author['firstname'], $author['lastname'], $this->settings->getOption('cris_layout', 'cris_univis', 'none'), 1, 1, $nameorder);
+					$authorList[] = $tools->getPersonLink($author['id'], $author['firstname'], $author['lastname'], $this->options['cris_layout_cris_univis'], 1, 1, $nameorder);
 				}
 				$authors_html = implode(", ", $authorList);
 			} else {
@@ -520,7 +520,7 @@ class Publications {
 					$publist .= $pubDetails['language'] != '' ? "<br />Sprache: <span itemprop=\"inLanguage\">" . $pubDetails['language'] . "</span>" : '';
 					break;
 			}
-			if ($this->settings->getOption('cris_layout', 'cris_bibtex', 1) == 1) {
+			if ($this->options['cris_layout_cris_bibtex'] == 1) {
 				$publist .= "<br />BibTeX: " . $pubDetails['bibtex_link'];
 			}
 			if ($showsubtype == 1 && $pubDetails['otherSubtype'] != '') {
@@ -606,7 +606,7 @@ class Publications {
 				}
 				$authorList = array();
 				foreach ($authorsArray as $author) {
-					$authorList[] = $tools->getPersonLink($author['id'], $author['firstname'], $author['lastname'], $this->settings->getOption('cris_layout', 'cris_univis', 'none'),1, 1, $this->parameter['nameorder']);
+					$authorList[] = $tools->getPersonLink($author['id'], $author['firstname'], $author['lastname'], $this->options['cris_layout_cris_univis'],1, 1, $this->parameter['nameorder']);
 				}
 				$authors_html = implode(", ", $authorList);
 			} else {

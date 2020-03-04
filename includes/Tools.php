@@ -94,7 +94,6 @@ class Tools {
 	}
 
 	public function getPersonLink( $id, $firstname, $lastname, $target, $inv = 0, $shortfirst = 0, $nameorder = '' ) {
-		$tools = new Tools();
 		$person = '';
 		switch ( $target ) {
 			case 'cris' :
@@ -204,6 +203,39 @@ class Tools {
 		} else {
 			return $this->cris_publicweb . $item . "/" . $cris_id . ( $lang == 'de' ? '?lang=de_DE' : '?lang=en_GB' );
 		}
+	}
+
+	public function XML2obj($xml_url) {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $xml_url);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		$xml = curl_exec($ch);
+		curl_close($ch);
+
+		$xmlTree = '';
+
+		libxml_use_internal_errors(true);
+		try {
+			$xmlTree = new \SimpleXMLElement($xml);
+		} catch (Exception $e) {
+			// Something went wrong.
+
+			$error_message = '<strong>' . __('Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.', 'fau-cris') . '</strong>';
+			if (defined('WP_DEBUG') && true === WP_DEBUG) {
+				print '<p>';
+				foreach (libxml_get_errors() as $error_line) {
+					$error_message .= "<br>" . $error_line->message;
+				}
+				trigger_error($error_message);
+				print '</p>';
+			} else {
+				//print $error_message;
+			}
+			return false;
+		}
+		return $xmlTree;
 	}
 
 

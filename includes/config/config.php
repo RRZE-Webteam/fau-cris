@@ -4,6 +4,8 @@ namespace FAU\CRIS\Config;
 
 defined('ABSPATH') || exit;
 
+const FAU_CRIS_BASE_URI = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+
 /**
  * Gibt der Name der Option zurück.
  * @return array [description]
