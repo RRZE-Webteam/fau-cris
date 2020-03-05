@@ -217,7 +217,8 @@ class Forschungsbereiche {
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
-            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+	        $description = str_replace(["\n", "\t", "\r"], '', $description);
+	        $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $param['fsp'] = ($field['selektion'] == 'Forschungsschwerpunkt') ? true : false;
             
             if (!in_array('title', $hide))
