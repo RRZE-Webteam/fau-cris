@@ -1005,7 +1005,11 @@ class FAU_CRIS {
             $sc_param['entity_id'] = $sc_param['publication'];
         } elseif ($sc_param['equipment'] != '') {
             $sc_param['entity'] = 'equipment';
-            $sc_param['entity_id'] = $sc_param['equipment'];
+	        if (strpos($sc_param['equipment'], ',') !== false) {
+		        $sc_param['equipment'] = str_replace(' ', '', $sc_param['equipment']);
+		        $sc_param['equipment'] = explode(',', $sc_param['equipment']);
+	        }
+	        $sc_param['entity_id'] = $sc_param['equipment'];
         } elseif ($sc_param['field'] != '') {
             $sc_param['entity'] = 'field';
 	        if (strpos($sc_param['field'], ',') !== false) {
