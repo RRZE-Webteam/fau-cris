@@ -520,7 +520,8 @@ class Projekte {
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
-            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+	        $description = str_replace(["\n", "\t", "\r"], '', $description);
+	        $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
             $imgs = self::get_project_images($project['ID']);
 
@@ -633,7 +634,8 @@ class Projekte {
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
-            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+	        $description = str_replace(["\n", "\t", "\r"], '', $description);
+	        $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
             $projlist .= "<li>";
@@ -734,7 +736,8 @@ class Projekte {
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
-            $description = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+	        $description = str_replace(["\n", "\t", "\r"], '', $description);
+	        $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             if (mb_strlen($description) > 500) {
                 $pos = strpos($description, ' ', 500);
                 $description = mb_substr($description, 0, $pos) . '&hellip;';

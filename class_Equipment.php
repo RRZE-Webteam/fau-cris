@@ -65,8 +65,7 @@ class Equipment {
     }
 
 	public function customEquipment($content = '', $param = array()) {
-    	//var_dump($param['entity_id']);
-		if ($param['entity'] == 'equipment') {
+    	if ($param['entity'] == 'equipment') {
 			$ws = new CRIS_equipments();
 			//var_dump($ws);
 			try {
@@ -220,7 +219,8 @@ class Equipment {
                     break;
             }
             $name = htmlentities($name, ENT_QUOTES);
-            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+	        $description = str_replace(["\n", "\t", "\r"], '', $description);
+	        $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $manufacturer  = $equipment['hersteller'];
             $model = $equipment['modell'];
             $constructionYear = $equipment['baujahr'];
@@ -382,6 +382,7 @@ class Equipment {
 					$description = ($equipment['description'] != '') ? $equipment['description'] : $equipment['description_en'];
 					break;
 			}
+			$description = str_replace(["\n", "\t", "\r"], '', $description);
 			$equipment_details['#name#'] =  htmlentities($name, ENT_QUOTES);
 			$equipment_details['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
 			$equipment_details['#manufacturer#']  = $equipment['hersteller'];
