@@ -82,9 +82,10 @@ ul.cris-equipment .equipment-name {
     font-weight: bold;
 }
 
-.cris-image {
-    float: right;
-    margin: 0 0 10px 20px;
+.cris-image img {
+/*    float: right;
+    margin: 0 0 10px 20px;*/
+    max-height: 180px;
     max-width: 180px;
 }
 
@@ -96,6 +97,15 @@ ul.cris-equipment .equipment-name {
     background-image: url(../img/OpenAccess16px.png);
     position: relative;
     top: 2px;
+}
+
+.cris-publications .alignleft {
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+.cris-publications .alignright {
+    margin-bottom: 0;
 }
 
 .cris-award div[class*="-columns-"] {

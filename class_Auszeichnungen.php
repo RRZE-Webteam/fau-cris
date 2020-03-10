@@ -472,7 +472,7 @@ class Auszeichnungen {
 					$i = 1;
 					foreach($imgs as $img) {
 						if (isset($img['png180']) && mb_strlen($img['png180']) > 30) {
-							$award_details['#image'.$i.'#'] = "<div class='wp-caption align" . $param['image_align'] . "'><img alt=\"". $award_details['#name#'] ."\" src=\"" . $img['png180'] . "\"><br />"
+							$award_details['#image'.$i.'#'] = "<div class='wp-caption " . $param['image_align'] . "'><img alt=\"". $award_details['#name#'] ."\" src=\"" . $img['png180'] . "\"><br />"
 							     . "<span class=\"wp-caption-text\">" . (($img['desc'] !='') ? $img['desc'] : "") . "</span>";
 							$award_details['#image'.$i.'#'] .= "</div>";
 						}

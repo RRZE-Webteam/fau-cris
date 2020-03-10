@@ -803,7 +803,7 @@ class FAU_CRIS {
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], $parameter['name_order_plugin'], $page_lang, $parameter['display_language']);
 
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
-                return $liste->singlePub($parameter['quotation']);
+                return $liste->singlePub($parameter['quotation'], '', 'default', $parameter['showimage'], $parameter['image_align'], $parameter['image_position']);
             }
             if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
                 return $liste->pubListe($parameter);
@@ -902,6 +902,7 @@ class FAU_CRIS {
             'showname' => 1,
             'showyear' => 1,
             'showawardname' => 1,
+            'showimage' => 0,
             'display' => 'list',
             'project' => '',
             'hide' => '',
@@ -930,12 +931,13 @@ class FAU_CRIS {
             'publications_peerreviewed' => '',
             'publications_orderby' => '',
             'publications_notable' => '',
-            'image_align' => 'left',
+            'image_align' => 'right',
             'accordion_title' => '#name# (#year#)',
             'accordion_color' => '',
             'display_language' => Tools::getPageLanguage($post->ID),
             'organisation' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
                             ), $atts));
+
 	    $sc_param['orderby'] = sanitize_text_field($orderby);
 	    $sc_param['orgid'] = ($orgid != '' ? sanitize_text_field($orgid) : sanitize_text_field($organisation));
 	    $sc_param['persid'] = sanitize_text_field($persid);
@@ -964,7 +966,8 @@ class FAU_CRIS {
         $sc_param['showname'] = sanitize_text_field($showname);
         $sc_param['showyear'] = sanitize_text_field($showyear);
         $sc_param['showawardname'] = sanitize_text_field($showawardname);
-        $sc_param['display'] = sanitize_text_field($display);
+	    $sc_param['showimage'] = $showimage == 1 ? 1 : 0;
+	    $sc_param['display'] = sanitize_text_field($display);
         $sc_param['role'] = sanitize_text_field($role);
         $sc_param['fau'] = sanitize_text_field($fau);
         $sc_param['equipment'] = sanitize_text_field($equipment);
@@ -985,8 +988,17 @@ class FAU_CRIS {
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
-	    $sc_param['image_align'] = (in_array($image_align, array('left', 'right', 'none'))) ? sanitize_text_field($image_align) : 'left';
-	    $sc_param['accordion_title'] = sanitize_text_field($accordion_title);
+	    if (in_array($image_align, ['left', 'right', 'none'])) {
+		    $sc_param['image_align'] = 'align' . sanitize_text_field($image_align);
+		    $sc_param['image_position'] = 'top';
+        } elseif (in_array($image_align, ['bottom', 'top'])) {
+		    $sc_param['image_align'] = 'alignnone';
+		    $sc_param['image_position'] = sanitize_text_field($image_align);
+        } else {
+		    $sc_param['image_align'] = 'alignright';
+		    $sc_param['image_position'] = 'top';
+        }
+        $sc_param['accordion_title'] = sanitize_text_field($accordion_title);
 	    $sc_param['accordion_color'] = sanitize_text_field($accordion_color);
 	    if (sanitize_text_field($current) == "1" && sanitize_text_field($status) == '') { // Abwärtskompatibilität
             $sc_param['status'] = 'current';
