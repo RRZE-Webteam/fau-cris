@@ -712,7 +712,7 @@ class FAU_CRIS {
             // Forschung
             require_once('class_Organisation.php');
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
-            return $liste->singleOrganisation($parameter['hide']);
+            return $liste->singleOrganisation($parameter['hide'], $parameter['image_align']);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'fields') {
             // Forschungsbereiche
             require_once('class_Forschungsbereiche.php');
@@ -827,7 +827,7 @@ class FAU_CRIS {
         // Forschung
             require_once('class_Organisation.php');
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
-            return $liste->customOrganisation($content);
+            return $liste->customOrganisation($content, $parameter['image_align']);
         } elseif ($parameter['show'] == 'equipment') {
         // Forschungsinfrastruktur
 	        require_once('class_Equipment.php');

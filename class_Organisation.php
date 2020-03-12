@@ -41,7 +41,7 @@ class Organisation {
      * Ausgabe einer einzelnen Organisation
      */
 
-    public function singleOrganisation($hide = '') {
+    public function singleOrganisation($hide = '', $image_align  = 'alignright') {
         $ws = new CRIS_organisations();
         try {
             $orgaArray = $ws->by_id($this->id);
@@ -53,8 +53,7 @@ class Organisation {
             $output = '<p>' . __('Es wurden leider keine Informationen gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-
-        $output = $this->make_single($orgaArray, $hide);
+	    $output = $this->make_single($orgaArray, $hide, $image_align);
 
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
@@ -63,7 +62,7 @@ class Organisation {
      * Ausgabe eines Organisation per Custom-Shortcode
      */
 
-    public function customOrganisation($content = '') {
+    public function customOrganisation($content = '', $image_align = 'alignright') {
         $ws = new CRIS_organisations();
         try {
             $orgaArray = $ws->by_id($this->id);
@@ -75,7 +74,7 @@ class Organisation {
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        $output = $this->make_custom_single($orgaArray, $content);
+        $output = $this->make_custom_single($orgaArray, $content, $image_align);
 	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
@@ -138,8 +137,9 @@ class Organisation {
      * Ausgabe der Organisation
      */
 
-    private function make_single($organisations) {
-        $output = '';
+    private function make_single($organisations, $image_align) {
+	    $image_align = 'alignright';
+	    $output = '';
         $output .= "<div class=\"cris-organisation\">";
 
         foreach ($organisations as $organisation) {
@@ -151,16 +151,15 @@ class Organisation {
             $research_imgs = self::get_research_images($organisation['ID']);
 
             if (count($research_imgs)) {
-                $output .= "<div class=\"cris-image\">";
-                foreach($research_imgs as $img) {
-                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $output .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
-                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
-                    }
-                }
-                $output .= "</div>";
-            }
-
+		        $output .= "<div class=\"cris-image wp-caption " . $image_align .  "\">";
+		        foreach($research_imgs as $img) {
+			        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+				        $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
+				        $output .= "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description;
+			        }
+		        }
+		        $output .= "</div>";
+	        }
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
                 $research = ($this->page_lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
                 $output .= "<p class=\"cris-research\">" . $research . "</p>";
@@ -171,7 +170,7 @@ class Organisation {
         return $output;
     }
 
-    private function make_custom_single($organisations, $custom_text) {
+    private function make_custom_single($organisations, $custom_text, $image_align = 'alignright') {
         $output = '';
         $output .= "<div class=\"cris-organisation\">";
 
@@ -181,21 +180,23 @@ class Organisation {
                 $organisation[$attribut] = $v;
             }
             unset($organisation['attributes']);
-            $details['#image1#'] = '';
-            $research_imgs = self::get_research_images($organisation['ID']);
-            if (count($research_imgs)) {
-                $i = 1;
-                $image = "<div class=\"cris-image\">";
-                foreach($research_imgs as $img) {
-                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $image .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
-                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
-                    }
-                }
-                $image .= "</div>";
-                $details["#image.$i.#"] .= $image;
-                $i++;
-            }
+	        $details['#image1#'] = '';
+	        $details['#images#'] = '';
+	        if (strpos($custom_text, '#image' ) !== false) {
+		        $imgs = self::get_research_images($organisation['ID']);
+		        if (count($imgs)) {
+			        $i = 1;
+			        foreach($imgs as $img) {
+				        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+					        $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
+					        $details['#image'.$i.'#'] = "<div class=\"cris-image wp-caption " . $image_align .  "\">" . "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description . "</div>";
+					        $details['#images#'] .= $details['#image'.$i.'#'];
+				        }
+				        $i++;
+			        }
+		        }
+	        }
+	        $details['#image#'] = $details['#image1#'];
             $details['#description#'] = '';
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
                 $research = ($this->page_lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
@@ -209,7 +210,8 @@ class Organisation {
 
     private function get_research_images($orga) {
         $images = array();
-        $imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
+        //$imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_PICT";
+	    $imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
         if ($imgXml['size'] != 0) {
