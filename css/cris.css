@@ -120,6 +120,16 @@ ul.cris-equipment .equipment-name {
     margin-bottom: 3px;
 }
 
+.equipment-description ul {
+    margin-left: 0;
+    padding-left: 25px;
+    overflow: hidden;
+}
+
+.equipment-details {
+    padding-bottom: .5em;
+}
+
 @media print {
     .cris-activities a[href]::after,
     .cris-awards a[href]::after,

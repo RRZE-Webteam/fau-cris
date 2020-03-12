@@ -389,7 +389,7 @@ class Publikationen {
 // Ende pubNachTyp()
 
     public function singlePub($quotation = '', $content = '', $sc_type = 'default', $showimage = 0, $image_align = 'right', $image_position = "top") {
-        $ws = new CRIS_publications();
+    	$ws = new CRIS_publications();
 
         try {
             $pubArray = $ws->by_id($this->id);
@@ -927,7 +927,7 @@ class Publikationen {
         return $publist;
     }
 
-    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de') {
+    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright') {
         $publist = '';
         $list = (count($publications) > 1) ? true : false;
         if ($list) {
@@ -1028,20 +1028,18 @@ class Publikationen {
                 $pubDetails['#projectLink#'] = $this->get_pub_projects($id, 'link');
             }
 	        $pubDetails['#image1#'] = '';
-	        if (strpos($custom_text, '#image1#' ) !== false) {
+	        if (strpos($custom_text, '#image#' ) !== false) {
 		        $imgs = self::get_pub_images($publication['ID']);
-		        $pubDetails['#image1#'] = '';
+		        $pubDetails['#image#'] = '';
+		        $imgs = self::get_pub_images( $id );
 		        if (count($imgs)) {
-			        $i = 1;
 			        foreach($imgs as $img) {
-				        $pubDetails['#image'.$i.'#'] = "<div class=\"cris-image\">";
-				        $img_description = (isset($img->attributes['description'])? $img->attributes['description'] : '');
 				        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-					        $pubDetails['#image'.$i.'#'] .= "<p><img alt=\"". $img_description ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
-					                                        . "<span class=\"wp-caption-text\">" . $img_description . "</span></p>";
-					        $pubDetails['#image'.$i.'#'] .= "</div>";
+					        $pubDetails['#image#'] = "<div class=\"cris-image wp-caption " . $image_align  . "\">";
+					        $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
+					        $pubDetails['#image#'] .= "<img alt=\"". $img_description ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description;
+					        $pubDetails['#image#'] .= "</div>";
 				        }
-				        $i++;
 			        }
 		        }
 	        }

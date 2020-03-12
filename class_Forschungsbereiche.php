@@ -225,14 +225,14 @@ class Forschungsbereiche {
                 $singlefield .= "<h2>" . $title . "</h2>";
 
             if (count($imgs)) {
-                $singlefield .= "<div class=\"cris-image\">";
-                foreach($imgs as $img) {
-                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                       $singlefield .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
-                        . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
-                    }
-                }
-                $singlefield .= "</div>";
+	            $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
+	            foreach($imgs as $img) {
+	            	if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+			            $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
+		            	$singlefield .= "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description;
+		            }
+	            }
+	            $singlefield .= "</div>";
             }
 
             $singlefield .= $description;
@@ -383,23 +383,23 @@ class Forschungsbereiche {
 		        }
 	        }
 	        $field_details['#image1#'] = '';
-            if (strpos($content, '#image1#' ) !== false) {
+	        $field_details['#images#'] = '';
+            if (strpos($content, '#image' ) !== false) {
                 $imgs = self::get_field_images($field['ID']);
-                $field_details['#image1#'] = '';
                 if (count($imgs)) {
                     $i = 1;
                     foreach($imgs as $img) {
-                        $field_details['#image'.$i.'#'] = "<div class=\"cris-image\">";
-                        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-                           $field_details['#image'.$i.'#'] .= "<p><img alt=\"". $img->attributes['description'] ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"180\" height=\"180\"><br />"
-                            . "<span class=\"wp-caption-text\">" . (($img->attributes['description'] !='') ? $img->attributes['description'] : "") . "</span></p>";
-                        $field_details['#image'.$i.'#'] .= "</div>";
-                        }
-                        $i++;
+	                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+		                    $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
+		                    $field_details['#image'.$i.'#'] = "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">" . "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description . "</div>";
+		                    $field_details['#images#'] .= $field_details['#image'.$i.'#'];
+	                    }
+	                    $i++;
                     }
                 }
             }
-            $output .= strtr($content, $field_details);
+            $field_details['#image#'] = $field_details['#image1#'];
+	        $output .= strtr($content, $field_details);
         }
         $output .= "</div>";
         return $output;
