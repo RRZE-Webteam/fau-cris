@@ -189,9 +189,9 @@ class Publikationen {
                         }
                     }
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"]' . $shortcode_data_inner . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
+                $openfirst = '';
             }
-            $openfirst = '';
             $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($pubList as $array_year => $publications) {
@@ -318,7 +318,7 @@ class Publikationen {
                         $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language']);
                     }
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $shortcode_data_other . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
