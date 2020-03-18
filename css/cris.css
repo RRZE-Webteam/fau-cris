@@ -56,6 +56,13 @@ div.cris-projects .project-type {
 ul.cris-projects .project-title {
     font-weight: bold;
 }
+ul.cris-projects h3.project-title {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    font-size: inherit;
+    line-height: inherit;
+}
+
 .js ul.cris-projects .abstract-title:hover {
     cursor: pointer;
 }

@@ -252,21 +252,21 @@ class Equipment {
             if (!in_array('details', $hide)) {
                 $equilist .= "<div class=\"equipment-details\">";
                 if (!in_array('manufacturer', (array)$hide) && !empty($manufacturer))
-                    $equilist .= "<b>" . __('Hersteller', 'fau-cris') . ': </b>' . $manufacturer;
+                    $equilist .= "<strong>" . __('Hersteller', 'fau-cris') . ': </strong>' . $manufacturer;
                 if (!in_array('model', (array)$hide) && !empty($model))
-                    $equilist .= "<br /><b>" . __('Modell', 'fau-cris') . ': </b>' . $model;
+                    $equilist .= "<br /><strong>" . __('Modell', 'fau-cris') . ': </strong>' . $model;
                 if (!in_array('constructionYear', (array)$hide) && !empty($constructionYear))
-                    $equilist .= "<br /><b>" . __('Baujahr', 'fau-cris') . ': </b>' . $constructionYear;
+                    $equilist .= "<br /><strong>" . __('Baujahr', 'fau-cris') . ': </strong>' . $constructionYear;
                 if (!in_array('location', (array)$hide) && !empty($location))
-                    $equilist .= "<br /><b>" . __('Standort', 'fau-cris') . ': </b>' . $location;
+                    $equilist .= "<br /><strong>" . __('Standort', 'fau-cris') . ': </strong>' . $location;
                 if (!in_array('url', (array)$hide) && !empty($url))
-                    $equilist .= "<br /><b>" . __('URL', 'fau-cris') . ': </b>' . $url;
+                    $equilist .= "<br /><strong>" . __('URL', 'fau-cris') . ': </strong>' . $url;
                 if (!in_array('year', (array)$hide) && !empty($year))
-                    $equilist .= "<br /><b>" . __('Jahr', 'fau-cris') . ': </b>' . $year;
+                    $equilist .= "<br /><strong>" . __('Jahr', 'fau-cris') . ': </strong>' . $year;
 	            if (!in_array('funding', $hide)) {
 	                $funding = $this->get_equipment_funding($id);
 	                if ($funding)
-	                    $equilist .=  "<br /><b>" . __('Mittelgeber', 'fau-cris') . ": </b>" . implode(', ', $funding);
+	                    $equilist .=  "<br /><strong>" . __('Mittelgeber', 'fau-cris') . ": </strong>" . implode(', ', $funding);
 	            }
 		        $equilist .= "</div>";
 	            }

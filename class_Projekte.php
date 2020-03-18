@@ -570,27 +570,27 @@ class Projekte {
 
                 $projlist .= "<p class=\"project-details\">";
                 if (!empty($parentprojecttitle))
-                    $projlist .= "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
+                    $projlist .= "<strong>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </strong>' . $parentprojecttitle;
                 if (!empty($leaders)) {
-                    $projlist .= "<br /><b>" . __('Projektleitung', 'fau-cris') . ': </b>';
+                    $projlist .= "<br /><strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $leaders);
                 }
                 if (!empty($members)) {
-                    $projlist .= "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ': </b>';
+                    $projlist .= "<br /><strong>" . __('Projektbeteiligte', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $members);
                 }
                 if (!empty($start))
-                    $projlist .= "<br /><b>" . __('Projektstart', 'fau-cris') . ': </b>' . $start;
+                    $projlist .= "<br /><strong>" . __('Projektstart', 'fau-cris') . ': </strong>' . $start;
                 if (!empty($end))
-                    $projlist .= "<br /><b>" . __('Projektende', 'fau-cris') . ': </b>' . $end;
+                    $projlist .= "<br /><strong>" . __('Projektende', 'fau-cris') . ': </strong>' . $end;
                 if (!empty($acronym))
-                    $projlist .= "<br /><b>" . __('Akronym', 'fau-cris') . ": </b>" . $acronym;
+                    $projlist .= "<br /><strong>" . __('Akronym', 'fau-cris') . ": </strong>" . $acronym;
                 if (!empty($funding)) {
-                    $projlist .= "<br /><b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
+                    $projlist .= "<br /><strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $funding);
                 }
                 if (!empty($url))
-                    $projlist .= "<br /><b>" . __('URL', 'fau-cris') . ": </b><a href=\"" . $url . "\">" . $url . "</a>";
+                    $projlist .= "<br /><strong>" . __('URL', 'fau-cris') . ": </strong><a href=\"" . $url . "\">" . $url . "</a>";
                 $projlist .= "</p>";
             }
 
@@ -639,7 +639,7 @@ class Projekte {
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
             $projlist .= "<li>";
-            $projlist .= "<span class=\"project-title\">" . $title . "</span>";
+            $projlist .= "<h3 class=\"project-title\">" . $title . "</h3>";
 
             if (!empty($type) && $showtype == 1)
                 $projlist .= "<br />(" . $type . ")";
@@ -665,19 +665,19 @@ class Projekte {
 
                 $projlist .= "<div class=\"project-details\">";
                 if (!empty($parentprojecttitle))
-                    $projlist .= "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle . '<br />';
+                    $projlist .= "<strong>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </strong>' . $parentprojecttitle . '<br />';
                 if (isset($leaders) && !empty($leaders)) {
-                    $projlist .= "<b>" . __('Projektleitung', 'fau-cris') . ': </b>';
+                    $projlist .= "<strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $leaders) . '<br />';
                 }
                 if (!empty($date))
-                    $projlist .= "<b>" . __('Laufzeit', 'fau-cris') . ': </b>' . $date . '<br />';
+                    $projlist .= "<strong>" . __('Laufzeit', 'fau-cris') . ': </strong>' . $date . '<br />';
                 if (!empty($funding)) {
-                    $projlist .= "<b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
+                    $projlist .= "<strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $funding) . '<br />';
                 }
                 if (!empty($url))
-                    $projlist .= "<b>" . __('URL', 'fau-cris') . ": </b><a href=\"" . $url . "\">" . $url . "</a>";
+                    $projlist .= "<strong>" . __('URL', 'fau-cris') . ": </strong><a href=\"" . $url . "\">" . $url . "</a>";
                 $projlist .= "</div>";
             }
 

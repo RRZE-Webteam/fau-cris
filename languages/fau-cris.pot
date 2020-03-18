@@ -645,7 +645,7 @@ msgstr ""
 
 #: fau-cris.php:1144
 msgid ""
-"<b>CRIS-OrgNr</b>:<br>Die Nummer der der Organisationseinheit, für die die "
+"<strong>CRIS-OrgNr</strong>:<br>Die Nummer der der Organisationseinheit, für die die "
 "Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn "
 "Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf "
 "http://cris.fau.de anzeigen lassen, in der URL: z.B. "
