@@ -230,7 +230,7 @@ class Sync {
                         $field_title = ($field->attributes['cfname'] !='') ? $field->attributes['cfname'] : $field->attributes['cfname_en'];
                         break;
                 }
-                $pages[$field->ID]['title'] = htmlentities($field_title, ENT_QUOTES);
+                $pages[$field->ID]['title'] = $field_title;
                 $pages[$field->ID]['position'] = $this->menu_position;
                 $pages[$field->ID]['content'] = $field_content;
                 $pages[$field->ID]['contact'] = $fcids;
@@ -270,7 +270,7 @@ class Sync {
                             $proj_title = ($project->attributes['cftitle'] !='') ? $project->attributes['cftitle'] : $project->attributes['cftitle_en'];
                             break;
                     }
-                    $pages[$field->ID]['projects'][$project->ID]['title'] = htmlentities($proj_title, ENT_QUOTES);
+                    $pages[$field->ID]['projects'][$project->ID]['title'] = $proj_title;
 
                     $pages[$field->ID]['projects'][$project->ID]['position'] = $this->menu_position;
                     $pages[$field->ID]['projects'][$project->ID]['content'] = $proj_content;
