@@ -407,8 +407,8 @@ class Projekte {
             $proj_details['#members#'] = implode(', ', $members);
             $start = $project['cfstartdate'];
             $proj_details['#start#'] = date_i18n( get_option( 'date_format' ), strtotime($start));
-            $end = $project['virtualenddate'];
-            $proj_details['#end#'] = date_i18n( get_option( 'date_format' ), strtotime($end));
+            $end = $project['cfenddate'];
+            $proj_details['#end#'] = (!empty($end) ? date_i18n( get_option( 'date_format' ), strtotime($end)) : '');
             $funding = $this->get_project_funding($id);
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
@@ -466,8 +466,8 @@ class Projekte {
             $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $start = $project['cfstartdate'];
             $proj_details['#start#'] = date_i18n( get_option( 'date_format' ), strtotime($start));
-            $end = $project['virtualenddate'];
-            $proj_details['#end#'] = date_i18n( get_option( 'date_format' ), strtotime($end));
+            $end = $project['cfenddate'];
+            $proj_details['#end#'] = (!empty($end) ? date_i18n( get_option( 'date_format' ), strtotime($end)) : '');
             $funding = $this->get_project_funding($id);
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
@@ -558,9 +558,8 @@ class Projekte {
                 }
                 $start = $project['cfstartdate'];
                 $start = date_i18n( get_option( 'date_format' ), strtotime($start));
-                if (!in_array('end', $param['hide'])) {
-                    $end = $project['virtualenddate'];
-                    $end = date_i18n( get_option( 'date_format' ), strtotime($end));
+                if (!in_array('end', $param['hide']) && !empty($project['cfenddate'])) {
+                    $end = date_i18n( get_option( 'date_format' ), strtotime($project['cfenddate']));
                 } else {
                     $end = '';
                 }
@@ -648,7 +647,7 @@ class Projekte {
                 $parentprojecttitle = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
                 $acronym = $project['cfacro'];
                 $start = $project['cfstartdate'];
-                $end = (!in_array('end', $hide)) ? $project['virtualenddate'] : '';
+                $end = (!in_array('end', $hide) && !empty($project['cfenddate'])) ? $project['cfenddate'] : '';
                 $date = Tools::make_date($start, $end);
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
