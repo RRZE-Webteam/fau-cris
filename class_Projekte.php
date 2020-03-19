@@ -938,7 +938,7 @@ class Projekte {
 		    return $liste->pubNachJahr ($args, $param['project'], '', false,$param['project']);
 	    if ($param['publications_orderby'] == 'type')
 		    return $liste->pubNachTyp ($args, $param['project'], '', false,$param['project']);
-	    return $liste->projectPub($param['project'], $param['quotation'], false, $param['publications_limit'], $param['display_language']);
+	    return $liste->projectPub($param['project'], $param['quotation'], $param['display_language'], $param['publications_limit'], $param['publications_display']);
     }
 
     private function get_project_images($project) {

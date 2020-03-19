@@ -103,12 +103,12 @@ class Publikationen {
         $output = '';
 
         if ($quotation == 'apa' || $quotation == 'mla') {
-            $output .= $this->make_quotation_list($pubList, $quotation);
+            $output .= $this->make_quotation_list($pubList, $quotation, 0,$param['display']);
         } else {
             if ($param['sc_type'] == 'custom') {
-                $output .= $this->make_custom_list($pubList, $content, '', $param['display_language']);
+                $output .= $this->make_custom_list($pubList, $content, '', $param['display_language'], $param['image_align'],$param['display']);
             } else {
-                $output .= $this->make_list($pubList, 1, $this->nameorder, $param['display_language']);
+                $output .= $this->make_list($pubList, 1, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'],$param['display']);
             }
         }
 
@@ -132,7 +132,7 @@ class Publikationen {
         $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
-	    $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -180,12 +180,12 @@ class Publikationen {
                         $shortcode_data_inner .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $shortcode_data_inner .= $this->make_quotation_list($publications_sub, $quotation);
+                        $shortcode_data_inner .= $this->make_quotation_list($publications_sub, $quotation, 0,$param['display']);
                     } else {
                         if ($param['sc_type'] == 'custom') {
                             $shortcode_data_inner .= $this->make_custom_list($publications_sub, $content, '', $param['display_language']);
                         } else {
-                            $shortcode_data_inner .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $param['display_language']);
+                            $shortcode_data_inner .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'],$param['display']);
                         }
                     }
                 }
@@ -207,12 +207,12 @@ class Publikationen {
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $output .= $this->make_quotation_list($publications_sub, $quotation);
+                        $output .= $this->make_quotation_list($publications_sub, $quotation, 0,$param['display']);
                     } else {
                         if ($param['sc_type'] == 'custom') {
                             $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language']);
                         } else {
-                            $output .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position']);
+                            $output .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'],$param['display']);
                         }
                     }
                 }
@@ -313,7 +313,7 @@ class Publikationen {
                         $shortcode_data_other .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation);
+                        $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation, 0,$param['display']);
                     } else {
                         $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language']);
                     }
@@ -372,12 +372,12 @@ class Publikationen {
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $output .= $this->make_quotation_list($publications_sub, $quotation);
+                        $output .= $this->make_quotation_list($publications_sub, $quotation, 0, $param['display']);
                     } else {
                         if ($param['sc_type'] == 'custom') {
-                            $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language']);
+                            $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language'], $param['image_align'], $param['display']);
                         } else {
-                            $output .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language']);
+                            $output .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'],$param['display']);
                         }
                     }
                 }
@@ -388,7 +388,7 @@ class Publikationen {
 
 // Ende pubNachTyp()
 
-    public function singlePub($quotation = '', $content = '', $sc_type = 'default', $showimage = 0, $image_align = 'right', $image_position = "top") {
+    public function singlePub($quotation = '', $content = '', $sc_type = 'default', $showimage = 0, $image_align = 'right', $image_position = "top", $display='no-list') {
     	$ws = new CRIS_publications();
 
         try {
@@ -400,19 +400,21 @@ class Publikationen {
         if (!count($pubArray))
             return;
 
+        $display = (count($pubArray) < 2 ? 'no-list' : $display);
+
         if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubArray, $quotation, $showimage, $image_align);
+            $output = $this->make_quotation_list($pubArray, $quotation, $showimage, $display);
         } else {
             if ($sc_type == 'custom') {
-                $output = $this->make_custom_list($pubArray, $content, '', $this->sc_lang, $image_align);
+                $output = $this->make_custom_list($pubArray, $content, '', $this->sc_lang, $image_align, $display);
             } else {
-                $output = $this->make_list($pubArray, 0, $this->nameorder, $this->sc_lang, $showimage, $image_align, $image_position);
+                $output = $this->make_list($pubArray, 0, $this->nameorder, $this->sc_lang, $showimage, $image_align, $image_position, $display);
             }
         }
 	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    public function projectPub($project, $quotation = '', $display_language = 'de') {
+    public function projectPub($project, $quotation = '', $display_language = 'de', $limit='', $display = 'list') {
         $ws = new CRIS_publications();
 
         try {
@@ -436,9 +438,9 @@ class Publikationen {
         $pubList = $res[$orderby];
 
         if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubList, $quotation);
+            $output = $this->make_quotation_list($pubList, $quotation, 0, $display);
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder, $display_language);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $display_language,0,'', '', $display);
         }
 
         return $output;
@@ -481,9 +483,9 @@ class Publikationen {
 
         $output = '';
         if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
-            $output = $this->make_quotation_list($pubList, $param['quotation']);
+            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_display']);
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language']);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'],0,'', '', $param['publications_display']);
         }
 
         return $output;
@@ -568,10 +570,11 @@ class Publikationen {
      * Ausgabe der Publikationsdetails in Zitierweise (MLA/APA)
      */
 
-    private function make_quotation_list($publications, $quotation, $showimage = 0) {
+    private function make_quotation_list($publications, $quotation, $showimage = 0, $display = 'list') {
 
         $quotation = strtolower($quotation);
-        $publist = "<ul class=\"cris-publications\">";
+        $list_class = ($display == 'no-list' ? 'no-list' : '');
+        $publist = "<ul class=\"cris-publications $list_class\">";
 
         foreach ($publications as $publication) {
             $publication->insert_quotation_links();
@@ -601,9 +604,10 @@ class Publikationen {
      * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
      */
 
-    private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top') {
+    private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top', $display = 'list') {
 
-        $publist = "<ul class=\"cris-publications\" lang=\"" . $lang . "\">";
+        $list_class = ($display == 'no-list' ? 'no-list' : '');
+        $publist = "<ul class=\"cris-publications $list_class\" lang=\"" . $lang . "\">";
 
         foreach ($publications as $publicationObject) {
 

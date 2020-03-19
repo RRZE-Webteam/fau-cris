@@ -803,7 +803,7 @@ class FAU_CRIS {
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], $parameter['name_order_plugin'], $page_lang, $parameter['display_language']);
 
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
-                return $liste->singlePub($parameter['quotation'], '', 'default', $parameter['showimage'], $parameter['image_align'], $parameter['image_position']);
+                return $liste->singlePub($parameter['quotation'], '', 'default', $parameter['showimage'], $parameter['image_align'], $parameter['image_position'], $parameter['display']);
             }
             if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
                 return $liste->pubListe($parameter);
@@ -931,6 +931,7 @@ class FAU_CRIS {
             'publications_peerreviewed' => '',
             'publications_orderby' => '',
             'publications_notable' => '',
+            'publications_display' => 'list',
             'image_align' => 'right',
             'accordion_title' => '#name# (#year#)',
             'accordion_color' => '',
@@ -980,6 +981,7 @@ class FAU_CRIS {
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
         $sc_param['notable'] = $notable == 1 ? 1 : 0;
         $sc_param['publications_limit'] = sanitize_text_field($publications_limit);
+        $sc_param['publications_display'] = sanitize_text_field($publications_display);
         $sc_param['publications_year'] = sanitize_text_field($publications_year);
         $sc_param['publications_start'] = sanitize_text_field($publications_start);
         $sc_param['publications_type'] = sanitize_text_field($publications_type);
