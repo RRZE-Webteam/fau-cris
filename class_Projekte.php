@@ -407,8 +407,8 @@ class Projekte {
             $proj_details['#members#'] = implode(', ', $members);
             $start = $project['cfstartdate'];
             $proj_details['#start#'] = date_i18n( get_option( 'date_format' ), strtotime($start));
-            $end = $project['virtualenddate'];
-            $proj_details['#end#'] = date_i18n( get_option( 'date_format' ), strtotime($end));
+            $end = $project['cfenddate'];
+            $proj_details['#end#'] = (!empty($end) ? date_i18n( get_option( 'date_format' ), strtotime($end)) : '');
             $funding = $this->get_project_funding($id);
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
@@ -466,8 +466,8 @@ class Projekte {
             $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $start = $project['cfstartdate'];
             $proj_details['#start#'] = date_i18n( get_option( 'date_format' ), strtotime($start));
-            $end = $project['virtualenddate'];
-            $proj_details['#end#'] = date_i18n( get_option( 'date_format' ), strtotime($end));
+            $end = $project['cfenddate'];
+            $proj_details['#end#'] = (!empty($end) ? date_i18n( get_option( 'date_format' ), strtotime($end)) : '');
             $funding = $this->get_project_funding($id);
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
@@ -558,9 +558,8 @@ class Projekte {
                 }
                 $start = $project['cfstartdate'];
                 $start = date_i18n( get_option( 'date_format' ), strtotime($start));
-                if (!in_array('end', $param['hide'])) {
-                    $end = $project['virtualenddate'];
-                    $end = date_i18n( get_option( 'date_format' ), strtotime($end));
+                if (!in_array('end', $param['hide']) && !empty($project['cfenddate'])) {
+                    $end = date_i18n( get_option( 'date_format' ), strtotime($project['cfenddate']));
                 } else {
                     $end = '';
                 }
@@ -570,27 +569,27 @@ class Projekte {
 
                 $projlist .= "<p class=\"project-details\">";
                 if (!empty($parentprojecttitle))
-                    $projlist .= "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle;
+                    $projlist .= "<strong>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </strong>' . $parentprojecttitle;
                 if (!empty($leaders)) {
-                    $projlist .= "<br /><b>" . __('Projektleitung', 'fau-cris') . ': </b>';
+                    $projlist .= "<br /><strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $leaders);
                 }
                 if (!empty($members)) {
-                    $projlist .= "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ': </b>';
+                    $projlist .= "<br /><strong>" . __('Projektbeteiligte', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $members);
                 }
                 if (!empty($start))
-                    $projlist .= "<br /><b>" . __('Projektstart', 'fau-cris') . ': </b>' . $start;
+                    $projlist .= "<br /><strong>" . __('Projektstart', 'fau-cris') . ': </strong>' . $start;
                 if (!empty($end))
-                    $projlist .= "<br /><b>" . __('Projektende', 'fau-cris') . ': </b>' . $end;
+                    $projlist .= "<br /><strong>" . __('Projektende', 'fau-cris') . ': </strong>' . $end;
                 if (!empty($acronym))
-                    $projlist .= "<br /><b>" . __('Akronym', 'fau-cris') . ": </b>" . $acronym;
+                    $projlist .= "<br /><strong>" . __('Akronym', 'fau-cris') . ": </strong>" . $acronym;
                 if (!empty($funding)) {
-                    $projlist .= "<br /><b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
+                    $projlist .= "<br /><strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $funding);
                 }
                 if (!empty($url))
-                    $projlist .= "<br /><b>" . __('URL', 'fau-cris') . ": </b><a href=\"" . $url . "\">" . $url . "</a>";
+                    $projlist .= "<br /><strong>" . __('URL', 'fau-cris') . ": </strong><a href=\"" . $url . "\">" . $url . "</a>";
                 $projlist .= "</p>";
             }
 
@@ -639,7 +638,7 @@ class Projekte {
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
             $projlist .= "<li>";
-            $projlist .= "<span class=\"project-title\">" . $title . "</span>";
+            $projlist .= "<h3 class=\"project-title\">" . $title . "</h3>";
 
             if (!empty($type) && $showtype == 1)
                 $projlist .= "<br />(" . $type . ")";
@@ -648,7 +647,7 @@ class Projekte {
                 $parentprojecttitle = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
                 $acronym = $project['cfacro'];
                 $start = $project['cfstartdate'];
-                $end = (!in_array('end', $hide)) ? $project['virtualenddate'] : '';
+                $end = (!in_array('end', $hide) && !empty($project['cfenddate'])) ? $project['cfenddate'] : '';
                 $date = Tools::make_date($start, $end);
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
@@ -665,19 +664,19 @@ class Projekte {
 
                 $projlist .= "<div class=\"project-details\">";
                 if (!empty($parentprojecttitle))
-                    $projlist .= "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </b>' . $parentprojecttitle . '<br />';
+                    $projlist .= "<strong>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </strong>' . $parentprojecttitle . '<br />';
                 if (isset($leaders) && !empty($leaders)) {
-                    $projlist .= "<b>" . __('Projektleitung', 'fau-cris') . ': </b>';
+                    $projlist .= "<strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $leaders) . '<br />';
                 }
                 if (!empty($date))
-                    $projlist .= "<b>" . __('Laufzeit', 'fau-cris') . ': </b>' . $date . '<br />';
+                    $projlist .= "<strong>" . __('Laufzeit', 'fau-cris') . ': </strong>' . $date . '<br />';
                 if (!empty($funding)) {
-                    $projlist .= "<b>" . __('Mittelgeber', 'fau-cris') . ': </b>';
+                    $projlist .= "<strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
                     $projlist .= implode(', ', $funding) . '<br />';
                 }
                 if (!empty($url))
-                    $projlist .= "<b>" . __('URL', 'fau-cris') . ": </b><a href=\"" . $url . "\">" . $url . "</a>";
+                    $projlist .= "<strong>" . __('URL', 'fau-cris') . ": </strong><a href=\"" . $url . "\">" . $url . "</a>";
                 $projlist .= "</div>";
             }
 
@@ -939,7 +938,7 @@ class Projekte {
 		    return $liste->pubNachJahr ($args, $param['project'], '', false,$param['project']);
 	    if ($param['publications_orderby'] == 'type')
 		    return $liste->pubNachTyp ($args, $param['project'], '', false,$param['project']);
-	    return $liste->projectPub($param['project'], $param['quotation'], false, $param['publications_limit'], $param['display_language']);
+	    return $liste->projectPub($param['project'], $param['quotation'], $param['display_language'], $param['publications_limit'], $param['publications_display']);
     }
 
     private function get_project_images($project) {

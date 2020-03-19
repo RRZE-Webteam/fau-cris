@@ -196,7 +196,7 @@ class Equipment {
         return $equilist;
     }
 
-    private function make_single($equipments, $hide = array(), $quotation = '') {
+    private function make_single($equipments, $hide = array(), $quotation = '', $image_align = 'alignright') {
         $equilist = '';
         $equilist .= "<div class=\"cris-equipment\">";
         foreach($equipments as $equipment) {
@@ -235,40 +235,41 @@ class Equipment {
 	        if (!in_array('image', (array)$hide)) {
 	            $imgs = self::get_equipment_images($id);
 		        if (count($imgs)) {
-		            $equilist .= "<div class=\"cris-image\">";
-		            foreach ( $imgs as $img ) {
-			            if ( isset( $img['png180'] ) && mb_strlen( $img['png180'] ) > 30 ) {
-				            $equilist .= "<p><img alt=\"" . $img['desc'] . "\" src=\"" . $img['png180'] . "\" width=\"180\" height=\"180\"><br />"
-				                         . "<span class=\"wp-caption-text\">" . ( ( $img['desc'] != '' ) ? $img['desc'] : "" ) . "</span></p>";
-			            }
-		            }
-		            $equilist .= "</div>";
-	            }
+			        $equilist .= "<div class=\"cris-image wp-caption " . $image_align  . "\">";
+			        foreach($imgs as $img) {
+			        	$img_description = ($img['desc'] != '' ? "<p class=\"wp-caption-text\">" . $img['desc'] . "</p>" : '');
+				        if (isset($img['png180']) && mb_strlen($img['png180']) > 30) {
+					        $equilist .= "<img alt=\"". $img_description ."\" src=\"" . $img['png180'] . "\" width=\"\" height=\"\">" . $img_description;
+				        }
+			        }
+			        $equilist .= "</div>";
+		        }
             }
 
             if ($description && !in_array('description', (array)$hide)) {
-                $equilist .= "<p class=\"equipment-description\">" . $description . '</p>';
+                $equilist .= "<div class=\"equipment-description\">" . $description . '</div>';
             }
             if (!in_array('details', $hide)) {
-                $equilist .= "<p class=\"equipment-details\">";
+                $equilist .= "<div class=\"equipment-details\">";
                 if (!in_array('manufacturer', (array)$hide) && !empty($manufacturer))
-                    $equilist .= "<b>" . __('Hersteller', 'fau-cris') . ': </b>' . $manufacturer;
+                    $equilist .= "<strong>" . __('Hersteller', 'fau-cris') . ': </strong>' . $manufacturer;
                 if (!in_array('model', (array)$hide) && !empty($model))
-                    $equilist .= "<br /><b>" . __('Modell', 'fau-cris') . ': </b>' . $model;
+                    $equilist .= "<br /><strong>" . __('Modell', 'fau-cris') . ': </strong>' . $model;
                 if (!in_array('constructionYear', (array)$hide) && !empty($constructionYear))
-                    $equilist .= "<br /><b>" . __('Baujahr', 'fau-cris') . ': </b>' . $constructionYear;
+                    $equilist .= "<br /><strong>" . __('Baujahr', 'fau-cris') . ': </strong>' . $constructionYear;
                 if (!in_array('location', (array)$hide) && !empty($location))
-                    $equilist .= "<br /><b>" . __('Standort', 'fau-cris') . ': </b>' . $location;
+                    $equilist .= "<br /><strong>" . __('Standort', 'fau-cris') . ': </strong>' . $location;
                 if (!in_array('url', (array)$hide) && !empty($url))
-                    $equilist .= "<br /><b>" . __('URL', 'fau-cris') . ': </b>' . $url;
+                    $equilist .= "<br /><strong>" . __('URL', 'fau-cris') . ': </strong>' . $url;
                 if (!in_array('year', (array)$hide) && !empty($year))
-                    $equilist .= "<br /><b>" . __('Jahr', 'fau-cris') . ': </b>' . $year;
-            }
-            if (!in_array('funding', $hide)) {
-                $funding = $this->get_equipment_funding($id);
-                if ($funding)
-                    $equilist .=  "<br /><b>" . __('Mittelgeber', 'fau-cris') . ": </b>" . implode(', ', $funding);
-            }
+                    $equilist .= "<br /><strong>" . __('Jahr', 'fau-cris') . ': </strong>' . $year;
+	            if (!in_array('funding', $hide)) {
+	                $funding = $this->get_equipment_funding($id);
+	                if ($funding)
+	                    $equilist .=  "<br /><strong>" . __('Mittelgeber', 'fau-cris') . ": </strong>" . implode(', ', $funding);
+	            }
+		        $equilist .= "</div>";
+	            }
             if (!in_array('fields', $hide)) {
                 $fields = $this->get_equipment_fields($id);
                 if ($fields) {
@@ -384,7 +385,7 @@ class Equipment {
 			}
 			$description = str_replace(["\n", "\t", "\r"], '', $description);
 			$equipment_details['#name#'] =  htmlentities($name, ENT_QUOTES);
-			$equipment_details['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+			$equipment_details['#description#'] = "<div class=\"equipment-description\">" . strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>') . "</div>";
 			$equipment_details['#manufacturer#']  = $equipment['hersteller'];
 			$equipment_details['#model#'] = $equipment['modell'];
 			$equipment_details['#constructionYear#'] = $equipment['baujahr'];
@@ -400,8 +401,8 @@ class Equipment {
 					$i = 1;
 					foreach($imgs as $img) {
 						if (isset($img['png180']) && mb_strlen($img['png180']) > 30) {
-							$equipment_details['#image'.$i.'#'] = "<div class='wp-caption align" . $param['image_align'] . "'><img alt=\"". $equipment_details['#name#'] ."\" src=\"" . $img['png180'] . "\"><br />"
-							                                  . "<span class=\"wp-caption-text\">" . (($img['desc'] !='') ? $img['desc'] : "") . "</span>";
+							$img_description = ($img['desc'] != '' ? "<p class=\"wp-caption-text\">" . $img['desc'] . "</p>" : '');
+							$equipment_details['#image'.$i.'#'] = "<div class='cris-image wp-caption " . $param['image_align'] . "'><img alt=\"". $equipment_details['#name#'] ."\" src=\"" . $img['png180'] . "\"><p class=\"wp-caption-text\">" . $img_description . "</p>";
 							$equipment_details['#image'.$i.'#'] .= "</div>";
 						}
 						$i++;
@@ -505,6 +506,7 @@ class Equipment {
 				    }
 			    }
 			    foreach ($img->relation->attribute as $imgRelAttribut) {
+				    $images[$i]['desc'] = '';
 				    if ($imgRelAttribut['name'] == 'description') {
 					    $images[$i]['desc'] = (!empty($imgRelAttribut->data)) ? (string) $imgRelAttribut->data : '';
 				    }

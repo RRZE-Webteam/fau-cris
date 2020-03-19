@@ -1145,7 +1145,177 @@ class CRIS_Dicts {
                     'title' => 'FAU-interne Gremienmitgliedschaften / Funktionen'),
                 'en' => array(
                     'name' => 'Membership in representative bodies / functions (FAU-internal)',
-                    'title' => 'Memberships in representative bodies / functions (FAU-internal)')
+                    'title' => 'Memberships in representative bodies / functions (FAU-internal)'),
+                'subtypes' => array(
+                    'Women\'s representative of FAU' => array(
+                        'de' => array('name' => 'Frauenbeautragte/r der FAU'),
+                        'en' => array('name' => 'Women\'s representative of FAU'),
+                    ),
+                    'Senat (Membership)' => array(
+                        'de' => array('name' => 'Senat (Mitglied)'),
+                        'en' => array('name' => 'Senat (Membership)'),
+                    ),
+                    'Special Representative' => array(
+                        'de' => array('name' => 'Sonderbeauftragte/r'),
+                        'en' => array('name' => 'Special Representative'),
+                    ),
+                    'Speaker of the Faculty' => array(
+                        'de' => array('name' => 'Fachbereichsleitung'),
+                        'en' => array('name' => 'Speaker of the Faculty'),
+                    ),
+                    'Library Commettee (Presidency)' => array(
+                        'de' => array('name' => 'Bibliotheksausschuss (Vorsitz)'),
+                        'en' => array('name' => 'Library Commettee (Presidency)'),
+                    ),
+                    'Library Commettee (Membership)' => array(
+                        'de' => array('name' => 'Bibliotheksausschuss (Mitglied)'),
+                        'en' => array('name' => 'Library Commettee (Membership)'),
+                    ),
+                    'Open-Access-Representative' => array(
+                        'de' => array('name' => 'Open-Access-Beauftragte/r'),
+                        'en' => array('name' => 'Open-Access-Representative'),
+                    ),
+                    'Faculty Management Board (Presidency)' => array(
+                        'de' => array('name' => 'Fakultätsvorstand (Vorsitz)'),
+                        'en' => array('name' => 'Faculty Management Board (Presidency)'),
+                    ),
+                    'Fakultätsvorstand (Mitglied)' => array(
+                        'de' => array('name' => 'Fakultätsvorstand (Mitglied)'),
+                        'en' => array('name' => 'Faculty Management Board (Membership)'),
+                    ),
+                    'Department\'s board of directors (Membership)' => array(
+                        'de' => array('name' => 'Departmentleitung (Mitglied)'),
+                        'en' => array('name' => 'Department\'s board of directors (Membership)'),
+                    ),
+                    'Commission for Ethical Issues (Presidency)' => array(
+                        'de' => array('name' => 'Ethikkommission (Vorsitz)'),
+                        'en' => array('name' => 'Commission for Ethical Issues (Presidency)'),
+                    ),
+                    'Commission for Ethical Issues (Membership)' => array(
+                        'de' => array('name' => 'Ethikkommission (Mitglied)'),
+                        'en' => array('name' => 'Commission for Ethical Issues (Membership)'),
+                    ),
+                    'Commission for Internationalisation (Presidency)' => array(
+                        'de' => array('name' => 'Kommission Internationalisierung (Vorsitz)'),
+                        'en' => array('name' => 'Commission for Internationalisation (Presidency)'),
+                    ),
+                    'Commission for Internationalisation (Membership)' => array(
+                        'de' => array('name' => 'Kommission Internationalisierung (Mitglied)'),
+                        'en' => array('name' => 'Commission for Internationalisation (Membership)'),
+                    ),
+                    'Commission on Study & Teaching (Presidency)' => array(
+                        'de' => array('name' => 'Kommission Lehre / Studium (Vorsitz)'),
+                        'en' => array('name' => 'Commission on Study & Teaching (Presidency)'),
+                    ),
+                    'Commission on Study & Teaching (Membership)' => array(
+                        'de' => array('name' => 'Kommission Lehre / Studium (Mitglied)'),
+                        'en' => array('name' => 'Commission on Study & Teaching (Membership)'),
+                    ),
+                    'Commission on Computer Systems (Membership)' => array(
+                        'de' => array('name' => 'Kommission Rechenanlagen (Mitglied)'),
+                        'en' => array('name' => 'Commission on Computer Systems (Membership)'),
+                    ),
+                    'Commission on Erratic Behaviour in Science (Presidency)' => array(
+                        'de' => array('name' => 'Kommission wissenschaftliches Fehlverhalten (Vorsitz)'),
+                        'en' => array('name' => 'Commission on Erratic Behaviour in Science (Presidency)'),
+                    ),
+                    'Commission on Erratic Behaviour in Science (Membership)' => array(
+                        'de' => array('name' => 'Kommission wissenschaftliches Fehlverhalten (Mitglied)'),
+                        'en' => array('name' => 'Commission on Erratic Behaviour in Science (Membership)'),
+                    ),
+                    'Commission on Conflict Settlement (Presidency)' => array(
+                        'de' => array('name' => 'Konfliktkommision (Vorsitz)'),
+                        'en' => array('name' => 'Commission on Conflict Settlement (Presidency)'),
+                    ),
+                    'Commission on Conflict Settlement (Membership)' => array(
+                        'de' => array('name' => 'Konfliktkommision (Mitglied)'),
+                        'en' => array('name' => 'Commission on Conflict Settlement (Membership)'),
+                    ),
+                    'Board of Examiners of the Faculty (Presidency)' => array(
+                        'de' => array('name' => 'Prüfungsausschuss der Fakultät (Vorsitz)'),
+                        'en' => array('name' => 'Board of Examiners of the Faculty (Presidency)'),
+                    ),
+                    'Board of Examiners of the Faculty (Membership)' => array(
+                        'de' => array('name' => 'Prüfungsausschuss der Fakultät (Mitglied)'),
+                        'en' => array('name' => 'Board of Examiners of the Faculty (Membership)'),
+                    ),
+                    'Commission for Equal Opportunities (Membership)' => array(
+                        'de' => array('name' => 'Komission Chancengleichheit (Mitgliedschaft)'),
+                        'en' => array('name' => 'Commission for Equal Opportunities (Membership)'),
+                    ),
+                    'Board of the Faculty (Membership)' => array(
+                        'de' => array('name' => 'Fakultätsrat (Mitglied)'),
+                        'en' => array('name' => 'Board of the Faculty (Membership)'),
+                    ),
+                    'Board of Research / Young academics (Membership)' => array(
+                        'de' => array('name' => 'Kommission Forschung / wissenschaftl. Nachwuchs (Mitglied)'),
+                        'en' => array('name' => 'Board of Research / Young academics (Membership)'),
+                    ),
+                    'Board of Research / Young academics (Presidency)' => array(
+                        'de' => array('name' => 'Kommission Forschung / wissenschaftl. Nachwuchs (Vorsitz)'),
+                        'en' => array('name' => 'Board of Research / Young academics (Presidency)'),
+                    ),
+                    'Convention on Researchers (Presidency)' => array(
+                        'de' => array('name' => 'Konvent wissenschaftliche Mitarbeiter (Vorsitz)'),
+                        'en' => array('name' => 'Convention on Researchers (Presidency)'),
+                    ),
+                    'Convention on Researchers (Managing Board)' => array(
+                        'de' => array('name' => 'Konvent wissenschaftliche Mitarbeiter (Leitungsgremium)'),
+                        'en' => array('name' => 'Convention on Researchers (Managing Board)'),
+                    ),
+                    'Senat (Presidency)' => array(
+                        'de' => array('name' => 'Senat (Vorsitz)'),
+                        'en' => array('name' => 'Senat (Presidency)'),
+                    ),
+                    'Management Board / Speaker of a FAU-Central Institute\')' => array(
+                        'de' => array('name' => 'Kollegiale Leitung / Sprecher/in eines FAU-Zentralinstituts'),
+                        'en' => array('name' => 'Management Board / Speaker of a FAU-Central Institute'),
+                    ),
+                    'Speaker of SFB, GRK or elite program' => array(
+                        'de' => array('name' => 'Sprecher für SFB, GRK oder Elitestudiengang'),
+                        'en' => array('name' => 'Speaker of SFB, GRK or elite program'),
+                    ),
+                    'Central Board on Disposition of the Tuition Fees' => array(
+                        'de' => array('name' => 'Zentrales Gremium Verwendung Studienbeiträge'),
+                        'en' => array('name' => 'Central Board on Disposition of the Tuition Fees'),
+                    ),
+                    'Decentralised Board on Disposition of the Tuition Fees' => array(
+                        'de' => array('name' => 'Dezentrales Gremium zur Verwendung der Studienbeiträge'),
+                        'en' => array('name' => 'Decentralised Board on Disposition of the Tuition Fees'),
+                    ),
+                    'Interdisziplinary Center (Speaker)' => array(
+                        'de' => array('name' => 'Interdisziplinäres Zentrum (Sprecher/in)'),
+                        'en' => array('name' => 'Interdisziplinary Center (Speaker)'),
+                    ),
+                    'Interdisziplinary Center (Member)' => array(
+                        'de' => array('name' => 'Interdisziplinäres Zentrum (Mitglied)'),
+                        'en' => array('name' => 'Interdisziplinary Center (Member)'),
+                    ),
+                    'Appointment Committee (Member)' => array(
+                        'de' => array('name' => 'Berufungskommission (Mitglied)'),
+                        'en' => array('name' => 'Appointment Committee (Member)'),
+                    ),
+                    'Appointment Committee (Presidency)' => array(
+                        'de' => array('name' => 'Berufungskommission (Vorsitz)'),
+                        'en' => array('name' => 'Appointment Committee (Presidency)'),
+                    ),
+                    'Dean' => array(
+                        'de' => array('name' => 'Dekan'),
+                        'en' => array('name' => 'Dean'),
+                    ),
+                    'Vice Dean' => array(
+                        'de' => array('name' => 'Prodekan'),
+                        'en' => array('name' => 'Vice Dean'),
+                    ),
+                    'Interdisziplinary Center (Board member)' => array(
+                        'de' => array('name' => 'Interdisziplinäres Zentrum (Vorstandsmitglied)'),
+                        'en' => array('name' => 'Interdisziplinary Center (Board member)'),
+                    ),
+                    'EDP committee' => array(
+                        'de' => array('name' => 'EDV-Kommission'),
+                        'en' => array('name' => 'EDP committee'),
+                    ),
+                )
             ),
             'Organisation einer Tagung / Konferenz' => array(
                 'order' => 2,

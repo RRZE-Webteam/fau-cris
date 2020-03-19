@@ -385,25 +385,31 @@ class Auszeichnungen {
 
 	private function make_custom_list($awards, $custom_text = '', $param = array()) {
 		switch ($param['display']) {
-			case 'accordion':
-				$tag_open = '[collapsibles expand-all-link="true"]';
-				$tag_close= '[/collapsibles]';
-				$item_open = '[collapse title="%1s" color="%2s" name="%3s"]';
-				$item_close = '[/collapse]';
-				break;
-			case 'no-list':
-				$tag_open = '<div class="cris-awards">';
-				$tag_close= '</div>';
-				$item_open = '<div class="cris-award">';
-				$item_close = '</div>';
-				break;
-			case 'list':
-			default:
-				$tag_open = '<ul class="cris-awards">';
-				$tag_close= '</ul>';
-				$item_open = '<li>';
-				$item_close = '</li>';
-		}
+            case 'accordion':
+                $tag_open = '[collapsibles expand-all-link="true"]';
+                $tag_close = '[/collapsibles]';
+                $item_open = '[collapse title="%1s" color="%2s" name="%3s"]';
+                $item_close = '[/collapse]';
+                break;
+            case 'no-list':
+                $tag_open = '<div class="cris-awards">';
+                $tag_close = '</div>';
+                $item_open = '<div class="cris-award">';
+                $item_close = '</div>';
+                break;
+            case 'gallery':
+                $tag_open = '<ul class="cris-awards cris-gallery">';
+                $tag_close = '</ul>';
+                $item_open = '<li class="cris-award">';
+                $item_close = '</li>';
+                break;
+            case 'list':
+            default:
+                $tag_open = '<ul class="cris-awards">';
+                $tag_close = '</ul>';
+                $item_open = '<li>';
+                $item_close = '</li>';
+        }
 
     	$awardlist = $tag_open;
 
@@ -468,18 +474,21 @@ class Auszeichnungen {
 			if (strpos($custom_text, '#image') !== false) {
 				$imgs = self::get_pic($award['ID']);
 				$award_details['#image1#'] = '';
+                $award_details['#image1desc#'] = '';
 				if (count($imgs)) {
 					$i = 1;
 					foreach($imgs as $img) {
-						if (isset($img['png180']) && mb_strlen($img['png180']) > 30) {
-							$award_details['#image'.$i.'#'] = "<div class='wp-caption align" . $param['image_align'] . "'><img alt=\"". $award_details['#name#'] ."\" src=\"" . $img['png180'] . "\"><br />"
-							     . "<span class=\"wp-caption-text\">" . (($img['desc'] !='') ? $img['desc'] : "") . "</span>";
-							$award_details['#image'.$i.'#'] .= "</div>";
+                        if (isset($img['png180']) && mb_strlen($img['png180']) > 30) {
+							$award_details['#image'.$i.'#'] = "<div class='cris-image wp-caption " . $param['image_align'] . "'>"
+                                ."<img alt=\"". $award_details['#name#'] ."\" src=\"" . $img['png180'] . "\">"
+                                . "</div>";
+                            $award_details['#image'.$i.'desc#'] = ($img['desc'] != '' ? "<span class=\"wp-caption-text imgsrc\">" . $img['desc'] . "</span>" : '');
 						}
 						$i++;
 					}
 				}
 				$award_details['#image#'] = $award_details['#image1#'];
+                $award_details['#imagedesc#'] = $award_details['#image1desc#'];
 			}
 			$award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "Person/" . $award['relpersid'];
 
@@ -535,14 +544,13 @@ class Auszeichnungen {
             }
             $award_year = $award['year award'];
             $award_pic = self::get_pic($award['ID']);
-
             $awardlist .= "<li>";
             $awardlist .= (isset($award_pic[1]['png180']) && mb_strlen($award_pic[1]['png180']) > 30) ? "<img alt=\"Portrait " . $award['award_preistraeger'] . "\" src=\"" . $award_pic[1]['png180'] . "\"  />" : "<div class=\"noimage\">&nbsp</div>";
 	        $awardlist .= $name == 1 ? $preistraeger_html . ': ' : '';
             $awardlist .= (($awardname == 1) ? " <strong>" . $award_name . "</strong> "
                     . ((isset($organisation) && $award['type of award'] != 'Akademie-Mitgliedschaft') ? " (" . $organisation . ")" : "") : "" );
             $awardlist .= ($year == 1 && !empty($award_year)) ? "<br />" . $award_year : '';
-            $awardlist .= (isset($award_pic['desc']) && mb_strlen($award_pic['desc']) > 0) ? "<br /><span class=\"imgsrc\">(" . _x('Bild:', 'Wird bei Galerien vor die Bildquelle geschrieben.', 'fau-cris') . " " . $award_pic['desc'] . ")</span>" : "";
+            $awardlist .= (isset($award_pic[1]['desc']) && mb_strlen($award_pic[1]['desc']) > 0) ? "<br /><span class=\"imgsrc\">(" . $award_pic[1]['desc'] . ")</span>" : "";
             $awardlist .= "</li>";
         }
 

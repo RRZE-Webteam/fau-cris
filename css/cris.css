@@ -5,6 +5,13 @@ ul.cris-publications li {
 ul.cris-publications p {
     margin-bottom: 0;
 }
+ul.cris-publications.no-list {
+    margin-left: 0;
+    padding-left: 0;
+}
+ul.cris-publications.no-list li {
+    list-style-type: none;
+}
 
 ul.cris-gallery {
     list-style-type: none;
@@ -56,6 +63,13 @@ div.cris-projects .project-type {
 ul.cris-projects .project-title {
     font-weight: bold;
 }
+ul.cris-projects h3.project-title {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    font-size: inherit;
+    line-height: inherit;
+}
+
 .js ul.cris-projects .abstract-title:hover {
     cursor: pointer;
 }
@@ -82,9 +96,10 @@ ul.cris-equipment .equipment-name {
     font-weight: bold;
 }
 
-.cris-image {
-    float: right;
-    margin: 0 0 10px 20px;
+.cris-image img {
+/*    float: right;
+    margin: 0 0 10px 20px;*/
+    max-height: 180px;
     max-width: 180px;
 }
 
@@ -98,6 +113,15 @@ ul.cris-equipment .equipment-name {
     top: 2px;
 }
 
+.cris-publications .alignleft {
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+.cris-publications .alignright {
+    margin-bottom: 0;
+}
+
 .cris-award div[class*="-columns-"] {
     margin-bottom: 10px;
 }
@@ -108,6 +132,16 @@ ul.cris-equipment .equipment-name {
 .cris-award .elements-divider {
     padding-top: 3px;
     margin-bottom: 3px;
+}
+
+.equipment-description ul {
+    margin-left: 0;
+    padding-left: 25px;
+    overflow: hidden;
+}
+
+.equipment-details {
+    padding-bottom: .5em;
 }
 
 @media print {

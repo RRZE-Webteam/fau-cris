@@ -295,7 +295,7 @@ class Aktivitaeten {
 
             switch (strtolower($activity['type of activity'])) {
                 case "fau-interne gremienmitgliedschaften / funktionen":
-                    $activity_name = $activity['description function'];
+                    $activity_name = Tools::getName('activities', $activity['type of activity'], $this->sc_lang, $subtype = $activity['typeofinternalmembership']);
                     $activity_detail = '';
                     $activity_nameofshow = '';
                     $activity_eventname = '';

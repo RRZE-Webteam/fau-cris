@@ -230,7 +230,7 @@ class Sync {
                         $field_title = ($field->attributes['cfname'] !='') ? $field->attributes['cfname'] : $field->attributes['cfname_en'];
                         break;
                 }
-                $pages[$field->ID]['title'] = htmlentities($field_title, ENT_QUOTES);
+                $pages[$field->ID]['title'] = $field_title;
                 $pages[$field->ID]['position'] = $this->menu_position;
                 $pages[$field->ID]['content'] = $field_content;
                 $pages[$field->ID]['contact'] = $fcids;
@@ -244,14 +244,14 @@ class Sync {
                             . "<h2>#title#</h2>\n"
                             . "<p class=\"project-type\">(#type#)</p>\n"
                             . "<p class=\"project-details\">"
-                            . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> #parentprojecttitle#"
-                            . "<br /><b>" . __('Projektleitung', 'fau-cris') . ":</b> #leaders#"
-                            . "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ":</b> #members#"
-                            . "<br /><b>" . __('Projektstart', 'fau-cris') . ":</b> #start#"
-                            . "<br /><b>" . __('Projektende', 'fau-cris') . ":</b> #end#"
-                            . "<br /><b>" . __('Akronym', 'fau-cris') . ":  </b> #acronym#"
-                            . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> #funding#"
-                            . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"#url#\">#url#</a>"
+                            . "<strong>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</strong> #parentprojecttitle#"
+                            . "<br /><strong>" . __('Projektleitung', 'fau-cris') . ":</strong> #leaders#"
+                            . "<br /><strong>" . __('Projektbeteiligte', 'fau-cris') . ":</strong> #members#"
+                            . "<br /><strong>" . __('Projektstart', 'fau-cris') . ":</strong> #start#"
+                            . "<br /><strong>" . __('Projektende', 'fau-cris') . ":</strong> #end#"
+                            . "<br /><strong>" . __('Akronym', 'fau-cris') . ":  </strong> #acronym#"
+                            . "<br /><strong>" . __('Mittelgeber', 'fau-cris') . ":</strong> #funding#"
+                            . "<br /><strong>" . __('URL', 'fau-cris') . ":</strong> <a href=\"#url#\">#url#</a>"
                             . "</p>"
                             . "<h3>" . __('Abstract', 'fau-cris') . "</h3>"
                             . "<p class=\"project-description\">#description#</p>"
@@ -270,7 +270,7 @@ class Sync {
                             $proj_title = ($project->attributes['cftitle'] !='') ? $project->attributes['cftitle'] : $project->attributes['cftitle_en'];
                             break;
                     }
-                    $pages[$field->ID]['projects'][$project->ID]['title'] = htmlentities($proj_title, ENT_QUOTES);
+                    $pages[$field->ID]['projects'][$project->ID]['title'] = $proj_title;
 
                     $pages[$field->ID]['projects'][$project->ID]['position'] = $this->menu_position;
                     $pages[$field->ID]['projects'][$project->ID]['content'] = $proj_content;
@@ -306,14 +306,14 @@ class Sync {
                         . "<h2>#title#</h2>\n"
                         . "<p class=\"project-type\">(#type#)</p>\n"
                         . "<p class=\"project-details\">"
-                        . "<b>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</b> #parentprojecttitle#"
-                        . "<br /><b>" . __('Projektleitung', 'fau-cris') . ":</b> #leaders#"
-                        . "<br /><b>" . __('Projektbeteiligte', 'fau-cris') . ":</b> #members#"
-                        . "<br /><b>" . __('Projektstart', 'fau-cris') . ":</b> #start#"
-                        . "<br /><b>" . __('Projektende', 'fau-cris') . ":</b> #end#"
-                        . "<br /><b>" . __('Akronym', 'fau-cris') . ":  </b> #acronym#"
-                        . "<br /><b>" . __('Mittelgeber', 'fau-cris') . ":</b> #funding#"
-                        . "<br /><b>" . __('URL', 'fau-cris') . ":</b> <a href=\"#url#\">#url#</a>"
+                        . "<strong>" . __('Titel des Gesamtprojektes', 'fau-cris') . ":</strong> #parentprojecttitle#"
+                        . "<br /><strong>" . __('Projektleitung', 'fau-cris') . ":</strong> #leaders#"
+                        . "<br /><strong>" . __('Projektbeteiligte', 'fau-cris') . ":</strong> #members#"
+                        . "<br /><strong>" . __('Projektstart', 'fau-cris') . ":</strong> #start#"
+                        . "<br /><strong>" . __('Projektende', 'fau-cris') . ":</strong> #end#"
+                        . "<br /><strong>" . __('Akronym', 'fau-cris') . ":  </strong> #acronym#"
+                        . "<br /><strong>" . __('Mittelgeber', 'fau-cris') . ":</strong> #funding#"
+                        . "<br /><strong>" . __('URL', 'fau-cris') . ":</strong> <a href=\"#url#\">#url#</a>"
                         . "</p>"
                         . "<h3>" . __('Abstract', 'fau-cris') . "</h3>"
                         . "<p class=\"project-description\">#description#</p>"

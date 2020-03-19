@@ -1,9 +1,9 @@
 CRIS-Plugin für Wordpress
 =========================
 
-Version 3.14.5
+Version 3.15.0
 
-Einbinden von Daten aus dem FAU-Forschungsinformationssystem <b>CRIS</b> in Webseiten
+Einbinden von Daten aus dem FAU-Forschungsinformationssystem <strong>CRIS</strong> in Webseiten
 
 Aktuell werden folgende in CRIS erfasste Forschungsleistungen unterstützt:
 - Publikationen
