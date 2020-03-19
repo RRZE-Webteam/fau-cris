@@ -8,7 +8,7 @@
  * Text Domain: fau-cris
  * Domain Path: /languages
  * Requires at least: 3.9.2
- * Tested up to: 5.2.2
+ * Tested up to: 5.3.2
  * License: GPLv2 or later
  * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris
  * GitHub Branch: master
@@ -213,7 +213,9 @@ class FAU_CRIS {
         $current = self::current_tab($_GET);
         if (isset($_GET['action']) && $_GET['action'] == 'cris_sync') {
             include 'class_Sync.php';
-            $sync = new Sync();
+            global $post;
+            $page_lang = Tools::getPageLanguage($post->ID);
+            $sync = new Sync($page_lang);
             $result = $sync->do_sync();
         }
         $options = self::get_options();
