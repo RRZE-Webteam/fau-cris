@@ -697,17 +697,22 @@ class Publikationen {
             	$imgs = self::get_pub_images( $id );
             	if (count($imgs)) {
 		            $cleardiv = '<div style="float: none; clear: both;"></div>';
-		            $publication['image'] = "<div class=\"cris-image wp-caption " . $image_align  . "\">";
 		            foreach($imgs as $img) {
-		            	$img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
+		                $img_size = getimagesizefromstring (base64_decode($img->attributes['png180']));
+		                $publication['image'] = "<div class=\"cris-image wp-caption " . $image_align  . "\" style=\"width: " . $img_size[0] . "px;\">";
+                        $img_description = (isset($img->attributes['description']) ? $img->attributes['description'] : '');
 			            if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-				            $publication['image'] .= "<img alt=\"". $img_description ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description;
+				            $publication['image'] .= "<img alt=\"Coverbild: ". $img_description ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3].">"
+                                . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
+				            //$publication['image'] .= "<img alt=\"". $img->attributes['description'] ."\" src=\"\" width=\"\" height=\"\">" . $img_description;
+
 			            }
+                        $publication['image'] .= "</div>";
 		            }
-		            $publication['image'] .= "</div>";
+
 	            }
             }
-
+//exit;
             switch (strtolower($pubDetails['pubType'])) {
 
                 case "book": // OK
