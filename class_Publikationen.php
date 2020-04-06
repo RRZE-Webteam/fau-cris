@@ -712,7 +712,7 @@ class Publikationen {
 
 	            }
             }
-//exit;
+
             switch (strtolower($pubDetails['pubType'])) {
 
                 case "book": // OK

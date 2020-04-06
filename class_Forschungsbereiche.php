@@ -227,10 +227,18 @@ class Forschungsbereiche {
             if (count($imgs)) {
 	            $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
 	            foreach($imgs as $img) {
-	            	if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-			            $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
-		            	$singlefield .= "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description;
-		            }
+                    foreach($imgs as $img) {
+                        $img_size = getimagesizefromstring (base64_decode($img->attributes['png180']));
+                        $singlefield = "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";
+                        $img_description = (isset($img->attributes['description']) ? $img->attributes['description'] : '');
+                        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+                            $singlefield .= "<img alt=\"Coverbild: ". $img_description ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3].">"
+                                . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
+                            //$publication['image'] .= "<img alt=\"". $img->attributes['description'] ."\" src=\"\" width=\"\" height=\"\">" . $img_description;
+
+                        }
+                        $singlefield .= "</div>";
+                    }
 	            }
 	            $singlefield .= "</div>";
             }
