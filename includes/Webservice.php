@@ -3,8 +3,6 @@
  * These classes provide generic access to the CRIS web service data including
  * filter and sorting methods.
  *
- * Namespaces are not used respecting older PHP versions.
- *
  * @author Marcus Walther
  */
 
@@ -28,9 +26,12 @@ class Webservice {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
 		$xml = curl_exec($ch);
-
-		if ($xml === false)
-			throw new Exception('remote request failed '. curl_error($ch));
+		$response_code = curl_getinfo ($ch, CURLINFO_RESPONSE_CODE);
+		if ($xml === false) {
+            throw new \Exception('Remote request failed ' . curl_error($ch));
+        } elseif ($response_code != 200) {
+            throw new \Exception('Remote request failed: Error ' . $response_code);
+        }
 
 		curl_close($ch);
 		return $xml;
@@ -43,6 +44,24 @@ class Webservice {
 	public function enable_cache() {
 		$this->cache = true;
 	}
+
+	public function make_request ($entity, $by, $id) {
+        if ($id === null || $id === "0")
+            throw new \Exception('Please supply valid ID');
+        if (!is_array($id))
+            $id = array($id);
+        $requests = array();
+        foreach ($id as $i) {
+            if (is_array(WS_REQUESTS[$entity][$by])) {
+                foreach(WS_REQUESTS[$entity][$by] as $string) {
+                    $requests[] = sprintf($string, $i);
+                }
+            } else {
+                $requests[] = sprintf(WS_REQUESTS[$entity][$by], $i);
+            }
+        }
+        return $requests;
+    }
 
 	public function get($id, &$filter) {
 		/*
@@ -83,23 +102,22 @@ class Webservice {
 		}
 
 		try {
-			$rawxml = $this->fetch($base_uri . $id . $seed);
-		} catch (Exception $ex) {
-			$rawxml = null;
+			$rawxml = $this->fetch(WS_URL . $id . $seed);
+		} catch (\Exception $ex) {
+		    $rawxml = null;
+            return $ex;
 		}
-		if ($rawxml === null)
-			throw new Exception('request failed');
 
 		// parse into object
 		libxml_use_internal_errors(true);
 		try {
 			$xmlobj = new \SimpleXMLElement($rawxml);
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			$error_message = array();
 			foreach(libxml_get_errors() as $error_line) {
 				$error_message[] = $error_line->message;
 			}
-			throw new Exception(implode('\n', $error_message));
+			throw new \Exception(implode(' \n ', $error_message));
 		}
 
 		# build envelope array if necessary

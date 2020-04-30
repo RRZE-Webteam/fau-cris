@@ -4,7 +4,7 @@
   div.publication {
     margin-bottom: .5em;
   }
-  ul.publications {
+  ul.cris-publications {
     margin-bottom: 1em;
     li {
       margin-bottom: 1em;
@@ -12,6 +12,13 @@
     }
     p {
       margin-bottom: 0;
+    }
+    &.no-list {
+      margin-left: 0;
+      padding-left: 0;
+      li {
+        list-style-type: none;
+      }
     }
   }
 

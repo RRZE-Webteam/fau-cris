@@ -30,8 +30,6 @@ use FAU\CRIS\Options;
 
 const RRZE_PHP_VERSION = '7.3';
 const RRZE_WP_VERSION = '5.2';
-const FAU_CRIS_OPEN = '<div class="fau-cris">';
-const FAU_CRIS_CLOSE = '</div>';
 
 // Automatische Laden von Klassen.
 spl_autoload_register(function ($class) {

@@ -7,11 +7,11 @@ defined('ABSPATH') || exit;
 require_once 'config/config.php';
 
 use FAU\CRIS\Tools;
-use function FAU\CRIS\Config\getOptionName;
-use function FAU\CRIS\Config\getMenuSettings;
-use function FAU\CRIS\Config\getHelpTab;
-use function FAU\CRIS\Config\getSections;
-use function FAU\CRIS\Config\getFields;
+use function FAU\CRIS\getOptionName;
+use function FAU\CRIS\getMenuSettings;
+use function FAU\CRIS\getHelpTab;
+use function FAU\CRIS\getSections;
+use function FAU\CRIS\getFields;
 
 /**
  * Settings-Klasse

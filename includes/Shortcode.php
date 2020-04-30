@@ -4,11 +4,12 @@ namespace FAU\CRIS;
 
 defined('ABSPATH') || exit;
 
+require_once(__DIR__ . '/Tools.php');
+
 /**
  * Shortcode
  */
-class Shortcode
-{
+class Shortcode {
     /**
      * Der vollständige Pfad- und Dateiname der Plugin-Datei.
      * @var string
@@ -68,19 +69,13 @@ class Shortcode
 	    wp_enqueue_script('fau-cris-shortcode');
 	    $parameter = self::crisShortcodeParameter($atts, $content, $tag);
 		//Publications
-	    if (isset($parameter['show']) && $parameter['show'] == 'publications') {
-	    	$output = new Entities\Publications($parameter, $content, $tag, $this->options);
-		    if ($parameter['publication'] != '') {
-		    	if (!is_array($parameter['publication'])) {
-				    return $output->singlePublication();
-			    } else {
-				    return $output->flatList();
-			    }
+        if (isset($parameter['show']) && $parameter['show'] == 'publications') {
+            $output = new Entities\Publications($parameter, $content, $tag, $this->options);
+//		    if (empty($parameter['order']) && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+		    if (empty($parameter['order']) || $parameter['order'][0] == 'none') {
+		        return $output->flatList();
 		    }
-		    if (empty($parameter['order']) && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
-			    return $output->flatList();
-		    }
-		    return $output->orderedList();
+            return $output->orderedList();
 	    }
 	    //Projects
 	    if (isset($parameter['show']) && $parameter['show'] == 'projects') {
@@ -130,65 +125,68 @@ class Shortcode
 
 	private function crisShortcodeParameter($atts, $content = '', $tag) {
 		global $post;
-		$tools = new Tools();
 
 		$shortcode_atts = shortcode_atts([
-			'show' => 'publications',
-			'orderby' => '',
-			'year' => '',
-			'start' => '',
-			'end' => '',
-			'organisation' => $this->settings->getOption('cris_general','cris_org_nr', ''),
-			'orgid' => $this->settings->getOption('cris_general','cris_org_nr', ''),
-			'persid' => '',
-			'publication' => '',
-			'pubtype' => '',
-			'quotation' => '',
-			'language' => '',
-			'items' => '',
-			'limit' => '',
-			'sortby' => '',
-			'format' => 'default',
-			'award' => '',
-			'awardnameid' => '',
-			'type' => '',
-			'subtype' => '',
-			'showname' => 1,
-			'showyear' => 1,
-			'showawardname' => 1,
-			'display' => 'list',
-			'project' => '',
-			'hide' => '',
-			'role' => 'all',
-			'status' => '',
-			'patent' => '',
-			'activity' => '',
-			'field' => '',
-			'fau' => '',
-			'equipment' => '',
-			'manufacturer' => '',
-			'constructionyear' => '',
-			'constructionyearstart' => '',
-			'constructionyearend' => '',
-			'location' => '',
-			'peerreviewed' => '',
-			'current' => '',
-			'publications_limit' => $this->settings->getOption('cris_layout','cris_fields_num_pub', '5'),
-			'notable' => '',
-			'publications_year' => '',
-			'publications_start' => '',
-			'publications_type' => '',
-			'publications_subtype' => '',
-			'publications_fau' => '',
-			'publications_peerreviewed' => '',
-			'publications_orderby' => '',
-			'publications_notable' => '',
-			'image_align' => 'left',
-			'accordion_title' => '#name# (#year#)',
-			'accordion_color' => '',
-			'display_language' => $tools->getPageLanguage($post->ID),
-			'page_language' => $tools->getPageLanguage($post->ID),
-			'curation' => 0,
+            'show' => 'publications',
+            'orderby' => 'year',
+            'year' => '',
+            'start' => '',
+            'end' => '',
+            'orgid' => $this->settings->getOption('cris_general','cris_org_nr', ''),
+            'organisation' => $this->settings->getOption('cris_general','cris_org_nr', ''),
+            'persid' => '',
+            'publication' => '',
+            'pubtype' => '',
+            'quotation' => '',
+            'language' => '',
+            'items' => '',
+            'limit' => '',
+            'sortby' => '',
+            'format' => 'list',
+            'display' => '',
+            'award' => '',
+            'awardnameid' => '',
+            'type' => '',
+            'subtype' => '',
+            'showname' => 1,
+            'showyear' => 1,
+            'showawardname' => 1,
+            'showimage' => '',
+            'project' => '',
+            'hide' => '',
+            'role' => 'all',
+            'status' => '',
+            'patent' => '',
+            'activity' => '',
+            'field' => '',
+            'fau' => '',
+            'equipment' => '',
+            'manufacturer' => '',
+            'constructionyear' => '',
+            'constructionyearstart' => '',
+            'constructionyearend' => '',
+            'location' => '',
+            'peerreviewed' => '',
+            'current' => '',
+            'publications_limit' => $this->settings->getOption('cris_layout','cris_fields_num_pub', '5'),
+            'name_order_plugin' => (isset($options['cris_name_order_plugin']) && !empty($options['cris_name_order_plugin'])) ? $options['cris_name_order_plugin'] : 'firstname-lastname',
+            'notable' => '',
+            'publications_year' => '',
+            'publications_start' => '',
+            'publications_end' => '',
+            'publications_type' => '',
+            'publications_subtype' => '',
+            'publications_fau' => '',
+            'publications_peerreviewed' => '',
+            'publications_orderby' => '',
+            'publications_notable' => '',
+            'publications_display' => 'list',
+            'image_align' => 'right',
+            'accordion_title' => '#name# (#year#)',
+            'accordion_color' => '',
+            'display_language' => getPageLanguage($post->ID),
+            'page_language' => getPageLanguage($post->ID),
+            'curation' => 0,
 		], $atts, $tag);
 		$shortcode_atts = array_map('sanitize_text_field', $shortcode_atts);
 
@@ -196,17 +194,19 @@ class Shortcode
 		$shortcode_atts['nameorder'] = $this->settings->getOption('cris_layout','cris_name_order_plugin', 'firstname-lastname');
 
 		if ($shortcode_atts['publication'] != '') {
-			$shortcode_atts['entity'] = 'publication';
-			if (strpos($shortcode_atts['publication'], ',')) {
-				$shortcode_atts['publication'] = str_replace(' ', '', $shortcode_atts['publication']);
-				$shortcode_atts['publication'] = explode(',', $shortcode_atts['publication']);
-			}
+			$shortcode_atts['entity'] = 'id';
+			$shortcode_atts['publication'] = str_replace(' ', '', $shortcode_atts['publication']);
+			$shortcode_atts['publication'] = explode(',', $shortcode_atts['publication']);
 			$shortcode_atts['entity_id'] = $shortcode_atts['publication'];
 		} elseif ($shortcode_atts['equipment'] != '') {
 			$shortcode_atts['entity'] = 'equipment';
 			$shortcode_atts['entity_id'] = $shortcode_atts['equipment'];
 		} elseif ($shortcode_atts['field'] != '') {
-			$shortcode_atts['entity'] = 'field';
+		    if ($shortcode_atts['notable'] == '1') {
+                $shortcode_atts['entity'] = 'field_notable';
+            } else {
+		        $shortcode_atts['entity'] = 'field';
+            }
 			if (strpos($shortcode_atts['field'], ',') !== false) {
 				$shortcode_atts['field'] = str_replace(' ', '', $shortcode_atts['field']);
 				$shortcode_atts['field'] = explode(',', $shortcode_atts['field']);
@@ -239,7 +239,7 @@ class Shortcode
 			}
 			$shortcode_atts['entity_id'] = $shortcode_atts['persid'];
 		} elseif (isset($shortcode_atts['orgid']) && $shortcode_atts['orgid'] != '') {
-			$shortcode_atts['entity'] = 'orga';
+			$shortcode_atts['entity'] = 'organisation';
 			if (strpos($shortcode_atts['orgid'], ',') !== false) {
 				$shortcode_atts['orgid'] = str_replace(' ', '', $shortcode_atts['orgid']);
 				$shortcode_atts['orgid'] = explode(',', $shortcode_atts['orgid']);
@@ -250,12 +250,12 @@ class Shortcode
 			$shortcode_atts['entity_id'] = '';
 		}
 
-		$shortcode_atts['order'] = [];
+        $shortcode_atts['order'] = [];
 		if (!empty($shortcode_atts['orderby'])) {
 			$orderby = explode(',', $shortcode_atts['orderby'] );
 			$shortcode_atts['order'] = array_map( 'trim', $orderby );
 			array_splice($shortcode_atts['order'],2);
-			if (!in_array($shortcode_atts['order'][0],['year','type','author']))
+			if (!in_array($shortcode_atts['order'][0],['year','type','author', 'none']))
 				$shortcode_atts['order'][0] = 'year';
 			if (!isset($shortcode_atts['order'][1])
 			    || !in_array($shortcode_atts['order'][1],['year','type','subtype','author'])
@@ -269,6 +269,19 @@ class Shortcode
 		if ($shortcode_atts['format'] == 'accordion' && !shortcode_exists('collapsibles'))
 			$shortcode_atts['format'] == 'default';
 
-		return $shortcode_atts;
+        if (in_array($shortcode_atts['image_align'], ['left', 'right', 'none'])) {
+            $shortcode_atts['image_align'] = 'align' . sanitize_text_field($shortcode_atts['image_align']);
+            $shortcode_atts['image_position'] = 'top';
+        } elseif (in_array($shortcode_atts['image_align'], ['bottom', 'top'])) {
+            $shortcode_atts['image_align'] = 'alignnone';
+            $shortcode_atts['image_position'] = sanitize_text_field($shortcode_atts['image_align']);
+        } else {
+            $shortcode_atts['image_align'] = 'alignright';
+            $shortcode_atts['image_position'] = 'top';
+        }
+        // format und display abwärtskompatibel zusammenführen
+        $shortcode_atts['format'] = $shortcode_atts['format'] . $shortcode_atts['display'];
+
+        return $shortcode_atts;
     }
 }
