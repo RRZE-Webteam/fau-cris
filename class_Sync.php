@@ -40,6 +40,7 @@ class Sync {
         $this->num_ok_mp = 0;
         $this->num_errors = 0;
         $this->title_research = __('Forschung', 'fau-cris');
+        $this->menu_research = sanitize_title($this->title_research);
         $this->title_noFieldsPage = __('Weitere Projekte', 'fau-cris');
         $this->page_template_portal = ( '' != locate_template('page-templates/page-portal.php')) ? 'page-templates/page-portal.php' : 'page.php';
         $this->page_template_nav = ( '' != locate_template('page-templates/page-subnav.php')) ? 'page-templates/page-subnav.php' : 'page.php';
@@ -90,6 +91,8 @@ class Sync {
         require_once('class_Organisation.php');
         $orga = new Organisation();
         $research_contacts = $orga->researchContacts(true);
+        if (is_string($research_contacts))
+            $research_contacts = [];
         if (!isset($page_research) || !count($page_research)) {
         // Seite Forschung existiert noch nicht -> anlegen
             if ($this->options['cris_sync_shortcode_format']['research'] == 1) {
@@ -162,14 +165,14 @@ class Sync {
             $updated ? $this->num_updated_p ++ : $this->num_ok_p ++;
         }
         // Wenn nötig Hauptmenü-Eintrag anlegen
-        $research_menu_item = self::cris_menu_item_exists($this->menu_items, $this->title_research, 0, 0);
+        $research_menu_item = self::cris_menu_item_exists($this->menu_items, $this->title_research, 0, $this->menu_research);
         if (!$research_menu_item) {
-            $research_mid = self::cris_make_menu_item($this->menu_id, $this->title_research, $research_pid, 0, $this->menu_position);
+            $research_mid = self::cris_make_menu_item($this->menu_research, $this->menu_id, $this->title_research, $research_pid, 0, $this->menu_position);
             $this->num_created_m ++;
         } else {
             /*if ($page_research->menu_order != $this->menu_position) {
             // Wenn nötig existierende Menüposition korrigieren
-                self::cris_make_menu_item($this->menu_id, $this->title_research, $research_pid, 0, $this->menu_position, $research_menu_item->ID);
+                self::cris_make_menu_item($cris_id, $this->menu_id, $this->title_research, $research_pid, 0, $this->menu_position, $research_menu_item->ID);
                 $this->num_updated_m ++;
             } else {*/
                 $this->num_ok_m ++;
@@ -239,7 +242,7 @@ class Sync {
                 if (!$projects)
                     continue;
                 foreach ($projects as $project) {
-                    if ($this->options['cris_sync_shortcode_format']['projects'] == 1) {
+                    if (array_key_exists('projects', $this->options['cris_sync_shortcode_format']) && $this->options['cris_sync_shortcode_format']['projects'] == 1) {
                         $proj_content = "[cris-custom show=projects project=$project->ID]\n"
                             . "<h2>#title#</h2>\n"
                             . "<p class=\"project-type\">(#type#)</p>\n"
@@ -301,7 +304,7 @@ class Sync {
         $all_projects = $p->by_orga_id($this->orgNr);
         $orga_projects = array();
         foreach ($all_projects as $a_p) {
-            if ($this->options['cris_sync_shortcode_format']['projects'] == 1) {
+            if (array_key_exists('projects', $this->options['cris_sync_shortcode_format']) && $this->options['cris_sync_shortcode_format']['projects'] == 1) {
                 $nf_proj_content = "[cris-custom show=projects project=$a_p->ID]\n"
                         . "<h2>#title#</h2>\n"
                         . "<p class=\"project-type\">(#type#)</p>\n"
@@ -363,10 +366,12 @@ class Sync {
         /*
          *  Seiten Forschungsbereiche unter Forschung
          */
-        foreach ($pages as $field) {
+        foreach ($pages as $field_id => $field) {
+//            var_dump($field_id);
+//            exit;
             if ($field['title'] == $this->title_noFieldsPage && (!count($field['projects'])))
                 continue;
-            $field_page = self::cris_make_page($field['title'], $field['content'], $field['contact'], $field['position'], $research_pid, $research_mid,0,1);
+            $field_page = self::cris_make_page($field_id, $field['title'], $field['content'], $field['contact'], $field['position'], $research_pid, $research_mid,0,1);
             $this->menu_count ++;
 
             /*
@@ -374,8 +379,8 @@ class Sync {
              */
 
             $projects = $field['projects'];
-            foreach ($projects as $project) {
-                $project_page = self::cris_make_page($project['title'], $project['content'], $project['contact'], $project['position'], $field_page['pid'], $field_page['mid'], $field_page['mpid'],1,$this->page_template_nav);
+            foreach ($projects as $project_id => $project) {
+                $project_page = self::cris_make_page($project_id, $project['title'], $project['content'], $project['contact'], $project['position'], $field_page['pid'], $field_page['mid'], $field_page['mpid'],1,$this->page_template_nav);
             }
         }
 
@@ -420,20 +425,18 @@ class Sync {
      * Helfer-Funktionen
      */
 
-    private function cris_menu_item_exists($menu, $title, $parent = 0) {
+    private function cris_menu_item_exists($menu, $title, $parent = 0, $cris_id = '') {
         if (!is_array($menu))
             return;
         foreach ($menu as $menu_item) {
-            if (basename($menu_item->url) == sanitize_title($title)
-                    && $menu_item->menu_item_parent == $parent
-                    && !isset($menu_item->_invalid)) {
+            if (in_array('cris-'.$cris_id, $menu_item->classes)) {
                 return $menu_item;
             }
         }
         return;
     }
 
-    private function cris_make_menu_item($menu, $title, $object_id, $parent_id, $position = 0, $menu_item_db_id = 0) {
+    private function cris_make_menu_item($cris_id, $menu, $title, $object_id, $parent_id, $position = 0, $menu_item_db_id = 0) {
         $first_class = ($this->menu_count == 1) ? ' cris-first' : '';
         $last_class = ($this->menu_count == $this->num_menu_items) ? ' cris-last' : '';
         $mid = wp_update_nav_menu_item($menu, $menu_item_db_id, array(
@@ -448,7 +451,7 @@ class Sync {
             //'menu-item-description' => '',
             //'menu-item-attr-title' => '',
             //'menu-item-target' => '',
-            'menu-item-classes' => 'cris' . $first_class . $last_class,
+            'menu-item-classes' => 'cris-' . $cris_id . $first_class . $last_class,
             //'menu-item-xfn' => '',
             'menu-item-status' => 'publish',
             )
@@ -457,7 +460,7 @@ class Sync {
             return $mid;
     }
 
-    private function cris_make_page($title, $content, $contact = array(), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php') {
+    private function cris_make_page($cris_id, $title, $content, $contact = array(), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php') {
         $pages = get_pages(array('child_of' => $parent_pid, 'post_status' => 'publish'));
         $pages_array = array();
         foreach ($pages as $page) {
@@ -519,15 +522,16 @@ class Sync {
             $updated ? $this->num_updated_p ++ : $this->num_ok_p ++;
         }
         // Wenn nötig Hauptmenü-Eintrag anlegen
-        $menu_item = self::cris_menu_item_exists($this->menu_items, $title, $parent_mid);
+        $menu_item = self::cris_menu_item_exists($this->menu_items, $title, $parent_mid, $cris_id);
+        //print $menu_item->url . "<br />";
         if (!$menu_item) {
-            $mid = self::cris_make_menu_item($this->menu_id, $title, $pid, $parent_mid, $position);
+            $mid = self::cris_make_menu_item($cris_id, $this->menu_id, $title, $pid, $parent_mid, $position);
             $this->num_created_m ++;
         } else {
             $mid = $menu_item->ID;
             if ($menu_item->menu_order != $position) {
             // Wenn nötig existierende Menüposition korrigieren
-                self::cris_make_menu_item($this->menu_id, $title, $pid, $parent_mid, $position, $menu_item->ID);
+                self::cris_make_menu_item($cris_id, $this->menu_id, $title, $pid, $parent_mid, $position, $menu_item->ID);
                 $this->num_updated_m ++;
             } else {
                 $this->num_ok_m ++;
@@ -535,15 +539,15 @@ class Sync {
         }
         if ($portal == 1) {
             // Wenn nötig Portalmenü-Eintrag anlegen
-            $portal_item = self::cris_menu_item_exists($this->portal_items, $title, $parent_mpid);
+            $portal_item = self::cris_menu_item_exists($this->portal_items, $title, $parent_mpid, $cris_id);
             if (!$portal_item) {
-                $mpid = self::cris_make_menu_item($this->portal_id, $title, $pid, $parent_mpid, $position);
+                $mpid = self::cris_make_menu_item($cris_id, $this->portal_id, $title, $pid, $parent_mpid, $position);
                 $this->num_created_mp ++;
             } else {
                 $mpid = $portal_item->ID;
                 if ($portal_item->menu_order != ($position - $this->menu_position_start)) {
                 // Wenn nötig existierende Menüposition korrigieren
-                    self::cris_make_menu_item($this->portal_id, $title, $pid, $parent_mpid, $position, $portal_item->ID);
+                    self::cris_make_menu_item($cris_id, $this->portal_id, $title, $pid, $parent_mpid, $position, $portal_item->ID);
                     $this->num_updated_mp ++;
                 } else {
                     $this->num_ok_mp ++;

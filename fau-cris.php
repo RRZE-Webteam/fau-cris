@@ -214,7 +214,7 @@ class FAU_CRIS {
         if (isset($_GET['action']) && $_GET['action'] == 'cris_sync') {
             include 'class_Sync.php';
             global $post;
-            $page_lang = Tools::getPageLanguage($post->ID);
+            $page_lang = substr(get_locale(), 0, 2);
             $sync = new Sync($page_lang);
             $result = $sync->do_sync();
         }
@@ -572,7 +572,7 @@ class FAU_CRIS {
                         type='checkbox'
                         value='1'
                         <?php
-                        if (array_key_exists($name, $options)) {
+                        if (array_key_exists($name, $options) && array_key_exists($_k, $options[$name])) {
                             print checked($options[$name][ $_k], 1, false);
                         }
                         ?>
