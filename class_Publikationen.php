@@ -414,11 +414,12 @@ class Publikationen {
 	    return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    public function projectPub($project, $quotation = '', $display_language = 'de', $limit='', $display = 'list') {
+    public function projectPub($param = array()) {
         $ws = new CRIS_publications();
 
         try {
-            $pubArray = $ws->by_project($project);
+            $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
+            $pubArray = $ws->by_project($param['project'], $filter);
         } catch (Exception $ex) {
             return;
         }
@@ -437,10 +438,13 @@ class Publikationen {
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby];
 
-        if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubList, $quotation, 0, $display);
+        if ($param['publications_limit'] != '') {
+            $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
+        }
+        if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
+            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_display']);
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder, $display_language,0,'', '', $display);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'],0,'', '', $param['publications_display']);
         }
 
         return $output;
@@ -452,7 +456,7 @@ class Publikationen {
         if ($seed)
             $ws->disable_cache();
         try {
-            $filter = null;
+            $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
             if ($param['publications_notable'] == '1') {
             	//$filter = array();
 	            $filter = Tools::publication_filter('', '', '', '', '', '', '', '', '1');
@@ -592,7 +596,7 @@ class Publikationen {
             if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
                 $publist .= '<br />BibTeX: <a href="' . sprintf($this->bibtexlink, $publication->attributes['id_publ']) . '">Download</a>';
             }
-            $publist .= "</li>";
+            $publist .= "<br />".$publication->attributes['publication type']."</li>";
         }
 
         $publist .= "</ul>";
@@ -1145,7 +1149,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    public function by_project($projID = null) {
+    public function by_project($projID = null, &$filter) {
         if ($projID === null || $projID === "0")
             throw new Exception('Please supply valid publication ID');
 
@@ -1156,7 +1160,7 @@ class CRIS_publications extends CRIS_webservice {
         foreach ($projID as $_p) {
             $requests[] = sprintf('getrelated/Project/%d/proj_has_publ', $_p);
         }
-        return $this->retrieve($requests);
+        return $this->retrieve($requests, $filter);
     }
 
     public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field') {

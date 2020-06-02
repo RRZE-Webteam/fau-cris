@@ -934,6 +934,7 @@ class FAU_CRIS {
             'publications_peerreviewed' => '',
             'publications_orderby' => '',
             'publications_notable' => '',
+            'publications_language' => '',
             'publications_display' => 'list',
             'image_align' => 'right',
             'accordion_title' => '#name# (#year#)',
@@ -983,6 +984,7 @@ class FAU_CRIS {
         $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
         $sc_param['notable'] = $notable == 1 ? 1 : 0;
+        $sc_param['publications_language'] = sanitize_text_field($publications_language);
         $sc_param['publications_limit'] = sanitize_text_field($publications_limit);
         $sc_param['publications_display'] = sanitize_text_field($publications_display);
         $sc_param['publications_year'] = sanitize_text_field($publications_year);
