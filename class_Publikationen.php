@@ -132,6 +132,8 @@ class Publikationen {
         $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
+        $sortby = (isset($param['sortby']) && $param['sortby'] != '') ? $param['sortby'] : 'virtualdate';
+
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
         if (!count($pubArray)) {
@@ -238,6 +240,7 @@ class Publikationen {
         $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
+        $sortby = (isset($param['sortby']) && $param['sortby'] != '') ? $param['sortby'] : 'virtualdate';
 
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
@@ -933,7 +936,7 @@ class Publikationen {
 	        if($image_position == 'bottom') {
 		        $publist .= $publication['image'];
 	        }
-            $publist .= $cleardiv."</li>";
+            $publist .= $cleardiv . "</li>";
         }
         $publist .= "</ul>";
 
