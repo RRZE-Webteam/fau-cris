@@ -18,8 +18,8 @@ class Sync {
         $this->portal_id = '';
     }
 
-    public function do_sync() {
-        if (!$this->orgNr || $this->orgNr == 0) {
+    public function do_sync($manual = false) {
+        if ($manual && (!$this->orgNr || $this->orgNr == 0)) {
             // Admin-Notice: Synchronisation fehlgeschlagen
             add_settings_error('Automatische Synchronisation', 'cris_sync_check',  __('Synchronisierung fehlgeschlagen!<br />Bitte geben Sie im Reiter "Allgemein" die CRIS-ID Ihrer Organisationseinheit an.', 'fau-cris') , 'error' );
             settings_errors();
@@ -357,9 +357,11 @@ class Sync {
         if (count($pages) < 2 && !count($pages['no_field']['projects'])) {
             if (count($this->portal_items) < 1)
                 wp_delete_nav_menu($portal_name);
-            $this->message = __('Der Bereich "Forschung" konnte nicht erstellt werden: Es wurden keine Forschungsprojekte gefunden.','fau-cris');
-            add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'error' );
-            settings_errors();
+            if ($manual) {
+                $this->message = __('Der Bereich "Forschung" konnte nicht erstellt werden: Es wurden keine Forschungsprojekte gefunden.','fau-cris');
+                add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'error' );
+                settings_errors();
+            }
             return;
         }
 
@@ -410,14 +412,16 @@ class Sync {
         /*
          *  Admin-Notice: Synchronisation erfolgreich
          */
-        $this->message .= '<li>' . __('Seiten', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $this->num_ok_p, $this->num_updated_p, $this->num_created_p ) . '</span></li>';
-        $this->message .= '<li>' . __('Menüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $this->num_ok_m, $this->num_updated_m, $this->num_created_m ) . '</span></li>';
-        $this->message .= '<li>' . __('Portalmenüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $this->num_ok_mp, $this->num_updated_mp, $this->num_created_mp ) . '</span></li>';
-        if ($this->num_errors > 0)
-                $this->message .= '<li>' . sprintf( __( '%d Seite(n) konnten nicht erstellt werden.', 'fau-cris' ), $this->num_errors ) . '</li>';
-        $this->message .= '</ul>';
-        add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'updated' );
-        settings_errors();
+        if ($manual) {
+            $this->message .= '<li>' . __('Seiten', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $this->num_ok_p, $this->num_updated_p, $this->num_created_p ) . '</span></li>';
+            $this->message .= '<li>' . __('Menüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $this->num_ok_m, $this->num_updated_m, $this->num_created_m ) . '</span></li>';
+            $this->message .= '<li>' . __('Portalmenüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf( __( '%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris' ), $this->num_ok_mp, $this->num_updated_mp, $this->num_created_mp ) . '</span></li>';
+            if ($this->num_errors > 0)
+                    $this->message .= '<li>' . sprintf( __( '%d Seite(n) konnten nicht erstellt werden.', 'fau-cris' ), $this->num_errors ) . '</li>';
+            $this->message .= '</ul>';
+            add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message , 'updated' );
+            settings_errors();
+        }
     }
 
 

@@ -216,7 +216,7 @@ class FAU_CRIS {
             global $post;
             $page_lang = substr(get_locale(), 0, 2);
             $sync = new Sync($page_lang);
-            $result = $sync->do_sync();
+            $result = $sync->do_sync(true);
         }
         $options = self::get_options();
         ?>
@@ -1116,7 +1116,7 @@ class FAU_CRIS {
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
         $sync = new Sync($page_lang);
-        $sync->do_sync();
+        $sync->do_sync(false);
     }
 
     public static function cris_cron() {
