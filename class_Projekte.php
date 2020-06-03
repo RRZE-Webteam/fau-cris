@@ -931,17 +931,18 @@ class Projekte {
 			    $args[substr($_k,13)] = $_v;
 		    }
 	    }
-	    $args['sc_type'] = 'default';
-	    $args['quotation'] = $param['quotation'];
-	    $args['display_language'] = $param['display_language'];
-        $args['showimage'] = $param['showimage'];
-        $args['image_align'] = $param['image_align'];
-        $args['image_position'] = $param['image_position'];
+//	    $args['sc_type'] = 'default';
+//	    $args['quotation'] = $param['quotation'];
+//	    $args['display_language'] = $param['display_language'];
+//        $args['showimage'] = $param['showimage'];
+//        $args['image_align'] = $param['image_align'];
+//        $args['image_position'] = $param['image_position'];
+        $param['sc_type'] = 'default';
         if ($param['publications_orderby'] == 'year')
-		    return $liste->pubNachJahr ($args, $param['project'], '', false,$param['project']);
+		    return $liste->pubNachJahr ($param, $param['project'], '', false, $param['project']);
 	    if ($param['publications_orderby'] == 'type')
-		    return $liste->pubNachTyp ($args, $param['project'], '', false,$param['project']);
-	    return $liste->projectPub($param['project'], $param['quotation'], $param['display_language'], $param['publications_limit'], $param['publications_display']);
+		    return $liste->pubNachTyp ($param, $param['project'], '', false, $param['project']);
+	    return $liste->projectPub($param);
     }
 
     private function get_project_images($project) {

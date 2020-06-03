@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.15.1
+ * Version: 3.15.2
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -214,9 +214,9 @@ class FAU_CRIS {
         if (isset($_GET['action']) && $_GET['action'] == 'cris_sync') {
             include 'class_Sync.php';
             global $post;
-            $page_lang = Tools::getPageLanguage($post->ID);
+            $page_lang = substr(get_locale(), 0, 2);
             $sync = new Sync($page_lang);
-            $result = $sync->do_sync();
+            $result = $sync->do_sync(true);
         }
         $options = self::get_options();
         ?>
@@ -572,7 +572,7 @@ class FAU_CRIS {
                         type='checkbox'
                         value='1'
                         <?php
-                        if (array_key_exists($name, $options)) {
+                        if (array_key_exists($name, $options) && array_key_exists($_k, $options[$name])) {
                             print checked($options[$name][ $_k], 1, false);
                         }
                         ?>
@@ -934,6 +934,7 @@ class FAU_CRIS {
             'publications_peerreviewed' => '',
             'publications_orderby' => '',
             'publications_notable' => '',
+            'publications_language' => '',
             'publications_display' => 'list',
             'image_align' => 'right',
             'accordion_title' => '#name# (#year#)',
@@ -983,6 +984,7 @@ class FAU_CRIS {
         $sc_param['peerreviewed'] = sanitize_text_field($peerreviewed);
         $sc_param['name_order_plugin'] = sanitize_text_field($name_order_plugin);
         $sc_param['notable'] = $notable == 1 ? 1 : 0;
+        $sc_param['publications_language'] = sanitize_text_field($publications_language);
         $sc_param['publications_limit'] = sanitize_text_field($publications_limit);
         $sc_param['publications_display'] = sanitize_text_field($publications_display);
         $sc_param['publications_year'] = sanitize_text_field($publications_year);
@@ -1114,7 +1116,7 @@ class FAU_CRIS {
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
         $sync = new Sync($page_lang);
-        $sync->do_sync();
+        $sync->do_sync(false);
     }
 
     public static function cris_cron() {

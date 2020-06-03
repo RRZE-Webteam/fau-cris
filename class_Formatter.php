@@ -75,10 +75,10 @@ class CRIS_formatter {
 
         # first sort main groups
         if (is_array($this->group_order)) {
-                # user-defined array for sorting
-                $this->sortkey = $group_key;
-                $this->sortvalues = $this->group_order;
-                uksort($final, "self::compare_group");
+            # user-defined array for sorting
+            $this->sortkey = $group_key;
+            $this->sortvalues = $this->group_order;
+            uksort($final, "self::compare_group");
         } elseif ($this->group_order === SORT_ASC)
                 ksort($final);
         elseif ($this->group_order === SORT_DESC)
