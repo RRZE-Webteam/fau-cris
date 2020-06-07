@@ -599,7 +599,7 @@ class Publikationen {
             if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
                 $publist .= '<br />BibTeX: <a href="' . sprintf($this->bibtexlink, $publication->attributes['id_publ']) . '">Download</a>';
             }
-            $publist .= "<br />".$publication->attributes['publication type']."</li>";
+            $publist .= "</li>";
         }
 
         $publist .= "</ul>";
