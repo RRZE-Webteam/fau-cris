@@ -433,7 +433,7 @@ class Sync {
         if (!is_array($menu))
             return;
         foreach ($menu as $menu_item) {
-            if (in_array('cris-'.$cris_id, $menu_item->classes)) {
+            if (in_array('cris-'.$cris_id, $menu_item->classes) && $menu_item->menu_item_parent == $parent) {
                 return $menu_item;
             }
         }
