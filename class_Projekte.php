@@ -735,6 +735,7 @@ class Projekte {
                     break;
             }
             $title = htmlentities($title, ENT_QUOTES);
+            $title = str_replace(['[', ']'],['&#91;', '&#93;'], $title);
 	        $description = str_replace(["\n", "\t", "\r"], '', $description);
 	        $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             if (mb_strlen($description) > 500) {
@@ -744,6 +745,8 @@ class Projekte {
             if (!empty($project['kurzbeschreibung' . $lang_key])) {
                 $description = $project['kurzbeschreibung' . $lang_key];
             }
+            $description = str_replace(['[', ']'],['&#91;', '&#93;'], $description);
+
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
 
