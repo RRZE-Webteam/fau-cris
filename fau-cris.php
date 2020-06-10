@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.15.4
+ * Version: 3.15.5
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -1007,7 +1007,8 @@ class FAU_CRIS {
 		    $sc_param['image_position'] = 'top';
         }
         $sc_param['accordion_title'] = sanitize_text_field($accordion_title);
-	    $sc_param['accordion_color'] = sanitize_text_field($accordion_color);
+        $sc_param['accordion_title'] = str_replace(['[', ']'],['&#91;', '&#93;'], $accordion_title);
+        $sc_param['accordion_color'] = sanitize_text_field($accordion_color);
 	    if (sanitize_text_field($current) == "1" && sanitize_text_field($status) == '') { // Abwärtskompatibilität
             $sc_param['status'] = 'current';
         } else {
