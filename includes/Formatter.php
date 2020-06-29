@@ -80,7 +80,7 @@ class Formatter {
 			# user-defined array for sorting
 			$this->sortkey = $group_key;
 			$this->sortvalues = $this->group_order;
-			uksort($final, "self::compare_group");
+			uksort($final, "self::compareGroup");
 		} elseif ($this->group_order === SORT_ASC)
 			ksort($final);
 		elseif ($this->group_order === SORT_DESC)
@@ -95,7 +95,7 @@ class Formatter {
 				$final[$_k] = $group;
 			} else {
 				$this->sortkey = $this->sort;
-				uasort($group, "self::compare_attributes");
+				uasort($group, "self::compareAttributes");
 				if ($this->sort_order === SORT_DESC)
 					$final[$_k] = array_reverse ($group, true);
 				else
@@ -108,7 +108,7 @@ class Formatter {
 		return $final;
 	}
 
-	private function compare_group($a, $b) {
+	private function compareGroup($a, $b) {
 		# look-up index
 		# returns false if not found (in case that sort array is incomplete)
 		$_a = array_search(strtolower($a), $this->sortvalues);
@@ -119,7 +119,7 @@ class Formatter {
 		if ($_b === false || $_a < $_b) return -1;
 	}
 
-	private function compare_attributes($a, $b) {
+	private function compareAttributes($a, $b) {
 		# Compare data based on attribute specified in self::sortkey
 		if (is_numeric($a->attributes[$this->sortkey]) && is_numeric($b->attributes[$this->sortkey])) {
 			return $a->attributes[$this->sortkey] - $b->attributes[$this->sortkey];

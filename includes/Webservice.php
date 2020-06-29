@@ -8,11 +8,17 @@
 
 namespace FAU\CRIS;
 
+use function FAU\CRIS\Config\getConstants;
+
 class Webservice {
 
-	/*
-	 * generic class for web service access.
-	 */
+    public function __construct() {
+        $this->constants = getConstants();
+    }
+
+    /*
+     * generic class for web service access.
+     */
 	private $cache = true;
 
 	private function fetch($url) {
@@ -37,27 +43,27 @@ class Webservice {
 		return $xml;
 	}
 
-	public function disable_cache() {
+	public function disableCache() {
 		$this->cache = false;
 	}
 
-	public function enable_cache() {
+	public function enableCache() {
 		$this->cache = true;
 	}
 
-	public function make_request ($entity, $by, $id) {
+	public function makeRequest ($entity, $by, $id) {
         if ($id === null || $id === "0")
             throw new \Exception('Please supply valid ID');
         if (!is_array($id))
             $id = array($id);
         $requests = array();
         foreach ($id as $i) {
-            if (is_array(WS_REQUESTS[$entity][$by])) {
-                foreach(WS_REQUESTS[$entity][$by] as $string) {
+            if (is_array($this->constants['ws_requests'][$entity][$by])) {
+                foreach($this->constants['ws_requests'][$entity][$by] as $string) {
                     $requests[] = sprintf($string, $i);
                 }
             } else {
-                $requests[] = sprintf(WS_REQUESTS[$entity][$by], $i);
+                $requests[] = sprintf($this->constants['ws_requests'][$entity][$by], $i);
             }
         }
         return $requests;
@@ -102,7 +108,7 @@ class Webservice {
 		}
 
 		try {
-			$rawxml = $this->fetch(WS_URL . $id . $seed);
+			$rawxml = $this->fetch($this->constants['ws_url'] . $id . $seed);
 		} catch (\Exception $ex) {
 		    $rawxml = null;
             return $ex;

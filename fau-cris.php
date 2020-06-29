@@ -27,6 +27,8 @@ defined('ABSPATH') || exit;
 
 use FAU\CRIS\Main;
 use FAU\CRIS\Options;
+require_once 'config/config.php';
+require_once 'includes/Tools.php';
 
 const RRZE_PHP_VERSION = '7.3';
 const RRZE_WP_VERSION = '5.2';

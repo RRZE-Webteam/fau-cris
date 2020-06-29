@@ -3,20 +3,21 @@
 namespace FAU\CRIS\Entities;
 
 use FAU\CRIS\Entity;
-use const FAU\CRIS\WS_REQUESTS;
-use const FAU\CRIS\WS_URL;
+use function FAU\CRIS\Config\getConstants;
+use function FAU\CRIS\Tools\XML2obj;
 
 require_once(plugin_dir_path(__DIR__). '/Tools.php');
 
 class Images {
 
     public function __construct($parameter) {
+        $this->constants = getConstants();
         $this->parameter = $parameter;
     }
 
-    public function get_images($entity, $id, $image_align = 'right') {
+    public function getImages($entity, $id, $image_align = 'right') {
         $images = [];
-        $imgdata = $this->get_data($entity, $id);
+        $imgdata = $this->getData($entity, $id);
         if (count($imgdata)) {
             foreach($imgdata as $img) {
                 $image = '';
@@ -34,10 +35,10 @@ class Images {
         return $images;
     }
 
-    private function get_data($entity, $id) {
+    private function getData($entity, $id) {
         $images = array();
-        $imgString = sprintf(WS_URL . WS_REQUESTS['images'][$entity], $id);
-        $imgXml = \FAU\CRIS\XML2obj($imgString);
+        $imgString = sprintf($this->constants['ws_url'] . $this->constants['ws_requests']['images'][$entity], $id);
+        $imgXml = XML2obj($imgString);
         if ($imgXml['size'] != 0) {
             foreach ($imgXml as $img) {
                 $_i = new Image($img);

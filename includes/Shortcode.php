@@ -4,7 +4,10 @@ namespace FAU\CRIS;
 
 defined('ABSPATH') || exit;
 
-require_once(__DIR__ . '/Tools.php');
+//require_once(plugin_dir_path(__DIR__). 'includes/Tools.php');
+//require_once('Tools.php');
+use FAU\CRIS\Tools;
+use function FAU\CRIS\Tools\getPageLanguage;
 
 /**
  * Shortcode
@@ -70,12 +73,8 @@ class Shortcode {
 	    $parameter = self::crisShortcodeParameter($atts, $content, $tag);
 		//Publications
         if (isset($parameter['show']) && $parameter['show'] == 'publications') {
-            $output = new Entities\Publications($parameter, $content, $tag, $this->options);
-//		    if (empty($parameter['order']) && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
-		    if (empty($parameter['order']) || $parameter['order'][0] == 'none') {
-		        return $output->flatList();
-		    }
-            return $output->orderedList();
+            $publications = new Entities\Publications($parameter, $content, $tag, $this->options);
+            return $publications->shortcodeOutput();
 	    }
 	    //Projects
 	    if (isset($parameter['show']) && $parameter['show'] == 'projects') {
@@ -141,7 +140,7 @@ class Shortcode {
             'language' => '',
             'items' => '',
             'limit' => '',
-            'sortby' => '',
+            'sortby' => 'virtualdate',
             'format' => 'list',
             'display' => '',
             'award' => '',
@@ -159,6 +158,7 @@ class Shortcode {
             'patent' => '',
             'activity' => '',
             'field' => '',
+            'fsp' => '',
             'fau' => '',
             'equipment' => '',
             'manufacturer' => '',
@@ -180,6 +180,7 @@ class Shortcode {
             'publications_peerreviewed' => '',
             'publications_orderby' => '',
             'publications_notable' => '',
+            'publications_quotation' => '',
             'publications_display' => 'list',
             'image_align' => 'right',
             'accordion_title' => '#name# (#year#)',
@@ -197,6 +198,9 @@ class Shortcode {
 			$shortcode_atts['entity'] = 'id';
 			$shortcode_atts['publication'] = str_replace(' ', '', $shortcode_atts['publication']);
 			$shortcode_atts['publication'] = explode(',', $shortcode_atts['publication']);
+			if (count($shortcode_atts['publication']) == 1) {
+                $shortcode_atts['format'] = 'no-list';
+            }
 			$shortcode_atts['entity_id'] = $shortcode_atts['publication'];
 		} elseif ($shortcode_atts['equipment'] != '') {
 			$shortcode_atts['entity'] = 'equipment';
@@ -212,7 +216,14 @@ class Shortcode {
 				$shortcode_atts['field'] = explode(',', $shortcode_atts['field']);
 			}
 			$shortcode_atts['entity_id'] = $shortcode_atts['field'];
-		} elseif (isset($shortcode_atts['activity']) && $shortcode_atts['activity'] != '') {
+        } elseif ($shortcode_atts['fsp'] != '') {
+            $shortcode_atts['entity'] = 'fsp';
+            if (strpos($shortcode_atts['fsp'], ',') !== false) {
+                $shortcode_atts['fsp'] = str_replace(' ', '', $shortcode_atts['fsp']);
+                $shortcode_atts['fsp'] = explode(',', $shortcode_atts['fsp']);
+            }
+            $shortcode_atts['entity_id'] = $shortcode_atts['fsp'];
+        } elseif (isset($shortcode_atts['activity']) && $shortcode_atts['activity'] != '') {
 			$shortcode_atts['entity'] = 'activity';
 			$shortcode_atts['entity_id'] = $shortcode_atts['activity'];
 		} elseif (isset($shortcode_atts['patent']) && $shortcode_atts['patent'] != '') {

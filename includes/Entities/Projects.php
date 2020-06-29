@@ -44,7 +44,7 @@ class Projects {
 		}
 
 		if (is_array($this->parameter['project'])) {
-			$output = $this->make_list($projArray, $this->parameter['hide']);
+			$output = $this->makeList($projArray, $this->parameter['hide']);
 		} else {
 			$output = $this->make_single($projArray);
 		}
@@ -304,7 +304,7 @@ class Projects {
 	public function pubProjects($pub, $seed = false) {
 		$ws = new CRIS_projects();
 		if ($seed)
-			$ws->disable_cache();
+			$ws->disableCache();
 		try {
 			$projArray = $ws->by_pub($pub);
 		} catch (Exception $ex) {
@@ -331,7 +331,7 @@ class Projects {
 		$res = $formatter->execute($projArray);
 		$projList = $res[$orderby];
 		$hide = array();
-		$output = $this->make_list($projList, $hide, 0, 1);
+		$output = $this->makeList($projList, $hide, 0, 1);
 		return $output;
 	}
 }
