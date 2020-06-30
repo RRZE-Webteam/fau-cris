@@ -312,7 +312,6 @@ class Forschungsbereiche {
 
 
     private function make_custom_single($fields, $content, $param = array()) {
-        
         $field_details = array();
         $output = "<div class=\"cris-fields\">";;
 
@@ -335,6 +334,7 @@ class Forschungsbereiche {
                     break;
             }
             $param['fsp'] = ($field['selektion'] == 'Forschungsschwerpunkt') ? true : false;
+            $param['field'] = $id;
             
             $field_details['#title#'] = htmlentities($title, ENT_QUOTES);
             $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
@@ -384,7 +384,7 @@ class Forschungsbereiche {
                 }
             }
 	        $field_details['#project_publications#'] = '';
-	        if (strpos($content, '#project_publications#' ) !== false) {
+            if (strpos($content, '#project_publications#' ) !== false) {
 		        $project_publications = $this->get_field_publications($param, 'field_proj');
 		        if ($project_publications) {
 			        $field_details['#project_publications#'] = $project_publications;
