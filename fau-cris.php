@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.15.6
+ * Version: 3.16.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -966,7 +966,6 @@ class FAU_CRIS {
         $sc_param['language'] = in_array($language, CRIS_Dicts::$pubLanguages) ? $language : '';
         $limit = ($limit != '' ? $limit : $items);
         $sc_param['limit'] = sanitize_text_field($limit);
-        $sc_param['sortby'] = (in_array($sortby, array('created', 'updated'))) ? sanitize_text_field($sortby) : '';
         $sc_param['format'] = sanitize_text_field($format);
         $sc_param['showname'] = sanitize_text_field($showname);
         $sc_param['showyear'] = sanitize_text_field($showyear);
@@ -996,7 +995,26 @@ class FAU_CRIS {
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
-	    if (in_array($image_align, ['left', 'right', 'none'])) {
+	    switch($sortby) {
+            case 'created':
+                $sc_param['sortby'] = 'updatedon';
+                $sc_param['sortorder'] = SORT_DESC;
+                break;
+            case 'updated':
+                $sc_param['sortby'] = 'createdon';
+                $sc_param['sortorder'] = SORT_DESC;
+                break;
+            case 'author':
+                $sc_param['sortby'] = 'relauthors';
+                $sc_param['sortorder'] = SORT_ASC;
+                break;
+            case 'date':
+            default:
+                $sc_param['sortby'] = 'virtualdate';
+                $sc_param['sortorder'] = SORT_DESC;
+                break;
+        }
+        if (in_array($image_align, ['left', 'right', 'none'])) {
 		    $sc_param['image_align'] = 'align' . sanitize_text_field($image_align);
 		    $sc_param['image_position'] = 'top';
         } elseif (in_array($image_align, ['bottom', 'top'])) {
