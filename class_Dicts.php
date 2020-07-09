@@ -337,8 +337,20 @@ class CRIS_Dicts {
                             'title' => 'Decision Notes'
                         )
                     ),
-                    'undefined' => array(
+                    'EditedVolumesSubtype_educational' => array(
                         'order' => 12,
+                        'short' => 'lehrmaterial',
+                        'de' => array(
+                            'name' => 'Lehrmaterial',
+                            'title' => 'Lehrmaterial'
+                        ),
+                        'en' => array(
+                            'name' => 'Educational material',
+                            'title' => 'Educational Material'
+                        )
+                    ),
+                    'undefined' => array(
+                        'order' => 13,
                         'short' => 'andere',
                         'de' => array(
                             'name' => 'Andere / O.A.',
