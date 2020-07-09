@@ -241,6 +241,7 @@ class Publikationen {
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
         $sortby = (isset($param['sortby']) && $param['sortby'] != '') ? $param['sortby'] : 'virtualdate';
+        $sortorder = (isset($param['sortorder']) && $param['sortorder'] != '') ? $param['sortby'] : SORT_DESC;
 
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
@@ -288,16 +289,16 @@ class Publikationen {
                 }
                 switch ($order2) {
                     case 'author':
-                        $subformatter = new CRIS_formatter(NULL, NULL, "relauthors", SORT_ASC);
+                        $subformatter = new CRIS_formatter(NULL, NULL, $sortby, $sortorder);
                         break;
                     case 'subtype':
-                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
                         break;
                     case 'year':
-                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, $sortby, $sortorder);
                         break;
                     default:
-                        $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
+                        $subformatter = new CRIS_formatter(NULL, NULL, $sortby, $sortorder);
                         break;
                 }
                 $pubOtherList = $subformatter->execute($publications);
@@ -347,16 +348,16 @@ class Publikationen {
                 }
                 switch ($order2) {
                     case 'author':
-                        $subformatter = new CRIS_formatter(NULL, NULL, "relauthors", SORT_ASC);
+                        $subformatter = new CRIS_formatter(NULL, NULL, $sortby, $sortorder);
                         break;
                     case 'subtype':
-                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), "virtualdate", SORT_DESC);
+                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
                         break;
                     case 'year':
-                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, $sortby, $sortorder);
                         break;
                     default:
-                        $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
+                        $subformatter = new CRIS_formatter(NULL, NULL, $sortby, $sortorder);
                         break;
                 }
                 $pubOtherList = $subformatter->execute($publications);
