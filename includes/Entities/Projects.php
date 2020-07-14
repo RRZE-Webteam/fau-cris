@@ -21,7 +21,6 @@ class Projects {
 		if ($parameter['display_language'] != $parameter['page_language']) {
 			$this->langdiv_open = '<div class="cris" lang="' . $parameter['display_language'] . '">';
 		}
-		include (plugin_dir_path(__DIR__)."dictionary.php");
 		$this->base_uri = $base_uri;
 		$this->tools = new Tools();
 	}

@@ -77,7 +77,6 @@ class Webservice {
 		 * for "publyear" is enabled for organisation requests.
 		 */
 
-		include ("dictionary.php");
 		$supported = array();
 		$id_parts = explode('/', $id);
 		if ($filter instanceof CRIS_Filter) {
