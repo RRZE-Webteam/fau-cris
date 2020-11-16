@@ -654,7 +654,7 @@ class Publikationen {
             $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
             $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
-                    . "<a href=\"" . Tools::get_item_url("publication", $title, $id, $post->ID) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
+                    . "<a href=\"" . Tools::get_item_url("publication", $title, $id, $post->ID, $lang) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                     . $title
                     . "</a></strong></span>";
             if ($publication['openaccess'] == "Ja") {
@@ -991,7 +991,7 @@ class Publikationen {
             $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
             $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
-                    . "<a href=\"" . Tools::get_item_url("publication", $title, $id, $post->ID) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
+                    . "<a href=\"" . Tools::get_item_url("publication", $title, $id, $post->ID, $lang) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                     . $title
                     . "</a></strong></span>";
             //pubType
@@ -1004,7 +1004,7 @@ class Publikationen {
                 '#id#' => $id,
                 '#author#' => $authors_html,
                 '#title#' => $title,
-                '#url#' => Tools::get_item_url("publication", $title, $id, $post->ID),
+                '#url#' => Tools::get_item_url("publication", $title, $id, $post->ID, $lang),
                 '#city#' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
                 '#publisher#' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
                 '#year#' => (array_key_exists('publyear', $publication) ? strip_tags($publication['publyear']) : __('O.J.', 'fau-cris')),

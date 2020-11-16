@@ -303,7 +303,7 @@ class Forschungsbereiche {
             }
 			if (is_array($param['field'])) {
 				global $post;
-				$singlefield .= "<p></p><a href=\"" . Tools::get_item_url( "forschungsbereich", $title, $field['ID'], $post->ID ) . "\">" . __('Mehr Informationen', 'fau-cris') . " &#8594;</a></p>";
+				$singlefield .= "<p></p><a href=\"" . Tools::get_item_url( "forschungsbereich", $title, $field['ID'], $post->ID, $this->page_lang) . "\">" . __('Mehr Informationen', 'fau-cris') . " &#8594;</a></p>";
 			}
 		}
         $singlefield .= "</div>";
@@ -433,7 +433,7 @@ class Forschungsbereiche {
             }
             $title = htmlentities($title, ENT_QUOTES);
             global $post;
-            $title = "<a href=\"" . Tools::get_item_url("forschungsbereich", $title, $field['ID'], $post->ID) . "\">" . $title . "</a>";
+            $title = "<a href=\"" . Tools::get_item_url("forschungsbereich", $title, $field['ID'], $post->ID, $this->page_lang) . "\">" . $title . "</a>";
 
             $fieldslist .= "<li>" . $title . "</li>";
         }

@@ -298,7 +298,7 @@ class Patente {
             $patentlist .= "<li>";
 
             if (!empty($patent_name))
-                $patentlist .= "<strong><a href=\"" . Tools::get_item_url("cfrespat", $patent_name, $patent_id, $post->ID) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
+                $patentlist .= "<strong><a href=\"" . Tools::get_item_url("cfrespat", $patent_name, $patent_id, $post->ID, $this->page_lang) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
             if (!empty($patent_type) || !empty($patent_number))
                 $patentlist .= " (";
             if (!empty($patent_type) & $showtype != 0)
