@@ -807,7 +807,7 @@ class FAU_CRIS {
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
                 return $liste->singlePub($parameter['quotation'], '', 'default', $parameter['showimage'], $parameter['image_align'], $parameter['image_position'], $parameter['display']);
             }
-            if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+            if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['notable'] != 0)) {
                 return $liste->pubListe($parameter);
             }
             if (strpos($parameter['order1'], 'type') !== false) {
