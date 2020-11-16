@@ -377,8 +377,8 @@ class CRIS_Dicts {
                 'subtypes' => array(
                     'Monographie' => array(
                         'order' => 1,
-                        'short' => 'mongraphien',
-                        'short_alt' => 'mongraphie',
+                        'short' => 'monographie',
+                        'short_alt' => 'monographie',
                         'de' => array(
                             'name' => 'Monographie',
                             'title' => 'Monographien'
