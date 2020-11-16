@@ -241,7 +241,7 @@ class Publikationen {
         $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
         $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
         $sortby = (isset($param['sortby']) && $param['sortby'] != '') ? $param['sortby'] : 'virtualdate';
-        $sortorder = (isset($param['sortorder']) && $param['sortorder'] != '') ? $param['sortby'] : SORT_DESC;
+        $sortorder = (isset($param['sortorder']) && $param['sortorder'] != '') ? $param['sortorder'] : SORT_DESC;
 
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
