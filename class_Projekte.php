@@ -409,6 +409,7 @@ class Projekte {
             $proj_details['#start#'] = date_i18n( get_option( 'date_format' ), strtotime($start));
             $end = $project['cfenddate'];
             $proj_details['#end#'] = (!empty($end) ? date_i18n( get_option( 'date_format' ), strtotime($end)) : '');
+            $proj_details['#extend#'] = (!empty($project['extension date'])) ? date_i18n(get_option('date_format'), strtotime($project['extension date'])) : '';
             $funding = $this->get_project_funding($id);
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
@@ -468,6 +469,7 @@ class Projekte {
             $proj_details['#start#'] = date_i18n( get_option( 'date_format' ), strtotime($start));
             $end = $project['cfenddate'];
             $proj_details['#end#'] = (!empty($end) ? date_i18n( get_option( 'date_format' ), strtotime($end)) : '');
+            $proj_details['#extend#'] = (!empty($project['extension date'])) ? date_i18n(get_option('date_format'), strtotime($project['extension date'])) : '';
             $funding = $this->get_project_funding($id);
             $proj_details['#funding#'] = implode(', ', $funding);
             $proj_details['#url#'] = $project['cfuri'];
@@ -558,10 +560,9 @@ class Projekte {
                 }
                 $start = $project['cfstartdate'];
                 $start = date_i18n( get_option( 'date_format' ), strtotime($start));
-                if (!in_array('end', $param['hide']) && !empty($project['cfenddate'])) {
-                    $end = date_i18n( get_option( 'date_format' ), strtotime($project['cfenddate']));
-                } else {
-                    $end = '';
+                if (!in_array('end', $param['hide'])) {
+                    $end = (!empty($project['cfenddate'])) ? date_i18n(get_option('date_format'), strtotime($project['cfenddate'])) : '';
+                    $extend = (!empty($project['extension date'])) ? date_i18n(get_option('date_format'), strtotime($project['extension date'])) : '';
                 }
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
@@ -582,6 +583,8 @@ class Projekte {
                     $projlist .= "<br /><strong>" . __('Projektstart', 'fau-cris') . ': </strong>' . $start;
                 if (!empty($end))
                     $projlist .= "<br /><strong>" . __('Projektende', 'fau-cris') . ': </strong>' . $end;
+                if (!empty($extend))
+                    $projlist .= "<br /><strong>" . __('Laufzeitverlängerung bis', 'fau-cris') . ': </strong>' . $extend;
                 if (!empty($acronym))
                     $projlist .= "<br /><strong>" . __('Akronym', 'fau-cris') . ": </strong>" . $acronym;
                 if (!empty($funding)) {
@@ -647,7 +650,11 @@ class Projekte {
                 $parentprojecttitle = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
                 $acronym = $project['cfacro'];
                 $start = $project['cfstartdate'];
-                $end = (!in_array('end', $hide) && !empty($project['cfenddate'])) ? $project['cfenddate'] : '';
+                if (!in_array('end', $hide)) {
+                        $end = (!empty($project['extension date'])) ? $project['extension date'] : ((!empty($project['cfenddate'])) ? $project['cfenddate'] : '');
+                } else {
+                    $end = '';
+                }
                 $date = Tools::make_date($start, $end);
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
