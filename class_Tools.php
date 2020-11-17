@@ -242,28 +242,51 @@ class Tools {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
-                    $pubTyp[] = self::getType('publications', $v);
+                    if (strpos($v, '-') === 0) {
+                        $tmpType = substr($v, 1);
+                        $pubTypExclude[] = self::getType('publications', $tmpType);
+                    } else {
+                        $pubTyp[] = self::getType('publications', $v);
+                    }
                 }
             } else {
-                $pubTyp = (array) self::getType('publications', $type);
+                if (strpos($type, '-') === 0) {
+                    $tmpType = substr($type, 1);
+                    $pubTypExclude = (array)self::getType('publications', $tmpType);
+                } else {
+                    $pubTyp = (array)self::getType('publications', $type);
+                }
             }
-            if (empty($pubTyp)) {
+            if (empty($pubTyp) && empty($pubTypExclude)) {
                 $output = '<p>' . __('Falscher Parameter für Publikationstyp', 'fau-cris') . '</p>';
                 return $output;
             }
-            $filter['publication type__eq'] = $pubTyp;
+            if (!empty($pubTyp)) {
+                $filter['publication type__eq'] = $pubTyp;
+            } elseif (!empty($pubTypExclude)) {
+                $filter['publication type__not'] = $pubTypExclude;
+            }
         }
         if ($subtype !== '' && $subtype !== NULL) {
             $subtype = str_replace(' ', '', $subtype);
             $subtypes = explode(',', $subtype);
             foreach($subtypes as $v) {
-                $pubSubTyp[] = self::getType('publications', $v, $pubTyp[0]);
+                if (strpos($v, '-') === 0) {
+                    $tmpSubType = substr($v, 1);
+                    $pubSubTypExclude[] = self::getType('publications', $tmpSubType, $pubTyp[0]);
+                } else {
+                    $pubSubTyp[] = self::getType('publications', $v, $pubTyp[0]);
+                }
             }
-            if (empty($pubSubTyp)) {
+            if (empty($pubSubTyp) && empty($pubSubTypExclude)) {
                 $output = '<p>' . __('Falscher Parameter für Publikationssubtyp', 'fau-cris') . '</p>';
                 return $output;
             }
-            $filter['subtype__eq'] = $pubSubTyp;
+            if (!empty($pubSubTyp)) {
+                $filter['subtype__eq'] = $pubSubTyp;
+            } elseif (!empty($pubSubTypExclude)) {
+                $filter['subtype__not'] = $pubSubTypExclude;
+            }
         }
         if ($fau !== '') {
             if ($fau == 1) {

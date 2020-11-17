@@ -78,6 +78,12 @@ class CRIS_filter {
                 } else {
                     return (in_array($value, $reference));
                 }
+            case "not":
+                if (is_string($value)) {
+                    return (!in_array(strtolower($value),array_map('strtolower', $reference)));
+                } else {
+                    return (!in_array($value, $reference));
+                }
             case "le":
                 return ($value <= $reference);
             case "lt":

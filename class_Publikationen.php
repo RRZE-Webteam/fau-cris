@@ -329,7 +329,7 @@ class Publikationen {
         } else {
             foreach ($pubList as $array_type => $publications) {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
-                if (empty($type)) {
+                if (empty($type) || strpos($type, '-') === 0 || strpos($type, ',') !== false) {
                     $title = Tools::getTitle('publications', $array_type, $param['display_language']);
                     if (!shortcode_exists('collapsibles') || $format != 'accordion') {
                         $output .= "<h3>";
