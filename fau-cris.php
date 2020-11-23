@@ -38,7 +38,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '3.15.6';
+    const version = '3.16.0';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -807,7 +807,7 @@ class FAU_CRIS {
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
                 return $liste->singlePub($parameter['quotation'], '', 'default', $parameter['showimage'], $parameter['image_align'], $parameter['image_position'], $parameter['display']);
             }
-            if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
+            if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['notable'] != 0)) {
                 return $liste->pubListe($parameter);
             }
             if (strpos($parameter['order1'], 'type') !== false) {

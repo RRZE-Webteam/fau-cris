@@ -349,8 +349,20 @@ class CRIS_Dicts {
                             'title' => 'Educational Material'
                         )
                     ),
-                    'undefined' => array(
+                    'Kommentierung' => array(
                         'order' => 13,
+                        'short' => 'kommentierung',
+                        'de' => array(
+                            'name' => 'Kommentierung',
+                            'title' => 'Kommentierungen'
+                        ),
+                        'en' => array(
+                            'name' => 'Annotation',
+                            'title' => 'Annotations'
+                        )
+                    ),
+                    'undefined' => array(
+                        'order' => 14,
                         'short' => 'andere',
                         'de' => array(
                             'name' => 'Andere / O.A.',
@@ -377,8 +389,8 @@ class CRIS_Dicts {
                 'subtypes' => array(
                     'Monographie' => array(
                         'order' => 1,
-                        'short' => 'mongraphien',
-                        'short_alt' => 'mongraphie',
+                        'short' => 'monographie',
+                        'short_alt' => 'monographie',
                         'de' => array(
                             'name' => 'Monographie',
                             'title' => 'Monographien'
