@@ -33,7 +33,7 @@ function getOrder($object, $type = '') {
     return $order;
 }
 
-function getXType($object, $short, $type = '') {
+function getType($object, $short, $type = '') {
     $constants = getConstants();
     if ($type == '') {
         foreach ($constants['typeinfos'][$object] as $k => $v) {
@@ -69,7 +69,6 @@ function getName($object, $type, $lang, $subtype = '') {
             return $subtype;
         }
     }
-    return $type;
 }
 
 function getTitle($object, $name, $lang, $type = '') {
@@ -86,11 +85,12 @@ function getTitle($object, $name, $lang, $type = '') {
 }
 
 function getPersonLink($id, $firstname, $lastname, $target, $inv = 0, $shortfirst = 0, $nameorder = '') {
+    $constants = getConstants();
     $person = '';
     switch ($target) {
         case 'cris' :
             if (is_numeric($id)) {
-                $link_pre = "<a href=\"" . $this->cris_publicweb . "Person/" . $id . "\" class=\"extern\">";
+                $link_pre = "<a href=\"" . $constants['publicweb_url'] . "Person/" . $id . "\" class=\"extern\">";
                 $link_post = "</a>";
             } else {
                 $link_pre = '';
@@ -99,7 +99,7 @@ function getPersonLink($id, $firstname, $lastname, $target, $inv = 0, $shortfirs
             break;
         case 'person':
             if (personExists($firstname, $lastname, $nameorder)) {
-                $link_pre = "<a href=\"" . $this->univis_path . personSlug($firstname, $lastname, $nameorder) . "\">";
+                $link_pre = "<a href=\"" . $constants['publicweb_url'] . personSlug($firstname, $lastname, $nameorder) . "\">";
                 $link_post = "</a>";
             } else {
                 $link_pre = '';
@@ -181,6 +181,7 @@ function personSlug($firstname = '', $lastname = '', $nameorder = '') {
 }
 
 function getItemUrl($item, $title, $cris_id, $page_id = '', $lang = 'de') {
+    $constants = getConstants();
     // First search in subpages
     $pages = get_pages(array('child_of' => $page_id, 'post_status' => 'publish'));
     foreach ($pages as $page) {
@@ -193,7 +194,7 @@ function getItemUrl($item, $title, $cris_id, $page_id = '', $lang = 'de') {
     if ($page && !empty($page->ID)) {
         return get_permalink($page->ID);
     } else {
-        return $this->cris_publicweb . $item . "/" . $cris_id . ($lang == 'de' ? '?lang=de_DE' : '?lang=en_GB');
+        return $constants['publicweb_url'] . $item . "/" . $cris_id . ($lang == 'de' ? '?lang=de_DE' : '?lang=en_GB');
     }
 }
 

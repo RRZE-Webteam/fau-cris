@@ -387,8 +387,32 @@ function getConstants()
                                 'title' => 'Decision Notes'
                             ]
                         ],
-                        'undefined' => [
+                        'EditedVolumesSubtype_educational' => array(
                             'order' => 12,
+                            'short' => 'lehrmaterial',
+                            'de' => array(
+                                'name' => 'Lehrmaterial',
+                                'title' => 'Lehrmaterial'
+                            ),
+                            'en' => array(
+                                'name' => 'Educational material',
+                                'title' => 'Educational Material'
+                            )
+                        ),
+                        'Kommentierung' => array(
+                            'order' => 13,
+                            'short' => 'kommentierung',
+                            'de' => array(
+                                'name' => 'Kommentierung',
+                                'title' => 'Kommentierungen'
+                            ),
+                            'en' => array(
+                                'name' => 'Annotation',
+                                'title' => 'Annotations'
+                            )
+                        ),
+                        'undefined' => [
+                            'order' => 14,
                             'short' => 'andere',
                             'de' => [
                                 'name' => 'Andere / O.A.',
@@ -415,8 +439,8 @@ function getConstants()
                     'subtypes' => [
                         'Monographie' => [
                             'order' => 1,
-                            'short' => 'mongraphien',
-                            'short_alt' => 'mongraphie',
+                            'short' => 'monographie',
+                            'short_alt' => 'monographie',
                             'de' => [
                                 'name' => 'Monographie',
                                 'title' => 'Monographien'

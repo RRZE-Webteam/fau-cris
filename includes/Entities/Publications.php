@@ -10,7 +10,7 @@ use function FAU\CRIS\Config\getConstants;
 use function FAU\CRIS\Tools\getItemUrl;
 use function FAU\CRIS\Tools\getName;
 use function FAU\CRIS\Tools\getOrder;
-use function FAU\CRIS\Tools\getXType;
+use function FAU\CRIS\Tools\getType;
 use function FAU\CRIS\Tools\getTitle;
 use function FAU\CRIS\Tools\getPersonLink;
 use function FAU\CRIS\Tools\numericXmlEncode;
@@ -28,7 +28,7 @@ class Publications {
 		$this->langdiv_open = $this->constants['div_open'];
 		$this->langdiv_close = $this->constants['div_close'];
 		if ($parameter['display_language'] != $parameter['page_language']) {
-			$this->langdiv_open = str_replace('">', '" lang="' . $parameter['display_language'] . '">', $div_open);
+			$this->langdiv_open = str_replace('">', '" lang="' . $parameter['display_language'] . '">', $this->langdiv_open);
 		}
 	}
 
@@ -40,8 +40,7 @@ class Publications {
             return;
         }
 		if (!count($pubArray)) {
-			$output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
-			return $output;
+            return '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
 		}
 
         switch ($this->parameter['sortby']) {
@@ -70,7 +69,7 @@ class Publications {
 
                 if ($typeorder[0] != '' && ((array_search($typeorder[0], array_column($this->constants['typeinfos']['publications'], 'short')) !== false) || array_search($typeorder[0], array_column($this->constants['typeinfos']['publications'], 'short_alt')) !== false)) {
                     foreach ($typeorder as $key => $value) {
-                        $typeorder[$key] = getXType('publications', $value);
+                        $typeorder[$key] = getType('publications', $value);
                     }
                 } else {
                     $typeorder = getOrder('publications');
@@ -114,7 +113,7 @@ class Publications {
         $count = 0;
 
 		foreach ($pubList as $array_group => $publications) {
-            if ($count >= $limit) break;
+            if ($limit != '' && ($count >= $limit)) break;
 
             $title = getTitle('publications', $array_group, $this->parameter['display_language']);
 			if (count($order) > 1) {
@@ -145,7 +144,7 @@ class Publications {
 					if ($this->tag == 'cris-custom') {
 						$sublists[$subtitle] = $this->makeCustomList($publications_sub, $this->content, $this->parameter['display_language']);
 					} else {
-						$sublists[ $subtitle ] = $this->makeList( $publications_sub, 0, $this->parameter['nameorder'], $this->parameter['display_language'] );
+						$sublists[ $subtitle ] = $this->makeList( $publications_sub, 0);
 					}
 				}
                 $count += count($publications_sub);
@@ -301,7 +300,7 @@ class Publications {
 					}
 					$publist .= ($pubDetails['pagesTotal'] != '' ? "<br /><span itemprop=\"numberOfPages\">" . $pubDetails['pagesTotal'] . "</span> " . __('Seiten', 'fau-cris') : '')
                         . ($pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '')
-                        . ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . DOI . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '')
+                        . ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . $this->constants['doi_url'] . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '')
                         . ($pubDetails['DOI'] == '' && $pubDetails['OA'] == 'Ja' && $pubDetails['OAlink'] != '' ? "<br />Open Access: <a href='" . $pubDetails['OAlink'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['OAlink'] . "</a>" : '')
                         . ($pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '');
 					break;
@@ -337,7 +336,7 @@ class Publications {
 							$publist .= ($pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '')
                                 . "</span>";
 						}
-						$publist .= ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . DOI . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a></span>" : '')
+						$publist .= ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . $this->constants['doi_url'] . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a></span>" : '')
                             . (($pubDetails['DOI'] == '' && $pubDetails['OA'] == 'Ja' && $pubDetails['OAlink'] != '') ? "<br />Open Access: <a href='" . $pubDetails['OAlink'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['OAlink'] . "</a>" : '')
                             . ($pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '');
 						break;
@@ -427,7 +426,7 @@ class Publications {
 					}
 					$publist .= ($pubDetails['pagesTotal'] != '' ? "<br /><span itemprop=\"numberOfPages\">" . $pubDetails['pagesTotal'] . "</span> " . __('Seiten', 'fau-cris') : '')
                         . ($pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '')
-                        . ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . DOI . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '')
+                        . ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . $this->constants['doi_url'] . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '')
                         . (($pubDetails['DOI'] == '' && $pubDetails['OA'] == 'Ja' && $pubDetails['OAlink'] != '') ? "<br />Open Access: <a href='" . $pubDetails['OAlink'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['OAlink'] . "</a>" : '')
                         . ($pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '');
 					break;
@@ -439,7 +438,7 @@ class Publications {
                     $publist .= $pubDetails['authors'] . ':'
                         . "<br />" . $pubDetails['title']
                         . " (" . ($pubDetails['thesisSubtype'] != '' ? getName('publications', 'Thesis', $this->parameter['display_language'], $pubDetails['thesisSubtype']) : __('Abschlussarbeit', 'fau-cris')) . ", <span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>)"
-                        . ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . DOI . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '')
+                        . ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . $this->constants['doi_url'] . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '')
                         . ($pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '');
 					break;
 				case "translation":
@@ -464,7 +463,7 @@ class Publications {
                         . ($pubDetails['pagesTotal'] != '' ? "<br /><span itemprop=\"numberOfPages\">" . $pubDetails['pagesTotal'] . "</span> " . __('Seiten', 'fau-cris') : '')
                         . ($pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '')
                         . ($pubDetails['ISSN'] != '' ? "<br /><span itemprop=\"issn\">ISSN: " . $pubDetails['ISSN'] . "</span>" : '')
-                        . ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . DOI . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '')
+                        . ($pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . $this->constants['doi_url'] . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '')
                         . (($pubDetails['DOI'] == '' && $pubDetails['OA'] == 'Ja' && $pubDetails['OAlink'] != '') ? "<br />Open Access: <a href='" . $pubDetails['OAlink'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['OAlink'] . "</a>" : '')
                         . ($pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '')
                         . ($pubDetails['origTitle'] != '' ? "<br />Originaltitel: " . $pubDetails['origTitle'] : '')
@@ -670,34 +669,45 @@ class PublicationsRequest extends Webservice {
             $filter['publyear__le'] = $parameter['end'];
         }
         if ( $parameter['type'] !== '' ) {
-            if ( strpos( $parameter['type'], ',' ) ) {
-                $type  = str_replace( ' ', '', $parameter['type'] );
-                $types = explode( ',', $type );
-                foreach ( $types as $v ) {
-                    $pubTyp[] = getType( 'publications', $v );
+            $type  = str_replace( ' ', '', $parameter['type'] );
+            $types = explode( ',', $type );
+            foreach ( $types as $v ) {
+                if (strpos($v, '-') === 0) {
+                    $tmpType = substr($v, 1);
+                    $pubTypExclude[] = getType('publications', $tmpType);
+                } else {
+                    $pubTyp[] = getType('publications', $v);
                 }
-            } else {
-                $pubTyp = (array) getType( 'publications', $parameter['type'] );
             }
-            if ( empty( $pubTyp ) ) {
-                $output = '<p>' . __( 'Falscher Parameter für Publikationstyp', 'fau-cris' ) . '</p>';
+            if (empty($pubTyp) && empty($pubTypExclude)) {
+                return '<p>' . __( 'Falscher Parameter für Publikationstyp', 'fau-cris' ) . '</p>';
+            }
+            if (!empty($pubTyp)) {
+                $filter['publication type__eq'] = $pubTyp;
+            } elseif (!empty($pubTypExclude)) {
+                $filter['publication type__not'] = $pubTypExclude;
+            }
 
-                return $output;
-            }
-            $filter['publication type__eq'] = $pubTyp;
         }
         if ( $parameter['subtype'] !== '' ) {
             $subtype  = str_replace( ' ', '', $parameter['subtype'] );
             $subtypes = explode( ',', $subtype );
             foreach ( $subtypes as $v ) {
-                $pubSubTyp[] = getType( 'publications', $v, $pubTyp[0] );
+                if (strpos($v, '-') === 0) {
+                    $tmpSubType = substr($v, 1);
+                    $pubSubTypExclude[] = getType('publications', $tmpSubType, $pubTyp[0]);
+                } else {
+                    $pubSubTyp[] = getType('publications', $v, $pubTyp[0]);
+                }
             }
-            if ( empty( $pubSubTyp ) ) {
-                $output = '<p>' . __( 'Falscher Parameter für Publikationssubtyp', 'fau-cris' ) . '</p>';
-
-                return $output;
+            if (empty($pubSubTyp) && empty($pubSubTypExclude)) {
+                return '<p>' . __( 'Falscher Parameter für Publikationssubtyp', 'fau-cris' ) . '</p>';
             }
-            $filter['subtype__eq'] = $pubSubTyp;
+            if (!empty($pubSubTyp)) {
+                $filter['subtype__eq'] = $pubSubTyp;
+            } elseif (!empty($pubSubTypExclude)) {
+                $filter['subtype__not'] = $pubSubTypExclude;
+            }
         }
         if ( $parameter['fau'] !== '' ) {
             if ( $parameter['fau'] == 1 ) {
