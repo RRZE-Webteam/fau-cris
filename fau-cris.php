@@ -38,7 +38,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '3.15.6';
+    const version = '3.16.0';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
