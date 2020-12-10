@@ -159,6 +159,7 @@ class FAU_CRIS {
             'cris_patent_link' => 'none',
             'cris_activities_order' =>  Tools::getOptionsOrder('activities'),
             'cris_activities_link' => 'none',
+            'cris_standardizations_order' =>  Tools::getOptionsOrder('standardizations'),
             'cris_sync_check' => 0,
             'cris_sync_research_custom' => 0,
             'cris_sync_field_custom' => 0,
@@ -699,15 +700,6 @@ class FAU_CRIS {
             $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if ($parameter['standardization'] != '') {
                 return $liste->singleStandardization($parameter['hide'], $parameter['quotation']);
-            }
-            if ($parameter['limit'] != '' ) {
-                return $liste->standardizationListe($parameter);
-            }
-            if (strpos($parameter['order1'], 'type') !== false) {
-                return $liste->standardizationNachTyp($parameter);
-            }
-            if (strpos($parameter['order1'], 'year') !== false) {
-                return $liste->standardizationNachJahr($parameter);
             }
             return $liste->standardizationListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'equipment') {

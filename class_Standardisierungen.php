@@ -43,7 +43,7 @@ class Standardisierungen {
      * Ausgabe einer einzelnen Standardisierung
      */
 
-    public function singleStandardization($hide = array(), $quotation = '') {
+    public function singleStandardization($hide = array()) {
         $ws = new CRIS_standardizations();
 
         try {
@@ -57,7 +57,7 @@ class Standardisierungen {
             return $output;
         }
 
-        $output = $this->make_single($standardizationArray, $hide, $quotation);
+        $output = $this->make_single($standardizationArray, $hide);
         
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
@@ -100,39 +100,69 @@ class Standardisierungen {
 	}
 
 	public function standardizationListe($param = array()) {
-		$constructionYearStart = (isset($param['constructionyearstart']) && $param['constructionyearstart'] != '') ? $param['constructionyearstart'] : '';
-        $constructionYearEnd = (isset($param['constructionyearend']) && $param['constructionyearend'] != '') ? $param['constructionyearend'] : '';
-        $constructionYear = (isset($param['constructionyear']) && $param['constructionyear'] != '') ? $param['constructionyear'] : '';
-        //$limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
-        $manufacturer = (isset($param['manufacturer']) && $param['manufacturer'] != '') ? $param['manufacturer'] : '';
-        $location = (isset($param['location']) && $param['location'] != '') ? $param['location'] : '';
-        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
 
-        $standardizationArray = $this->fetch_standardizations($manufacturer, $location, $constructionYear, $constructionYearStart, $constructionYearEnd);
+        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
+        $standardizationArray = $this->fetch_standardizations();
 
         if (!count($standardizationArray)) {
             $output = '<p>' . __('Es wurden leider kein Eintrag gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
 
+        // Gruppierung
+        if ($param['orderby'] == 'year') {
+            $group = 'year';
+            $groupOrder = SORT_DESC;
+        } elseif ($param['orderby'] == 'type') {
+            $group = 'subtype';
+            $groupOrder = SORT_ASC;
+        } else {
+            $group = NULL;
+            $groupOrder = NULL;
+        }
         // sortiere nach Erscheinungsdatum
-        $order = "cfname";
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_ASC);
-        $res = $formatter->execute($standardizationArray);
-        $standardizationList = $res[$order];
+        $sort = "venue_start";
+        $sortOrder = SORT_DESC;
+        $formatter = new CRIS_formatter($group, $groupOrder, $sort, $sortOrder);
+        $standardizations = $formatter->execute($standardizationArray);
+/*print "<pre>";
+var_dump($standardizations);
+print "</pre>";*/
 
-        $output =  $this->make_list($standardizationList, $hide);
-
-		return $this->langdiv_open . $output . $this->langdiv_close;
+        $output = '';
+        if ($param['display'] == 'accordion') {
+            $output .= '[collapsibles expand-all-link="true"]';
+        }
+        foreach ($standardizations as $key => $stanGroup) {
+            switch ($param['orderby']) {
+                case 'year':
+                    $subtitle = $key;
+                    break;
+                case 'type':
+                    $subtitle = Tools::getTitle('standardizations', $key, $this->page_lang);
+                    break;
+                default:
+                    $subtitle = '';
+            }
+            if ($param['display'] == 'accordion') {
+                $output .= sprintf('[collapse title="%1s" color="%2s" name="%3s"]', $subtitle, $param['accordion_color'], sanitize_title($subtitle));
+            } elseif ($subtitle != '') {
+                $output .= '<h3>' . $subtitle . '</h3>';
+            }
+            $output .= $this->make_list($stanGroup, $hide);
+            if ($param['display'] == 'accordion') {
+                $output .= '[/collapse]';
+            }
+        }
+        if ($param['display'] == 'accordion') {
+            $output .= '[/collapsibles]';
+        }
+        return do_shortcode($this->langdiv_open . $output . $this->langdiv_close);
     }
 
-    public function standardizationNachTyp($parameter) {}
-
-    public function standardizationNachJahr($parameter) {}
-
-    private function make_list($standardizations, $hide = array()) {
-    	$standardizationList = '';
-        $standardizationList .= "<ul class=\"cris-standardization\">";
+    private function make_list($standardizations, $hide = array(), $display='list') {
+        $standardizationList = '';
+        $standardizationList .= "<ul class=\"cris-standardizations\">";
         foreach($standardizations as $standardization) {
             $standardization = (array) $standardization;
             foreach ($standardization['attributes'] as $attribut => $v) {
@@ -140,52 +170,51 @@ class Standardisierungen {
             }
             unset($standardization['attributes']);
 
-            switch ($this->sc_lang) {
-                case 'en':
-                    $name = ($standardization['cfname_en'] != '') ? $standardization['cfname_en'] : $standardization['cfname'];
-                    break;
-                case 'de':
-                default:
-                    $name = ($standardization['cfname'] != '') ? $standardization['cfname'] : $standardization['cfname_en'];
-                    break;
-            }
-            $name = htmlentities($name, ENT_QUOTES);
-
-            $manufacturer = null;
-            $model = null;
-            $constructionYear = null;
-            $location = null;
-            if ($standardization['hersteller'] != '' && !in_array('manufacturer', $hide)) {
-                $manufacturer = $standardization['hersteller'];
-            }
-            if ($standardization['modell'] != '' && !in_array('model', $hide)) {
-                $model = $standardization['modell'];
-            }
-            if ($standardization['baujahr'] != '' && !in_array('constructionYear', $hide)) {
-                $constructionYear = $standardization['baujahr'];
-            }
-            if ($standardization['standort'] !='' && !in_array('location', $hide)) {
-                $location = $standardization['standort'];
-            }
-            //var_dump($manufacturer);
             $standardizationList .= "<li>";
-            $standardizationList .= "<span class=\"standardization-name\">" . $name . "</span>";
-            if ($manufacturer) {
-                $standardizationList .= '<br />' . $manufacturer;
-            }
-            if ($model) {
-                if ($manufacturer) {
-                    $standardizationList .= ': ';
-                } else {
-                    $standardizationList .= '<br />';
+            if (!in_array('author', (array)$hide)) {
+                $author = explode("|", $standardization['exportnames']);
+                $authorIDs = explode(",", $standardization['persid']);
+                $authorArray = array();
+                foreach ($authorIDs as $i => $key) {
+                    $nameparts = explode(":", $author[$i]);
+                    $authorArray[] = array(
+                        'id' => $key,
+                        'lastname' => $nameparts[0],
+                        'firstname' => array_key_exists(1, $nameparts) ? substr($nameparts[1], 0,1) . '. ' : '');
                 }
-                $standardizationList .= $model;
+                $authorList = array();
+                foreach ($authorArray as $v) {
+                    $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardization_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
+                }
+                $authorHtml = implode(", ", $authorList);
+                if ($authorHtml) {
+                    $standardizationList .= $authorHtml . ": ";
+                }
             }
-            if ($constructionYear) {
-                $standardizationList .= ' (' . __('Bj.', 'fau-cris') . ' ' . $constructionYear . ')';
+            if (!in_array('title', (array)$hide)) {
+                $name = $standardization['title'];
+                $name = htmlentities($name, ENT_QUOTES);
+                if ($name) {
+                    $standardizationList .= '<span class="standardization-name">"' . $name . '"</span>';
+                }
             }
-            if ($location) {
-                $standardizationList .= '<br />' . __('Standort', 'fau-cris') . ': '. $location;
+            if (!in_array('number', (array)$hide)) {
+                $documentNumber = $standardization['document_number'];
+                if ($documentNumber) {
+                    $standardizationList .= ', document ' . $documentNumber;
+                }
+            }
+            if (!in_array('location', (array)$hide)) {
+                $meetingVenue = $standardization['ws_location'];
+                if ($meetingVenue) {
+                    $standardizationList .= ', ' . $meetingVenue;
+                }
+            }
+            if (!in_array('year', (array)$hide)) {
+                $year = $standardization['year'];
+                if ($year) {
+                    $standardizationList .= ', ' . $year;
+                }
             }
             $standardizationList .= "</li>";
         }
@@ -194,7 +223,7 @@ class Standardisierungen {
         return $standardizationList;
     }
 
-    private function make_single($standardizations, $hide = array(), $quotation = '', $image_align = 'alignright') {
+    private function make_single($standardizations, $hide = array()) {
         $standardizationList = '';
         $standardizationList .= "<div class=\"cris-standardization\">";
         foreach($standardizations as $standardization) {
@@ -203,9 +232,7 @@ class Standardisierungen {
                 $standardization[$attribut] = $v;
             }
             unset($standardization['attributes']);
-/*print "<pre>";
-var_dump($standardization);
-print "</pre>";*/
+
             $id = $standardization['ID'];
             $name = htmlentities($standardization['title'], ENT_QUOTES);
 	        $description = str_replace(["\n", "\t", "\r"], '', $standardization['abstract']);
@@ -525,16 +552,19 @@ print "</pre>";*/
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_standardizations($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = '') {
+    private function fetch_standardizations() {
 
-        $filter = Tools::standardization_filter($manufacturer, $location, $constructionYear, $constructionYearStart, $constructionYearEnd);
-
+        //$filter = Tools::standardization_filter();
+        $filter = [];
         $ws = new CRIS_standardizations();
         $standardizationArray = array();
 
         try {
             if ($this->einheit === "orga") {
                 $standardizationArray = $ws->by_orga_id($this->id, $filter);
+            }
+            if ($this->einheit === "person") {
+                $standardizationArray = $ws->by_pers_id($this->id, $filter);
             }
         } catch (Exception $ex) {
             $standardizationArray = array();
@@ -557,20 +587,34 @@ class CRIS_standardizations extends CRIS_webservice {
 
         $requests = array();
         foreach ($orgaID as $_o) {
-            $requests[] = sprintf("getrelated/Organisation/%d/standardization_has_orga", $_o);
+            $requests[] = sprintf("getautorelated/organisation/%d/orga_card_stan", $_o);
         }
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($awarID = null) {
-        if ($awarID === null || $awarID === "0")
-            throw new Exception('Please supply valid standardization ID');
+    public function by_pers_id($persID = null, &$filter = null, $role = 'all') {
+        if ($persID === null || $persID === "0")
+            throw new Exception('Please supply valid person ID');
 
-        if (!is_array($awarID))
-            $awarID = array($awarID);
+        if (!is_array($persID))
+            $persID = array($persID);
 
         $requests = array();
-        foreach ($awarID as $_p) {
+        foreach ($persID as $_p) {
+            $requests[] = sprintf('getautorelated/person/%s/pers_card_stan', $_p);
+        }
+        return $this->retrieve($requests, $filter);
+    }
+
+    public function by_id($stanID = null) {
+        if ($stanID === null || $stanID === "0")
+            throw new Exception('Please supply valid standardization ID');
+
+        if (!is_array($stanID))
+            $stanID = array($stanID);
+
+        $requests = array();
+        foreach ($stanID as $_p) {
             $requests[] = sprintf('get/standardization/%d', $_p);
         }
         return $this->retrieve($requests);
@@ -596,24 +640,6 @@ class CRIS_standardizations extends CRIS_webservice {
         foreach ($data as $_d) {
             foreach ($_d as $standardization) {
                 $a = new CRIS_standardization($standardization);
-                if ($a->ID) {
-                    if (!empty($a->attributes['date'])) {
-                        $a->attributes['year'] = mb_substr($a->attributes['date'], 0, 4);
-                        $a->attributes['sortdate'] = $a->attributes['date'];
-                    } elseif (!empty($a->attributes['start date'])) {
-                        $a->attributes['year'] = mb_substr($a->attributes['start date'], 0, 4);
-                        $a->attributes['sortdate'] = $a->attributes['start date'];
-                    } elseif (!empty($a->attributes['mandate start'])) {
-                        $a->attributes['year'] = mb_substr($a->attributes['mandate start'], 0, 4);
-                        $a->attributes['sortdate'] = $a->attributes['mandate start'];
-                    }
-                    if (!empty($a->attributes['sortdate'])) {
-                        $a->attributes['year'] = mb_substr($a->attributes['sortdate'], 0, 4);
-                    } else {
-                        $a->attributes['year'] = '';
-                    }
-                }
-
                 if ($a->ID && ($filter === null || $filter->evaluate($a)))
                     $standardizations[$a->ID] = $a;
             }
