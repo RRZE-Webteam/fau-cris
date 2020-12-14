@@ -699,7 +699,7 @@ class FAU_CRIS {
             require_once('class_Standardisierungen.php');
             $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if ($parameter['standardization'] != '') {
-                return $liste->singleStandardization($parameter['hide'], $parameter['quotation']);
+                return $liste->singleStandardization($parameter['hide']);
             }
             return $liste->standardizationListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'equipment') {
@@ -834,7 +834,12 @@ class FAU_CRIS {
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
 
-        if ($parameter['show'] == 'organisation') {
+        // Standardisierung
+        if (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
+            require_once('class_Standardisierungen.php');
+            $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            return $liste->standardizationListe($parameter, $content);
+        } elseif ($parameter['show'] == 'organisation') {
         // Forschung
             require_once('class_Organisation.php');
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
