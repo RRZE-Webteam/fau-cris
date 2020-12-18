@@ -144,6 +144,10 @@ ul.cris-equipment .equipment-name {
     padding-bottom: .5em;
 }
 
+div.cris-standardization {
+    margin-bottom: 1em;
+}
+
 @media print {
     .cris-activities a[href]::after,
     .cris-awards a[href]::after,

@@ -89,11 +89,9 @@ class Standardisierungen {
         $standardizations = $formatter->execute($standardizationArray);
         $isGroupAccordion = ($param['display'] == 'accordion' && in_array($param['orderby'], ['year', 'type']));
         $isSingleAccordion = ($param['display'] == 'accordion' && $param['orderby'] == '');
-        
-        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
 
         $output = '';
-        if ($isGroupAccordion || $isSingleAccordion) {
+        if ($isGroupAccordion) {
             $output .= '[collapsibles expand-all-link="true"]';
         }
         foreach ($standardizations as $key => $stanGroup) {
@@ -113,27 +111,29 @@ class Standardisierungen {
                 $output .= '<h3>' . $subtitle . '</h3>';
             }
             if ($param['sc_type'] == 'custom') {
-                $output .= $this->make_custom_list($stanGroup, $param, $custom_text);
-            } elseif ($isSingleAccordion) {
-                $output .= $this->make_single($stanGroup, $param, $custom_text);
+                $output .= $this->make_custom($stanGroup, $param, $custom_text, $isSingleAccordion);
             } else {
-                $output .= $this->make_list($stanGroup, $hide, $param, $isSingleAccordion);
+                if ($isSingleAccordion) {
+                    $output .= $this->make_single($stanGroup, $param, $isSingleAccordion);
+                } else {
+                    $output .= $this->make_list($stanGroup, $param);
+                }
             }
             if ($isGroupAccordion) {
                 $output .= '[/collapse]';
             }
         }
-        if ($isGroupAccordion || $isSingleAccordion) {
+        if ($isGroupAccordion) {
             $output .= '[/collapsibles]';
         }
         return do_shortcode($this->langdiv_open . $output . $this->langdiv_close);
     }
 
-    private function make_list($standardizations, $hide = array(), $param = array(), $isSingleAccordion = false) {
+    private function make_list($standardizations, $param = array(), $isSingleAccordion = false) {
+        $hide = $param['hide'];
         $standardizationList = '';
-        if (!$isSingleAccordion) {
-            $standardizationList .= "<ul class=\"cris-standardizations\">";
-        }
+        $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<ul class=\"cris-standardizations\">");
+
         foreach($standardizations as $standardization) {
             $standardization = (array) $standardization;
             foreach ($standardization['attributes'] as $attribut => $v) {
@@ -189,33 +189,28 @@ class Standardisierungen {
             }
             $standardizationList .= ($isSingleAccordion ? '[/collapse]' : "</li>");
         }
-        if (!$isSingleAccordion) {
-            $standardizationList .= "</ul>";
-        }
+
+        $standardizationList .= ($isSingleAccordion ? '[/collapsibles]' : "</ul>");
 
         return $standardizationList;
     }
 
-    private function make_custom_list($standardizations, $param, $custom_text = '') {
-        switch ($param['display']) {
-            case 'accordion':
-                $tag_open = '[collapsibles expand-all-link="true"]';
-                $tag_close= '[/collapsibles]';
-                $item_open = '[collapse title="%1s" color="%2s" name="%3s"]';
-                $item_close = '[/collapse]';
-                break;
-            case 'no-list':
-                $tag_open = '<div class="cris-standardizations">';
-                $tag_close= '</div>';
-                $item_open = '<div class="cris-standardization">';
-                $item_close = '</div>';
-                break;
-            case 'list':
-            default:
-                $tag_open = '<ul class="cris-standardizations">';
-                $tag_close= '</ul>';
-                $item_open = '<li>';
-                $item_close = '</li>';
+    private function make_custom($standardizations, $param = array(), $custom_text = '', $isSingleAccordion = false) {
+        if  ($param['display'] == 'no-list') {
+            $tag_open = '<div class="cris-standardizations">';
+            $tag_close = '</div>';
+            $item_open = '<div class="cris-standardization">';
+            $item_close = '</div>';
+        } elseif ($isSingleAccordion) {
+            $tag_open = '[collapsibles expand-all-link="true"]';
+            $tag_close = '[/collapsibles]';
+            $item_open = '[collapse title="%1s" color="%2s" name="%3s"]';
+            $item_close = '[/collapse]';
+        } else {
+            $tag_open = '<ul class="cris-standardizations">';
+            $tag_close= '</ul>';
+            $item_open = '<li>';
+            $item_close = '</li>';
         }
 
         $standardizationList = '';
@@ -228,6 +223,7 @@ class Standardisierungen {
             }
             unset($standardization['attributes']);
             $stanDetails['#title#'] = htmlentities($standardization['title'], ENT_QUOTES);
+            $stanDetails['#name#'] = htmlentities($standardization['title'], ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $standardization['abstract']);
             $stanDetails['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $stanDetails['#documentNumber#'] = $standardization['document_number'];
@@ -240,6 +236,7 @@ class Standardisierungen {
             $stanDetails['#meetingEnd#'] = $standardization['venue_end'];
             $stanDetails['#meetingVenue#'] = $standardization['ws_location'];
             $stanDetails['#meetingHost#'] = $standardization['host'];
+            $stanDetails['#year#'] = $standardization['year'];
             $stanDetails['#type#'] = Tools::getName('standardizations', $standardization['subtype'], $this->sc_lang);
             $author = explode("|", $standardization['exportnames']);
             $authorIDs = explode(",", $standardization['persid']);
@@ -260,8 +257,6 @@ class Standardisierungen {
             if ($param['display'] == 'accordion') {
                 $item_open = sprintf($item_open, $param['accordion_title'], $param['accordion_color'], sanitize_title($stanDetails['#title#']));
             }
-            //var_dump($item_open); exit;
-            //$standardizationList .= $item_open . strtr($custom_text, $stanDetails) . $item_close;
             $standardizationList .= strtr($item_open . $custom_text . $item_close, $stanDetails);
         }
 
@@ -270,8 +265,15 @@ class Standardisierungen {
         return do_shortcode($standardizationList);
     }
 
-    private function make_single($standardizations, $hide = array()) {
+    private function make_single($standardizations, $param = array(), $isSingleAccordion = false) {
+        $hide = (isset($param['hide']) && is_array($param['hide'])) ? $param['hide'] : [];
+        if ($isSingleAccordion) {
+            array_push($hide, ['hide']);
+        }
+
         $standardizationList = '';
+        $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<div class=\"cris-standardizations\">");
+
         foreach($standardizations as $standardization) {
             $standardization = (array) $standardization;
             foreach ($standardization['attributes'] as $attribut => $v) {
@@ -279,129 +281,105 @@ class Standardisierungen {
             }
             unset($standardization['attributes']);
 
-            $id = $standardization['ID'];
-            $title = htmlentities($standardization['title'], ENT_QUOTES);
-	        $description = str_replace(["\n", "\t", "\r"], '', $standardization['abstract']);
-	        $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
-            $documentNumber = $standardization['document_number'];
-            $url = $standardization['uri'];
-            $contributionTo = $standardization['document_contribution'];
-            $acceptedIn = $standardization['document_final'];
-            $committeeOrganization = $standardization['ws_organisation'];
-            $committeeGroup = $standardization['group'];
-            $meetingStart = $standardization['venue_start'];
-            $meetingEnd = $standardization['venue_end'];
-            $meetingVenue = $standardization['ws_location'];
-            $meetingHost = $standardization['host'];
-            $type = Tools::getName('standardizations', $standardization['subtype'], $this->sc_lang);
-            $author = explode("|", $standardization['exportnames']);
-            $authorIDs = explode(",", $standardization['persid']);
-            $authorArray = array();
-            foreach ($authorIDs as $i => $key) {
-                $nameparts = explode(":", $author[$i]);
-                $authorArray[] = array(
-                    'id' => $key,
-                    'lastname' => $nameparts[0],
-                    'firstname' => array_key_exists(1, $nameparts) ? $nameparts[1] : '');
-            }
-            $authorList = array();
-            foreach ($authorArray as $v) {
-                $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardization_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
-            }
-            $authorHtml = implode(", ", $authorList);
-
-            $standardizationList .= "<div class=\"cris-standardization\">";
+            $standardizationList .= ($isSingleAccordion ? sprintf('[collapse title="%1s" color="%2s" name="%3s"]', $standardization['title'], $param['accordion_color'], sanitize_title($standardization['title'])) : "<div class=\"cris-standardization\">");
 
             if (!in_array('title', (array)$hide)) {
-		        $standardizationList .= "<h3>" . $title . "</h3>";
+		        $standardizationList .= "<h3>" . htmlentities($standardization['title'], ENT_QUOTES) . "</h3>";
 	        }
 
-            if ($type && !in_array('type', (array)$hide)) {
-                $standardizationList .= "<p>" . $type . '</p>';
+            if (!in_array('type', (array)$hide)) {
+                $type = Tools::getName('standardizations', $standardization['subtype'], $this->sc_lang);
+                if ($type) {
+                    $standardizationList .= "<p>" . $type . '</p>';
+                }
             }
 
-            if ($description && !in_array('description', (array)$hide)) {
-                $standardizationList .= "<div class=\"standardization-description\">" . $description . '</div>';
+            if (!in_array('description', (array)$hide)) {
+                $description = str_replace(["\n", "\t", "\r"], '', $standardization['abstract']);
+                $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+                if ($description) {
+                    $standardizationList .= "<div class=\"standardization-description\">" . $description . '</div>';
+                }
             }
             if (!in_array('details', $hide)) {
-                if (!in_array('documentNumber', (array)$hide) && !empty($documentNumber)) {
-                    $standardizationList .= "<strong>" . __('Nummer des Dokuments', 'fau-cris') . ': </strong>' . $documentNumber;
+                if (!in_array('documentNumber', (array)$hide) && !empty($standardization['document_number'])) {
+                    $standardizationList .= "<strong>" . __('Nummer des Dokuments', 'fau-cris') . ': </strong>' . $standardization['document_number'];
                 }
-                if (!in_array('url', (array)$hide) && !empty($url)) {
-                    $standardizationList .= "<br /><strong>" . __('URL', 'fau-cris') . ': </strong>' . $url;
+                if (!in_array('url', (array)$hide) && !empty($standardization['uri'])) {
+                    $standardizationList .= "<br /><strong>" . __('URL', 'fau-cris') . ': </strong>' . $standardization['uri'];
                 }
-                if (!in_array('contributionTo', (array)$hide) && !empty($contributionTo)) {
-                    $standardizationList .= "<br /><strong>" . __('Beitrag zum Dokument (Nummer)', 'fau-cris') . ': </strong>' . $contributionTo;
+                if (!in_array('contributionTo', (array)$hide) && !empty($standardization['document_contribution'])) {
+                    $standardizationList .= "<br /><strong>" . __('Beitrag zum Dokument (Nummer)', 'fau-cris') . ': </strong>' . $standardization['document_contribution'];
                 }
-                if (!in_array('acceptedIn', (array)$hide) && !empty($acceptedIn)) {
-                    $standardizationList .= "<br /><strong>" . __('Übernahme in öffentliches Dokument (Nummer)', 'fau-cris') . ': </strong>' . $acceptedIn;
+                if (!in_array('acceptedIn', (array)$hide) && !empty($standardization['document_final'])) {
+                    $standardizationList .= "<br /><strong>" . __('Übernahme in öffentliches Dokument (Nummer)', 'fau-cris') . ': </strong>' . $standardization['document_final'];
                 }
-                if (!in_array('authors', (array)$hide) && !empty($authorHtml)) {
+                if (!in_array('authors', (array)$hide) && !empty($standardization['exportnames'])) {
+                    $author = explode("|", $standardization['exportnames']);
+                    $authorIDs = explode(",", $standardization['persid']);
+                    $authorArray = array();
+                    foreach ($authorIDs as $i => $key) {
+                        $nameparts = explode(":", $author[$i]);
+                        $authorArray[] = array(
+                            'id' => $key,
+                            'lastname' => $nameparts[0],
+                            'firstname' => array_key_exists(1, $nameparts) ? $nameparts[1] : '');
+                    }
+                    $authorList = array();
+                    foreach ($authorArray as $v) {
+                        $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardization_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
+                    }
+                    $authorHtml = implode(", ", $authorList);
                     $standardizationList .= "<br /><strong>" . __('Autor/-innen', 'fau-cris') . ': </strong>' . $authorHtml;
                 }
             }
             if (!in_array('committee', $hide)) {
                 $standardizationList .= '<h4>' . __('Gremium') . '</h4>';
-                if (!in_array('organization', (array)$hide) && !empty($committeeOrganization)) {
-                    $standardizationList .= "<strong>" . __('Organisation', 'fau-cris') . ': </strong>' . $committeeOrganization;
+                if (!in_array('organization', (array)$hide) && !empty($standardization['ws_organisation'])) {
+                    $standardizationList .= "<strong>" . __('Organisation', 'fau-cris') . ': </strong>' . $standardization['ws_organisation'];
                 }
-                if (!in_array('group', (array)$hide) && !empty($url)) {
-                    $standardizationList .= "<br /><strong>" . __('Arbeitsgruppe', 'fau-cris') . ': </strong>' . $committeeGroup;
+                if (!in_array('group', (array)$hide) && !empty($standardization['group'])) {
+                    $standardizationList .= "<br /><strong>" . __('Arbeitsgruppe', 'fau-cris') . ': </strong>' . $standardization['group'];
                 }
             }
             if (!in_array('meeting', $hide)) {
                 $standardizationList .= '<h4>' . __('Meeting') . '</h4>';
-                if (!in_array('date', (array)$hide) && (!empty($meetingStart) || !empty($meetingEnd))) {
-                    $startDate = date_i18n(get_option('date_format') , strtotime($meetingStart));
-                    $endDate = date_i18n(get_option('date_format') , strtotime($meetingEnd));
+                if (!in_array('date', (array)$hide) && (!empty($standardization['venue_start']) || !empty($standardization['venue_end']))) {
+                    $startDate = date_i18n(get_option('date_format') , strtotime($standardization['venue_start']));
+                    $endDate = date_i18n(get_option('date_format') , strtotime($standardization['venue_end']));
                     $standardizationList .= "<br /><strong>" . __('Datum', 'fau-cris') . ': </strong>';
-                    if (!empty($meetingStart) && !empty($meetingStart)) {
+                    if (!empty($standardization['venue_start']) && !empty($standardization['venue_end'])) {
                         $standardizationList .= $startDate . ' &mdash; ' . $endDate;
-                    } elseif (empty($meetingStart) xor empty($meetingStart)) {
+                    } elseif (empty($standardization['venue_start']) xor empty($standardization['venue_end'])) {
                         $standardizationList .= $startDate . $endDate;
-                    } elseif ($meetingStart == $meetingStart) {
+                    } elseif ($standardization['venue_start'] == $standardization['venue_end']) {
                         $standardizationList .= $startDate;
                     }
                 }
-                if (!in_array('host', (array)$hide) && !empty($meetingHost)) {
-                    $standardizationList .= "<br /><strong>" . __('Veranstalter', 'fau-cris') . ': </strong>' . $meetingHost;
+                if (!in_array('host', (array)$hide) && !empty($standardization['host'])) {
+                    $standardizationList .= "<br /><strong>" . __('Veranstalter', 'fau-cris') . ': </strong>' . $standardization['host'];
                 }
-                if (!in_array('venue', (array)$hide) && !empty($meetingVenue)) {
-                    $standardizationList .= "<br /><strong>" . __('Ort', 'fau-cris') . ': </strong>' . $meetingVenue;
+                if (!in_array('venue', (array)$hide) && !empty($standardization['ws_location'])) {
+                    $standardizationList .= "<br /><strong>" . __('Ort', 'fau-cris') . ': </strong>' . $standardization['ws_location'];
                 }
             }
-            
-            $standardizationList .= "</div>";
+
+            $standardizationList .= ($isSingleAccordion ? '[/collapse]' : "</div>");
         }
+        $standardizationList .= ($isSingleAccordion ? '[/collapsibles]' : "</div>");
 
         return $standardizationList;
 
     }
 
-	private function make_custom($standardizations, $custom_text = '', $param = array()) {
+	private function make_custom_single($standardizations, $param = array(), $custom_text = '', $isSingleAccordion = false) {
+        /*$hide = (isset($param['hide']) && is_array($param['hide'])) ? $param['hide'] : [];
+        if ($isSingleAccordion) {
+            array_push($hide, ['hide']);
+        }
 
-		switch ($param['display']) {
-			case 'accordion':
-				$tag_open = '[collapsibles expand-all-link="true"]';
-				$tag_close= '[/collapsibles]';
-				$item_open = '[collapse title="%1s" color="%2s" name="%3s"]';
-				$item_close = '[/collapse]';
-				break;
-			case 'no-list':
-				$tag_open = '<div class="cris-standardizations">';
-				$tag_close= '</div>';
-				$item_open = '<div class="cris-standardization">';
-				$item_close = '</div>';
-				break;
-			case 'list':
-			default:
-				$tag_open = '<ul class="cris-standardizations">';
-				$tag_close= '</ul>';
-				$item_open = '<li>';
-				$item_close = '</li>';
-		}
-
-		$standardizationList = $tag_open;
+        $standardizationList = '';
+        $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<div class=\"cris-standardizations\">");
 
 		foreach ($standardizations as $standardization) {
 
@@ -442,7 +420,7 @@ class Standardisierungen {
 
 		$standardizationList .= $tag_close;
 
-		return do_shortcode($standardizationList);
+		return do_shortcode($standardizationList);*/
 	}
 
     /*
