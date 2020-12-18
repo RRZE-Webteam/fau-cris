@@ -21,7 +21,7 @@ class CRIS_filter {
          */
 
         $filterlist = array();
-        foreach ($definitions as $_k => $_v) {
+        foreach ((array)$definitions as $_k => $_v) {
             // force lower case statements
             $_op = explode('__', strtolower($_k));
             if (count($_op) != 2)
