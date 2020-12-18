@@ -435,7 +435,7 @@ class Projekte {
         return $projlist;
     }
 
-    private function make_custom_list($projects, $custom_text) {
+    private function make_custom_list($projects, $custom_text, $param = array()) {
         $projlist = '';
         $projlist .= "<ul class=\"cris-projects\">";
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.16.0
+ * Version: 3.17.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -159,6 +159,7 @@ class FAU_CRIS {
             'cris_patent_link' => 'none',
             'cris_activities_order' =>  Tools::getOptionsOrder('activities'),
             'cris_activities_link' => 'none',
+            'cris_standardizations_order' =>  Tools::getOptionsOrder('standardizations'),
             'cris_sync_check' => 0,
             'cris_sync_research_custom' => 0,
             'cris_sync_field_custom' => 0,
@@ -693,7 +694,15 @@ class FAU_CRIS {
         $parameter = self::cris_shortcode_parameter($atts, $content = null, $tag);
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
-        if (isset($parameter['show']) && $parameter['show'] == 'equipment') {
+        if (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
+            // Standardisierung
+            require_once('class_Standardisierungen.php');
+            $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            if ($parameter['standardization'] != '') {
+                return $liste->singleStandardization($parameter['hide']);
+            }
+            return $liste->standardizationListe($parameter);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'equipment') {
             // Equipment
             require_once('class_Equipment.php');
             $liste = new Equipment($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
@@ -825,7 +834,12 @@ class FAU_CRIS {
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
 
-        if ($parameter['show'] == 'organisation') {
+        // Standardisierung
+        if (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
+            require_once('class_Standardisierungen.php');
+            $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            return $liste->standardizationListe($parameter, $content);
+        } elseif ($parameter['show'] == 'organisation') {
         // Forschung
             require_once('class_Organisation.php');
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
@@ -941,6 +955,7 @@ class FAU_CRIS {
             'accordion_color' => '',
             'display_language' => Tools::getPageLanguage($post->ID),
             'organisation' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
+            'standardization' => ''
                             ), $atts));
 
 	    $sc_param['orderby'] = sanitize_text_field($orderby);
@@ -995,7 +1010,8 @@ class FAU_CRIS {
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
-	    switch($sortby) {
+        $sc_param['standardization'] = sanitize_text_field($standardization);
+        switch($sortby) {
             case 'created':
                 $sc_param['sortby'] = 'updatedon';
                 $sc_param['sortorder'] = SORT_DESC;
@@ -1042,6 +1058,13 @@ class FAU_CRIS {
                 $sc_param['publication'] = explode(',', $sc_param['publication']);
             }
             $sc_param['entity_id'] = $sc_param['publication'];
+        } elseif ($sc_param['standardization'] != '') {
+            $sc_param['entity'] = 'standardization';
+	        if (strpos($sc_param['standardization'], ',') !== false) {
+		        $sc_param['standardization'] = str_replace(' ', '', $sc_param['standardization']);
+		        $sc_param['standardization'] = explode(',', $sc_param['standardization']);
+	        }
+	        $sc_param['entity_id'] = $sc_param['standardization'];
         } elseif ($sc_param['equipment'] != '') {
             $sc_param['entity'] = 'equipment';
 	        if (strpos($sc_param['equipment'], ',') !== false) {

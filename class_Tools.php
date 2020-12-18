@@ -467,8 +467,7 @@ class Tools {
                 $activityTyp = (array) self::getType('activities', $type);
             }
             if (empty($activityTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Aktivitätstyp', 'fau-cris') . '</p>';
-                return $output;
+                return '<p>' . __('Falscher Parameter für Aktivitätstyp', 'fau-cris') . '</p>';
             }
             $filter['type of activity__eq'] = $activityTyp;
         }
@@ -523,6 +522,39 @@ class Tools {
             $filter['baujahr__ge'] = $constructionYearStart;
         if ($constructionYearEnd !== '' && $constructionYearEnd !== NULL)
             $filter['baujahr__le'] = $constructionYearEnd;
+
+        if (count($filter))
+            return $filter;
+        return null;
+    }
+
+    /*
+     * Array zur Definition des Filters für Standardisierungen
+     */
+
+    public static function standardizations_filter($year = '', $start = '', $end = '', $type = '') {
+        $filter = array();
+        if ($year !== '' && $year !== NULL)
+            $filter['year__eq'] = $year;
+        if ($start !== '' && $start !== NULL)
+            $filter['year__ge'] = $start;
+        if ($end !== '' && $end !== NULL)
+            $filter['year__le'] = $end;
+        if ($type !== '' && $type !== NULL) {
+            if (strpos($type, ',')) {
+                $type = str_replace(' ', '', $type);
+                $types = explode(',', $type);
+                foreach($types as $v) {
+                    $activityTyp[] = self::getType('standardizations', $v);
+                }
+            } else {
+                $activityTyp = (array) self::getType('standardizations', $type);
+            }
+            if (empty($activityTyp)) {
+                return '<p>' . __('Falscher Parameter für Standardisierungstyp', 'fau-cris') . '</p>';
+            }
+            $filter['type of activity__eq'] = $activityTyp;
+        }
 
         if (count($filter))
             return $filter;

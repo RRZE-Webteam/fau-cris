@@ -1442,6 +1442,38 @@ class CRIS_Dicts {
                     'title' => 'Other activities (FAU-external)')
             ),
         ),
+        'standardizations' => array(
+            'standardization_type_norm' => array(
+                'order' => 1,
+                'short' => 'norm',
+                'de' => array(
+                    'name' => 'Normung',
+                    'title' => 'Normungen'),
+                'en' => array(
+                    'name' => 'Standard',
+                    'title' => 'Standards')
+            ),
+            'standardization_type_standard' => array(
+                'order' => 2,
+                'short' => 'standardization',
+                'de' => array(
+                    'name' => 'Standardisierung',
+                    'title' => 'Standardisierungen'),
+                'en' => array(
+                    'name' => 'Standardization',
+                    'title' => 'Standardizations')
+            ),
+            'standardization_type_regulation' => array(
+                'order' => 3,
+                'short' => 'regulation',
+                'de' => array(
+                    'name' => 'Regulierung',
+                    'title' => 'Regulierungen'),
+                'en' => array(
+                    'name' => 'Regulation',
+                    'title' => 'Regulations')
+            ),
+        ),
         'projectroles' => array(
             'leader' => array(
                 'order' => 1,
