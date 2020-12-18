@@ -545,15 +545,15 @@ class Tools {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
                 foreach($types as $v) {
-                    $activityTyp[] = self::getType('standardizations', $v);
+                    $stanTyp[] = self::getType('standardizations', $v);
                 }
             } else {
-                $activityTyp = (array) self::getType('standardizations', $type);
+                $stanTyp = (array) self::getType('standardizations', $type);
             }
-            if (empty($activityTyp)) {
+            if (empty($stanTyp)) {
                 return '<p>' . __('Falscher Parameter für Standardisierungstyp', 'fau-cris') . '</p>';
             }
-            $filter['type of activity__eq'] = $activityTyp;
+            $filter['subtype__eq'] = $stanTyp;
         }
 
         if (count($filter))
