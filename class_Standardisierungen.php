@@ -372,57 +372,6 @@ class Standardisierungen {
 
     }
 
-	private function make_custom_single($standardizations, $param = array(), $custom_text = '', $isSingleAccordion = false) {
-        /*$hide = (isset($param['hide']) && is_array($param['hide'])) ? $param['hide'] : [];
-        if ($isSingleAccordion) {
-            array_push($hide, ['hide']);
-        }
-
-        $standardizationList = '';
-        $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<div class=\"cris-standardizations\">");
-
-		foreach ($standardizations as $standardization) {
-
-			$standardization = (array) $standardization;
-			foreach ($standardization['attributes'] as $attribut => $v) {
-				$standardization[$attribut] = $v;
-			}
-			unset($standardization['attributes']);
-
-			$id = $standardization['ID'];
-			switch ($this->sc_lang) {
-				case 'en':
-					$title = ($standardization['cfname_en'] != '') ? $standardization['cfname_en'] : $standardization['cfname'];
-					$description = ($standardization['description_en'] != '') ? $standardization['description_en'] : $standardization['description'];
-					break;
-				case 'de':
-				default:
-					$title = ($standardization['cfname'] != '') ? $standardization['cfname'] : $standardization['cfname_en'];
-					$description = ($standardization['description'] != '') ? $standardization['description'] : $standardization['description_en'];
-					break;
-			}
-			$description = str_replace(["\n", "\t", "\r"], '', $description);
-			$standardization_details['#title#'] =  htmlentities($title, ENT_QUOTES);
-			$standardization_details['#description#'] = "<div class=\"standardization-description\">" . strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>') . "</div>";
-			$standardization_details['#manufacturer#']  = $standardization['hersteller'];
-			$standardization_details['#model#'] = $standardization['modell'];
-			$standardization_details['#constructionYear#'] = $standardization['baujahr'];
-			$standardization_details['#location#'] = $standardization['standort'];
-			$standardization_details['#url#'] = $standardization['url'];
-			$standardization_details['#year#'] = $standardization['year'];
-
-			if ($param['display'] == 'accordion') {
-				$item_open = sprintf($item_open, $param['accordion_title'],$param['accordion_color'], sanitize_title($standardization_details['#title#']));
-			}
-
-			$standardizationList .= strtr($item_open . $custom_text . $item_close, $standardization_details);
-		}
-
-		$standardizationList .= $tag_close;
-
-		return do_shortcode($standardizationList);*/
-	}
-
     /*
      * Holt Daten vom Webservice je nach definierter Einheit.
      */

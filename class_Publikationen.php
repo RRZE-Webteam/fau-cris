@@ -103,10 +103,10 @@ class Publikationen {
         $output = '';
 
         if ($quotation == 'apa' || $quotation == 'mla') {
-            $output .= $this->make_quotation_list($pubList, $quotation, 0,$param['display']);
+            $output .= $this->make_quotation_list($pubList, $quotation, $param['showimage'], $param['display']);
         } else {
             if ($param['sc_type'] == 'custom') {
-                $output .= $this->make_custom_list($pubList, $content, '', $param['display_language'], $param['image_align'],$param['display']);
+                $output .= $this->make_custom_list($pubList, $content, '', $param['display_language'], $param['image_align']);
             } else {
                 $output .= $this->make_list($pubList, 1, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'],$param['display']);
             }
@@ -182,7 +182,7 @@ class Publikationen {
                         $shortcode_data_inner .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $shortcode_data_inner .= $this->make_quotation_list($publications_sub, $quotation, 0,$param['display']);
+                        $shortcode_data_inner .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'],$param['display']);
                     } else {
                         if ($param['sc_type'] == 'custom') {
                             $shortcode_data_inner .= $this->make_custom_list($publications_sub, $content, '', $param['display_language']);
@@ -209,7 +209,7 @@ class Publikationen {
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $output .= $this->make_quotation_list($publications_sub, $quotation, 0,$param['display']);
+                        $output .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display']);
                     } else {
                         if ($param['sc_type'] == 'custom') {
                             $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language']);
@@ -317,9 +317,9 @@ class Publikationen {
                         $shortcode_data_other .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation, 0,$param['display']);
+                        $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'],$param['display']);
                     } else {
-                        $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language']);
+                        $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'],$param['display']);
                     }
                 }
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
@@ -376,7 +376,7 @@ class Publikationen {
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $output .= $this->make_quotation_list($publications_sub, $quotation, 0, $param['display']);
+                        $output .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display']);
                     } else {
                         if ($param['sc_type'] == 'custom') {
                             $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language'], $param['image_align'], $param['display']);
@@ -582,11 +582,34 @@ class Publikationen {
 
         $quotation = strtolower($quotation);
         $list_class = ($display == 'no-list' ? 'no-list' : '');
+        $image_align = 'alignright';
         $publist = "<ul class=\"cris-publications $list_class\">";
 
         foreach ($publications as $publication) {
+            $id = $publication->ID;
             $publication->insert_quotation_links();
+            $cleardiv = '';
             $publist .= "<li>";
+            if ($showimage == 1) {
+                $publication->attributes['image'] = '';
+                $imgs = self::get_pub_images( $id );
+                if (count($imgs)) {
+                    $cleardiv = '<div style="float: none; clear: both;"></div>';
+                    foreach($imgs as $img) {
+                        $img_size = getimagesizefromstring (base64_decode($img->attributes['png180']));
+                        $publication->attributes['image'] = "<div class=\"cris-image wp-caption " . $image_align  . "\" style=\"width: " . $img_size[0] . "px;\">";
+                        $img_description = (isset($img->attributes['description']) ? $img->attributes['description'] : '');
+                        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+                            $publication->attributes['image'] .= "<img alt=\"Coverbild: ". $img_description ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3].">"
+                                . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
+                            //$publication['image'] .= "<img alt=\"". $img->attributes['description'] ."\" src=\"\" width=\"\" height=\"\">" . $img_description;
+
+                        }
+                        $publication->attributes['image'] .= "</div>";
+                    }
+                }
+                $publist .= $publication->attributes['image'];
+            }
             $publist .= $publication->attributes['quotation' . $quotation . 'link'];
             if ($publication->attributes['openaccess'] == "Ja" && isset($this->options['cris_oa']) && $this->options['cris_oa'] == 1) {
                 $publist .= "<span aria-hidden class=\"oa-icon\" title=\"Open-Access-Publikation\"></span>";
@@ -600,7 +623,7 @@ class Publikationen {
             if (isset($this->options['cris_bibtex']) && $this->options['cris_bibtex'] == 1) {
                 $publist .= '<br />BibTeX: <a href="' . sprintf($this->bibtexlink, $publication->attributes['id_publ']) . '">Download</a>';
             }
-            $publist .= "</li>";
+            $publist .= $cleardiv."</li>";
         }
 
         $publist .= "</ul>";
