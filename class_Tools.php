@@ -598,8 +598,17 @@ class Tools {
             }
             $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
-            $person_id = $wpdb->get_var($sql);
-            return $person_id;
+            $persons = $wpdb->get_results($sql);
+            if (count($persons) == 1) {
+                return $persons[0]->ID;
+            } elseif (count($persons) >= 1) {
+                // more than 1 match
+                foreach ($persons as $person) {
+                    if ((get_the_title($person->ID) == $firstname . ' ' . $lastname) || (get_the_title($person->ID) == $lastname . ', ' . $firstname)) {
+                        return $person->ID;
+                    }
+                }
+            }
         }
         if ($cms == 'wbk') {
             // Webbaukasten
@@ -635,9 +644,21 @@ class Tools {
             } else {
                 $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
             }
-            $sql = "SELECT post_name FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
+            $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
             $sql = $wpdb->prepare($sql, $person);
-            $person_slug = $wpdb->get_var($sql);
+            $persons = $wpdb->get_results($sql);
+            if (count($persons) == 1) {
+                $personObj = get_post($persons[0]->ID);
+                $person_slug = $personObj->post_name;
+            } elseif (count($persons) >= 1) {
+                // more than 1 match
+                foreach ($persons as $person) {
+                    $personObj = get_post($person->ID);
+                    if (($personObj->post_title == $firstname . ' ' . $lastname) || ($personObj->post_title == $lastname . ', ' . $firstname)) {
+                        $person_slug = $personObj->post_name;
+                    }
+                }
+            }
         } else {
             //Webbauksten
             $person_slug = strtolower($firstname) . "-" . strtolower($lastname) . ".shtml";
