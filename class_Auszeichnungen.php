@@ -493,10 +493,12 @@ class Auszeichnungen {
 			$award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "Person/" . $award['relpersid'];
 
 			if ($param['display'] == 'accordion') {
-				$item_open = sprintf($item_open, $param['accordion_title'],$param['accordion_color'], sanitize_title($award_details['#name#']));
-			}
+				$item_open_mod = sprintf($item_open, $param['accordion_title'],$param['accordion_color'], sanitize_title($award_details['#name#']));
+			} else {
+                $item_open_mod = $item_open;
+            }
 
-			$awardlist .= strtr($item_open . $custom_text . $item_close, $award_details);
+			$awardlist .= strtr($item_open_mod . $custom_text . $item_close, $award_details);
 		}
 
 		$awardlist .= $tag_close;
