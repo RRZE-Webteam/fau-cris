@@ -482,10 +482,12 @@ class Equipment {
 			}
 
 			if ($param['display'] == 'accordion') {
-				$item_open = sprintf($item_open, $param['accordion_title'],$param['accordion_color'], sanitize_title($equipment_details['#name#']));
+				$item_open_mod = sprintf($item_open, $param['accordion_title'],$param['accordion_color'], sanitize_title($equipment_details['#name#']));
+			} else {
+			    $item_open_mod = $item_open;
 			}
 
-			$equipmentlist .= strtr($item_open . $custom_text . $item_close, $equipment_details);
+			$equipmentlist .= strtr($item_open_mod . $custom_text . $item_close, $equipment_details);
 		}
 
 		$equipmentlist .= $tag_close;

@@ -7,7 +7,7 @@
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
  * Domain Path: /languages
- * Requires at least: 3.9.2
+ * Requires at least: 3.9.3
  * Tested up to: 5.8.2
  * License: GPLv2 or later
  * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris

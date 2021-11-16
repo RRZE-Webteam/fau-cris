@@ -255,9 +255,11 @@ class Standardisierungen {
             $stanDetails['#author#'] = implode(", ", $authorList);
 
             if ($param['display'] == 'accordion') {
-                $item_open = sprintf($item_open, $param['accordion_title'], $param['accordion_color'], sanitize_title($stanDetails['#title#']));
+                $item_open_mod = sprintf($item_open, $param['accordion_title'], $param['accordion_color'], sanitize_title($stanDetails['#title#']));
+            } else {
+                $item_open_mod = $item_open;
             }
-            $standardizationList .= strtr($item_open . $custom_text . $item_close, $stanDetails);
+            $standardizationList .= strtr($item_open_mod . $custom_text . $item_close, $stanDetails);
         }
 
         $standardizationList .= $tag_close;
