@@ -681,7 +681,7 @@ class Publikationen {
                     . $title
                     . "</a></strong></span>";
             if ($publication['openaccess'] == "Ja") {
-                $title_html .= "<span aria-hidden class=\"oa-icon\" title=\"Open-Access-Publikation\"></span>";
+                $title_html .= "<span aria-hidden=\"true\" tabindex=\"-1\" class=\"oa-icon\" title=\"Open-Access-Publikation\"></span>";
             }
             // make array
             $pubDetails = array(
