@@ -446,9 +446,9 @@ class Publikationen {
             $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
         }
         if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
-            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_display']);
+            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_format']);
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'],0,'', '', $param['publications_display']);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'],0,'', '', $param['publications_format']);
         }
 
         return $output;
@@ -491,9 +491,9 @@ class Publikationen {
 
         $output = '';
         if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
-            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_display']);
+            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_format']);
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'],0,'', '', $param['publications_display']);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'],0,'', '', $param['publications_format']);
         }
 
         return $output;

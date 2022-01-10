@@ -947,7 +947,8 @@ class Projekte {
 //        $args['showimage'] = $param['showimage'];
 //        $args['image_align'] = $param['image_align'];
 //        $args['image_position'] = $param['image_position'];
-        $param['sc_type'] = 'default';
+        $param['format'] = $param['publications_format'];
+	    $param['sc_type'] = 'default';
         if ($param['publications_orderby'] == 'year')
 		    return $liste->pubNachJahr ($param, $param['project'], '', false, $param['project']);
 	    if ($param['publications_orderby'] == 'type')

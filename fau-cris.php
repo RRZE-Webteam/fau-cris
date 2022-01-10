@@ -950,6 +950,7 @@ class FAU_CRIS {
             'publications_notable' => '',
             'publications_language' => '',
             'publications_display' => 'list',
+            'publications_format' => 'list',
             'image_align' => 'right',
             'accordion_title' => '#name# (#year#)',
             'accordion_color' => '',
@@ -1001,6 +1002,7 @@ class FAU_CRIS {
         $sc_param['publications_language'] = sanitize_text_field($publications_language);
         $sc_param['publications_limit'] = sanitize_text_field($publications_limit);
         $sc_param['publications_display'] = sanitize_text_field($publications_display);
+        $sc_param['publications_format'] = ($publications_format != 'list' ? sanitize_text_field($publications_format) : $sc_param['publications_display']);
         $sc_param['publications_year'] = sanitize_text_field($publications_year);
         $sc_param['publications_start'] = sanitize_text_field($publications_start);
         $sc_param['publications_end'] = sanitize_text_field($publications_end);

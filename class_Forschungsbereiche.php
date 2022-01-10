@@ -472,6 +472,7 @@ class Forschungsbereiche {
         $args['showimage'] = $param['showimage'];
         $args['image_align'] = $param['image_align'];
         $args['image_position'] = $param['image_position'];
+        $args['format'] = $param['publications_format'];
         if ($param['publications_orderby'] == 'year')
             return $liste->pubNachJahr ($args, $param['field'], '', $param['fsp']);
         if ($param['publications_orderby'] == 'type')
