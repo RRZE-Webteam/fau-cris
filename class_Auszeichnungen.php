@@ -468,7 +468,11 @@ class Auszeichnungen {
 			$award_details['#description#'] = $description;
 			//$award_details['#description#'] = strip_tags($description);
 			$award_details['#url_pressrelease#'] = $award['url_pressrelease'];
-			$award_details['#title_pressrelease#'] = $award['url_pressrelease_title'];
+			if ($this->page_lang == 'en' && $award['url_pressrelease_title_en'] != '') {
+                $award_details['#title_pressrelease#'] = $award['url_pressrelease_title_en'];
+            } else {
+                $award_details['#title_pressrelease#'] = $award['url_pressrelease_title'];
+            }
 			$award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "Person/" . $award['relpersid'];
 
 			if (strpos($custom_text, '#image') !== false) {
