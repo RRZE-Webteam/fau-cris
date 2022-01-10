@@ -147,6 +147,17 @@ ul.cris-equipment .equipment-name {
 div.cris-standardization {
     margin-bottom: 1em;
 }
+.cris-activities a,
+.cris-awards a,
+.cris-equipment a,
+.cris-fields a,
+.cris-organisation a,
+.cris-patents a,
+.cris-projects a,
+.cris-publications a,
+.cris-standardization a {
+    word-break: break-all;
+}
 
 @media print {
     .cris-activities a[href]::after,

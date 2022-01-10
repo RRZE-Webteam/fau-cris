@@ -305,7 +305,7 @@ class Patente {
                 $patentlist .= $patent_type . ": ";
             if (!empty($patent_number)) {
                 if (!empty($patent_link))
-                    $patentlist .= "<a href=\"" . $patent_link . "\ target=\"blank\" title=\"" . __('Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">";
+                    $patentlist .= '<a href="' . $patent_link . '" target="blank" title="' . __('Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen', 'fau-cris') . '">';
                 $patentlist .= $patent_number;
                 if (!empty($patent_link))
                     $patentlist .= "</a>";
