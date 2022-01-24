@@ -1287,16 +1287,14 @@ class CRIS_publication extends CRIS_Entity {
         $splitapa = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
 
         if ($splitapa === 1 && isset($matches[2])) {
-            $apalink = $matches[1] . \
-                    sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
+            $apalink = $matches[1] . sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
             if (isset($matches[4]))
                 $apalink .= sprintf('<a href="%s" target="_blank">%s</a>', $matches[4], $matches[4]);
         } else {
             // try to identify DOI at least
             $splitapa = preg_match("/^(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
             if ($splitapa === 1 && isset($matches[2])) {
-                $apalink = $matches[1] . \
-                        sprintf('<a href="%s" target="_blank">%s</a>', $matches[2], $matches[2]);
+                $apalink = $matches[1] . sprintf('<a href="%s" target="_blank">%s</a>', $matches[2], $matches[2]);
             } else
                 $apalink = $apa;
         }
