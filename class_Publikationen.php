@@ -1305,8 +1305,7 @@ class CRIS_publication extends CRIS_Entity {
         $splitmla = preg_match("/^(.+)(" . $title . ")(.+)$/", $mla, $matches);
 
         if ($splitmla === 1) {
-            $mlalink = $matches[1] . \
-                    sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
+            $mlalink = $matches[1] . sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
         } else {
             $mlalink = $mla;
         }
