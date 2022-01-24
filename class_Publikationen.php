@@ -1176,7 +1176,7 @@ class CRIS_publications extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    public function by_project($projID = null, &$filter) {
+    public function by_project($projID = null, &$filter = null) {
         if ($projID === null || $projID === "0")
             throw new Exception('Please supply valid publication ID');
 
