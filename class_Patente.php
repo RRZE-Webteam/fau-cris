@@ -119,14 +119,20 @@ class Patente {
 
         $output = '';
 
-        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (empty($year) || strpos($year, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($patentList as $array_year => $patents) {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($patents, $showname, $showyear, $showpatentname) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles '.$expandall.']' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($patentList as $array_year => $patents) {
                 if (empty($year)) {
@@ -182,15 +188,21 @@ class Patente {
         $patentList = $formatter->execute($patentArray);
         $output = '';
 
-        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (!empty($type) && strpos($type, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($patentList as $array_type => $patents) {
                 $title = Tools::getTitle('patents', $array_type, $this->sc_lang);
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($patents, $showname, $showyear, $showpatentname, 0) . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '" ' . $openfirst . ']' . $this->make_list($patents, $showname, $showyear, $showpatentname, 0) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($patentList as $array_type => $patents) {
                 if (empty($type)) {
