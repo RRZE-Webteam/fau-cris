@@ -152,14 +152,20 @@ class Projekte {
         $projList = $formatter->execute($projArray);
 
         $output = '';
-        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (empty($year) || strpos($year, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($projList as $array_year => $projects) {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_year => $projects) {
                 if (empty($year)) {
@@ -211,15 +217,21 @@ class Projekte {
         $projList = $formatter->execute($projArray);
 
         $output = '';
-        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (!empty($type) && strpos($type, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($projList as $array_type => $projects) {
                 $title = Tools::getTitle('projects', $array_type, $this->page_lang);
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($projects, $hide) . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_type => $projects) {
                 // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde

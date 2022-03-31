@@ -118,14 +118,20 @@ class Aktivitaeten {
 
         $output = '';
 
-        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (empty($year) || strpos($year, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($activityList as $array_year => $activities) {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($activities, $showname, $showyear, $showactivityname) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles '.$expandall.']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($activityList as $array_year => $activities) {
                 if (empty($year)) {
@@ -181,15 +187,21 @@ class Aktivitaeten {
         $activityList = $formatter->execute($activityArray);
         $output = '';
 
-		if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+		if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (!empty($type) && strpos($type, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($activityList as $array_type => $activities) {
                 $title = Tools::getTitle('activities', $array_type, $param['display_language']);
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' .$openfirst . ']' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
                 foreach ($activityList as $array_type => $activities) {
                 if (empty($type)) {

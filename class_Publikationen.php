@@ -169,9 +169,15 @@ class Publikationen {
         $output = '';
         $showsubtype = ($subtype == '') ? 1 : 0;
 
-	    if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+	    if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (empty($year) || strpos($year, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($pubList as $array_year => $publications) {
                 $shortcode_data_inner = '';
                 $pubSubList = $subformatter->execute($publications);
@@ -194,7 +200,7 @@ class Publikationen {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles '.$expandall.']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($pubList as $array_year => $publications) {
                 if (empty($year)) {
@@ -270,9 +276,15 @@ class Publikationen {
 
         $output = '';
 
-        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (!empty($type) && strpos($type, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($pubList as $array_type => $publications) {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
 	            $title = Tools::getTitle('publications', $array_type, $param['display_language']);
@@ -325,7 +337,7 @@ class Publikationen {
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles '.$expandall.']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($pubList as $array_type => $publications) {
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde

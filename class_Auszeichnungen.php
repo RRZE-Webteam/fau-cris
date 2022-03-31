@@ -129,9 +129,15 @@ class Auszeichnungen {
         $awardList = $formatter->execute($awardArray);
 
         $output = '';
-        if (empty($year) && shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (empty($year) || strpos($year, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($awardList as $array_year => $awards) {
                 if ($display == 'gallery') {
                     $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_gallery($awards, $showname, $showyear, $showawardname) . '[/collapse]');
@@ -140,7 +146,7 @@ class Auszeichnungen {
                 }
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($awardList as $array_year => $awards) {
                 if (count($awards) < 1)
@@ -202,19 +208,25 @@ class Auszeichnungen {
         }
         $awardList = $formatter->execute($awardArray);
         $output = '';
-        if (empty($type) && shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
-            $openfirst = ' load="open"';
+            if (!empty($type) && strpos($type, ',') !== false) {
+                $openfirst = ' load="open"';
+                $expandall = ' expand-all-link="true"';
+            } else {
+                $openfirst = '';
+                $expandall = '';
+            }
             foreach ($awardList as $array_type => $awards) {
                 $title = Tools::getTitle('awards', $array_type, $this->page_lang);
                 if ($display == 'gallery') {
-                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_gallery($awards, $showname, $showyear, $showawardname) . '[/collapse]');
+                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' .$openfirst . ']' . $this->make_gallery($awards, $showname, $showyear, $showawardname) . '[/collapse]');
                 } else {
-                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"]' . $this->make_list($awards, $showname, $showyear, $showawardname) . '[/collapse]');
+                    $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' .$openfirst . ']' . $this->make_list($awards, $showname, $showyear, $showawardname) . '[/collapse]');
                 }
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles expand-all-link="true"]' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($awardList as $array_type => $awards) {
                 if (empty($type)) {
