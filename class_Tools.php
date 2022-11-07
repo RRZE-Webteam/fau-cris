@@ -16,12 +16,12 @@ class Tools {
     }
 
     public static function getOrder ($object, $type = '') {
-        if ($type == '') {
+		if ($type == '' || !isset(CRIS_Dicts::$typeinfos[$object][$type]['subtypes'])) {
             foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
                 $order[$v['order']] = $k;
             }
         } else {
-            foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
+			foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
                 $order[$v['order']] = $k;
             }
         }
