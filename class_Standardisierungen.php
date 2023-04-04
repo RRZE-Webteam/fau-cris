@@ -18,7 +18,7 @@ class Standardisierungen {
         $this->univis = NULL;
 
         //$this->order = $this->options['cris_standardization_order'];
-        $this->cris_standardization_link = isset($this->options['cris_standardization_link']) ? $this->options['cris_standardization_link'] : 'none';
+        $this->cris_standardizations_link = isset($this->options['cris_standardizations_link']) ? $this->options['cris_standardizations_link'] : 'none';
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris') . '</strong></p>';
         }
@@ -130,6 +130,7 @@ class Standardisierungen {
     }
 
     private function make_list($standardizations, $param = array(), $isSingleAccordion = false) {
+        global $post;
         $hide = $param['hide'];
         $standardizationList = '';
         $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<ul class=\"cris-standardizations\">");
@@ -155,7 +156,7 @@ class Standardisierungen {
                 }
                 $authorList = array();
                 foreach ($authorArray as $v) {
-                    $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardization_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
+                    $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardizations_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
                 }
                 $authorHtml = implode(", ", $authorList);
                 if ($authorHtml) {
@@ -166,7 +167,7 @@ class Standardisierungen {
                 $title = $standardization['title'];
                 $title = htmlentities($title, ENT_QUOTES);
                 if ($title) {
-                    $standardizationList .= '<span class="standardization-title">"' . $title . '"</span>';
+                    $standardizationList .= "<span class=\"standardization-title\"><a href=\"" . Tools::get_item_url("standardization", $title, $standardization['ID'], $post->ID, $this->page_lang) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $title . "</a></span>";
                 }
             }
             if (!in_array('number', (array)$hide)) {
@@ -250,7 +251,7 @@ class Standardisierungen {
             }
             $authorList = array();
             foreach ($authorArray as $v) {
-                $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardization_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
+                $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardizations_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
             }
             $stanDetails['#author#'] = implode(", ", $authorList);
 
@@ -329,7 +330,7 @@ class Standardisierungen {
                     }
                     $authorList = array();
                     foreach ($authorArray as $v) {
-                        $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardization_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
+                        $authorList[] = Tools::get_person_link($v['id'], $v['firstname'], $v['lastname'], $this->cris_standardizations_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis, 0);
                     }
                     $authorHtml = implode(", ", $authorList);
                     $standardizationList .= "<br /><strong>" . __('Autor/-innen', 'fau-cris') . ': </strong>' . $authorHtml;

@@ -2,13 +2,13 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.18.5
+ * Version: 3.18.6
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
  * Domain Path: /languages
  * Requires at least: 3.9.2
- * Tested up to: 5.8.3
+ * Tested up to: 6.2
  * License: GPLv2 or later
  * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris
  * GitHub Branch: master
@@ -38,7 +38,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '3.18.5';
+    const version = '3.18.6';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -160,6 +160,7 @@ class FAU_CRIS {
             'cris_activities_order' =>  Tools::getOptionsOrder('activities'),
             'cris_activities_link' => 'none',
             'cris_standardizations_order' =>  Tools::getOptionsOrder('standardizations'),
+            'cris_standardizations_link' => 'none',
             'cris_sync_check' => 0,
             'cris_sync_research_custom' => 0,
             'cris_sync_field_custom' => 0,
@@ -459,6 +460,27 @@ class FAU_CRIS {
                         'none' => __('keinen Link setzen', 'fau-cris'))
                     )
                 );
+                add_settings_section(
+                    'cris_standardizations_section', // ID
+                    __('Standardisierungen', 'fau-cris'), // Title
+                    '__return_false', // Callback
+                    'fau_cris_options' // Page
+                );
+                add_settings_field(
+                    'cris_standardizations_order', __('Reihenfolge der Standardisierungen', 'fau-cris'), array(__CLASS__, 'cris_textarea_callback'), 'fau_cris_options', 'cris_standardizations_section', array(
+                        'name' => 'cris_standardizations_order',
+                        'description' => __('Siehe Reihenfolge der Publikationen. Nur eben für die Standardisierungen.', 'fau-cris')
+                    )
+                );
+                add_settings_field(
+                    'cris_standardizations_link', __('Personen verlinken', 'fau-cris'), array(__CLASS__, 'cris_radio_callback'), 'fau_cris_options', 'cris_standardizations_section', array(
+                        'name' => 'cris_standardizations_link',
+                        'options' => array(
+                            'person' => __('Personen mit ihrer Personen-Detailansicht im FAU-Person-Plugin verlinken', 'fau-cris'),
+                            'cris' => __('Personen mit ihrer Profilseite auf cris.fau.de verlinken','fau-cris'),
+                            'none' => __('keinen Link setzen', 'fau-cris'))
+                    )
+                );
                 break;
             case 'sync':
                 add_settings_section(
@@ -534,6 +556,8 @@ class FAU_CRIS {
                 $new_input['cris_patent_link'] = in_array($_POST[self::option_name]['cris_patent_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_patent_link'] : $default_options['cris_patent_link'];
                 $new_input['cris_activities_order'] = isset($_POST[self::option_name]['cris_activities_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_activities_order'])) : $default_options['cris_activities_order'];
                 $new_input['cris_activities_link'] = in_array($_POST[self::option_name]['cris_activities_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_activities_link'] : $default_options['cris_activities_link'];
+                $new_input['cris_standardizations_order'] = isset($_POST[self::option_name]['cris_standardizations_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_standardizations_order'])) : $default_options['cris_standardizations_order'];
+                $new_input['cris_standardizations_link'] = in_array($_POST[self::option_name]['cris_standardizations_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_standardizations_link'] : $default_options['cris_standardizations_link'];
                 break;
             case 'sync':
                 $new_input['cris_sync_check'] = isset($_POST[self::option_name]['cris_sync_check']) ? 1 : 0;
