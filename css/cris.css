@@ -147,6 +147,11 @@ ul.cris-equipment .equipment-name {
 div.cris-standardization {
     margin-bottom: 1em;
 }
+
+.standardization-title {
+    font-weight: bold;
+}
+
 .cris-activities a,
 .cris-awards a,
 .cris-equipment a,
