@@ -757,9 +757,9 @@ class Tools {
             }
         }
         // No subpage -> search all pages
-        $page = get_page_by_title($title);
-        if ($page && !empty($page->ID)) {
-            return get_permalink($page->ID);
+        $page = get_posts(['post_type' => 'page', 'pagename' => sanitize_title($title)]);
+        if ($page && !empty($page[0]->ID)) {
+            return get_permalink($page[0]->ID);
         } else {
             return FAU_CRIS::cris_publicweb . $item . "/" . $cris_id . ($lang == 'de' ? '?lang=de_DE' : '?lang=en_GB');
         }
