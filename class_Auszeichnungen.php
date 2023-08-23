@@ -583,7 +583,7 @@ class Auszeichnungen {
         $picString = CRIS_Dicts::$base_uri . "getrelated/Award/" . $award . "/awar_has_pict";
         $picXml = Tools::XML2obj($picString);
 		$i = 1;
-        if ($picXml['size'] != 0) {
+        if (!is_wp_error($picXml) && !empty($picXml->infoObject)) {
         	foreach ($picXml->infoObject as $pic) {
 		        foreach ($pic->attribute as $picAttribut) {
 			        if ($picAttribut['name'] == 'png180') {
@@ -670,12 +670,9 @@ class CRIS_awards extends CRIS_webservice {
 
         $data = array();
         foreach ($reqs as $_i) {
-            try {
-                $data[] = $this->get($_i, $filter);
-            } catch (Exception $e) {
-                // TODO: logging?
-//                $e->getMessage();
-                continue;
+            $_data = $this->get($_i, $filter);
+            if (!is_wp_error($_data)) {
+                $data[] = $_data;
             }
         }
 	    $awards = array();
