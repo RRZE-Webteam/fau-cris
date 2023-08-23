@@ -22,8 +22,7 @@ class CRIS_webservice
 
     private function fetch($url)
     {
-        $response = RemoteGet::retrieveResponse($url);
-        return $response['body'] ?? '';
+        return RemoteGet::retrieveContent($url);
     }
 
     public function disable_cache()
