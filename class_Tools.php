@@ -108,9 +108,8 @@ class Tools {
 
     public static function XML2obj($url)
     {
-        $response = RemoteGet::retrieveResponse($url);
-        $xml = $response['body'] ?? '';        
-        return XML::element($xml);
+        $content = RemoteGet::retrieveContent($url);
+        return XML::element($content);
     }
 
     /*
