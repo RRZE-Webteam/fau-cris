@@ -43,7 +43,7 @@ class Projekte {
 		    // print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
 		    // return;
             return new \WP_Error(
-                'CRIS OrgId Error', 
+                'cris-orgid-error', 
                 __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
             );          
 	    }
