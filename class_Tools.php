@@ -1,5 +1,7 @@
 <?php
 
+use RRZE\Cris\{RemoteGet, XML};
+
 require_once("class_Dicts.php");
 
 class Tools {
@@ -104,38 +106,11 @@ class Tools {
         return $page_lang;
     }
 
-    public static function XML2obj($xml_url) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $xml_url);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-        $xml = curl_exec($ch);
-        curl_close($ch);
-
-        $xmlTree = '';
-
-        libxml_use_internal_errors(true);
-        try {
-            $xmlTree = new SimpleXMLElement($xml);
-        } catch (Exception $e) {
-            // Something went wrong.
-
-            $error_message = '<strong>' . __('Fehler beim Einlesen der Daten: Bitte überprüfen Sie die CRIS-ID.', 'fau-cris') . '</strong>';
-            if (defined('WP_DEBUG') && true === WP_DEBUG) {
-                print '<p>';
-                foreach (libxml_get_errors() as $error_line) {
-                    $error_message .= "<br>" . $error_line->message;
-                }
-                trigger_error($error_message);
-                print '</p>';
-            } else {
-                //print $error_message;
-            }
-            return false;
-        }
-        return $xmlTree;
+    public static function XML2obj($url)
+    {
+        $response = RemoteGet::retrieveResponse($url);
+        $xml = $response['body'] ?? '';        
+        return XML::element($xml);
     }
 
     /*
@@ -357,7 +332,6 @@ class Tools {
         $filter = array();
         if ($year !== '' && $year !== NULL) {
             if ($year == 'current') {
-                $current = date('Y');
                 $filter['startyear__le'] = date('Y');
                 $filter['endyear__ge'] = date('Y');
             } else {
@@ -370,9 +344,8 @@ class Tools {
         if ($end !== '' && $end !== NULL)
             $filter['startyear__le'] = $end;
         if ($type !== '' && $type !== NULL) {
-            if (strpos($type, ',')) {
-                $type = str_replace(' ', '', $type);
-                $types = explode(',', $type);
+            if (strpos($type, ',') !== false) {
+                $types = explode(',', str_replace(' ', '', $type));
                 foreach($types as $v) {
                     $projTyp[] = self::getType('projects', $v);
                 }
@@ -380,15 +353,13 @@ class Tools {
                 $projTyp = (array) self::getType('projects', $type);
             }
             if (empty($projTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Projekttyp', 'fau-cris') . '</p>';
-                return $output;
+                return '<p>' . __('Falscher Parameter für Projekttyp', 'fau-cris') . '</p>';
             }
             $filter['project type__eq'] = $projTyp;
         }
         if ($status !== '' && $status !== NULL) {
-            if (strpos($status, ',')) {
-                $status = str_replace(' ', '', $status);
-                $arrStatus = explode(',', $status);
+            if (strpos($status, ',') !== false) {
+                $arrStatus = explode(',', str_replace(' ', '', $status));
             } else {
                 $arrStatus = (array) $status;
             }
@@ -435,13 +406,13 @@ class Tools {
                 $patTyp = (array) self::getType('patents', $type);
             }
             if (empty($patTyp)) {
-                $output .= '<p>' . __('Falscher Parameter für Patenttyp', 'fau-cris') . '</p>';
-                return $output;
+                return __('Falscher Parameter für Patenttyp', 'fau-cris');
             }
             $filter['patenttype__eq'] = $patTyp;
         }
-        if (count($filter))
+        if (count($filter)) {
             return $filter;
+        }
         return null;
     }
 
@@ -567,15 +538,21 @@ class Tools {
      */
 
     public static function get_univis() {
+        $univis = [];
         $univisID = self::get_univis_id();
+
         // Ich liebe UnivIS: Welche Abfrage liefert mehr Ergebnisse (hängt davon ab, wie die
         // Mitarbeiter der Institution zugeordnet wurden...)?
         $url1 = "http://univis.uni-erlangen.de/prg?search=departments&number=" . $univisID . "&show=xml";
         $daten1 = self::XML2obj($url1);
-        $num1 = count($daten1->Person);
         $url2 = "http://univis.uni-erlangen.de/prg?search=persons&department=" . $univisID . "&show=xml";
         $daten2 = self::XML2obj($url2);
-        $num2 = count($daten2->Person);
+
+        $num1 = !is_wp_error($daten1) && !empty($daten1->Person) ? count($daten1->Person) : 0;
+        $num2 = !is_wp_error($daten2) && !empty($daten2->Person) ? count($daten2->Person) : 0;
+        if (!$num1 && !$num2) {
+            return $univis;
+        }
         $daten = $num1 > $num2 ? $daten1 : $daten2;
 
         foreach ($daten->Person as $person) {
