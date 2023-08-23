@@ -1113,8 +1113,12 @@ class Publikationen {
     private function get_pub_projects($pub = NULL, $item = 'title') {
         require_once('class_Projekte.php');
         $liste = new Projekte();
-        $projects = $liste->pubProj($pub);
-        return $projects[$item];
+        if(is_wp_error($liste)) {
+            return $liste->get_error_message();
+        } else {
+            $projects = $liste->pubProj($pub);
+            return $projects[$item];
+        }
     }
 
 	private function get_pub_images($pub) {
@@ -1122,7 +1126,7 @@ class Publikationen {
 		$imgString = CRIS_Dicts::$base_uri . "getrelated/Publication/" . $pub . "/PUBL_has_PICT";
 		$imgXml = Tools::XML2obj($imgString);
 
-		if ($imgXml['size'] != 0) {
+		if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {
 			foreach ($imgXml as $img) {
 				$_i = new CRIS_pub_image($img);
 				$images[$_i->ID] = $_i;
@@ -1249,12 +1253,9 @@ class CRIS_publications extends CRIS_webservice {
         }
         $data = array();
         foreach ($reqs as $_i) {
-            try {
-                $data[] = $this->get($_i, $filter);
-            } catch (Exception $e) {
-                // TODO: logging?
-//                $e->getMessage();
-                continue;
+            $_data = $this->get($_i, $filter);
+            if (!is_wp_error($_data)) {
+                $data[] = $_data;
             }
         }
 
