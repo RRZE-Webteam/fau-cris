@@ -20,7 +20,8 @@ class Projekte {
 		    $this->options = (array) FAU_CRIS::get_options();
             $this->pathPersonenseiteUnivis = '/person/';
         }
-        $this->id = $id;
+
+        $this->id = $id ?: $this->options['cris_org_nr'];
         $this->suchstring = '';
         $this->univis = NULL;
 
@@ -29,6 +30,7 @@ class Projekte {
         if ($this->cms == 'wbk' && $this->cris_project_link == 'person') {
             $this->univis = Tools::get_univis();
         }
+
 	    $this->page_lang = $page_lang;
 	 
         if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field"))) {
@@ -36,6 +38,7 @@ class Projekte {
         } else {
             $this->einheit = "orga";
         }
+
         if (!$this->id) {
 		    // print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
 		    // return;
