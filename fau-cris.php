@@ -1014,7 +1014,7 @@ class FAU_CRIS {
 
         $orgid = str_replace(' ', '', sanitize_text_field($orgid));
         $organisation = str_replace(' ', '', sanitize_text_field($organisation));
-        $orgid = $orgid == '' ? ($organisation != '' ?: $options['cris_org_nr']) : $options['cris_org_nr'];
+        $orgid = $orgid ?: $organisation;
 
 	    $sc_param['orderby'] = sanitize_text_field($orderby);
 	    $sc_param['orgid'] = $orgid;
