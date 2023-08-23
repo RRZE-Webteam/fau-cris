@@ -20,7 +20,7 @@ class Projekte {
 		    $this->options = (array) FAU_CRIS::get_options();
             $this->pathPersonenseiteUnivis = '/person/';
         }
-        $this->orgNr = $this->options['cris_org_nr'];
+        $this->id = $id;
         $this->suchstring = '';
         $this->univis = NULL;
 
@@ -32,16 +32,17 @@ class Projekte {
 	    $this->page_lang = $page_lang;
 	 
         if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field"))) {
-            $this->id = $id;
             $this->einheit = $einheit;
         } else {
-            // keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
-            $this->id = $this->orgNr;
             $this->einheit = "orga";
         }
-        if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-		    print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
-		    return;
+        if (!$this->id) {
+		    // print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
+		    // return;
+            return new \WP_Error(
+                'CRIS OrgId Error', 
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );          
 	    }
 
     }
@@ -50,21 +51,19 @@ class Projekte {
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($param = array()) {
-        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
-        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
-        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
-        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
-        $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
-        $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
-        $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
+    public function projListe($param = []) {
+        $year = $param['year'] ?: '';
+        $start = $param['start'] ?: '';
+        $end = $param['end'] ?: '';
+        $type = $param['type'] ?: '';
+        $limit = $param['limit'] ?: '';
+        $hide = $param['hide'] ?: [];
+        $role = $param['role'] ?: 'all';
+        $status = $param['status'] ?: '';
 
         $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $status);
-
-        if (!count($projArray)) {
-            $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
-            return $output;
+        if (empty($projArray)) {
+            return '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
         }
         
         // sortiere nach Erscheinungsdatum
@@ -349,21 +348,19 @@ class Projekte {
      */
 
     private function fetch_projects($year = '', $start = '', $end = '', $type = '', $role = 'all', $status = '') {
-        $filter = Tools::project_filter($year, $start, $end, $type, $status);
-
-        $ws = new CRIS_projects();
         $awardArray = array();
 
-        try {
-            if ($this->einheit === "orga") {
+        $filter = Tools::project_filter($year, $start, $end, $type, $status);
+        if (!empty($filter)) {
+            $ws = new CRIS_projects();
+            if ($this->einheit == "orga") {
                 $awardArray = $ws->by_orga_id($this->id, $filter);
             }
-            if ($this->einheit === "person") {
+            if ($this->einheit == "person") {
                 $awardArray = $ws->by_pers_id($this->id, $filter, $role);
-            }
-        } catch (Exception $ex) {
-            $awardArray = array();
+            }            
         }
+
         return $awardArray;
     }
 
@@ -852,7 +849,7 @@ class Projekte {
         $leaders = array();
         $leadersString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_card";
         $leadersXml = Tools::XML2obj($leadersString);
-        if ($leadersXml['size'] != 0) {
+        if (!is_wp_error($leadersXml) && !empty($leadersXml->infoObject)) {
             $i = 0;
             foreach ($leadersXml->infoObject as $person) {
                 foreach ($person->attribute as $persAttribut) {
@@ -888,7 +885,7 @@ class Projekte {
         $members = array();
         $membersString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_col_card";
         $membersXml = Tools::XML2obj($membersString);
-        if ($membersXml['size'] != 0) {
+        if (!is_wp_error($membersXml) && !empty($membersXml->infoObject)) {
             $i = 0;
             foreach ($membersXml->infoObject as $person) {
                 foreach ($person->attribute as $persAttribut) {
@@ -931,7 +928,7 @@ class Projekte {
         $funding = array();
         $fundingString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_fund";
         $fundingXml = Tools::XML2obj($fundingString);
-        if ($fundingXml['size'] != 0) {
+        if (!is_wp_error($fundingXml) && !empty($fundingXml->infoObject)) {
             foreach ($fundingXml->infoObject as $fund) {
                 $_v = (string) $fund['id'];
                 foreach ($fund->attribute as $fundAttribut) {
@@ -973,7 +970,7 @@ class Projekte {
         $imgString = CRIS_Dicts::$base_uri . "getrelated/project/" . $project . "/PROJ_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
-        if ($imgXml['size'] != 0) {
+        if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {
             foreach ($imgXml as $img) {
                 $_i = new CRIS_project_image($img);
                 $images[$_i->ID] = $_i;
@@ -1074,12 +1071,9 @@ class CRIS_projects extends CRIS_webservice {
 
         $data = array();
         foreach ($reqs as $_i) {
-            try {
-                $data[] = $this->get($_i, $filter);
-            } catch (Exception $e) {
-                // TODO: logging?
-                //echo $e->getMessage();
-                continue;
+            $_data = $this->get($_i, $filter);
+            if (!is_wp_error($_data)) {
+                $data[] = $_data;
             }
         }
 
