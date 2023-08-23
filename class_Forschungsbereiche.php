@@ -282,7 +282,7 @@ class Forschungsbereiche {
             if (!in_array('persons', $hide)
                 && !is_array($param['field'])) {
                 $persons = $this->get_field_persons($id);
-                if ($persons) {
+                if (!is_wp_error($persons)) {
                     $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
                     $singlefield .= "<ul>";
                     foreach ($persons as $p_id => $person) {
@@ -345,7 +345,7 @@ class Forschungsbereiche {
             $field_details['#persons#'] = '';
             if (strpos($content, '#persons#' ) !== false) {
                 $persons = $this->get_field_persons($id);
-                if ($persons) {
+                if (!is_wp_error($persons)) {
                     $field_details['#persons#'] .= "<ul>";
                     foreach ($persons as $p_id => $person) {
                             $field_details['#persons#'] .= "<li>";
@@ -446,13 +446,21 @@ class Forschungsbereiche {
     private function get_field_projects($field = NULL) {
     	require_once('class_Projekte.php');
         $liste = new Projekte('field', $field, $this->sc_lang);
-        return $liste->fieldProj($field);
+        if(is_wp_error($liste)) {
+            return $liste->get_error_message();
+        } else {
+            return $liste->fieldProj($field);
+        }
     }
 
     private function get_field_persons($field = NULL) {
         require_once('class_Projekte.php');
         $liste = new Projekte('field', $field, $this->sc_lang);
-        return $liste->fieldPersons($field);
+        if(is_wp_error($liste)) {
+            return $liste;
+        } else {
+            return $liste->fieldPersons($field);
+        }
     }
 
     private function get_field_publications($param = array(), $entity = 'field') {
@@ -485,7 +493,7 @@ class Forschungsbereiche {
         $imgString = CRIS_Dicts::$base_uri . "getrelated/Forschungsbereich/" . $field . "/FOBE_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
-        if ($imgXml['size'] != 0) {
+        if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {
             foreach ($imgXml as $img) {
                 $_i = new CRIS_field_image($img);
                 $images[$_i->ID] = $_i;
@@ -562,12 +570,9 @@ class CRIS_fields extends CRIS_webservice {
 
         $data = array();
         foreach ($reqs as $_i) {
-            try {
-                $data[] = $this->get($_i, $filter);
-            } catch (Exception $e) {
-                // TODO: logging?
-//                $e->getMessage();
-                continue;
+            $_data = $this->get($_i, $filter);
+            if (!is_wp_error($_data)) {
+                $data[] = $_data;
             }
         }
 
