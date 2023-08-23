@@ -234,8 +234,10 @@ class Tools {
                 }
             }
             if (empty($pubTyp) && empty($pubTypExclude)) {
-                $output = '<p>' . __('Falscher Parameter für Publikationstyp', 'fau-cris') . '</p>';
-                return $output;
+                return new \WP_Error(
+                    'cris-publication-type', 
+                    __('Falscher Parameter für Publikationstyp', 'fau-cris')
+                );
             }
             if (!empty($pubTyp)) {
                 $filter['publication type__eq'] = $pubTyp;
@@ -353,7 +355,10 @@ class Tools {
                 $projTyp = (array) self::getType('projects', $type);
             }
             if (empty($projTyp)) {
-                return '<p>' . __('Falscher Parameter für Projekttyp', 'fau-cris') . '</p>';
+                return new \WP_Error(
+                    'cris-project-type', 
+                    __('Falscher Parameter für Projekttyp', 'fau-cris')
+                );
             }
             $filter['project type__eq'] = $projTyp;
         }
