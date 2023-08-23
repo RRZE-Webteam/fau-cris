@@ -20,7 +20,8 @@ class Publikationen {
             $this->options = (array) FAU_CRIS::get_options();
             $this->pathPersonenseiteUnivis = '/person/';
         }
-        $this->orgNr = $this->options['cris_org_nr'];
+
+        $this->id = $id ?: $this->options['cris_org_nr'];
         $this->suchstring = '';
         $this->univis = NULL;
 
@@ -33,17 +34,6 @@ class Publikationen {
             $this->univis = Tools::get_univis();
         }
 
-        if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Publikation an.', 'fau-cris') . '</strong></p>';
-        }
-        if (in_array($einheit, array("person", "orga", "publication", "project", "field", "field_proj", "field_notable"))) {
-            $this->id = $id;
-            $this->einheit = $einheit;
-        } else {
-            // keine Einheit angegeben -> OrgNr aus Einstellungen verwenden
-            $this->id = $this->orgNr;
-            $this->einheit = "orga";
-        }
         if (strlen(trim($nameorder))) {
             $this->nameorder = $nameorder;
         } else {
@@ -56,25 +46,39 @@ class Publikationen {
 	    if ($sc_lang != $this->page_lang) {
 		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
 	    }
+
+        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field"))) {
+            $this->einheit = $einheit;
+        } else {
+            $this->einheit = "orga";
+        }
+
+        if (!$this->id) {
+		    // print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
+		    // return;
+            return new \WP_Error(
+                'CRIS OrgId Error', 
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );          
+	    }        
     }
 
     /*
      * Ausgabe aller Publikationen ohne Gliederung
      */
-
     public function pubListe($param = array(), $content = '') {
-        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
-        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
-        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
-        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $subtype = (isset($param['subtype']) && $param['subtype'] != '') ? $param['subtype'] : '';
-        $quotation = (isset($param['quotation']) && $param['quotation'] != '') ? $param['quotation'] : '';
-        $limit = (isset($param['limit']) && $param['limit'] != '') ? $param['limit'] : '';
-        $sortby = (isset($param['sortby']) && $param['sortby'] != '') ? $param['sortby'] : 'virtualdate';
-        $fau = (isset($param['fau']) && $param['fau'] != '') ? $param['fau'] : '';
-        $peerreviewed = (isset($param['peerreviewed']) && $param['peerreviewed'] != '') ? $param['peerreviewed'] : '';
-        $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
-        $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
+        $year = $param['year'] ?: '';
+        $start = $param['start'] ?: '';
+        $end = $param['end'] ?: '';
+        $type = $param['type'] ?: '';
+        $subtype = $param['subtype'] ?: '';
+        $quotation = $param['quotation'] ?? '';
+        $limit = $param['limit'] ?: '';
+        $sortby = $param['sortby'] ?: 'virtualdate';
+        $fau = $param['fau'] ?: '';
+        $peerreviewed = $param['peerreviewed'] ?: '';
+        $notable = $param['notable'] ?: 0;
+        $language = $param['language'] ?: '';
 
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $language);
 
@@ -431,17 +435,15 @@ class Publikationen {
     }
 
     public function projectPub($param = array()) {
-        $ws = new CRIS_publications();
+        $pubArray = [];
 
-        try {
-            $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
+        $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
+        if (!is_wp_error($filter) && !empty($filter)) {
+            $ws = new CRIS_publications();
             $pubArray = $ws->by_project($param['project'], $filter);
-        } catch (Exception $ex) {
-            return;
+        } else {
+            return '';
         }
-
-        if (!count($pubArray))
-            return;
         
         if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
             $sortby = 'relation right seq';
@@ -467,24 +469,22 @@ class Publikationen {
     }
 
     public function fieldPub($param = array(), $seed = false) {
+        $pubArray = [];
 
-        $ws = new CRIS_publications();
-        if ($seed)
-            $ws->disable_cache();
-        try {
-            $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
-            if ($param['publications_notable'] == '1') {
-            	//$filter = array();
-	            $filter = Tools::publication_filter('', '', '', '', '', '', '', '', '1');
+        $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
+        if ($param['publications_notable'] == '1') {
+            $filter = Tools::publication_filter('', '', '', '', '', '', '', '', '1');
 
+        }
+        if (!is_wp_error($filter) && !empty($filter)) {
+            $ws = new CRIS_publications();
+            if ($seed) {
+                $ws->disable_cache();
             }
             $pubArray = $ws->by_field($param['field'], $filter, $param['fsp'], $this->einheit);
-        } catch (Exception $ex) {
-            return;
+        } else {
+            return '';
         }
-
-        if (!count($pubArray))
-            return;
         
         if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
             $sortby = 'relation right seq';
@@ -558,12 +558,11 @@ class Publikationen {
      */
 
     private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = '') {
-        $filter = NULL;
+        $pubArray = [];
 
         $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
-        $ws = new CRIS_publications();
-
-        try {
+        if (!is_wp_error($filter) && !empty($filter)) {
+            $ws = new CRIS_publications();
             if ($this->einheit === "orga") {
                 $pubArray = $ws->by_orga_id($this->id, $filter);
             }
@@ -579,8 +578,6 @@ class Publikationen {
             if ($this->einheit === "publication") {
                 $pubArray = $ws->by_id($this->id);
             }
-        } catch (Exception $ex) {
-            $pubArray = array();
         }
 
         return $pubArray;
