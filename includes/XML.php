@@ -39,10 +39,10 @@ class XML
         $badxml = $explodedxml[($error->line) - 1];
         $message = $error->message . ' at line ' . $error->line . '. Invalid XML: ' . htmlentities($badxml);
 
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log($message);
-        }
+        // if (defined('WP_DEBUG') && WP_DEBUG) {
+        //     error_log($message);
+        // }
 
-        return new \WP_Error('XML Error', $message);
+        return new \WP_Error('cris-xml-rror', $message);
     }
 }
