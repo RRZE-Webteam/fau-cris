@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 class XML
 {
-    public static function element(string $xml)
+    public static function element(string $xml = '')
     {
         $error = self::isXML($xml);
         if (is_wp_error($error)) {
@@ -15,7 +15,7 @@ class XML
         return new \SimpleXMLElement($xml);
     }
 
-    public static function isXML(string $xml)
+    public static function isXML(string $xml = '')
     {
         $xml = $xml ?: '<>';
 
