@@ -9,7 +9,8 @@ class RemoteGet
     private static $defaultArgs = [
         'timeout' => 5,
         'sslverify' => true,
-        'method' => 'GET'
+        'method' => 'GET',
+        'validate' => 'xml'
     ];
 
     public static function retrieveContent(string $url, array $args = [], int $code = 200, bool $safe = true)
@@ -36,7 +37,18 @@ class RemoteGet
                 $response = [];
             }
             $content = $response['body'] ?? '';
-            Cache::set($url, $content);
+            switch ($args['validate']) {
+                case 'xml':
+                    if ($content && is_wp_error(XML::isXML($content))) {
+                        $content = '';
+                    }
+                    break;
+                default:
+                    //
+            }
+            if ($content) {
+                Cache::set($url, $content);
+            }
         }
 
         return $content;
