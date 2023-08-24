@@ -388,12 +388,9 @@ class CRIS_patents extends CRIS_webservice {
 
         $data = array();
         foreach ($reqs as $_i) {
-            try {
-                $data[] = $this->get($_i, $filter);
-            } catch (Exception $e) {
-                // TODO: logging?
-//                $e->getMessage();
-                continue;
+            $_data = $this->get($_i, $filter);
+            if (!is_wp_error($_data)) {
+                $data[] = $_data;
             }
         }
 

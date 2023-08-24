@@ -500,7 +500,7 @@ class Equipment {
         $imgString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/equi_has_pict";
         $imgXml = Tools::XML2obj($imgString);
 	    $i = 1;
-	    if ($imgXml['size'] != 0) {
+	    if (!is_wp_error($imgXml) && !empty($imgXml->infoObject)) {
 		    foreach ($imgXml->infoObject as $img) {
 			    foreach ($img->attribute as $imgAttribut) {
 				    if ($imgAttribut['name'] == 'png180') {
@@ -529,7 +529,7 @@ class Equipment {
         $funding = array();
         $fundingString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_FUND";
         $fundingXml = Tools::XML2obj($fundingString);
-        if ($fundingXml['size'] != 0) {
+        if (!is_wp_error($fundingXml) && !empty($fundingXml->infoObject)) {
             foreach ($fundingXml->infoObject as $fund) {
                 $_v = (string) $fund['id'];
                 foreach ($fund->attribute as $fundAttribut) {
@@ -546,7 +546,7 @@ class Equipment {
         $fields = array();
         $fieldsString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/FOBE_has_EQUI";
         $fieldsXml = Tools::XML2obj($fieldsString);
-        if ($fieldsXml['size'] != 0) {
+        if (!is_wp_error($fieldsXml) && !empty($fieldsXml->infoObject)) {
             foreach ($fieldsXml->infoObject as $field) {
                 $_v = (string) $field['id'];
                 foreach ($field->attribute as $fieldAttribut) {
@@ -565,7 +565,7 @@ class Equipment {
         $projects = array();
         $projectsString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_PROJ";
         $projectsXml = Tools::XML2obj($projectsString);
-        if ($projectsXml['size'] != 0) {
+        if (!is_wp_error($projectsXml) && !empty($projectsXml->infoObject)) {
             foreach ($projectsXml->infoObject as $project) {
                 $_v = (string) $project['id'];
                 foreach ($project->attribute as $projectAttribut) {
@@ -641,12 +641,9 @@ class CRIS_equipments extends CRIS_webservice {
 
         $data = array();
         foreach ($reqs as $_i) {
-            try {
-                $data[] = $this->get($_i, $filter);
-            } catch (Exception $e) {
-                // TODO: logging?
-//                $e->getMessage();
-                continue;
+            $_data = $this->get($_i, $filter);
+            if (!is_wp_error($_data)) {
+                $data[] = $_data;
             }
         }
 

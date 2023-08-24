@@ -1,4 +1,5 @@
 <?php
+
 /**
  * These classes provide generic access to the CRIS web service data including
  * filter and sorting methods.
@@ -8,42 +9,34 @@
  * @author Marcus Walther
  */
 
+use RRZE\Cris\{RemoteGet, XML};
+
 require_once("class_Tools.php");
 
-class CRIS_webservice {
+class CRIS_webservice
+{
     /*
      * generic class for web service access.
      */
     private $cache = true;
 
-    private function fetch($url) {
-        /*
-         * fetch raw data from web service
-         */
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-        $xml = curl_exec($ch);
-
-        if ($xml === false)
-            throw new Exception('remote request failed '. curl_error($ch));
-
-        curl_close($ch);
-        return $xml;
+    private function fetch($url)
+    {
+        return RemoteGet::retrieveContent($url);
     }
 
-    public function disable_cache() {
+    public function disable_cache()
+    {
         $this->cache = false;
     }
 
-    public function enable_cache() {
+    public function enable_cache()
+    {
         $this->cache = true;
     }
 
-    public function get($id, &$filter) {
+    public function get($id, &$filter)
+    {
         /*
          * Initiate ws request and return parsed data (XML -> PHP object)
          *
@@ -80,38 +73,29 @@ class CRIS_webservice {
             $seed = '?flag=seednow';
         }
 
-        try {
-            $rawxml = $this->fetch(CRIS_Dicts::$base_uri . $id . $seed);
-        } catch (Exception $ex) {
-            $rawxml = null;
-        }
-        if ($rawxml === null)
-            throw new Exception('request failed');
+        $xml = $this->fetch(CRIS_Dicts::$base_uri . $id . $seed);
 
-        // parse into object
-        libxml_use_internal_errors(true);
-        try {
-            $xmlobj = new SimpleXMLElement($rawxml);
-        } catch (Exception $e) {
-            $error_message = array();
-            foreach(libxml_get_errors() as $error_line) {
-                $error_message[] = $error_line->message;
-            }
-            throw new Exception(implode('\n', $error_message));
+        $xmlobj = XML::element($xml);
+        if (is_wp_error($xmlobj)) {
+            return $xmlobj;
         }
 
-	    # build envelope array if necessary
-        if (empty($xmlobj->infoObject))
-        	return array($xmlobj);
+        # build envelope array if necessary
+        if (empty($xmlobj->infoObject)) {
+            return array($xmlobj);
+        }
+
         return $xmlobj->infoObject;
     }
 }
 
-class CRIS_entity {
+class CRIS_entity
+{
     /*
      * basic object for all CRIS webservice objects
      */
-    public function __construct($data) {
+    public function __construct($data)
+    {
         $this->ID = (string) $data['id'];
         $this->attributes = array();
         $this->attributes["createdon"] = (string) $data['createdOn'];
@@ -134,16 +118,16 @@ class CRIS_entity {
         foreach ($data->relation as $_r) {
             if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ", "PROJ_has_PUBL", "FOBE_has_top_PUBL", "FOBE_has_cur_PUBL", "FOBE_has_PICT", "EQUI_has_PICT")))
                 continue;
-            foreach($_r->attribute as $_ra) {
+            foreach ($_r->attribute as $_ra) {
                 if ($_ra['name'] == 'Left seq') {
                     $this->attributes["relation left seq"] = (string) $_ra->data;
                 }
                 if ($_ra['name'] == 'Right seq') {
                     $this->attributes["relation right seq"] = (string) $_ra->data;
                 }
-	            if ($_ra['name'] == 'curationsetting') {
-		            $this->attributes["relation curationsetting"] = (string) $_ra->additionalInfo;
-	            }
+                if ($_ra['name'] == 'curationsetting') {
+                    $this->attributes["relation curationsetting"] = (string) $_ra->additionalInfo;
+                }
             }
         }
         if (isset($this->attributes["publication type"])) {

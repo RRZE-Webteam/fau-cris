@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.18.6
+ * Version: 3.19.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -29,6 +29,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+/**
+ * SPL Autoloader (PSR-4).
+ * @param string $class The fully-qualified class name.
+ * @return void
+ */
+spl_autoload_register(function ($class) {
+    $prefix = 'RRZE\Cris';
+    $baseDir = __DIR__ . '/includes/';
+
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+
+    $relativeClass = substr($class, $len);
+    $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+
 add_action('plugins_loaded', array('FAU_CRIS', 'instance'));
 
 register_activation_hook(__FILE__, array('FAU_CRIS', 'activate'));
@@ -38,7 +60,7 @@ class FAU_CRIS {
     /**
      * Get Started
      */
-    const version = '3.18.6';
+    const version = '3.19.0';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -800,13 +822,15 @@ class FAU_CRIS {
             // Projekte
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
-
+            if(is_wp_error($liste)) {
+                return $liste->get_error_message();
+            }
             if ($parameter['project'] != '') {
                 return $liste->singleProj($parameter);
             }
-            if (!empty($parameter['limit'])) {
-                return $liste->projListe($parameter);
-            }
+            // if (!empty($parameter['limit'])) {
+            //     return $liste->projListe($parameter);
+            // }
             if (strpos($parameter['order1'], 'type') !== false) {
                 return $liste->projNachTyp($parameter, '');
             }
@@ -884,6 +908,9 @@ class FAU_CRIS {
         // Projekte
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            if(is_wp_error($liste)) {
+                return $liste->get_error_message();
+            }            
             if ($parameter['project'] != '') {
                 return $liste->customProj($content, $parameter);
             }
@@ -917,15 +944,14 @@ class FAU_CRIS {
         global $post;
         $options = self::get_options();
 
-        // Attributes
-        extract(shortcode_atts(
-                        array(
+        // Default attributes
+        $defaultAtts = [
             'show' => 'publications',
             'orderby' => '',
             'year' => '',
             'start' => '',
             'end' => '',
-            'orgid' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
+            'orgid' => $options['cris_org_nr'],
             'persid' => '',
             'publication' => '',
             'pubtype' => '',
@@ -960,8 +986,8 @@ class FAU_CRIS {
             'location' => '',
             'peerreviewed' => '',
             'current' => '',
-            'publications_limit' => (isset($options['cris_fields_num_pub']) && !empty($options['cris_fields_num_pub'])) ? $options['cris_fields_num_pub'] : '5',
-            'name_order_plugin' => (isset($options['cris_name_order_plugin']) && !empty($options['cris_name_order_plugin'])) ? $options['cris_name_order_plugin'] : 'firstname-lastname',
+            'publications_limit' => $options['cris_fields_num_pub'] ?: '5',
+            'name_order_plugin' => $options['cris_name_order_plugin'] ?: 'firstname-lastname',
             'notable' => '',
             'publications_year' => '',
             'publications_start' => '',
@@ -979,12 +1005,19 @@ class FAU_CRIS {
             'accordion_title' => '#name# (#year#)',
             'accordion_color' => '',
             'display_language' => Tools::getPageLanguage($post->ID),
-            'organisation' => isset($options['cris_org_nr']) ? $options['cris_org_nr'] : '',
+            'organisation' => $options['cris_org_nr'],
             'standardization' => ''
-                            ), $atts));
+        ];
+
+        // Attributes
+        extract(shortcode_atts($defaultAtts, $atts));
+
+        $orgid = str_replace(' ', '', sanitize_text_field($orgid));
+        $organisation = str_replace(' ', '', sanitize_text_field($organisation));
+        $orgid = $orgid ?: $organisation;
 
 	    $sc_param['orderby'] = sanitize_text_field($orderby);
-	    $sc_param['orgid'] = ($orgid != '' ? sanitize_text_field($orgid) : sanitize_text_field($organisation));
+	    $sc_param['orgid'] = $orgid;
 	    $sc_param['persid'] = sanitize_text_field($persid);
         $sc_param['publication'] = sanitize_text_field($publication);
         $sc_param['award'] = sanitize_text_field($award);
@@ -1131,13 +1164,20 @@ class FAU_CRIS {
                 $sc_param['persid'] = explode(',', $sc_param['persid']);
             }
             $sc_param['entity_id'] = $sc_param['persid'];
-        } elseif (isset($sc_param['orgid']) && $sc_param['orgid'] != '') {
-            $sc_param['entity'] = 'orga';
+        } elseif ($sc_param['orgid'] != '') {
+            $sc_param['entity'] = '';
+            $sc_param['entity_id'] = '';
             if (strpos($sc_param['orgid'], ',') !== false) {
-                $sc_param['orgid'] = str_replace(' ', '', $sc_param['orgid']);
                 $sc_param['orgid'] = explode(',', $sc_param['orgid']);
+                $sc_param['orgid'] = array_filter($sc_param['orgid'], fn($a) => (absint($a) !== 0));
+            } else {
+                $sc_param['orgid'] = absint($sc_param['orgid']);
+                $sc_param['orgid'] = $sc_param['orgid'] ?: '';
             }
-            $sc_param['entity_id'] = $sc_param['orgid'];
+            if (!empty($sc_param['orgid'])) {
+                $sc_param['entity'] = 'orga';
+                $sc_param['entity_id'] = $sc_param['orgid'];
+            }
         } else {
             $sc_param['entity'] = '';
             $sc_param['entity_id'] = '';
