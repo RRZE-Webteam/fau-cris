@@ -354,7 +354,7 @@ class Projekte {
         $awardArray = [];
 
         $filter = Tools::project_filter($year, $start, $end, $type, $status);
-        if (!is_wp_error($filter) && !empty($filter)) {
+        if (!is_wp_error($filter)) {
             $ws = new CRIS_projects();
             if ($this->einheit == "orga") {
                 $awardArray = $ws->by_orga_id($this->id, $filter);
