@@ -438,7 +438,7 @@ class Publikationen {
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
-        if (!is_wp_error($filter) && !empty($filter)) {
+        if (!is_wp_error($filter)) {
             $ws = new CRIS_publications();
             $pubArray = $ws->by_project($param['project'], $filter);
         } else {
@@ -476,7 +476,7 @@ class Publikationen {
             $filter = Tools::publication_filter('', '', '', '', '', '', '', '', '1');
 
         }
-        if (!is_wp_error($filter) && !empty($filter)) {
+        if (!is_wp_error($filter)) {
             $ws = new CRIS_publications();
             if ($seed) {
                 $ws->disable_cache();
@@ -561,7 +561,7 @@ class Publikationen {
         $pubArray = [];
 
         $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
-        if (!is_wp_error($filter) && !empty($filter)) {
+        if (!is_wp_error($filter)) {
             $ws = new CRIS_publications();
             if ($this->einheit === "orga") {
                 $pubArray = $ws->by_orga_id($this->id, $filter);
