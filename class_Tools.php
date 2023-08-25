@@ -287,8 +287,9 @@ class Tools {
 	    if ($curation == 1) {
 		    $filter['relation curationsetting__eq'] = 'curation_accepted';
 	    }
-	    if (count($filter))
+	    if (count($filter)) {
 	    	return $filter;
+        }
         return null;
     }
 
