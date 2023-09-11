@@ -62,7 +62,9 @@ class Forschungsbereiche {
             $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-        if (array_key_exists('relation left seq', reset($fieldsArray)->attributes)) {
+        $firstItem = reset($fieldsArray);
+        if ($firstItem && isset($firstItem->attributes['relation left seq'])) {         
+        //if (array_key_exists('relation left seq', reset($fieldsArray)->attributes)) {
             $sortby = 'relation left seq';
             $orderby = $sortby;
         } else {
@@ -72,10 +74,11 @@ class Forschungsbereiche {
         $hide = $param['hide'];
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
+        $list = $res[$orderby] ?? [];
         if ($param['limit'] != '')
-            $fieldList = array_slice($res[$orderby], 0, $param['limit']);
+            $fieldList = array_slice($list, 0, $param['limit']);
         else
-            $fieldList = $res[$orderby];
+            $fieldList = $list;
         $output = '';
         $output .= $this->make_list($fieldList);
 
@@ -137,7 +140,9 @@ class Forschungsbereiche {
                 $sortby = $sortby . '_en';
                 $orderby = $sortby;
         } else {
-            if (array_key_exists('relation left seq', reset($fieldsArray)->attributes)) {
+            $firstItem = reset($fieldsArray);
+            if ($firstItem && isset($firstItem->attributes['relation left seq'])) {            
+            //if (array_key_exists('relation left seq', reset($fieldsArray)->attributes)) {
                 $sortby = 'relation left seq';
                 $orderby = $sortby;
             } else {
@@ -148,7 +153,7 @@ class Forschungsbereiche {
 
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
-        $fieldList = $res[$orderby];
+        $fieldList = $res[$orderby] ?? [];
 
         return $fieldList;
     }
