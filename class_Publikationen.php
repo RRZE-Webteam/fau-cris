@@ -445,7 +445,9 @@ class Publikationen {
             return '';
         }
         
-        if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
+        $firstItem = reset($pubArray);
+        if ($firstItem && isset($firstItem->attributes['relation right seq'])) {        
+        //if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
@@ -454,7 +456,7 @@ class Publikationen {
         }
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
-        $pubList = $res[$orderby];
+        $pubList = $res[$orderby] ?? [];
 
         if ($param['publications_limit'] != '') {
             $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
@@ -486,7 +488,9 @@ class Publikationen {
             return '';
         }
         
-        if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
+        $firstItem = reset($pubArray);
+        if ($firstItem && isset($firstItem->attributes['relation right seq'])) {        
+        //if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
@@ -495,7 +499,7 @@ class Publikationen {
         }
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
-        $pubList = $res[$orderby];
+        $pubList = $res[$orderby] ?? [];
 
         if ($param['publications_limit'] != '') {
             $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
@@ -524,7 +528,9 @@ class Publikationen {
         if (!count($pubArray))
             return;
 
-        if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
+        $firstItem = reset($pubArray);
+        if ($firstItem && isset($firstItem->attributes['relation right seq'])) {            
+        //if (array_key_exists('relation right seq', reset($pubArray)->attributes)) {
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
@@ -533,7 +539,7 @@ class Publikationen {
         }
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
-        $pubList = $res[$orderby];
+        $pubList = $res[$orderby] ?? [];
 
         if ($publications_limit != '') {
             $pubList = array_slice($pubList, 0, $publications_limit, true);
