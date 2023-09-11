@@ -316,7 +316,9 @@ class Projekte {
         if (!count($projArray))
             return;
 
-        if (array_key_exists('relation right seq', reset($projArray)->attributes)) {
+        $firstItem = reset($projArray);
+        if ($firstItem && isset($firstItem->attributes['relation right seq'])) {             
+        //if (array_key_exists('relation right seq', reset($projArray)->attributes)) {
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
@@ -325,7 +327,9 @@ class Projekte {
         }
 
         // sortiere nach Erscheinungsdatum
-        if (array_key_exists('relation right seq', reset($projArray)->attributes)) {
+        $firstItem = reset($projArray);
+        if ($firstItem && isset($firstItem->attributes['relation right seq'])) {         
+        //if (array_key_exists('relation right seq', reset($projArray)->attributes)) {
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
@@ -334,7 +338,7 @@ class Projekte {
         }
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($projArray);
-        $projList = $res[$orderby];
+        $projList = $res[$orderby] ?? [];
 
         $hide = array();
         $output = $this->make_list($projList, $hide, 0, 1);
@@ -798,7 +802,9 @@ class Projekte {
             return $projArray;
 
         // sortiere nach Erscheinungsdatum
-        if (array_key_exists('relation right seq', reset($projArray)->attributes)) {
+        $firstItem = reset($projArray);
+        if ($firstItem && isset($firstItem->attributes['relation right seq'])) {         
+        //if (array_key_exists('relation right seq', reset($projArray)->attributes)) {
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
@@ -807,7 +813,7 @@ class Projekte {
         }
         $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
         $res = $formatter->execute($projArray);
-        $projList = $res[$orderby];
+        $projList = $res[$orderby] ?? [];
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
             $output = $this->make_accordion($projList);
