@@ -163,7 +163,7 @@ class Publikationen
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
         if (!count($pubArray)) {
-            $output = '<p>' . __('Unfortunately no publications were found.', 'fau-cris') . '</p>';
+            $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
 
