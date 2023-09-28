@@ -29,7 +29,11 @@ class CRIS_formatter {
         else
             $this->group_order = $group_order;
 
-        $this->sort = strtolower($sort_attribute);
+        if ($sort_attribute != null)
+            $this->sort = strtolower($sort_attribute);
+        else
+            $this->sort = null;
+            
         if (is_array($sort_order))
             $this->sort_order = array_map('strtolower', $sort_order);
         else
