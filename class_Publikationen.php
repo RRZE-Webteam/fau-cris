@@ -134,6 +134,7 @@ class Publikationen
      *  
      * Returns: publications list
      * 
+     * Start::pubNachJahr
      */
 
     public function pubNachJahr(
@@ -254,27 +255,40 @@ class Publikationen
         }
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
+    //End ::pubNachJahr
 
-    /*
-     * Ausgabe aller Publikationen nach Publikationstypen gegliedert
+     /**
+     * Name : pubNachTyp
+     * 
+     * Use: get publication list according by their types
+     *  
+     * Returns: publications list by type 
+     * 
+     * Start::pubNachTyp
      */
 
-    public function pubNachTyp($param = array(), $field = '', $content = '', $fsp = false, $project = '')
+    public function pubNachTyp(
+    array $param = [], 
+    $field = '', 
+    $content = '', 
+    $fsp = false, 
+    $project = '')
     {
-        $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
-        $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
-        $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
-        $type = (isset($param['type']) && $param['type'] != '') ? $param['type'] : '';
-        $subtype = (isset($param['subtype']) && $param['subtype'] != '') ? $param['subtype'] : '';
-        $quotation = (isset($param['quotation']) && $param['quotation'] != '') ? $param['quotation'] : '';
-        $order2 = (isset($param['order2']) && $param['order2'] != '') ? $param['order2'] : 'date';
-        $fau = (isset($param['fau']) && $param['fau'] != '') ? $param['fau'] : '';
-        $peerreviewed = (isset($param['peerreviewed']) && $param['peerreviewed'] != '') ? $param['peerreviewed'] : '';
-        $notable = (isset($param['notable']) && $param['notable'] != '') ? $param['notable'] : 0;
-        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
-        $language = (isset($param['language']) && $param['language'] != '') ? $param['language'] : '';
-        $sortby = (isset($param['sortby']) && $param['sortby'] != '') ? $param['sortby'] : 'virtualdate';
-        $sortorder = (isset($param['sortorder']) && $param['sortorder'] != '') ? $param['sortorder'] : SORT_DESC;
+
+        $year =  $param['year'] ?: '';
+        $start = $param['start'] ?: '';
+        $end = $param['end'] ?: '';
+        $type = $param['type'] ?: '';
+        $subtype = $param['subtype'] ?: '';
+        $quotation = $param['quotation'] ?: '';
+        $order2 = $param['order2'] ?: 'date';
+        $fau = $param['fau'] ?: '';
+        $peerreviewed = $param['peerreviewed'] ?: '';
+        $notable = $param['notable'] ?: 0;
+        $format = $param['format'] ?: '';
+        $language = $param['language'] ?: '';
+        $sortby =  $param['sortby'] ?: 'virtualdate';
+        $sortorder =  $param['sortorder'] ?: SORT_DESC;
 
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
@@ -429,9 +443,26 @@ class Publikationen
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    // Ende pubNachTyp()
+    // End::pubNachTyp
 
-    public function singlePub($quotation = '', $content = '', $sc_type = 'default', $showimage = 0, $image_align = 'right', $image_position = "top", $display = 'no-list')
+ /**
+     * Name : singlePub
+     * 
+     * Use: get single publication by the publication id
+     *  
+     * Returns: publications a single publication 
+     * 
+     * Start::singlePub
+     */
+
+    public function singlePub(
+        $quotation = '', 
+        $content = '', 
+        $sc_type = 'default', 
+        $showimage = 0, 
+        $image_align = 'right', 
+        $image_position = "top", 
+        $display = 'no-list')
     {
         $ws = new CRIS_publications();
 
@@ -457,6 +488,17 @@ class Publikationen
         }
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
+    // End::singlePub
+
+    /**
+     * Name : projectPub
+     * 
+     * Use: get projects of publication 
+     *  
+     * Returns: list of project in publications 
+     * 
+     * Start::projectPub
+     */
 
     public function projectPub($param = array())
     {
@@ -495,7 +537,21 @@ class Publikationen
         return $output;
     }
 
-    public function fieldPub($param = array(), $seed = false)
+    // End::projectPub
+    
+     /**
+     * Name : fieldPub
+     * 
+     * Use: get field of publication 
+     *  
+     * Returns: list of field of publications 
+     * 
+     * Start::fieldPub
+     */
+
+    public function fieldPub(
+        $param = array(), 
+        $seed = false)
     {
         $pubArray = [];
 
@@ -540,6 +596,18 @@ class Publikationen
         return $output;
     }
 
+    // End::fieldPub
+
+    /**
+     * Name : equiPub
+     * 
+     * Use: get equipment of publication 
+     *  
+     * Returns: list of equipment of publications 
+     * 
+     * Start::equiPub
+     */
+
     public function equiPub($equipment, $quotation = '', $seed = false, $publications_limit = '', $display_language = 'de')
     {
         $ws = new CRIS_publications();
@@ -580,6 +648,8 @@ class Publikationen
 
         return $output;
     }
+
+    // End::equiPub
 
     /* =========================================================================
      * Private Functions
