@@ -290,7 +290,7 @@ class Forschungsbereiche {
                 if (!is_wp_error($persons)) {
                     $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
                     $singlefield .= "<ul>";
-                    foreach ($persons as $p_id => $person) {
+                    foreach ($persons ?? [] as $p_id => $person) {
                         $singlefield .= "<li>";
                         $singlefield .= Tools::get_person_link($p_id, $person['firstname'], $person['lastname'], $this->cris_field_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                         $singlefield .= "</li>";
