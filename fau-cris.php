@@ -823,8 +823,8 @@ class FAU_CRIS {
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
 
-            if(is_wp_error($liste)) {
-                return $liste->get_error_message();
+            if(is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
             }
             if ($parameter['project'] != '') {
                 return $liste->singleProj($parameter);
@@ -861,6 +861,10 @@ class FAU_CRIS {
             // Publications
             require_once('class_Publikationen.php');
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], $parameter['name_order_plugin'], $page_lang, $parameter['display_language']);
+
+            if(is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
 
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
                 return $liste->singlePub($parameter['quotation'], '', 'default', $parameter['showimage'], $parameter['image_align'], $parameter['image_position'], $parameter['display']);
@@ -909,9 +913,9 @@ class FAU_CRIS {
         // Projekte
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
-            if(is_wp_error($liste)) {
-                return $liste->get_error_message();
-            }            
+            if(is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }          
             if ($parameter['project'] != '') {
                 return $liste->customProj($content, $parameter);
             }
