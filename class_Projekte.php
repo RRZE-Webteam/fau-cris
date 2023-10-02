@@ -26,7 +26,7 @@ class Projekte {
         $this->univis = NULL;
 
         $this->order = $this->options['cris_project_order'];
-        $this->cris_project_link = isset($this->options['cris_project_link']) ? $this->options['cris_project_link'] : 'none';
+        $this->cris_project_link = $this->options['cris_project_link'] ?? 'none';
         if ($this->cms == 'wbk' && $this->cris_project_link == 'person') {
             $this->univis = Tools::get_univis();
         }

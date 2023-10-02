@@ -18,7 +18,7 @@ class Standardisierungen {
         $this->univis = NULL;
 
         //$this->order = $this->options['cris_standardization_order'];
-        $this->cris_standardizations_link = isset($this->options['cris_standardizations_link']) ? $this->options['cris_standardizations_link'] : 'none';
+        $this->cris_standardizations_link = $this->options['cris_standardizations_link'] ?? 'none';
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             $this->error= new \WP_Error(
                 'cris-orgid-error', 

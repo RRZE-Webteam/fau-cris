@@ -29,7 +29,7 @@ class Publikationen
 
         $this->order = $this->options['cris_pub_order'];
         $this->subtypeorder = $this->options['cris_pub_subtypes_order'];
-        $this->univisLink = isset($this->options['cris_univis']) ? $this->options['cris_univis'] : 'none';
+        $this->univisLink = $this->options['cris_univis'] ?? 'none';
         $this->bibtex = $this->options['cris_bibtex'];
         $this->bibtexlink = "https://cris.fau.de/bibtex/publication/%s.bib";
         if ($this->cms == 'wbk' && $this->univisLink == 'person') {
@@ -710,7 +710,8 @@ class Publikationen
                     foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
                         $publication->attributes['image'] = "<div class=\"cris-image wp-caption " . $image_align  . "\" style=\"width: " . $img_size[0] . "px;\">";
-                        $img_description = (isset($img->attributes['description']) ? $img->attributes['description'] : '');
+                        $img_description = ( $img->attributes['description'] ??
+                                             '' );
                         if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                             $publication->attributes['image'] .= "<img alt=\"Coverbild: " . $img_description . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3] . ">"
                                 . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
@@ -845,7 +846,8 @@ class Publikationen
                     foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
                         $publication['image'] = "<div class=\"cris-image wp-caption " . $image_align  . "\" style=\"width: " . $img_size[0] . "px;\">";
-                        $img_description = (isset($img->attributes['description']) ? $img->attributes['description'] : '');
+                        $img_description = ( $img->attributes['description'] ??
+                                             '' );
                         if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                             $publication['image'] .= "<img alt=\"Coverbild: " . $img_description . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3] . ">"
                                 . "<p class=\"wp-caption-text\">" . $img_description . "</p>";

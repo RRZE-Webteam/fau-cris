@@ -27,7 +27,7 @@ class Aktivitaeten
         $this->univis = null;
 
         $this->order = $this->options['cris_activities_order'];
-        $this->cris_activities_link = isset($this->options['cris_activities_link']) ? $this->options['cris_activities_link'] : 'none';
+        $this->cris_activities_link = $this->options['cris_activities_link'] ?? 'none';
         if ($this->cms == 'wbk' && $this->univisLink == 'person') {
             $this->univis = Tools::get_univis();
         }

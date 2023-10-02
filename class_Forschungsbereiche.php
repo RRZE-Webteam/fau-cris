@@ -24,7 +24,7 @@ class Forschungsbereiche {
         $this->suchstring = '';
         $this->univis = NULL;
         
-        $this->cris_field_link = isset($this->options['cris_field_link']) ? $this->options['cris_field_link'] : 'none';
+        $this->cris_field_link = $this->options['cris_field_link'] ?? 'none';
         if ($this->cms == 'wbk' && $this->cris_field_link == 'person') {
             $this->univis = Tools::get_univis();
         }
@@ -235,7 +235,8 @@ class Forschungsbereiche {
                     foreach($imgs as $img) {
                         $img_size = getimagesizefromstring (base64_decode($img->attributes['png180']));
                         $singlefield = "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";
-                        $img_description = (isset($img->attributes['description']) ? $img->attributes['description'] : '');
+                        $img_description = ( $img->attributes['description'] ??
+                                             '' );
                         if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                             $singlefield .= "<img alt=\"Coverbild: ". $img_description ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3].">"
                                 . "<p class=\"wp-caption-text\">" . $img_description . "</p>";

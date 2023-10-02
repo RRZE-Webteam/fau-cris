@@ -28,7 +28,7 @@ class Patente
         $this->univis = NULL;
 
         $this->order = $this->options['cris_patent_order'];
-        $this->cris_patent_link = isset($this->options['cris_patent_link']) ? $this->options['cris_patent_link'] : 'none';
+        $this->cris_patent_link = $this->options['cris_patent_link'] ?? 'none';
         if ($this->cms == 'wbk' && $this->cris_patent_link == 'person') {
             $this->univis = Tools::get_univis();
         }

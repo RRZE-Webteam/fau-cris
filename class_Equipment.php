@@ -19,7 +19,7 @@ class Equipment
         $this->univis = NULL;
 
         //$this->order = $this->options['cris_equipment_order'];
-        $this->cris_equipment_link = isset($this->options['cris_equipment_link']) ? $this->options['cris_equipment_link'] : 'none';
+        $this->cris_equipment_link = $this->options['cris_equipment_link'] ?? 'none';
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
             $this->error = new \WP_Error(
                 'cris-orgid-error',

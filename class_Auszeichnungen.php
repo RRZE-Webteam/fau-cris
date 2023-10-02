@@ -26,7 +26,7 @@ class Auszeichnungen {
 
 
         $this->order = $this->options['cris_award_order'];
-        $this->cris_award_link = isset($this->options['cris_award_link']) ? $this->options['cris_award_link'] : 'none';
+        $this->cris_award_link = $this->options['cris_award_link'] ?? 'none';
         if ($this->cms == 'wbk' && $this->cris_award_link == 'person') {
             $this->univis = Tools::get_univis();
         }
