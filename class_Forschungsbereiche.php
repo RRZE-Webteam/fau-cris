@@ -30,8 +30,10 @@ class Forschungsbereiche {
         }
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation oder des Forschungsbereichs an.', 'fau-cris') . '</strong></p>';
-            return;
+            $this->error= new \WP_Error(
+                'cris-orgid-error', 
+                __('Bitte geben Sie die CRIS-ID der Organisation oder des Forschungsbereichs an.', 'fau-cris')
+            );
         }
         if (in_array($einheit, array("orga", "field"))) {
             $this->id = $id;

@@ -40,8 +40,7 @@ class Projekte {
         }
 
         if (!$this->id) {
-		    // print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris') . '</strong></p>';
-		    // return;
+            
             $this->error = new \WP_Error(
                 'cris-orgid-error', 
                 __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')

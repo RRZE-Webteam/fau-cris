@@ -5,19 +5,21 @@ require_once("class_Webservice.php");
 require_once("class_Filter.php");
 require_once("class_Formatter.php");
 
-class Aktivitaeten {
+class Aktivitaeten
+{
 
     private $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
+    {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
         } else {
             $this->cms = 'wp';
-	        $this->options = (array) FAU_CRIS::get_options();
+            $this->options = (array) FAU_CRIS::get_options();
             $this->pathPersonenseiteUnivis = '/person/';
         }
         $this->orgNr = $this->options['cris_org_nr'];
@@ -31,7 +33,10 @@ class Aktivitaeten {
         }
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris') . '</strong></p>';
+            $this->error = new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris')
+            );
         }
         if (in_array($einheit, array("person", "orga", "activity"))) {
             $this->id = $id;
@@ -42,19 +47,20 @@ class Aktivitaeten {
             $this->einheit = "orga";
         }
         $this->page_lang = $page_lang;
-	    $this->sc_lang = $sc_lang;
-	    $this->langdiv_open = '<div class="cris">';
-	    $this->langdiv_close = '</div>';
-	    if ($sc_lang != $this->page_lang) {
-		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
-	    }
+        $this->sc_lang = $sc_lang;
+        $this->langdiv_open = '<div class="cris">';
+        $this->langdiv_close = '</div>';
+        if ($sc_lang != $this->page_lang) {
+            $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+        }
     }
 
     /*
      * Ausgabe aller Aktivitäten ohne Gliederung
      */
 
-    public function actiListe($param = array()) {
+    public function actiListe($param = array())
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -82,14 +88,15 @@ class Aktivitaeten {
 
         $output = $this->langdiv_open . $this->make_list($activityList, $showname, $showyear, $showactivityname, $showtype) . $this->langdiv_close;
 
-	    return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
      * Ausgabe aller Aktivitäten nach Jahren gegliedert
      */
 
-    public function actiNachJahr($param = array()) {
+    public function actiNachJahr($param = array())
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -131,7 +138,7 @@ class Aktivitaeten {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($activities, $showname, $showyear, $showactivityname) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles '.$expandall.']' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($activityList as $array_year => $activities) {
                 if (empty($year)) {
@@ -142,14 +149,15 @@ class Aktivitaeten {
                 $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, $showtype);
             }
         }
-	    return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
      * Ausgabe aller Aktivitäten nach Patenttypen gegliedert
      */
 
-    public function actiNachTyp($param = array()) {
+    public function actiNachTyp($param = array())
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -187,7 +195,7 @@ class Aktivitaeten {
         $activityList = $formatter->execute($activityArray);
         $output = '';
 
-		if (shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
             if (!empty($type) && strpos($type, ',') !== false) {
                 $openfirst = ' load="open"';
@@ -198,12 +206,12 @@ class Aktivitaeten {
             }
             foreach ($activityList as $array_type => $activities) {
                 $title = Tools::getTitle('activities', $array_type, $param['display_language']);
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' .$openfirst . ']' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($activities, $showname, $showyear, $showactivityname, 0) . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
-                foreach ($activityList as $array_type => $activities) {
+            foreach ($activityList as $array_type => $activities) {
                 if (empty($type)) {
                     $title = Tools::getTitle('activities', $array_type, $this->sc_lang);
                     $output .= '<h3 class="clearfix clear">';
@@ -213,14 +221,15 @@ class Aktivitaeten {
                 $output .= $this->make_list($activities, $showname, $showyear, $showactivityname, 0);
             }
         }
-	    return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /*
      * Ausgabe eines einzelnen Patents
      */
 
-    public function singleActivity($hide) {
+    public function singleActivity($hide)
+    {
         $showname = 1;
         $showyear = 0;
         $showactivityname = 1;
@@ -239,7 +248,7 @@ class Aktivitaeten {
 
         $output = $this->langdiv_open . $this->make_list($activityArray, $showname, $showyear, $showactivityname) . $this->langdiv_close;
 
-	    return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
     /* =========================================================================
@@ -250,7 +259,8 @@ class Aktivitaeten {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_activities($year = '', $start = '', $end = '', $type = '') {
+    private function fetch_activities($year = '', $start = '', $end = '', $type = '')
+    {
         $filter = Tools::activity_filter($year, $start, $end, $type);
 
         $ws = new CRIS_activities();
@@ -273,7 +283,8 @@ class Aktivitaeten {
      * Ausgabe der Patents
      */
 
-    private function make_list($activities, $name = 1, $year = 1, $activityname = 1, $showtype = 1) {
+    private function make_list($activities, $name = 1, $year = 1, $activityname = 1, $showtype = 1)
+    {
         if ($this->einheit == "activity") {
             $activitylist = "<div class=\"cris-activities\">";
         } else {
@@ -401,7 +412,7 @@ class Aktivitaeten {
                     $activity_eventname = $activity['event name'];
                     $activity_date = $activity['date'];
                     if ($activity_date != '')
-                        $activity_date = date_i18n( get_option( 'date_format' ), strtotime($activity_date));
+                        $activity_date = date_i18n(get_option('date_format'), strtotime($activity_date));
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
                     break;
@@ -412,7 +423,7 @@ class Aktivitaeten {
                     $activity_eventname = '';
                     $activity_date = $activity['date'];
                     if ($activity_date != '')
-                        $activity_date = date_i18n( get_option( 'date_format' ), strtotime($activity_date));
+                        $activity_date = date_i18n(get_option('date_format'), strtotime($activity_date));
                     $activity_url = $activity['url'];
                     $activity_location = '';
                     break;
@@ -465,15 +476,16 @@ class Aktivitaeten {
 
         return $activitylist;
     }
-
 }
 
-class CRIS_activities extends CRIS_webservice {
+class CRIS_activities extends CRIS_webservice
+{
     /*
      * actients/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null) {
+    public function by_orga_id($orgaID = null, &$filter = null)
+    {
         if ($orgaID === null || $orgaID === "0")
             throw new Exception('Please supply valid organisation ID');
 
@@ -487,7 +499,8 @@ class CRIS_activities extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null) {
+    public function by_pers_id($persID = null, &$filter = null)
+    {
         if ($persID === null || $persID === "0")
             throw new Exception('Please supply valid person ID');
 
@@ -501,7 +514,8 @@ class CRIS_activities extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($awarID = null) {
+    public function by_id($awarID = null)
+    {
         if ($awarID === null || $awarID === "0")
             throw new Exception('Please supply valid activity ID');
 
@@ -515,7 +529,8 @@ class CRIS_activities extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null) {
+    private function retrieve($reqs, &$filter = null)
+    {
         if ($filter !== null && !$filter instanceof CRIS_filter)
             $filter = new CRIS_filter($filter);
 
@@ -556,16 +571,16 @@ class CRIS_activities extends CRIS_webservice {
 
         return $activities;
     }
-
 }
 
-class CRIS_activity extends CRIS_Entity {
+class CRIS_activity extends CRIS_Entity
+{
     /*
      * object for single activity
      */
 
-    function __construct($data) {
+    function __construct($data)
+    {
         parent::__construct($data);
     }
-
 }
