@@ -136,8 +136,9 @@ class Standardisierungen {
     private function make_list($standardizations, $param = array(), $isSingleAccordion = false) {
         global $post;
         $hide = $param['hide'];
-        $standardizationList = '';
-        $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<ul class=\"cris-standardizations\">");
+	    $standardizationList = ( $isSingleAccordion
+		    ? '[collapsibles expand-all-link="true"]'
+		    : "<ul class=\"cris-standardizations\">" );
 
         foreach($standardizations as $standardization) {
             $standardization = (array) $standardization;
@@ -218,8 +219,7 @@ class Standardisierungen {
             $item_close = '</li>';
         }
 
-        $standardizationList = '';
-        $standardizationList .= $tag_open;
+	    $standardizationList = $tag_open;
 
         foreach($standardizations as $standardization) {
             $standardization = (array)$standardization;
@@ -278,8 +278,9 @@ class Standardisierungen {
             array_push($hide, ['hide']);
         }
 
-        $standardizationList = '';
-        $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<div class=\"cris-standardizations\">");
+	    $standardizationList = ( $isSingleAccordion
+		    ? '[collapsibles expand-all-link="true"]'
+		    : "<div class=\"cris-standardizations\">" );
 
         foreach($standardizations as $standardization) {
             $standardization = (array) $standardization;

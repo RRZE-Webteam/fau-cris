@@ -51,6 +51,8 @@ spl_autoload_register(function ($class) {
     }
 });
 
+
+
 add_action('plugins_loaded', array('FAU_CRIS', 'instance'));
 
 register_activation_hook(__FILE__, array('FAU_CRIS', 'activate'));

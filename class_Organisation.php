@@ -148,8 +148,7 @@ class Organisation
     private function make_single($organisations, $image_align)
     {
         $image_align = 'alignright';
-        $output = '';
-        $output .= "<div class=\"cris-organisation\">";
+	    $output      = "<div class=\"cris-organisation\">";
 
         foreach ($organisations as $organisation) {
             $organisation = (array) $organisation;
@@ -181,8 +180,7 @@ class Organisation
 
     private function make_custom_single($organisations, $custom_text, $image_align = 'alignright')
     {
-        $output = '';
-        $output .= "<div class=\"cris-organisation\">";
+	    $output = "<div class=\"cris-organisation\">";
 
         foreach ($organisations as $organisation) {
             $organisation = (array) $organisation;

@@ -146,8 +146,7 @@ class Equipment
 
     private function make_list($equipments, $hide = array())
     {
-        $equilist = '';
-        $equilist .= "<ul class=\"cris-equipment\">";
+	    $equilist = "<ul class=\"cris-equipment\">";
         foreach ($equipments as $equipment) {
             $equipment = (array) $equipment;
             foreach ($equipment['attributes'] as $attribut => $v) {
@@ -211,8 +210,7 @@ class Equipment
 
     private function make_single($equipments, $hide = array(), $quotation = '', $image_align = 'alignright')
     {
-        $equilist = '';
-        $equilist .= "<div class=\"cris-equipment\">";
+	    $equilist = "<div class=\"cris-equipment\">";
         foreach ($equipments as $equipment) {
             $equipment = (array) $equipment;
             foreach ($equipment['attributes'] as $attribut => $v) {
@@ -519,7 +517,8 @@ class Equipment
             foreach ($imgXml->infoObject as $img) {
                 foreach ($img->attribute as $imgAttribut) {
                     if ($imgAttribut['name'] == 'png180') {
-                        $images[$i]['png180'] = (!empty($imgAttribut->data)) ? 'data:image/PNG;base64,' . (string) $imgAttribut->data : '';
+                        $images[$i]['png180'] = (!empty($imgAttribut->data)) ? 'data:image/PNG;base64,' . $imgAttribut->data
+	                        : '';
                     }
                 }
                 foreach ($img->relation->attribute as $imgRelAttribut) {
@@ -569,7 +568,7 @@ class Equipment
                 $_v = (string) $field['id'];
                 foreach ($field->attribute as $fieldAttribut) {
                     if ($fieldAttribut['language'] == '1') {
-                        $fields[$_v][(string) $fieldAttribut['name'] . '_en'] = (string) $fieldAttribut->data;
+                        $fields[$_v][ $fieldAttribut['name'] . '_en'] = (string) $fieldAttribut->data;
                     } else {
                         $fields[$_v][(string) $fieldAttribut['name']] = (string) $fieldAttribut->data;
                     }
@@ -589,7 +588,7 @@ class Equipment
                 $_v = (string) $project['id'];
                 foreach ($project->attribute as $projectAttribut) {
                     if ($projectAttribut['language'] == '1') {
-                        $projects[$_v][(string) $projectAttribut['name'] . '_en'] = (string) $projectAttribut->data;
+                        $projects[$_v][ $projectAttribut['name'] . '_en'] = (string) $projectAttribut->data;
                     } else {
                         $projects[$_v][(string) $projectAttribut['name']] = (string) $projectAttribut->data;
                     }

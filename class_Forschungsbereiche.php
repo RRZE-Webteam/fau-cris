@@ -81,8 +81,7 @@ class Forschungsbereiche {
             $fieldList = array_slice($list, 0, $param['limit']);
         else
             $fieldList = $list;
-        $output = '';
-        $output .= $this->make_list($fieldList);
+	    $output = $this->make_list( $fieldList );
 
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
@@ -201,8 +200,7 @@ class Forschungsbereiche {
 	private function make_single($fields, $param) {
         $hide = $param['hide'];
 
-        $singlefield = '';
-        $singlefield .= "<div class=\"cris-fields\">";
+		$singlefield = "<div class=\"cris-fields\">";
 
         foreach ($fields as $field) {
             $field = (array) $field;

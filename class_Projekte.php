@@ -450,8 +450,7 @@ class Projekte {
     }
 
     private function make_custom_list($projects, $custom_text, $param = array()) {
-        $projlist = '';
-        $projlist .= "<ul class=\"cris-projects\">";
+	    $projlist = "<ul class=\"cris-projects\">";
 
         foreach ($projects as $project) {
             $project = (array) $project;
@@ -513,8 +512,7 @@ class Projekte {
 
     private function make_single($projects, $param = array()) {
 
-        $projlist = '';
-        $projlist .= "<div class=\"cris-projects\">";
+	    $projlist = "<div class=\"cris-projects\">";
 
         foreach ($projects as $project) {
             $project = (array) $project;
@@ -627,8 +625,7 @@ class Projekte {
     private function make_list($projects, $hide = array(), $showtype = 1, $pubProj = 0) {
 
         global $post;
-        $projlist = '';
-        $projlist .= "<ul class=\"cris-projects\">";
+	    $projlist = "<ul class=\"cris-projects\">";
 
         foreach ($projects as $project) {
             $project = (array) $project;
@@ -732,8 +729,7 @@ class Projekte {
         global $post;
 
         $lang_key = ($this->page_lang == 'en') ? '_en' : '';
-        $projlist = '';
-        $projlist .= '[collapsibles]';
+	    $projlist = '[collapsibles]';
 
         foreach ($projects as $project) {
             $project = (array) $project;
