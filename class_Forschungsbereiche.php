@@ -453,8 +453,8 @@ class Forschungsbereiche {
     private function get_field_projects($field = NULL) {
     	require_once('class_Projekte.php');
         $liste = new Projekte('field', $field, $this->sc_lang);
-        if(is_wp_error($liste)) {
-            return $liste->get_error_message();
+        if(isset($liste->error) && is_wp_error($liste->error)) {
+            return $liste->error->get_error_message();
         } else {
             return $liste->fieldProj($field);
         }
@@ -463,8 +463,8 @@ class Forschungsbereiche {
     private function get_field_persons($field = NULL) {
         require_once('class_Projekte.php');
         $liste = new Projekte('field', $field, $this->sc_lang);
-        if(is_wp_error($liste)) {
-            return $liste;
+        if(isset($liste->error) && is_wp_error($liste->error)) {
+            return $liste->error->get_error_message();
         } else {
             return $liste->fieldPersons($field);
         }

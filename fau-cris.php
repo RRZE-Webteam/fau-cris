@@ -911,21 +911,33 @@ class FAU_CRIS {
         if (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
             require_once('class_Standardisierungen.php');
             $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            if(isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
             return $liste->standardizationListe($parameter, $content);
         } elseif ($parameter['show'] == 'organisation') {
         // Forschung
             require_once('class_Organisation.php');
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            if(isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
             return $liste->customOrganisation($content, $parameter['image_align']);
         } elseif ($parameter['show'] == 'equipment') {
         // Forschungsinfrastruktur
 	        require_once('class_Equipment.php');
 	        $liste = new Equipment($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            if(isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
 	        return $liste->customEquipment($content, $parameter);
         } elseif ($parameter['show'] == 'fields') {
         // Forschungsbereiche
             require_once('class_Forschungsbereiche.php');
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            if(isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
             if ($parameter['field'] != '') {
                 return $liste->customField($content, $parameter);
             }
@@ -933,9 +945,9 @@ class FAU_CRIS {
         // Projekte
             require_once('class_Projekte.php');
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
-            if(is_wp_error($liste->error)) {
+            if(isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
-            }          
+            }       
             if ($parameter['project'] != '') {
                 return $liste->customProj($content, $parameter);
             }
@@ -943,6 +955,9 @@ class FAU_CRIS {
         // Auszeichnungen
 	        require_once('class_Auszeichnungen.php');
 	        $liste = new Auszeichnungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
+            if(isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
 	        if ($parameter['award'] != '') {
 		        return $liste->customAward( $content, $parameter );
 	        }
@@ -951,6 +966,9 @@ class FAU_CRIS {
         // Publikationen
             require_once('class_Publikationen.php');
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], '', $page_lang);
+            if(isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
                 return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type'], 1, $parameter['image_align'], $parameter['image_position']);
             }
