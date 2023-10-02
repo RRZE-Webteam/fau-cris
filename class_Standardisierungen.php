@@ -6,7 +6,7 @@ require_once("class_Filter.php");
 require_once("class_Formatter.php");
 
 class Standardisierungen {
-    private $options;
+    private array $options;
     public $output;
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {

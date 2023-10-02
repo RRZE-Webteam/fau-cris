@@ -8,7 +8,7 @@ require_once("class_Formatter.php");
 class Organisation
 {
 
-    private $options;
+    private array $options;
     public $output;
 
     public function __construct($einheit = 'orga', $id = '', $page_lang = 'de', $sc_lang = 'de')

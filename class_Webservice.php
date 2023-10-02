@@ -18,7 +18,7 @@ class CRIS_webservice
     /*
      * generic class for web service access.
      */
-    private $cache = true;
+    private bool $cache = true;
 
     private function fetch($url)
     {

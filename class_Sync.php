@@ -6,7 +6,7 @@ require_once("class_Projekte.php");
 
 class Sync {
 
-    private $menu_position_start = 2;
+    private int $menu_position_start = 2;
 
     public function __construct($page_lang = 'de') {
         $this->options = (array) get_option('_fau_cris');

@@ -7,7 +7,7 @@ require_once("class_Formatter.php");
 
 class Auszeichnungen {
 
-    private $options;
+    private array $options;
     public $output;
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
