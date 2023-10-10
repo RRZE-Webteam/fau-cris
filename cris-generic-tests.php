@@ -1,4 +1,17 @@
-<?php
+<?php /** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
 
 /*
  * Vergleich zwischen generischem Zugang vs. bisherigem

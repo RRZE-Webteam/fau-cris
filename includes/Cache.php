@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 class Cache
 {
-    private static $ttl = 6 * HOUR_IN_SECONDS;
+    private static int|float $ttl = 6 * HOUR_IN_SECONDS;
 
     public static function set(string $url, string $ical): void {
         $prefix = parse_url($url, PHP_URL_SCHEME);
