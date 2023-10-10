@@ -103,7 +103,7 @@ class CRIS_entity
 
         foreach ($data->attribute as $_a) {
             if ($_a['language'] == 1) {
-                $attr_name = (string) $_a['name'] . '_en';
+                $attr_name = $_a['name'] . '_en';
             } else {
                 $attr_name = (string) $_a['name'];
             }
