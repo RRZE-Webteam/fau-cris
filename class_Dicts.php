@@ -1,6 +1,7 @@
 <?php
 
-class CRIS_Dicts {
+class CRIS_Dicts
+{
 
     public static string $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
     
@@ -649,16 +650,16 @@ class CRIS_Dicts {
                         )
                     ),
                     'specialissue' => array(
-	                    'order' => 5,
-	                    'short' => 'themenheft_zeitschrift',
-	                    'de' => array(
-		                    'name' => 'Themenheft einer Zeitschrift',
-		                    'title' => 'Themenhefte von Zeitschriften'
-	                    ),
-	                    'en' => array(
-		                    'name' => 'Special issue of a journal',
-		                    'title' => 'Special Issues of Journals'
-	                    )
+                        'order' => 5,
+                        'short' => 'themenheft_zeitschrift',
+                        'de' => array(
+                            'name' => 'Themenheft einer Zeitschrift',
+                            'title' => 'Themenhefte von Zeitschriften'
+                        ),
+                        'en' => array(
+                            'name' => 'Special issue of a journal',
+                            'title' => 'Special Issues of Journals'
+                        )
                     ),
                     'undefined' => array(
                         'order' => 6,
