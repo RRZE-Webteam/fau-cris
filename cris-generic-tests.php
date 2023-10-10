@@ -17,8 +17,7 @@ if (!function_exists("__")) {
 }
 
 if (!function_exists("get_option")) {
-    function get_option($x)
-    {
+    function get_option($x): array {
         return array(
             "cris_org_nr" => 142528,
             "cris_pub_order" => array(''),
@@ -27,8 +26,7 @@ if (!function_exists("get_option")) {
 }
 
 if (!function_exists("get_locale")) {
-    function get_locale()
-    {
+    function get_locale(): string {
         return "de_DE";
     }
 }

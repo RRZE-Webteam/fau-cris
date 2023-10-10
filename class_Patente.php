@@ -60,8 +60,7 @@ class Patente
      * Ausgabe aller Patente ohne Gliederung
      */
 
-    public function patListe($param = array())
-    {
+    public function patListe($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -97,8 +96,7 @@ class Patente
      * Ausgabe aller Patente nach Jahren gegliedert
      */
 
-    public function patNachJahr($param = array())
-    {
+    public function patNachJahr($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -157,8 +155,7 @@ class Patente
      * Ausgabe aller Patente nach Patenttypen gegliedert
      */
 
-    public function patNachTyp($param = array())
-    {
+    public function patNachTyp($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -257,8 +254,7 @@ class Patente
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_patents($year = '', $start = '', $end = '', $type = '')
-    {
+    private function fetch_patents($year = '', $start = '', $end = '', $type = ''): array {
         $filter = Tools::patent_filter($year, $start, $end, $type);
 
         $ws = new CRIS_patents();
@@ -281,8 +277,7 @@ class Patente
      * Ausgabe der Patents
      */
 
-    private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1)
-    {
+    private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1): string {
         global $post;
         $patentlist = "<ul class=\"cris-patents\">";
 
@@ -358,8 +353,7 @@ class CRIS_patents extends CRIS_webservice
      * patents/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null)
-    {
+    public function by_orga_id($orgaID = null, &$filter = null): array {
         if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -375,8 +369,7 @@ class CRIS_patents extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null)
-    {
+    public function by_pers_id($persID = null, &$filter = null): array {
         if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
         }
@@ -392,8 +385,7 @@ class CRIS_patents extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($awarID = null)
-    {
+    public function by_id($awarID = null): array {
         if ($awarID === null || $awarID === "0") {
             throw new Exception('Please supply valid patent ID');
         }
@@ -409,8 +401,7 @@ class CRIS_patents extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null)
-    {
+    private function retrieve($reqs, &$filter = null): array {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }

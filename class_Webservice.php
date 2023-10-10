@@ -26,13 +26,11 @@ class CRIS_webservice
         return RemoteGet::retrieveContent($url);
     }
 
-    public function disable_cache()
-    {
+    public function disable_cache(): void {
         $this->cache = false;
     }
 
-    public function enable_cache()
-    {
+    public function enable_cache(): void {
         $this->cache = true;
     }
 

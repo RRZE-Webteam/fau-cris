@@ -75,8 +75,7 @@ class FAU_CRIS
     protected static $instance = null;
     private static $cris_option_page = null;
 
-    public static function instance()
-    {
+    public static function instance(): ?FAU_CRIS {
 
         if (null == self::$instance) {
             self::$instance = new self;
@@ -105,19 +104,16 @@ class FAU_CRIS
     /**
      * Check PHP and WP Version
      */
-    public static function activate()
-    {
+    public static function activate(): void {
         self::version_compare();
         update_option(self::version_option_name, self::version);
     }
 
-    public static function deactivate()
-    {
+    public static function deactivate(): void {
         wp_clear_scheduled_hook('cris_auto_update');
     }
 
-    private static function version_compare()
-    {
+    private static function version_compare(): void {
         $error = '';
 
         if (version_compare(PHP_VERSION, self::php_version, '<')) {
@@ -141,8 +137,7 @@ class FAU_CRIS
         }
     }
 
-    public static function update_version()
-    {
+    public static function update_version(): void {
         if (get_option(self::version_option_name, null) != self::version) {
             update_option(self::version_option_name, self::version);
         }
@@ -151,8 +146,7 @@ class FAU_CRIS
     /**
      * Display settings link on the plugins page (beside the activate/deactivate links)
      */
-    public static function add_action_links($links)
-    {
+    public static function add_action_links($links): array {
         $mylinks = array(
             '<a href="' . admin_url('options-general.php?page=options-fau-cris') . '">' . __('Einstellungen', 'fau-cris') . '</a>',
         );
@@ -162,8 +156,7 @@ class FAU_CRIS
     /**
      * Get Options
      */
-    public static function get_options()
-    {
+    public static function get_options(): array {
         $defaults = self::default_options();
         $options = (array) get_option(self::option_name);
         $options = wp_parse_args($options, $defaults);
@@ -174,8 +167,7 @@ class FAU_CRIS
     /**
      * Set default options
      */
-    private static function default_options()
-    {
+    private static function default_options(): array {
         require_once("class_Tools.php");
         $options = array(
             'cris_org_nr' => '',
@@ -215,8 +207,7 @@ class FAU_CRIS
     /**
      * Add options page
      */
-    public static function add_options_page()
-    {
+    public static function add_options_page(): void {
         self::$cris_option_page = add_options_page(
             'CRIS: Einstellungen',
             'CRIS',
@@ -230,8 +221,7 @@ class FAU_CRIS
     /*
      * Options page tabs
      */
-    private static function options_page_tabs()
-    {
+    private static function options_page_tabs(): array {
         $tabs = array(
             'general' => __('Allgemein', 'fau-cris'),
             'layout' => __('Darstellung', 'fau-cris'),
@@ -254,8 +244,7 @@ class FAU_CRIS
     /**
      * Options page callback
      */
-    public static function options_fau_cris()
-    {
+    public static function options_fau_cris(): void {
         $tabs = self::options_page_tabs();
         $current = self::current_tab($_GET);
         if (isset($_GET['action']) && $_GET['action'] == 'cris_sync') {
@@ -297,8 +286,7 @@ class FAU_CRIS
     /**
      * Register and add settings
      */
-    public static function admin_init()
-    {
+    public static function admin_init(): void {
 
         register_setting(
             'fau_cris_options', // Option group
@@ -716,8 +704,7 @@ class FAU_CRIS
      * Get the settings option array and print its values
      */
     // Checkbox
-    public static function cris_check_callback($args)
-    {
+    public static function cris_check_callback($args): void {
         $options = self::get_options();
         if (array_key_exists('name', $args)) {
             $name = esc_attr($args['name']);
@@ -759,8 +746,7 @@ class FAU_CRIS
     }
 
     // Radio Button
-    public static function cris_radio_callback($args)
-    {
+    public static function cris_radio_callback($args): void {
         $options = self::get_options();
         if (array_key_exists('name', $args)) {
             $name = esc_attr($args['name']);
@@ -791,8 +777,7 @@ class FAU_CRIS
         }
 
     //Select
-    public static function cris_select_callback($args)
-    {
+    public static function cris_select_callback($args): void {
         $options = self::get_options();
         if (array_key_exists('name', $args)) {
             $name = esc_attr($args['name']);
@@ -820,8 +805,7 @@ class FAU_CRIS
         }
 
     // Textbox
-    public static function cris_textbox_callback($args)
-    {
+    public static function cris_textbox_callback($args): void {
         $options = self::get_options();
         if (array_key_exists('name', $args)) {
             $name = esc_attr($args['name']);
@@ -842,8 +826,7 @@ class FAU_CRIS
     }
 
     // Textarea
-    public static function cris_textarea_callback($args)
-    {
+    public static function cris_textarea_callback($args): void {
         $options = self::get_options();
         $default_options = self::default_options();
         if (array_key_exists('name', $args)) {
@@ -1120,8 +1103,7 @@ class FAU_CRIS
     }
 
 
-    private static function cris_shortcode_parameter($atts, $content = '', $tag = '')
-    {
+    private static function cris_shortcode_parameter($atts, $content = '', $tag = ''): array {
         global $post;
         $options = self::get_options();
 
@@ -1387,8 +1369,7 @@ class FAU_CRIS
         return $sc_param;
     }
 
-    public static function cris_enqueue_styles()
-    {
+    public static function cris_enqueue_styles(): void {
         global $post;
         $plugin_url = plugin_dir_url(__FILE__);
         if ($post && has_shortcode($post->post_content, 'cris')
@@ -1402,8 +1383,7 @@ class FAU_CRIS
      * WP-Cron
      */
 
-    public static function cris_auto_sync()
-    {
+    public static function cris_auto_sync(): void {
         include 'class_Sync.php';
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
@@ -1411,8 +1391,7 @@ class FAU_CRIS
         $sync->do_sync(false);
     }
 
-    public static function cris_cron()
-    {
+    public static function cris_cron(): void {
         $options = get_option('_fau_cris');
         if (isset($options['cris_sync_check'])
                 && $options['cris_sync_check'] != 1) {
@@ -1448,8 +1427,7 @@ class FAU_CRIS
      * Hilfe-Panel über der Theme-Options-Seite
      */
 
-    public static function cris_help_menu()
-    {
+    public static function cris_help_menu(): void {
 
         $content_cris = array(
             '<p>' . __('Binden Sie Daten aus aus dem FAU-Forschungsportal <strong>CRIS (Currrent Research Information System)</strong> in Ihren Webauftritt ein. Das Plugin ermöglicht außerdem die Integration mit dem FAU-Person-Plugin.', 'fau-cris') . '</p>',

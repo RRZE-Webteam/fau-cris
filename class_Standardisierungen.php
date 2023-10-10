@@ -137,8 +137,7 @@ class Standardisierungen
         return do_shortcode($this->langdiv_open . $output . $this->langdiv_close);
     }
 
-    private function make_list($standardizations, $param = array(), $isSingleAccordion = false)
-    {
+    private function make_list($standardizations, $param = array(), $isSingleAccordion = false): string {
         global $post;
         $hide = $param['hide'];
         $standardizationList = ($isSingleAccordion
@@ -278,8 +277,7 @@ class Standardisierungen
         return do_shortcode($standardizationList);
     }
 
-    private function make_single($standardizations, $param = array(), $isSingleAccordion = false)
-    {
+    private function make_single($standardizations, $param = array(), $isSingleAccordion = false): string {
         $hide = (isset($param['hide']) && is_array($param['hide'])) ? $param['hide'] : [];
         if ($isSingleAccordion) {
             array_push($hide, ['hide']);
@@ -391,8 +389,7 @@ class Standardisierungen
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_standardizations($year = '', $start = '', $end = '', $type = '')
-    {
+    private function fetch_standardizations($year = '', $start = '', $end = '', $type = ''): array {
 
         $filter = Tools::standardizations_filter($year, $start, $end, $type, );
         $ws = new CRIS_standardizations();
@@ -418,8 +415,7 @@ class CRIS_standardizations extends CRIS_webservice
      * actients/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null)
-    {
+    public function by_orga_id($orgaID = null, &$filter = null): array {
         if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -435,8 +431,7 @@ class CRIS_standardizations extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null, $role = 'all')
-    {
+    public function by_pers_id($persID = null, &$filter = null, $role = 'all'): array {
         if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
         }
@@ -452,8 +447,7 @@ class CRIS_standardizations extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($stanID = null)
-    {
+    public function by_id($stanID = null): array {
         if ($stanID === null || $stanID === "0") {
             throw new Exception('Please supply valid standardization ID');
         }
@@ -469,8 +463,7 @@ class CRIS_standardizations extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null)
-    {
+    private function retrieve($reqs, &$filter = null): array {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }

@@ -72,8 +72,7 @@ class Publikationen
      * Returns: publications list
      *
      */
-    public function pubListe(array $param = [], string $content = '')
-    {
+    public function pubListe(array $param = [], string $content = ''): string {
         $year = $param['year'] ?: '';
         $start = $param['start'] ?: '';
         $end = $param['end'] ?: '';
@@ -143,7 +142,7 @@ class Publikationen
         string $content = '', //It get the conetet which is passed by [cris-custom]#title# DOI: #DOI# URL: #url#[/cris-custom] eg:#title# DOI: #DOI# URL: #url#
         $fsp = false,
         $project = ''
-    ) {
+    ): string {
         // Extracting parameters from the $param array
 
         $year = $param['year'] ?: ''; // The year of publication
@@ -275,7 +274,7 @@ class Publikationen
         $content = '',
         $fsp = false,
         $project = ''
-    ) {
+    ): string {
 
         $year =  $param['year'] ?: '';
         $start = $param['start'] ?: '';
@@ -503,8 +502,7 @@ class Publikationen
      * Start::projectPub
      */
 
-    public function projectPub($param = array())
-    {
+    public function projectPub($param = array()): string {
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
@@ -555,7 +553,7 @@ class Publikationen
     public function fieldPub(
         $param = array(),
         $seed = false
-    ) {
+    ): string {
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
@@ -664,8 +662,7 @@ class Publikationen
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = '')
-    {
+    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = ''): array {
         $pubArray = [];
 
         $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
@@ -695,8 +692,7 @@ class Publikationen
      * Ausgabe der Publikationsdetails in Zitierweise (MLA/APA)
      */
 
-    private function make_quotation_list($publications, $quotation, $showimage = 0, $display = 'list')
-    {
+    private function make_quotation_list($publications, $quotation, $showimage = 0, $display = 'list'): string {
 
         $quotation = strtolower($quotation);
         $list_class = ($display == 'no-list' ? 'no-list' : '');
@@ -754,8 +750,7 @@ class Publikationen
      * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
      */
 
-    private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top', $display = 'list')
-    {
+    private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top', $display = 'list'): string {
 
         $list_class = ($display == 'no-list' ? 'no-list' : '');
         $publist = "<ul class=\"cris-publications $list_class\" lang=\"" . $lang . "\">";
@@ -1089,8 +1084,7 @@ class Publikationen
         return $publist;
     }
 
-    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright')
-    {
+    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright'): string {
         $publist = '';
         $list = (count($publications) > 1) ? true : false;
         if ($list) {
@@ -1236,8 +1230,7 @@ class Publikationen
         }
     }
 
-    private function get_pub_images($pub)
-    {
+    private function get_pub_images($pub): array {
         $images = array();
         $imgString = CRIS_Dicts::$base_uri . "getrelated/Publication/" . $pub . "/PUBL_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
@@ -1258,8 +1251,7 @@ class CRIS_publications extends CRIS_webservice
      * publication requests, supports multiple organisation ids given as array.
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null)
-    {
+    public function by_orga_id($orgaID = null, &$filter = null): array {
         if ($orgaID === null || $orgaID === "0" || $orgaID === "") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -1278,8 +1270,7 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null, $notable = 0)
-    {
+    public function by_pers_id($persID = null, &$filter = null, $notable = 0): array {
         if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
         }
@@ -1301,8 +1292,7 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($publID = null)
-    {
+    public function by_id($publID = null): array {
         if ($publID === null || $publID === "0") {
             throw new Exception('Please supply valid publication ID');
         }
@@ -1318,8 +1308,7 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    public function by_project($projID = null, &$filter = null)
-    {
+    public function by_project($projID = null, &$filter = null): array {
         if ($projID === null || $projID === "0") {
             throw new Exception('Please supply valid publication ID');
         }
@@ -1335,8 +1324,7 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field')
-    {
+    public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field'): array {
         if ($fieldID === null || $fieldID === "0") {
             throw new Exception('Please supply valid research field ID');
         }
@@ -1364,8 +1352,7 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_equipment($equiID = null, &$filter = null)
-    {
+    public function by_equipment($equiID = null, &$filter = null): array {
         if ($equiID === null || $equiID === "0") {
             throw new Exception('Please supply valid equipment ID');
         }
@@ -1382,8 +1369,7 @@ class CRIS_publications extends CRIS_webservice
     }
 
 
-    private function retrieve($reqs, &$filter = null)
-    {
+    private function retrieve($reqs, &$filter = null): array {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }
@@ -1420,8 +1406,7 @@ class CRIS_publication extends CRIS_Entity
         parent::__construct($data);
     }
 
-    public function insert_quotation_links()
-    {
+    public function insert_quotation_links(): void {
         /*
          * Enrich APA/MLA quotation by links to publication details (CRIS
          * website) and DOI (if present, applies only to APA).

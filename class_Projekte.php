@@ -55,8 +55,7 @@ class Projekte
      * Ausgabe aller Projekte ohne Gliederung
      */
 
-    public function projListe($param = [])
-    {
+    public function projListe($param = []): string {
         $year = $param['year'] ?: '';
         $start = $param['start'] ?: '';
         $end = $param['end'] ?: '';
@@ -92,8 +91,7 @@ class Projekte
      * Ausgabe aller Projekte nach Rolle (Leiter/Mitarbeit) gegliedert
      */
 
-    public function projNachRolle($param = array(), $content = '')
-    {
+    public function projNachRolle($param = array(), $content = ''): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -136,8 +134,7 @@ class Projekte
      * Ausgabe aller Projekte nach Jahren gegliedert
      */
 
-    public function projNachJahr($param = array(), $content = '')
-    {
+    public function projNachJahr($param = array(), $content = ''): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -192,8 +189,7 @@ class Projekte
      * Ausgabe aller Projekte nach Projekttypen gegliedert
      */
 
-    public function projNachTyp($param = array(), $content = '')
-    {
+    public function projNachTyp($param = array(), $content = ''): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -365,8 +361,7 @@ class Projekte
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_projects($year = '', $start = '', $end = '', $type = '', $role = 'all', $status = '')
-    {
+    private function fetch_projects($year = '', $start = '', $end = '', $type = '', $role = 'all', $status = ''): array {
         $awardArray = [];
 
         $filter = Tools::project_filter($year, $start, $end, $type, $status);
@@ -386,8 +381,7 @@ class Projekte
      * Ausgabe der Projekte
      */
 
-    private function make_custom_single($projects, $custom_text, $param = array())
-    {
+    private function make_custom_single($projects, $custom_text, $param = array()): string {
         $proj_details = array();
         $projlist = "<div class=\"cris-projects\">";
 
@@ -463,8 +457,7 @@ class Projekte
         return $projlist;
     }
 
-    private function make_custom_list($projects, $custom_text, $param = array())
-    {
+    private function make_custom_list($projects, $custom_text, $param = array()): string {
         $projlist = "<ul class=\"cris-projects\">";
 
         foreach ($projects as $project) {
@@ -525,8 +518,7 @@ class Projekte
         return $projlist;
     }
 
-    private function make_single($projects, $param = array())
-    {
+    private function make_single($projects, $param = array()): string {
 
         $projlist = "<div class=\"cris-projects\">";
 
@@ -647,8 +639,7 @@ class Projekte
         return $projlist;
     }
 
-    private function make_list($projects, $hide = array(), $showtype = 1, $pubProj = 0)
-    {
+    private function make_list($projects, $hide = array(), $showtype = 1, $pubProj = 0): array|string {
 
         global $post;
         $projlist = "<ul class=\"cris-projects\">";
@@ -886,8 +877,7 @@ class Projekte
         return $persList;
     }
 
-    public function get_project_leaders($project, $leadIDs)
-    {
+    public function get_project_leaders($project, $leadIDs): array {
         $leaders = array();
         $leadersString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_card";
         $leadersXml = Tools::XML2obj($leadersString);
@@ -923,8 +913,7 @@ class Projekte
         return $leaders;
     }
 
-    public function get_project_members($project, $collIDs)
-    {
+    public function get_project_members($project, $collIDs): array {
         $members = array();
         $membersString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_col_card";
         $membersXml = Tools::XML2obj($membersString);
@@ -958,8 +947,7 @@ class Projekte
         return $members;
     }
 
-    public function get_project_persons($project, $leadIDs, $collIDs)
-    {
+    public function get_project_persons($project, $leadIDs, $collIDs): array {
         $persons = array();
 
         $persons['leaders'] = $this->get_project_leaders($project, $leadIDs);
@@ -968,8 +956,7 @@ class Projekte
         return $persons;
     }
 
-    private function get_project_funding($project)
-    {
+    private function get_project_funding($project): array {
         $funding = array();
         $fundingString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_fund";
         $fundingXml = Tools::XML2obj($fundingString);
@@ -986,8 +973,7 @@ class Projekte
         return $funding;
     }
 
-    private function get_project_publications($project = null, $param = array())
-    {
+    private function get_project_publications($project = null, $param = array()): string {
         require_once('class_Publikationen.php');
         $liste = new Publikationen('project', $project);
         $args = array();
@@ -1013,8 +999,7 @@ class Projekte
         return $liste->projectPub($param);
     }
 
-    private function get_project_images($project)
-    {
+    private function get_project_images($project): array {
         $images = array();
         $imgString = CRIS_Dicts::$base_uri . "getrelated/project/" . $project . "/PROJ_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
@@ -1036,8 +1021,7 @@ class CRIS_projects extends CRIS_webservice
      * projects requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null)
-    {
+    public function by_orga_id($orgaID = null, &$filter = null): array {
         if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -1054,8 +1038,7 @@ class CRIS_projects extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null, $role = 'all')
-    {
+    public function by_pers_id($persID = null, &$filter = null, $role = 'all'): array {
         if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
         }
@@ -1078,8 +1061,7 @@ class CRIS_projects extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($projID = null)
-    {
+    public function by_id($projID = null): array {
         if ($projID === null || $projID === "0") {
             throw new Exception('Please supply valid project ID');
         }
@@ -1095,8 +1077,7 @@ class CRIS_projects extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    public function by_field($fieldID = null)
-    {
+    public function by_field($fieldID = null): array {
         if ($fieldID === null || $fieldID === "0") {
             throw new Exception('Please supply valid field of research ID');
         }
@@ -1113,8 +1094,7 @@ class CRIS_projects extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    public function by_pub($pubID = null)
-    {
+    public function by_pub($pubID = null): array {
         if ($pubID === null || $pubID === "0") {
             throw new Exception('Please supply valid publication ID');
         }
@@ -1130,8 +1110,7 @@ class CRIS_projects extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null)
-    {
+    private function retrieve($reqs, &$filter = null): array {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }

@@ -48,8 +48,7 @@ class CRIS_formatter
         }
     }
 
-    public function execute($data)
-    {
+    public function execute($data): array {
         /*
          * Perform formatting on $data. If $limit is set, return $limit entries
          * at max.

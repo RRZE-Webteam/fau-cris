@@ -128,8 +128,7 @@ class Organisation
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_organisation()
-    {
+    private function fetch_organisation(): array {
 
         $ws = new CRIS_organisations();
         $orgaArray = array();
@@ -146,8 +145,7 @@ class Organisation
      * Ausgabe der Organisation
      */
 
-    private function make_single($organisations, $image_align)
-    {
+    private function make_single($organisations, $image_align): string {
         $image_align = 'alignright';
         $output      = "<div class=\"cris-organisation\">";
 
@@ -179,8 +177,7 @@ class Organisation
         return $output;
     }
 
-    private function make_custom_single($organisations, $custom_text, $image_align = 'alignright')
-    {
+    private function make_custom_single($organisations, $custom_text, $image_align = 'alignright'): string {
         $output = "<div class=\"cris-organisation\">";
 
         foreach ($organisations as $organisation) {
@@ -217,8 +214,7 @@ class Organisation
         return $output;
     }
 
-    private function get_research_images($orga)
-    {
+    private function get_research_images($orga): array {
         $images = array();
         //$imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_PICT";
         $imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
@@ -240,8 +236,7 @@ class CRIS_organisations extends CRIS_webservice
      * projects requests
      */
 
-    public function by_id($orgaID = null)
-    {
+    public function by_id($orgaID = null): array {
         if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -257,8 +252,7 @@ class CRIS_organisations extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null)
-    {
+    private function retrieve($reqs, &$filter = null): array {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }

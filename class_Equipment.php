@@ -108,8 +108,7 @@ class Equipment
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    public function equiListe($param = array())
-    {
+    public function equiListe($param = array()): string {
         $constructionYearStart = (isset($param['constructionyearstart']) && $param['constructionyearstart'] != '') ? $param['constructionyearstart'] : '';
         $constructionYearEnd = (isset($param['constructionyearend']) && $param['constructionyearend'] != '') ? $param['constructionyearend'] : '';
         $constructionYear = (isset($param['constructionyear']) && $param['constructionyear'] != '') ? $param['constructionyear'] : '';
@@ -144,8 +143,7 @@ class Equipment
     {
     }
 
-    private function make_list($equipments, $hide = array())
-    {
+    private function make_list($equipments, $hide = array()): string {
         $equilist = "<ul class=\"cris-equipment\">";
         foreach ($equipments as $equipment) {
             $equipment = (array) $equipment;
@@ -208,8 +206,7 @@ class Equipment
         return $equilist;
     }
 
-    private function make_single($equipments, $hide = array(), $quotation = '', $image_align = 'alignright')
-    {
+    private function make_single($equipments, $hide = array(), $quotation = '', $image_align = 'alignright'): string {
         $equilist = "<div class=\"cris-equipment\">";
         foreach ($equipments as $equipment) {
             $equipment = (array) $equipment;
@@ -517,8 +514,7 @@ class Equipment
         return do_shortcode($equipmentlist);
     }
 
-    private function get_equipment_images($equipment)
-    {
+    private function get_equipment_images($equipment): array {
         $images = array();
         $imgString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/equi_has_pict";
         $imgXml = Tools::XML2obj($imgString);
@@ -543,15 +539,13 @@ class Equipment
         return $images;
     }
 
-    private function get_equipment_publications($equipment = null, $quotation = '')
-    {
+    private function get_equipment_publications($equipment = null, $quotation = ''): ?string {
         require_once('class_Publikationen.php');
         $liste = new Publikationen('equipment', $equipment);
         return $liste->equiPub($equipment, $quotation);
     }
 
-    private function get_equipment_funding($equipment = null)
-    {
+    private function get_equipment_funding($equipment = null): array {
         $funding = array();
         $fundingString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_FUND";
         $fundingXml = Tools::XML2obj($fundingString);
@@ -568,8 +562,7 @@ class Equipment
         return $funding;
     }
 
-    private function get_equipment_fields($equipment)
-    {
+    private function get_equipment_fields($equipment): array {
         $fields = array();
         $fieldsString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/FOBE_has_EQUI";
         $fieldsXml = Tools::XML2obj($fieldsString);
@@ -588,8 +581,7 @@ class Equipment
         return $fields;
     }
 
-    private function get_equipment_projects($equipment)
-    {
+    private function get_equipment_projects($equipment): array {
         $projects = array();
         $projectsString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_PROJ";
         $projectsXml = Tools::XML2obj($projectsString);
@@ -612,8 +604,7 @@ class Equipment
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_equipments($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = '')
-    {
+    private function fetch_equipments($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = ''): array {
 
         $filter = Tools::equipment_filter($manufacturer, $location, $constructionYear, $constructionYearStart, $constructionYearEnd);
 
@@ -637,8 +628,7 @@ class CRIS_equipments extends CRIS_webservice
      * actients/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null)
-    {
+    public function by_orga_id($orgaID = null, &$filter = null): array {
         if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -654,8 +644,7 @@ class CRIS_equipments extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($awarID = null)
-    {
+    public function by_id($awarID = null): array {
         if ($awarID === null || $awarID === "0") {
             throw new Exception('Please supply valid equipment ID');
         }
@@ -671,8 +660,7 @@ class CRIS_equipments extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null)
-    {
+    private function retrieve($reqs, &$filter = null): array {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }

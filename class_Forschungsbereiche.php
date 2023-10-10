@@ -58,8 +58,7 @@ class Forschungsbereiche
      * Ausgabe aller Forschungsbereiche
      */
 
-    public function fieldListe($param = array())
-    {
+    public function fieldListe($param = array()): string {
 
         $fieldsArray = $this->fetch_fields();
 
@@ -178,8 +177,7 @@ class Forschungsbereiche
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_fields($seed=false)
-    {
+    private function fetch_fields($seed=false): array {
         $filter = Tools::field_filter();
         $ws = new CRIS_fields();
         if ($seed) {
@@ -209,8 +207,7 @@ class Forschungsbereiche
      *
      * @return string
      */
-    private function make_single($fields, $param)
-    {
+    private function make_single($fields, $param): string {
         $hide = $param['hide'];
 
         $singlefield = "<div class=\"cris-fields\">";
@@ -331,8 +328,7 @@ class Forschungsbereiche
     }
 
 
-    private function make_custom_single($fields, $content, $param = array())
-    {
+    private function make_custom_single($fields, $content, $param = array()): string {
         $field_details = array();
         $output = "<div class=\"cris-fields\">";
         ;
@@ -435,8 +431,7 @@ class Forschungsbereiche
         return $output;
     }
 
-    private function make_list($fields)
-    {
+    private function make_list($fields): string {
         $fieldslist = "<ul class=\"cris-fields\">";
 
         foreach ($fields as $field) {
@@ -488,8 +483,7 @@ class Forschungsbereiche
         }
     }
 
-    private function get_field_publications($param = array(), $entity = 'field')
-    {
+    private function get_field_publications($param = array(), $entity = 'field'): string {
         require_once('class_Publikationen.php');
         if ($param['publications_notable'] == '1') {
             $entity = 'field_notable';
@@ -516,8 +510,7 @@ class Forschungsbereiche
         return $liste->fieldPub($param, false);
     }
 
-    private function get_field_images($field)
-    {
+    private function get_field_images($field): array {
         $images = array();
         $imgString = CRIS_Dicts::$base_uri . "getrelated/Forschungsbereich/" . $field . "/FOBE_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
@@ -538,8 +531,7 @@ class CRIS_fields extends CRIS_webservice
      * publication requests, supports multiple organisation ids given as array.
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null)
-    {
+    public function by_orga_id($orgaID = null, &$filter = null): array {
         if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -555,8 +547,7 @@ class CRIS_fields extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null)
-    {
+    public function by_pers_id($persID = null, &$filter = null): array {
         if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
         }
@@ -572,8 +563,7 @@ class CRIS_fields extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($fieldID = null)
-    {
+    public function by_id($fieldID = null): array {
         if ($fieldID === null || $fieldID === "0") {
             throw new Exception('Please supply valid field of research ID');
         }
@@ -589,8 +579,7 @@ class CRIS_fields extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    public function by_project($projID = null)
-    {
+    public function by_project($projID = null): array {
         if ($projID === null || $projID === "0") {
             throw new Exception('Please supply valid publication ID');
         }
@@ -606,8 +595,7 @@ class CRIS_fields extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null)
-    {
+    private function retrieve($reqs, &$filter = null): array {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }

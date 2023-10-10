@@ -40,8 +40,7 @@ class CRIS_filter
         $this->skip = array();
     }
 
-    public function evaluate($data)
-    {
+    public function evaluate($data): bool {
         /*
          * Test "AND"-combined filters against data attributes.
          */
@@ -75,8 +74,7 @@ class CRIS_filter
         return true;
     }
 
-    private function compare($value, $operator, $reference)
-    {
+    private function compare($value, $operator, $reference): bool {
         /*
          * Check attribute value. The comparision is done non-strict so we
          * don't have to care for value types.

@@ -20,8 +20,7 @@ class Sync
         $this->portal_id = '';
     }
 
-    public function do_sync($manual = false)
-    {
+    public function do_sync($manual = false): void {
         if ($manual && (!$this->orgNr || $this->orgNr == 0)) {
             // Admin-Notice: Synchronisation fehlgeschlagen
             add_settings_error('Automatische Synchronisation', 'cris_sync_check', __('Synchronisierung fehlgeschlagen!<br />Bitte geben Sie im Reiter "Allgemein" die CRIS-ID Ihrer Organisationseinheit an.', 'fau-cris'), 'error');
@@ -485,8 +484,7 @@ class Sync
         }
     }
 
-    private function cris_make_page($cris_id, $title, $content, $contact = array(), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php')
-    {
+    private function cris_make_page($cris_id, $title, $content, $contact = array(), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php'): array {
         $pages = get_pages(array('child_of' => $parent_pid, 'post_status' => 'publish'));
         $pages_array = array();
         foreach ($pages as $page) {
@@ -615,8 +613,7 @@ class Sync
         return $ids;
     }
 
-    private function get_string_between($string, $start, $end)
-    {
+    private function get_string_between($string, $start, $end): string {
         $string = ' ' . $string;
         $ini = strpos($string, $start);
         if ($ini == 0) {
