@@ -16,7 +16,7 @@ class Equipment
         $this->pathPersonenseiteUnivis = '/person/';
         $this->orgNr = $this->options['cris_org_nr'];
         $this->suchstring = '';
-        $this->univis = NULL;
+        $this->univis = null;
 
         //$this->order = $this->options['cris_equipment_order'];
         $this->cris_equipment_link = $this->options['cris_equipment_link'] ?? 'none';
@@ -99,7 +99,7 @@ class Equipment
 
         // sortiere nach Erscheinungsdatum
         $order = "cfname";
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_ASC);
+        $formatter = new CRIS_formatter(null, null, $order, SORT_ASC);
         $res = $formatter->execute($equiArray);
         $equiList = $res[$order];
 
@@ -127,7 +127,7 @@ class Equipment
 
         // sortiere nach Erscheinungsdatum
         $order = "cfname";
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_ASC);
+        $formatter = new CRIS_formatter(null, null, $order, SORT_ASC);
         $res = $formatter->execute($equiArray);
         $equiList = $res[$order];
 
@@ -146,7 +146,7 @@ class Equipment
 
     private function make_list($equipments, $hide = array())
     {
-	    $equilist = "<ul class=\"cris-equipment\">";
+        $equilist = "<ul class=\"cris-equipment\">";
         foreach ($equipments as $equipment) {
             $equipment = (array) $equipment;
             foreach ($equipment['attributes'] as $attribut => $v) {
@@ -210,7 +210,7 @@ class Equipment
 
     private function make_single($equipments, $hide = array(), $quotation = '', $image_align = 'alignright')
     {
-	    $equilist = "<div class=\"cris-equipment\">";
+        $equilist = "<div class=\"cris-equipment\">";
         foreach ($equipments as $equipment) {
             $equipment = (array) $equipment;
             foreach ($equipment['attributes'] as $attribut => $v) {
@@ -263,22 +263,29 @@ class Equipment
             }
             if (!in_array('details', $hide)) {
                 $equilist .= "<div class=\"equipment-details\">";
-                if (!in_array('manufacturer', (array)$hide) && !empty($manufacturer))
+                if (!in_array('manufacturer', (array)$hide) && !empty($manufacturer)) {
                     $equilist .= "<strong>" . __('Hersteller', 'fau-cris') . ': </strong>' . $manufacturer;
-                if (!in_array('model', (array)$hide) && !empty($model))
+                }
+                if (!in_array('model', (array)$hide) && !empty($model)) {
                     $equilist .= "<br /><strong>" . __('Modell', 'fau-cris') . ': </strong>' . $model;
-                if (!in_array('constructionYear', (array)$hide) && !empty($constructionYear))
+                }
+                if (!in_array('constructionYear', (array)$hide) && !empty($constructionYear)) {
                     $equilist .= "<br /><strong>" . __('Baujahr', 'fau-cris') . ': </strong>' . $constructionYear;
-                if (!in_array('location', (array)$hide) && !empty($location))
+                }
+                if (!in_array('location', (array)$hide) && !empty($location)) {
                     $equilist .= "<br /><strong>" . __('Standort', 'fau-cris') . ': </strong>' . $location;
-                if (!in_array('url', (array)$hide) && !empty($url))
+                }
+                if (!in_array('url', (array)$hide) && !empty($url)) {
                     $equilist .= "<br /><strong>" . __('URL', 'fau-cris') . ': </strong>' . $url;
-                if (!in_array('year', (array)$hide) && !empty($year))
+                }
+                if (!in_array('year', (array)$hide) && !empty($year)) {
                     $equilist .= "<br /><strong>" . __('Jahr', 'fau-cris') . ': </strong>' . $year;
+                }
                 if (!in_array('funding', $hide)) {
                     $funding = $this->get_equipment_funding($id);
-                    if ($funding)
+                    if ($funding) {
                         $equilist .=  "<br /><strong>" . __('Mittelgeber', 'fau-cris') . ": </strong>" . implode(', ', $funding);
+                    }
                 }
                 $equilist .= "</div>";
             }
@@ -340,8 +347,9 @@ class Equipment
 
             if (!in_array('publications', $hide)) {
                 $publications = $this->get_equipment_publications($id, $quotation);
-                if ($publications)
+                if ($publications) {
                     $equilist .= "<h4>" . __('Zugehörige Publikationen', 'fau-cris') . ': </h4>' . $publications;
+                }
             }
         }
 
@@ -426,8 +434,9 @@ class Equipment
             if (strpos($custom_text, '#funding#') !== false) {
                 $equipment_details['#funding#'] = '-/-';
                 $funding = $this->get_equipment_funding($id);
-                if ($funding)
+                if ($funding) {
                     $equipment_details['#funding#'] = implode(', ', $funding);
+                }
             }
 
             if (strpos($custom_text, '#fields#') !== false) {
@@ -489,8 +498,9 @@ class Equipment
             if (strpos($custom_text, '#publications#') !== false) {
                 $equipment_details['#publications#'] = '-/-';
                 $publications = $this->get_equipment_publications($id, $param['quotation']);
-                if ($publications)
+                if ($publications) {
                     $equipment_details['#publications#'] = $publications;
+                }
             }
 
             if ($param['display'] == 'accordion') {
@@ -518,7 +528,7 @@ class Equipment
                 foreach ($img->attribute as $imgAttribut) {
                     if ($imgAttribut['name'] == 'png180') {
                         $images[$i]['png180'] = (!empty($imgAttribut->data)) ? 'data:image/PNG;base64,' . $imgAttribut->data
-	                        : '';
+                            : '';
                     }
                 }
                 foreach ($img->relation->attribute as $imgRelAttribut) {
@@ -533,14 +543,14 @@ class Equipment
         return $images;
     }
 
-    private function get_equipment_publications($equipment = NULL, $quotation = '')
+    private function get_equipment_publications($equipment = null, $quotation = '')
     {
         require_once('class_Publikationen.php');
         $liste = new Publikationen('equipment', $equipment);
         return $liste->equiPub($equipment, $quotation);
     }
 
-    private function get_equipment_funding($equipment = NULL)
+    private function get_equipment_funding($equipment = null)
     {
         $funding = array();
         $fundingString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_FUND";
@@ -629,11 +639,13 @@ class CRIS_equipments extends CRIS_webservice
 
     public function by_orga_id($orgaID = null, &$filter = null)
     {
-        if ($orgaID === null || $orgaID === "0")
+        if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
+        }
 
-        if (!is_array($orgaID))
+        if (!is_array($orgaID)) {
             $orgaID = array($orgaID);
+        }
 
         $requests = array();
         foreach ($orgaID as $_o) {
@@ -644,11 +656,13 @@ class CRIS_equipments extends CRIS_webservice
 
     public function by_id($awarID = null)
     {
-        if ($awarID === null || $awarID === "0")
+        if ($awarID === null || $awarID === "0") {
             throw new Exception('Please supply valid equipment ID');
+        }
 
-        if (!is_array($awarID))
+        if (!is_array($awarID)) {
             $awarID = array($awarID);
+        }
 
         $requests = array();
         foreach ($awarID as $_p) {
@@ -659,8 +673,9 @@ class CRIS_equipments extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null)
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter)
+        if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
+        }
 
         $data = array();
         foreach ($reqs as $_i) {
@@ -693,8 +708,9 @@ class CRIS_equipments extends CRIS_webservice
                     }
                 }
 
-                if ($a->ID && ($filter === null || $filter->evaluate($a)))
+                if ($a->ID && ($filter === null || $filter->evaluate($a))) {
                     $equipments[$a->ID] = $a;
+                }
             }
         }
 
@@ -708,7 +724,7 @@ class CRIS_equipment extends CRIS_Entity
      * object for single equipment
      */
 
-    function __construct($data)
+    public function __construct($data)
     {
         parent::__construct($data);
     }
@@ -725,8 +741,9 @@ class CRIS_equipment_image extends CRIS_Entity
         parent::__construct($data);
 
         foreach ($data->relation as $_r) {
-            if ($_r['type'] != "EQUI_has_PICT")
+            if ($_r['type'] != "EQUI_has_PICT") {
                 continue;
+            }
             foreach ($_r->attribute as $_a) {
                 if ($_a['name'] == 'description') {
                     $this->attributes["description"] = (string) $_a->data;
