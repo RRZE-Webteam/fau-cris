@@ -25,7 +25,7 @@ class Patente
         }
         $this->orgNr = $this->options['cris_org_nr'];
         $this->suchstring = '';
-        $this->univis = NULL;
+        $this->univis = null;
 
         $this->order = $this->options['cris_patent_order'];
         $this->cris_patent_link = $this->options['cris_patent_link'] ?? 'none';
@@ -80,12 +80,13 @@ class Patente
         }
 
         $order = "registryear";
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($patentArray);
-        if ($limit != '')
+        if ($limit != '') {
             $patentList = array_slice($res[$order], 0, $limit);
-        else
+        } else {
             $patentList = $res[$order];
+        }
 
         $output = $this->make_list($patentList, $showname, $showyear, $showpatentname);
 
@@ -319,23 +320,30 @@ class Patente
 
             $patentlist .= "<li>";
 
-            if (!empty($patent_name))
+            if (!empty($patent_name)) {
                 $patentlist .= "<strong><a href=\"" . Tools::get_item_url("cfrespat", $patent_name, $patent_id, $post->ID, $this->page_lang) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
-            if (!empty($patent_type) || !empty($patent_number))
-                $patentlist .= " (";
-            if (!empty($patent_type) & $showtype != 0)
-                $patentlist .= $patent_type . ": ";
-            if (!empty($patent_number)) {
-                if (!empty($patent_link))
-                    $patentlist .= '<a href="' . $patent_link . '" target="blank" title="' . __('Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen', 'fau-cris') . '">';
-                $patentlist .= $patent_number;
-                if (!empty($patent_link))
-                    $patentlist .= "</a>";
             }
-            if (!empty($patent_type) && !empty($patent_number))
+            if (!empty($patent_type) || !empty($patent_number)) {
+                $patentlist .= " (";
+            }
+            if (!empty($patent_type) & $showtype != 0) {
+                $patentlist .= $patent_type . ": ";
+            }
+            if (!empty($patent_number)) {
+                if (!empty($patent_link)) {
+                    $patentlist .= '<a href="' . $patent_link . '" target="blank" title="' . __('Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen', 'fau-cris') . '">';
+                }
+                $patentlist .= $patent_number;
+                if (!empty($patent_link)) {
+                    $patentlist .= "</a>";
+                }
+            }
+            if (!empty($patent_type) && !empty($patent_number)) {
                 $patentlist .= ")";
-            if (!empty($inventors))
+            }
+            if (!empty($inventors)) {
                 $patentlist .= "<br />" . __('Erfinder', 'fau-cris') . ": " . $inventors_html;
+            }
             $patentlist .= "</li>";
         }
 
@@ -352,11 +360,13 @@ class CRIS_patents extends CRIS_webservice
 
     public function by_orga_id($orgaID = null, &$filter = null)
     {
-        if ($orgaID === null || $orgaID === "0")
+        if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
+        }
 
-        if (!is_array($orgaID))
+        if (!is_array($orgaID)) {
             $orgaID = array($orgaID);
+        }
 
         $requests = array();
         foreach ($orgaID as $_o) {
@@ -367,11 +377,13 @@ class CRIS_patents extends CRIS_webservice
 
     public function by_pers_id($persID = null, &$filter = null)
     {
-        if ($persID === null || $persID === "0")
+        if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
+        }
 
-        if (!is_array($persID))
+        if (!is_array($persID)) {
             $persID = array($persID);
+        }
 
         $requests = array();
         foreach ($persID as $_p) {
@@ -382,11 +394,13 @@ class CRIS_patents extends CRIS_webservice
 
     public function by_id($awarID = null)
     {
-        if ($awarID === null || $awarID === "0")
+        if ($awarID === null || $awarID === "0") {
             throw new Exception('Please supply valid patent ID');
+        }
 
-        if (!is_array($awarID))
+        if (!is_array($awarID)) {
             $awarID = array($awarID);
+        }
 
         $requests = array();
         foreach ($awarID as $_p) {
@@ -397,8 +411,9 @@ class CRIS_patents extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null)
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter)
+        if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
+        }
 
         $data = array();
         foreach ($reqs as $_i) {
@@ -419,8 +434,9 @@ class CRIS_patents extends CRIS_webservice
                     $a->attributes['expiryyear'] = $a->attributes['patexpirydate'] != '' ? mb_substr($a->attributes['patexpirydate'], 0, 4) : '';
                 }
 
-                if ($a->ID && ($filter === null || $filter->evaluate($a)))
+                if ($a->ID && ($filter === null || $filter->evaluate($a))) {
                     $patents[$a->ID] = $a;
+                }
             }
         }
 
@@ -434,7 +450,7 @@ class CRIS_patent extends CRIS_Entity
      * object for single patent
      */
 
-    function __construct($data)
+    public function __construct($data)
     {
         parent::__construct($data);
     }

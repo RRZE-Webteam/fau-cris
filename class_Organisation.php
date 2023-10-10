@@ -87,8 +87,9 @@ class Organisation
     public function researchContacts($seed = false)
     {
         $ws = new CRIS_organisations();
-        if ($seed)
+        if ($seed) {
             $ws->disable_cache();
+        }
         try {
             $orgaArray = $ws->by_id($this->id);
         } catch (Exception $ex) {
@@ -148,7 +149,7 @@ class Organisation
     private function make_single($organisations, $image_align)
     {
         $image_align = 'alignright';
-	    $output      = "<div class=\"cris-organisation\">";
+        $output      = "<div class=\"cris-organisation\">";
 
         foreach ($organisations as $organisation) {
             $organisation = (array) $organisation;
@@ -180,7 +181,7 @@ class Organisation
 
     private function make_custom_single($organisations, $custom_text, $image_align = 'alignright')
     {
-	    $output = "<div class=\"cris-organisation\">";
+        $output = "<div class=\"cris-organisation\">";
 
         foreach ($organisations as $organisation) {
             $organisation = (array) $organisation;
@@ -241,11 +242,13 @@ class CRIS_organisations extends CRIS_webservice
 
     public function by_id($orgaID = null)
     {
-        if ($orgaID === null || $orgaID === "0")
+        if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
+        }
 
-        if (!is_array($orgaID))
+        if (!is_array($orgaID)) {
             $orgaID = array($orgaID);
+        }
 
         $requests = array();
         foreach ($orgaID as $_o) {
@@ -256,8 +259,9 @@ class CRIS_organisations extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null)
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter)
+        if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
+        }
 
         $data = array();
         foreach ($reqs as $_i) {
@@ -272,8 +276,9 @@ class CRIS_organisations extends CRIS_webservice
         foreach ($data as $_d) {
             foreach ($_d as $organisation) {
                 $a = new CRIS_organisation($organisation);
-                if ($a->ID && ($filter === null || $filter->evaluate($a)))
+                if ($a->ID && ($filter === null || $filter->evaluate($a))) {
                     $organisations[$a->ID] = $a;
+                }
             }
         }
 
@@ -287,7 +292,7 @@ class CRIS_organisation extends CRIS_Entity
      * object for single award
      */
 
-    function __construct($data)
+    public function __construct($data)
     {
         parent::__construct($data);
     }
@@ -304,8 +309,9 @@ class CRIS_research_image extends CRIS_Entity
         parent::__construct($data);
 
         foreach ($data->relation as $_r) {
-            if ($_r['type'] != "ORGA_has_research_PICT")
+            if ($_r['type'] != "ORGA_has_research_PICT") {
                 continue;
+            }
             foreach ($_r->attribute as $_a) {
                 if ($_a['name'] == 'description') {
                     $this->attributes["description"] = (string) $_a->data;

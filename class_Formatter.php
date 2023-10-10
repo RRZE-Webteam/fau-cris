@@ -1,6 +1,7 @@
 <?php
 
-class CRIS_formatter {
+class CRIS_formatter
+{
     /*
      * This class provides grouping and sorting methods for any CRIS data.
      * It will return reformatted data.
@@ -9,8 +10,11 @@ class CRIS_formatter {
     private $sortvalues;
 
     public function __construct(
-            $group_attribute, $group_order=SORT_DESC, $sort_attribute=null,
-            $sort_order=SORT_ASC) {
+        $group_attribute,
+        $group_order=SORT_DESC,
+        $sort_attribute=null,
+        $sort_order=SORT_ASC
+    ) {
         /*
          * The method takes up to four arguments. First two group all datasets
          * into a sorted array. Last two arguments define the order inside
@@ -19,28 +23,33 @@ class CRIS_formatter {
          * year.
          */
 
-        if ($group_attribute != null)
+        if ($group_attribute != null) {
             $this->group = strtolower($group_attribute);
-        else
+        } else {
             $this->group = null;
+        }
         # make all lookup values lower case
-        if (is_array($group_order))
+        if (is_array($group_order)) {
             $this->group_order = array_map('strtolower', $group_order);
-        else
+        } else {
             $this->group_order = $group_order;
+        }
 
-        if ($sort_attribute != null)
+        if ($sort_attribute != null) {
             $this->sort = strtolower($sort_attribute);
-        else
+        } else {
             $this->sort = null;
+        }
             
-        if (is_array($sort_order))
+        if (is_array($sort_order)) {
             $this->sort_order = array_map('strtolower', $sort_order);
-        else
+        } else {
             $this->sort_order = $sort_order;
+        }
     }
 
-    public function execute($data) {
+    public function execute($data)
+    {
         /*
          * Perform formatting on $data. If $limit is set, return $limit entries
          * at max.
@@ -61,18 +70,20 @@ class CRIS_formatter {
                 $group_key = $this->sort;
             }
 
-            if ($this->group === null)
+            if ($this->group === null) {
                 $value = $group_key;
-            else
+            } else {
                 $value = $single_dataset->attributes[$group_key];
+            }
 
-            if (!array_key_exists($value, $final))
+            if (!array_key_exists($value, $final)) {
                 $final[$value] = array();
+            }
 
             if (!empty($value)) {
                 $final[$value][] = $single_dataset;
             } else {
-                $final[__('O.A.','fau-cris')][] = $single_dataset;
+                $final[__('O.A.', 'fau-cris')][] = $single_dataset;
             }
         }
         unset($final[0]);
@@ -83,45 +94,55 @@ class CRIS_formatter {
             $this->sortkey = $group_key;
             $this->sortvalues = $this->group_order;
             uksort($final, "self::compare_group");
-        } elseif ($this->group_order === SORT_ASC)
-                ksort($final);
-        elseif ($this->group_order === SORT_DESC)
-                krsort($final);
-        elseif ($this->group_order !== NULL)
-                trigger_error('Unknown sorting');
+        } elseif ($this->group_order === SORT_ASC) {
+            ksort($final);
+        } elseif ($this->group_order === SORT_DESC) {
+            krsort($final);
+        } elseif ($this->group_order !== null) {
+            trigger_error('Unknown sorting');
+        }
 
         # sort data inside groups
         foreach ($final as $_k => $group) {
             if ($_k == "Other" || $_k == "O.A." || $_k == "o.a." || $_k == __('O.A.', 'fau-cris') || $_k ==  __('o.a.', 'fau-cris')) {
-            /* } elseif (!is_array($this->sort)){*/
+                /* } elseif (!is_array($this->sort)){*/
                 $final[$_k] = $group;
             } else {
                 $this->sortkey = $this->sort;
                 uasort($group, "self::compare_attributes");
-                if ($this->sort_order === SORT_DESC)
-                    $final[$_k] = array_reverse ($group, true);
-                else
+                if ($this->sort_order === SORT_DESC) {
+                    $final[$_k] = array_reverse($group, true);
+                } else {
                     $final[$_k] = $group;
+                }
             }
             if (empty($group)) {
                 unset($final[$_k]);
             }
         }
-       return $final;
+        return $final;
     }
 
-    private function compare_group($a, $b) {
+    private function compare_group($a, $b)
+    {
         # look-up index
         # returns false if not found (in case that sort array is incomplete)
         $_a = array_search(strtolower($a), $this->sortvalues);
         $_b = array_search(strtolower($b), $this->sortvalues);
 
-        if ($_a == $b) return 0;
-        if ($_a === false || $_a > $_b) return 1;
-        if ($_b === false || $_a < $_b) return -1;
+        if ($_a == $b) {
+            return 0;
+        }
+        if ($_a === false || $_a > $_b) {
+            return 1;
+        }
+        if ($_b === false || $_a < $_b) {
+            return -1;
+        }
     }
 
-    private function compare_attributes($a, $b) {
+    private function compare_attributes($a, $b)
+    {
         # Compare data based on attribute specified in self::sortkey
         if (is_numeric($a->attributes[$this->sortkey]) && is_numeric($b->attributes[$this->sortkey])) {
             return $a->attributes[$this->sortkey] - $b->attributes[$this->sortkey];

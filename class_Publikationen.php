@@ -25,7 +25,7 @@ class Publikationen
 
         $this->id = $id ?: $this->options['cris_org_nr'];
         $this->suchstring = '';
-        $this->univis = NULL;
+        $this->univis = null;
 
         $this->order = $this->options['cris_pub_order'];
         $this->subtypeorder = $this->options['cris_pub_subtypes_order'];
@@ -66,11 +66,11 @@ class Publikationen
 
     /**
      * Name : pubListe
-     * 
+     *
      * Use: get publication list sorted by year
-     *  
+     *
      * Returns: publications list
-     * 
+     *
      */
     public function pubListe(array $param = [], string $content = '')
     {
@@ -104,12 +104,13 @@ class Publikationen
             default:
                 $order = 'virtualdate';
         }
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($pubArray);
-        if ($limit != '')
+        if ($limit != '') {
             $pubList = array_slice($res[$order], 0, $limit);
-        else
+        } else {
             $pubList = $res[$order];
+        }
 
         $output = '';
 
@@ -128,11 +129,11 @@ class Publikationen
 
     /**
      * Name : pubNachJahr
-     * 
+     *
      * Use: get publication list sorted by year
-     *  
+     *
      * Returns: publications list
-     * 
+     *
      * Start::pubNachJahr
      */
 
@@ -149,7 +150,7 @@ class Publikationen
         $start = $param['start'] ?: ''; // The start of year from where publication is needed
         $end = $param['end'] ?: ''; // The end of year from where publication is needed
         $type = $param['type'] ?: ''; //Type of publication
-        $subtype = $param['subtype'] ?: ''; //SubType of publication 
+        $subtype = $param['subtype'] ?: ''; //SubType of publication
         $quotation = $param['quotation'] ?: ''; // Quotation of publication eg:apa
         $order2 =  $param['order2'] ?: 'author';
         $fau = $param['fau'] ?: ''; // It is a fau publication or not if yes 1 and 0 for no
@@ -159,7 +160,7 @@ class Publikationen
         $language = $param['language'] ?: '';
         $sortby = $param['sortby'] ?: 'virtualdate';
 
-        // fetching the publication 
+        // fetching the publication
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
 
         if (!count($pubArray)) {
@@ -167,7 +168,7 @@ class Publikationen
             return $output;
         }
 
-        // Sorting order 
+        // Sorting order
         $typeorder = $this->order; //cris default order given by plugin options
         if ($typeorder[0] != '' && ((array_search($typeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short')) !== false) || array_search($typeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short_alt')) !== false)) {
             foreach ($typeorder as $key => $value) {
@@ -179,7 +180,7 @@ class Publikationen
         switch ($order2) {
             case 'author':
                 $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
-                $subformatter = new CRIS_formatter(NULL, NULL, "relauthors", SORT_ASC);
+                $subformatter = new CRIS_formatter(null, null, "relauthors", SORT_ASC);
                 break;
             case 'type':
                 $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
@@ -187,7 +188,7 @@ class Publikationen
                 break;
             default:
                 $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
-                $subformatter = new CRIS_formatter(NULL, NULL, "virtualdate", SORT_DESC);
+                $subformatter = new CRIS_formatter(null, null, "virtualdate", SORT_DESC);
                 break;
         }
         $pubList = $formatter->execute($pubArray);
@@ -210,7 +211,8 @@ class Publikationen
                 foreach ($pubSubList as $array_subtype => $publications_sub) {
                     if ($order2 == 'type') {
                         $shortcode_data_inner .= "<h4>";
-                        $shortcode_data_inner .= Tools::getTitle('publications', $array_subtype, $param['display_language']);;
+                        $shortcode_data_inner .= Tools::getTitle('publications', $array_subtype, $param['display_language']);
+                        ;
                         $shortcode_data_inner .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
@@ -237,7 +239,8 @@ class Publikationen
                     // Zwischenüberschrift
                     if ($order2 == 'type') {
                         $output .= "<h4>";
-                        $output .= Tools::getTitle('publications', $array_subtype, $param['display_language']);;
+                        $output .= Tools::getTitle('publications', $array_subtype, $param['display_language']);
+                        ;
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
@@ -256,23 +259,23 @@ class Publikationen
     }
     //End ::pubNachJahr
 
-     /**
-     * Name : pubNachTyp
-     * 
-     * Use: get publication list according by their types
-     *  
-     * Returns: publications list by type 
-     * 
-     * Start::pubNachTyp
-     */
+    /**
+    * Name : pubNachTyp
+    *
+    * Use: get publication list according by their types
+    *
+    * Returns: publications list by type
+    *
+    * Start::pubNachTyp
+    */
 
     public function pubNachTyp(
-    array $param = [], 
-    $field = '', 
-    $content = '', 
-    $fsp = false, 
-    $project = '')
-    {
+        array $param = [],
+        $field = '',
+        $content = '',
+        $fsp = false,
+        $project = ''
+    ) {
 
         $year =  $param['year'] ?: '';
         $start = $param['start'] ?: '';
@@ -341,7 +344,7 @@ class Publikationen
                 }
                 switch ($order2) {
                     case 'author':
-                        $subformatter = new CRIS_formatter(NULL, NULL, $sortby, $sortorder);
+                        $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
                         break;
                     case 'subtype':
                         $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
@@ -350,7 +353,7 @@ class Publikationen
                         $subformatter = new CRIS_formatter("publyear", SORT_DESC, $sortby, $sortorder);
                         break;
                     default:
-                        $subformatter = new CRIS_formatter(NULL, NULL, $sortby, $sortorder);
+                        $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
                         break;
                 }
                 $pubOtherList = $subformatter->execute($publications);
@@ -400,7 +403,7 @@ class Publikationen
                 }
                 switch ($order2) {
                     case 'author':
-                        $subformatter = new CRIS_formatter(NULL, NULL, $sortby, $sortorder);
+                        $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
                         break;
                     case 'subtype':
                         $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
@@ -409,7 +412,7 @@ class Publikationen
                         $subformatter = new CRIS_formatter("publyear", SORT_DESC, $sortby, $sortorder);
                         break;
                     default:
-                        $subformatter = new CRIS_formatter(NULL, NULL, $sortby, $sortorder);
+                        $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
                         break;
                 }
                 $pubOtherList = $subformatter->execute($publications);
@@ -444,25 +447,25 @@ class Publikationen
 
     // End::pubNachTyp
 
- /**
-     * Name : singlePub
-     * 
-     * Use: get single publication by the publication id
-     *  
-     * Returns: publications a single publication 
-     * 
-     * Start::singlePub
-     */
+    /**
+        * Name : singlePub
+        *
+        * Use: get single publication by the publication id
+        *
+        * Returns: publications a single publication
+        *
+        * Start::singlePub
+        */
 
     public function singlePub(
-        $quotation = '', 
-        $content = '', 
-        $sc_type = 'default', 
-        $showimage = 0, 
-        $image_align = 'right', 
-        $image_position = "top", 
-        $display = 'no-list')
-    {
+        $quotation = '',
+        $content = '',
+        $sc_type = 'default',
+        $showimage = 0,
+        $image_align = 'right',
+        $image_position = "top",
+        $display = 'no-list'
+    ) {
         $ws = new CRIS_publications();
 
         try {
@@ -471,8 +474,9 @@ class Publikationen
             return;
         }
 
-        if (!count($pubArray))
+        if (!count($pubArray)) {
             return;
+        }
 
         $display = (count($pubArray) < 2 ? 'no-list' : $display);
 
@@ -491,11 +495,11 @@ class Publikationen
 
     /**
      * Name : projectPub
-     * 
-     * Use: get projects of publication 
-     *  
-     * Returns: list of project in publications 
-     * 
+     *
+     * Use: get projects of publication
+     *
+     * Returns: list of project in publications
+     *
      * Start::projectPub
      */
 
@@ -517,10 +521,10 @@ class Publikationen
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
-            $sortby = NULL;
+            $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
+        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
 
@@ -538,20 +542,20 @@ class Publikationen
 
     // End::projectPub
     
-     /**
-     * Name : fieldPub
-     * 
-     * Use: get field of publication 
-     *  
-     * Returns: list of field of publications 
-     * 
-     * Start::fieldPub
-     */
+    /**
+    * Name : fieldPub
+    *
+    * Use: get field of publication
+    *
+    * Returns: list of field of publications
+    *
+    * Start::fieldPub
+    */
 
     public function fieldPub(
-        $param = array(), 
-        $seed = false)
-    {
+        $param = array(),
+        $seed = false
+    ) {
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
@@ -574,10 +578,10 @@ class Publikationen
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
-            $sortby = NULL;
+            $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
+        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
 
@@ -599,27 +603,29 @@ class Publikationen
 
     /**
      * Name : equiPub
-     * 
-     * Use: get equipment of publication 
-     *  
-     * Returns: list of equipment of publications 
-     * 
+     *
+     * Use: get equipment of publication
+     *
+     * Returns: list of equipment of publications
+     *
      * Start::equiPub
      */
 
     public function equiPub($equipment, $quotation = '', $seed = false, $publications_limit = '', $display_language = 'de')
     {
         $ws = new CRIS_publications();
-        if ($seed)
+        if ($seed) {
             $ws->disable_cache();
+        }
         try {
             $pubArray = $ws->by_equipment($equipment);
         } catch (Exception $ex) {
             return;
         }
 
-        if (!count($pubArray))
+        if (!count($pubArray)) {
             return;
+        }
 
         $firstItem = reset($pubArray);
         if ($firstItem && isset($firstItem->attributes['relation right seq'])) {
@@ -627,10 +633,10 @@ class Publikationen
             $sortby = 'relation right seq';
             $orderby = $sortby;
         } else {
-            $sortby = NULL;
+            $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-        $formatter = new CRIS_formatter(NULL, NULL, $sortby, SORT_ASC);
+        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
 
@@ -710,8 +716,8 @@ class Publikationen
                     foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
                         $publication->attributes['image'] = "<div class=\"cris-image wp-caption " . $image_align  . "\" style=\"width: " . $img_size[0] . "px;\">";
-                        $img_description = ( $img->attributes['description'] ??
-                                             '' );
+                        $img_description = ($img->attributes['description'] ??
+                                             '');
                         if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                             $publication->attributes['image'] .= "<img alt=\"Coverbild: " . $img_description . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3] . ">"
                                 . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
@@ -846,8 +852,8 @@ class Publikationen
                     foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
                         $publication['image'] = "<div class=\"cris-image wp-caption " . $image_align  . "\" style=\"width: " . $img_size[0] . "px;\">";
-                        $img_description = ( $img->attributes['description'] ??
-                                             '' );
+                        $img_description = ($img->attributes['description'] ??
+                                             '');
                         if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                             $publication['image'] .= "<img alt=\"Coverbild: " . $img_description . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3] . ">"
                                 . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
@@ -930,6 +936,7 @@ class Publikationen
                         $publist .= $pubDetails['URI'] != '' ? "<br />URL: <a href='" . $pubDetails['URI'] . "' target='blank' itemprop=\"url\">" . $pubDetails['URI'] . "</a>" : '';
                         break;
                     }
+                    // no break
                 case "journal article":
                     $publist .= "<li itemscope itemtype=\"http://schema.org/ScholarlyArticle\">";
                     if ($image_position == 'top') {
@@ -1217,7 +1224,7 @@ class Publikationen
         return $publist;
     }
 
-    private function get_pub_projects($pub = NULL, $item = 'title')
+    private function get_pub_projects($pub = null, $item = 'title')
     {
         require_once('class_Projekte.php');
         $liste = new Projekte();
@@ -1253,11 +1260,13 @@ class CRIS_publications extends CRIS_webservice
 
     public function by_orga_id($orgaID = null, &$filter = null)
     {
-        if ($orgaID === null || $orgaID === "0" || $orgaID === "")
+        if ($orgaID === null || $orgaID === "0" || $orgaID === "") {
             throw new Exception('Please supply valid organisation ID');
+        }
 
-        if (!is_array($orgaID))
+        if (!is_array($orgaID)) {
             $orgaID = array($orgaID);
+        }
 
         $requests = array();
         foreach ($orgaID as $_o) {
@@ -1271,11 +1280,13 @@ class CRIS_publications extends CRIS_webservice
 
     public function by_pers_id($persID = null, &$filter = null, $notable = 0)
     {
-        if ($persID === null || $persID === "0")
+        if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
+        }
 
-        if (!is_array($persID))
+        if (!is_array($persID)) {
             $persID = array($persID);
+        }
 
         $requests = array();
         if ($notable == 1) {
@@ -1292,11 +1303,13 @@ class CRIS_publications extends CRIS_webservice
 
     public function by_id($publID = null)
     {
-        if ($publID === null || $publID === "0")
+        if ($publID === null || $publID === "0") {
             throw new Exception('Please supply valid publication ID');
+        }
 
-        if (!is_array($publID))
+        if (!is_array($publID)) {
             $publID = array($publID);
+        }
 
         $requests = array();
         foreach ($publID as $_p) {
@@ -1307,11 +1320,13 @@ class CRIS_publications extends CRIS_webservice
 
     public function by_project($projID = null, &$filter = null)
     {
-        if ($projID === null || $projID === "0")
+        if ($projID === null || $projID === "0") {
             throw new Exception('Please supply valid publication ID');
+        }
 
-        if (!is_array($projID))
+        if (!is_array($projID)) {
             $projID = array($projID);
+        }
 
         $requests = array();
         foreach ($projID as $_p) {
@@ -1322,11 +1337,13 @@ class CRIS_publications extends CRIS_webservice
 
     public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field')
     {
-        if ($fieldID === null || $fieldID === "0")
+        if ($fieldID === null || $fieldID === "0") {
             throw new Exception('Please supply valid research field ID');
+        }
 
-        if (!is_array($fieldID))
+        if (!is_array($fieldID)) {
             $fieldID = array($fieldID);
+        }
 
         $requests = array();
         switch ($entity) {
@@ -1349,11 +1366,13 @@ class CRIS_publications extends CRIS_webservice
 
     public function by_equipment($equiID = null, &$filter = null)
     {
-        if ($equiID === null || $equiID === "0")
+        if ($equiID === null || $equiID === "0") {
             throw new Exception('Please supply valid equipment ID');
+        }
 
-        if (!is_array($equiID))
+        if (!is_array($equiID)) {
             $equiID = array($equiID);
+        }
 
         $requests = array();
         foreach ($equiID as $_p) {
@@ -1381,8 +1400,9 @@ class CRIS_publications extends CRIS_webservice
         foreach ($data as $_d) {
             foreach ($_d as $publ) {
                 $p = new CRIS_publication($publ);
-                if ($p->ID && ($filter === null || $filter->evaluate($p)))
+                if ($p->ID && ($filter === null || $filter->evaluate($p))) {
                     $publs[$p->ID] = $p;
+                }
             }
         }
         return $publs;
@@ -1420,15 +1440,17 @@ class CRIS_publication extends CRIS_Entity
 
         if ($splitapa === 1 && isset($matches[2])) {
             $apalink = $matches[1] . sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
-            if (isset($matches[4]))
+            if (isset($matches[4])) {
                 $apalink .= sprintf('<a href="%s" target="_blank">%s</a>', $matches[4], $matches[4]);
+            }
         } else {
             // try to identify DOI at least
             $splitapa = preg_match("/^(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
             if ($splitapa === 1 && isset($matches[2])) {
                 $apalink = $matches[1] . sprintf('<a href="%s" target="_blank">%s</a>', $matches[2], $matches[2]);
-            } else
+            } else {
                 $apalink = $apa;
+            }
         }
 
         $this->attributes["quotationapalink"] = $apalink;
@@ -1449,16 +1471,17 @@ class CRIS_publication extends CRIS_Entity
 class CRIS_pub_image extends CRIS_Entity
 {
     /*
-	 * object for single publication
-	 */
+     * object for single publication
+     */
 
     public function __construct($data)
     {
         parent::__construct($data);
 
         foreach ($data->relation as $_r) {
-            if ($_r['type'] != "PUBL_has_PICT")
+            if ($_r['type'] != "PUBL_has_PICT") {
                 continue;
+            }
             foreach ($_r->attribute as $_a) {
                 if ($_a['name'] == 'description') {
                     $this->attributes["description"] = (string) $_a->data;
@@ -1476,7 +1499,7 @@ if (!debug_backtrace()) {
     $f = new CRIS_Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
     $publs = $p->by_orga_id("142285", $f);
     $order = "virtualdate";
-    $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+    $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
     $res = $formatter->execute($publs);
     foreach ($res[$order] as $key => $value) {
         echo sprintf("%s: %s\n", $key, $value->attributes[$order]);
