@@ -342,15 +342,13 @@ class Publikationen
                     $subtypeorder = Tools::getOrder('publications', $array_type);
                 }
                 switch ($order2) {
-                    case 'author':
-                        $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
-                        break;
                     case 'subtype':
                         $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
                         break;
                     case 'year':
                         $subformatter = new CRIS_formatter("publyear", SORT_DESC, $sortby, $sortorder);
                         break;
+                    case 'author':
                     default:
                         $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
                         break;
@@ -401,15 +399,13 @@ class Publikationen
                     $subtypeorder = Tools::getOrder('publications', $array_type);
                 }
                 switch ($order2) {
-                    case 'author':
-                        $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
-                        break;
                     case 'subtype':
                         $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
                         break;
                     case 'year':
                         $subformatter = new CRIS_formatter("publyear", SORT_DESC, $sortby, $sortorder);
                         break;
+                    case 'author':
                     default:
                         $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
                         break;
