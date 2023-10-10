@@ -8,7 +8,8 @@ require_once("class_Dicts.php");
 class Tools
 {
 
-    public static function getAcronym($acadTitle): string {
+    public static function getAcronym($acadTitle): string
+    {
         $acronym = '';
         foreach (explode(' ', $acadTitle) as $actitle) {
             if (array_key_exists($actitle, CRIS_Dicts::$acronyms) && CRIS_Dicts::$acronyms[$actitle] != '') {
@@ -19,7 +20,8 @@ class Tools
         return $acronym;
     }
 
-    public static function getOrder($object, $type = ''): array {
+    public static function getOrder($object, $type = ''): array
+    {
         if ($type == '' || !isset(CRIS_Dicts::$typeinfos[$object][$type]['subtypes'])) {
             foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
                 $order[$v['order']] = $k;
@@ -33,7 +35,8 @@ class Tools
         return $order;
     }
 
-    public static function getOptionsOrder($object, $type = ''): array {
+    public static function getOptionsOrder($object, $type = ''): array
+    {
         $order_raw = self::getOrder($object, $type);
         if ($type == '') {
             foreach ($order_raw as $k => $v) {
@@ -51,7 +54,7 @@ class Tools
     {
         if ($type == '') {
             foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
-                if($v['short'] == $short) {
+                if ($v['short'] == $short) {
                     return $k;
                 }
                 if (array_key_exists('short_alt', $v) && $v['short_alt'] == $short) {
@@ -60,7 +63,7 @@ class Tools
             }
         } else {
             foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
-                if($v['short'] == $short) {
+                if ($v['short'] == $short) {
                     return $k;
                 }
             }
@@ -106,7 +109,8 @@ class Tools
         return CRIS_Dicts::$typeinfos[$object][$type]['subtypeattribute'];
     }
 
-    public static function getPageLanguage($postID): string {
+    public static function getPageLanguage($postID): string
+    {
         $page_lang_meta = get_post_meta($postID, 'fauval_langcode', true);
         if ($page_lang_meta != '') {
             $page_lang = ($page_lang_meta == 'de') ? 'de' : 'en';
@@ -116,7 +120,8 @@ class Tools
         return $page_lang;
     }
 
-    public static function XML2obj($url): WP_Error|SimpleXMLElement|bool {
+    public static function XML2obj($url): WP_Error|SimpleXMLElement|bool
+    {
         $content = RemoteGet::retrieveContent($url);
         return XML::element($content);
     }
@@ -129,7 +134,8 @@ class Tools
     {
 
         // Define the custom sort function
-        function custom_sort($a, $b): int {
+        function custom_sort($a, $b): int
+        {
             return (strcasecmp($a['lastName'], $b['lastName']));
         }
 
@@ -142,7 +148,8 @@ class Tools
     {
 
         // Define the custom sort function
-        function custom_sort_year($a, $b): bool {
+        function custom_sort_year($a, $b): bool
+        {
             return $a['publYear'] < $b['publYear'];
         }
 
@@ -155,7 +162,8 @@ class Tools
     {
 
         // Define the custom sort function
-        function custom_sort_virtualdate($a, $b): bool {
+        function custom_sort_virtualdate($a, $b): bool
+        {
             return $a['virtualdate'] < $b['virtualdate'];
         }
 
@@ -190,7 +198,8 @@ class Tools
      * Quelle: http://php.net/manual/de/function.array-multisort.php#91638
      */
 
-    public static function array_msort($array, $cols): array {
+    public static function array_msort($array, $cols): array
+    {
         $colarr = array();
         foreach ($cols as $col => $order) {
             $colarr[$col] = array();
@@ -221,7 +230,8 @@ class Tools
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = ''): WP_Error|array|string|null {
+    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = ''): WP_Error|array|string|null
+    {
         $filter = array();
         if ($year !== '' && $year !== null) {
             $filter['publyear__eq'] = $year;
@@ -236,7 +246,7 @@ class Tools
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     if (strpos($v, '-') === 0) {
                         $tmpType = substr($v, 1);
                         $pubTypExclude[] = self::getType('publications', $tmpType);
@@ -267,7 +277,7 @@ class Tools
         if ($subtype !== '' && $subtype !== null) {
             $subtype = str_replace(' ', '', $subtype);
             $subtypes = explode(',', $subtype);
-            foreach($subtypes as $v) {
+            foreach ($subtypes as $v) {
                 if (strpos($v, '-') === 0) {
                     $tmpSubType = substr($v, 1);
                     $pubSubTypExclude[] = self::getType('publications', $tmpSubType, $pubTyp[0]);
@@ -317,7 +327,8 @@ class Tools
      * Array zur Definition des Filters für Awards
      */
 
-    public static function award_filter($year = '', $start = '', $end = '', $type = ''): array|string|null {
+    public static function award_filter($year = '', $start = '', $end = '', $type = ''): array|string|null
+    {
         $filter = array();
         if ($year !== '' && $year !== null) {
             $filter['year award__eq'] = $year;
@@ -332,7 +343,7 @@ class Tools
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $awardTyp[] = self::getType('awards', $v);
                 }
             } else {
@@ -354,7 +365,8 @@ class Tools
      * Array zur Definition des Filters für Projekte
      */
 
-    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = ''): WP_Error|array|null {
+    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = ''): WP_Error|array|null
+    {
         $filter = array();
         if ($year !== '' && $year !== null) {
             if ($year == 'current') {
@@ -374,7 +386,7 @@ class Tools
         if ($type !== '' && $type !== null) {
             if (strpos($type, ',') !== false) {
                 $types = explode(',', str_replace(' ', '', $type));
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $projTyp[] = self::getType('projects', $v);
                 }
             } else {
@@ -435,7 +447,7 @@ class Tools
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $patTyp[] = self::getType('patents', $v);
                 }
             } else {
@@ -456,7 +468,8 @@ class Tools
      * Array zur Definition des Filters für Aktivitäten
      */
 
-    public static function activity_filter($year = '', $start = '', $end = '', $type = ''): array|string|null {
+    public static function activity_filter($year = '', $start = '', $end = '', $type = ''): array|string|null
+    {
         $filter = array();
         if ($year !== '' && $year !== null) {
             $filter['year__eq'] = $year;
@@ -471,7 +484,7 @@ class Tools
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $activityTyp[] = self::getType('activities', $v);
                 }
             } else {
@@ -492,7 +505,8 @@ class Tools
      * Array zur Definition des Filters für Forschungsbereiche
      */
 
-    public static function field_filter($year = '', $start = ''): ?array {
+    public static function field_filter($year = '', $start = ''): ?array
+    {
         $filter = array();
         if ($year !== '' && $year !== null) {
             $filter['startyear__eq'] = $year;
@@ -511,7 +525,8 @@ class Tools
      * Array zur Definition des Filters für Equipment
      */
 
-    public static function equipment_filter($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = ''): ?array {
+    public static function equipment_filter($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = ''): ?array
+    {
         $filter = array();
         if ($manufacturer !== '' && $manufacturer !== null) {
             $filter['hersteller__eq'] = $manufacturer;
@@ -551,7 +566,8 @@ class Tools
      * Array zur Definition des Filters für Standardisierungen
      */
 
-    public static function standardizations_filter($year = '', $start = '', $end = '', $type = ''): array|string|null {
+    public static function standardizations_filter($year = '', $start = '', $end = '', $type = ''): array|string|null
+    {
         $filter = array();
         if ($year !== '' && $year !== null) {
             $filter['year__eq'] = $year;
@@ -566,7 +582,7 @@ class Tools
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $stanTyp[] = self::getType('standardizations', $v);
                 }
             } else {
@@ -588,7 +604,8 @@ class Tools
      * Anbindung an UnivIS-/FAU-Person-Plugin
      */
 
-    public static function get_univis(): array {
+    public static function get_univis(): array
+    {
         $univis = [];
         $univisID = self::get_univis_id();
 
@@ -718,10 +735,11 @@ class Tools
         return $univisID;
     }
 
-    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = ''): string {
+    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = ''): string
+    {
         $person = '';
         switch ($target) {
-            case 'cris' :
+            case 'cris':
                 if (is_numeric($id)) {
                     $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "Person/" . $id . "\" class=\"extern\">";
                     $link_post = "</a>";
@@ -765,7 +783,8 @@ class Tools
         return $person;
     }
 
-    public static function make_date($start, $end): string {
+    public static function make_date($start, $end): string
+    {
         $date = '';
         if ($start != '') {
             $start = date_i18n(get_option('date_format'), strtotime($start));
@@ -801,7 +820,8 @@ class Tools
         }
     }
 
-    public static function numeric_xml_encode($text, $double_encode=true): string {
+    public static function numeric_xml_encode($text, $double_encode = true): string
+    {
         /*
          * Deliver numerically encoded XML representation of special characters.
          * E.g. use &#8211; instead of &ndash;
@@ -847,5 +867,4 @@ class Tools
         }
         return $encoded;
     }
-
 }

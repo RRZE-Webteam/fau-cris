@@ -58,7 +58,8 @@ class Forschungsbereiche
      * Ausgabe aller Forschungsbereiche
      */
 
-    public function fieldListe($param = array()): string {
+    public function fieldListe($param = array()): string
+    {
 
         $fieldsArray = $this->fetch_fields();
 
@@ -137,7 +138,7 @@ class Forschungsbereiche
      * Array aller Forschungsbereiche für die Synchonisierung
      */
 
-    public function fieldsArray($seed=false, $sortby=null)
+    public function fieldsArray($seed = false, $sortby = null)
     {
         $fieldsArray = $this->fetch_fields($seed);
 
@@ -177,7 +178,8 @@ class Forschungsbereiche
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_fields($seed=false): array {
+    private function fetch_fields($seed = false): array
+    {
         $filter = Tools::field_filter();
         $ws = new CRIS_fields();
         if ($seed) {
@@ -207,7 +209,8 @@ class Forschungsbereiche
      *
      * @return string
      */
-    private function make_single($fields, $param): string {
+    private function make_single($fields, $param): string
+    {
         $hide = $param['hide'];
 
         $singlefield = "<div class=\"cris-fields\">";
@@ -242,8 +245,8 @@ class Forschungsbereiche
 
             if (count($imgs)) {
                 $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
-                foreach($imgs as $img) {
-                    foreach($imgs as $img) {
+                foreach ($imgs as $img) {
+                    foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
                         $singlefield = "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";
                         $img_description = ($img->attributes['description'] ??
@@ -252,7 +255,6 @@ class Forschungsbereiche
                             $singlefield .= "<img alt=\"Coverbild: ". $img_description ."\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3].">"
                                 . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
                             //$publication['image'] .= "<img alt=\"". $img->attributes['description'] ."\" src=\"\" width=\"\" height=\"\">" . $img_description;
-
                         }
                         $singlefield .= "</div>";
                     }
@@ -286,13 +288,12 @@ class Forschungsbereiche
                     }
                     $singlefield .= "<h3>" . __('Kontaktpersonen', 'fau-cris') . ": </h3>";
                     $singlefield .= "<ul>";
-                    foreach($contactsArray as $c_id => $contact) {
+                    foreach ($contactsArray as $c_id => $contact) {
                         $singlefield .= "<li>";
                         $singlefield .= Tools::get_person_link($c_id, $contact['firstname'], $contact['lastname'], $this->cris_field_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                         $singlefield .= "</li>";
                     }
                     $singlefield .= "</ul>";
-
                 }
             }
 
@@ -328,7 +329,8 @@ class Forschungsbereiche
     }
 
 
-    private function make_custom_single($fields, $content, $param = array()): string {
+    private function make_custom_single($fields, $content, $param = array()): string
+    {
         $field_details = array();
         $output = "<div class=\"cris-fields\">";
         ;
@@ -386,7 +388,7 @@ class Forschungsbereiche
                             'firstname' => $nameparts[1]);
                     }
                     $field_details['#contactpersons#'] .= "<ul>";
-                    foreach($contactsArray as $c_id => $contact) {
+                    foreach ($contactsArray as $c_id => $contact) {
                         $field_details['#contactpersons#'] .= "<li>";
                         $field_details['#contactpersons#'] .= Tools::get_person_link($c_id, $contact['firstname'], $contact['lastname'], $this->cris_field_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                         $field_details['#contactpersons#'] .= "</li>";
@@ -414,7 +416,7 @@ class Forschungsbereiche
                 $imgs = self::get_field_images($field['ID']);
                 if (count($imgs)) {
                     $i = 1;
-                    foreach($imgs as $img) {
+                    foreach ($imgs as $img) {
                         if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
                             $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
                             $field_details['#image'.$i.'#'] = "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">" . "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description . "</div>";
@@ -431,7 +433,8 @@ class Forschungsbereiche
         return $output;
     }
 
-    private function make_list($fields): string {
+    private function make_list($fields): string
+    {
         $fieldslist = "<ul class=\"cris-fields\">";
 
         foreach ($fields as $field) {
@@ -465,7 +468,7 @@ class Forschungsbereiche
     {
         require_once('class_Projekte.php');
         $liste = new Projekte('field', $field, $this->sc_lang);
-        if(isset($liste->error) && is_wp_error($liste->error)) {
+        if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
         } else {
             return $liste->fieldProj($field);
@@ -476,14 +479,15 @@ class Forschungsbereiche
     {
         require_once('class_Projekte.php');
         $liste = new Projekte('field', $field, $this->sc_lang);
-        if(isset($liste->error) && is_wp_error($liste->error)) {
+        if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
         } else {
             return $liste->fieldPersons($field);
         }
     }
 
-    private function get_field_publications($param = array(), $entity = 'field'): string {
+    private function get_field_publications($param = array(), $entity = 'field'): string
+    {
         require_once('class_Publikationen.php');
         if ($param['publications_notable'] == '1') {
             $entity = 'field_notable';
@@ -510,7 +514,8 @@ class Forschungsbereiche
         return $liste->fieldPub($param, false);
     }
 
-    private function get_field_images($field): array {
+    private function get_field_images($field): array
+    {
         $images = array();
         $imgString = CRIS_Dicts::$base_uri . "getrelated/Forschungsbereich/" . $field . "/FOBE_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
@@ -531,7 +536,8 @@ class CRIS_fields extends CRIS_webservice
      * publication requests, supports multiple organisation ids given as array.
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null): array {
+    public function by_orga_id($orgaID = null, &$filter = null): array
+    {
         if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -547,7 +553,8 @@ class CRIS_fields extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null): array {
+    public function by_pers_id($persID = null, &$filter = null): array
+    {
         if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
         }
@@ -563,7 +570,8 @@ class CRIS_fields extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($fieldID = null): array {
+    public function by_id($fieldID = null): array
+    {
         if ($fieldID === null || $fieldID === "0") {
             throw new Exception('Please supply valid field of research ID');
         }
@@ -579,7 +587,8 @@ class CRIS_fields extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    public function by_project($projID = null): array {
+    public function by_project($projID = null): array
+    {
         if ($projID === null || $projID === "0") {
             throw new Exception('Please supply valid publication ID');
         }
@@ -595,7 +604,8 @@ class CRIS_fields extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null): array {
+    private function retrieve($reqs, &$filter = null): array
+    {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }
@@ -621,7 +631,6 @@ class CRIS_fields extends CRIS_webservice
 
         return $fields;
     }
-
 }
 
 class CRIS_field extends CRIS_Entity
@@ -634,7 +643,6 @@ class CRIS_field extends CRIS_Entity
     {
         parent::__construct($data);
     }
-
 }
 
 class CRIS_field_image extends CRIS_Entity
@@ -651,7 +659,7 @@ class CRIS_field_image extends CRIS_Entity
             if ($_r['type'] != "FOBE_has_PICT") {
                 continue;
             }
-            foreach($_r->attribute as $_a) {
+            foreach ($_r->attribute as $_a) {
                 if ($_a['name'] == 'description') {
                     $this->attributes["description"] = (string) $_a->data;
                 }

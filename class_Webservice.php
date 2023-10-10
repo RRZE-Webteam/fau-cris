@@ -26,11 +26,13 @@ class CRIS_webservice
         return RemoteGet::retrieveContent($url);
     }
 
-    public function disable_cache(): void {
+    public function disable_cache(): void
+    {
         $this->cache = false;
     }
 
-    public function enable_cache(): void {
+    public function enable_cache(): void
+    {
         $this->cache = true;
     }
 
@@ -48,8 +50,7 @@ class CRIS_webservice
         if ($filter instanceof CRIS_Filter) {
             $remaining = array();
             foreach ($filter->filters as $attr => $value) {
-                if (
-                    strtolower($attr) !== 'publyear' ||
+                if (strtolower($attr) !== 'publyear' ||
                     strtolower($id_parts[1]) !== 'organisation'
                 ) {
                     $remaining[$attr] = $value;

@@ -1528,5 +1528,4 @@ class CRIS_Dicts
         'Turkish',
         'Ukrainian'
     );
-
 }

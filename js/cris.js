@@ -1,4 +1,4 @@
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     $('.cris-projects .abstract-title').click(function () {
         $header = $(this);
         $content = $header.next();

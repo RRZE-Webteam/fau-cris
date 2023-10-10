@@ -20,7 +20,8 @@ class Sync
         $this->portal_id = '';
     }
 
-    public function do_sync($manual = false): void {
+    public function do_sync($manual = false): void
+    {
         if ($manual && (!$this->orgNr || $this->orgNr == 0)) {
             // Admin-Notice: Synchronisation fehlgeschlagen
             add_settings_error('Automatische Synchronisation', 'cris_sync_check', __('Synchronisierung fehlgeschlagen!<br />Bitte geben Sie im Reiter "Allgemein" die CRIS-ID Ihrer Organisationseinheit an.', 'fau-cris'), 'error');
@@ -194,16 +195,15 @@ class Sync
         $fields = array();
         $fields = $_f->fieldsArray(true);
         if (!$fields || !is_array($fields)) {
-            if(wp_next_scheduled('cris_auto_update')) {
+            if (wp_next_scheduled('cris_auto_update')) {
                 wp_clear_scheduled_hook('cris_auto_update');
             }
             $this->message .= '<li>Es konnten keine Forschungsbereiche gefunden werden. Bitte legen Sie zunächst Forschungsbereiche und zugeordnete Projekte in CRIS an.</li>';
-
         }
         if ($fields) {
             foreach ($fields as $field) {
                 $_p = new Projekte();
-                if(is_wp_error($_p)) {
+                if (is_wp_error($_p)) {
                     continue;
                 }
                 $projects = $_p->fieldProj($field->ID, 'array', true);
@@ -301,13 +301,12 @@ class Sync
         $this->menu_position ++;
 
         $this->field_projects = array();
-        foreach($pages as $field) {
+        foreach ($pages as $field) {
             foreach ($field['projects'] as $id => $project) {
                 if (!empty($field['projects'])) {
                     $this->field_projects[$id] = $project;
                 }
             }
-
         }
         $p = new CRIS_projects;
         $p->disable_cache();
@@ -408,13 +407,13 @@ class Sync
             }
             // Hauptmenü-Eintrag entfernen
             foreach ($this->menu_items as $_mi) {
-                if($_mi->menu_item_parent == $research_mid && $_mi->title == $this->title_noFieldsPage) {
+                if ($_mi->menu_item_parent == $research_mid && $_mi->title == $this->title_noFieldsPage) {
                     wp_delete_post($_mi->ID);
                 }
             }
             // Portalmenü-Eintrag entfernen
             foreach ($this->portal_items as $_pi) {
-                if($_pi->menu_item_parent == 0 && $_pi->title == $this->title_noFieldsPage) {
+                if ($_pi->menu_item_parent == 0 && $_pi->title == $this->title_noFieldsPage) {
                     wp_delete_post($_pi->ID);
                 }
             }
@@ -484,7 +483,8 @@ class Sync
         }
     }
 
-    private function cris_make_page($cris_id, $title, $content, $contact = array(), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php'): array {
+    private function cris_make_page($cris_id, $title, $content, $contact = array(), $position, $parent_pid, $parent_mid, $parent_mpid, $portal = 1, $template = 'page.php'): array
+    {
         $pages = get_pages(array('child_of' => $parent_pid, 'post_status' => 'publish'));
         $pages_array = array();
         foreach ($pages as $page) {
@@ -509,7 +509,7 @@ class Sync
                 $args['meta_input']['sidebar_title_personen'] = __('Kontakt', 'fau-cris');
             }
             $pid = wp_insert_post($args);
-            if($pid) {
+            if ($pid) {
                 $this->message .= '<li>' . sprintf(__('Seite "%s" wurde erstellt.', 'fau-cris'), $title) . '</li>';
                 $this->num_created_p ++;
             } else {
@@ -534,7 +534,7 @@ class Sync
                 $nfp_content = $nfp_post->post_content;
                 $ist_projs = self::get_string_between($nfp_content, "[cris show=projects project=\"", "\"]");
                 $soll_projs = self::get_string_between($content, "[cris show=projects project=\"", "\"]");
-                if($ist_projs != $soll_projs) {
+                if ($ist_projs != $soll_projs) {
                     str_replace($ist_projs, $soll_projs, $content);
                     wp_update_post(array(
                         'ID' => $pages_array[0]->ID,
@@ -593,13 +593,13 @@ class Sync
             }
             // Hauptmenü-Eintrag entfernen
             foreach ($this->menu_items as $_mi) {
-                if($_mi->menu_item_parent == $mid && array_search($_mi->title, array_column($this->field_projects, 'title')) !== false) {
+                if ($_mi->menu_item_parent == $mid && array_search($_mi->title, array_column($this->field_projects, 'title')) !== false) {
                     wp_delete_post($_mi->ID);
                 }
             }
             // Portalmenü-Eintrag entfernen
             foreach ($this->portal_items as $_pi) {
-                if($_pi->menu_item_parent == $mpid && array_search($_pi->title, array_column($this->field_projects, 'title')) !== false) {
+                if ($_pi->menu_item_parent == $mpid && array_search($_pi->title, array_column($this->field_projects, 'title')) !== false) {
                     wp_delete_post($_pi->ID);
                 }
             }
@@ -613,7 +613,8 @@ class Sync
         return $ids;
     }
 
-    private function get_string_between($string, $start, $end): string {
+    private function get_string_between($string, $start, $end): string
+    {
         $string = ' ' . $string;
         $ini = strpos($string, $start);
         if ($ini == 0) {

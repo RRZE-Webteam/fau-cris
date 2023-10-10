@@ -60,7 +60,8 @@ class Auszeichnungen
      * Ausgabe aller Auszeichnungen ohne Gliederung
      */
 
-    public function awardsListe($param = array(), $content = ''): string {
+    public function awardsListe($param = array(), $content = ''): string
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -106,7 +107,8 @@ class Auszeichnungen
      * Ausgabe aller Auszeichnungen nach Jahren gegliedert
      */
 
-    public function awardsNachJahr($param = array()): string {
+    public function awardsNachJahr($param = array()): string
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -176,7 +178,8 @@ class Auszeichnungen
      * Ausgabe aller Auszeichnungen nach Auszeichnungstypen gegliedert
      */
 
-    public function awardsNachTyp($param = array()): string {
+    public function awardsNachTyp($param = array()): string
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -309,7 +312,8 @@ class Auszeichnungen
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_awards($year = '', $start = '', $end = '', $type = '', $awardnameid = ''): array {
+    private function fetch_awards($year = '', $start = '', $end = '', $type = '', $awardnameid = ''): array
+    {
         if (!isset($this->einheit) || !isset($this->id)) {
             return array();
         }
@@ -339,7 +343,8 @@ class Auszeichnungen
      * Ausgabe der Awards
      */
 
-    private function make_list($awards, $name = 1, $year = 1, $awardname = 1): string {
+    private function make_list($awards, $name = 1, $year = 1, $awardname = 1): string
+    {
         $awardlist = "<ul class=\"cris-awards\">";
 
         foreach ($awards as $award) {
@@ -503,7 +508,7 @@ class Auszeichnungen
                 $award_details['#image1desc#'] = '';
                 if (count($imgs)) {
                     $i = 1;
-                    foreach($imgs as $img) {
+                    foreach ($imgs as $img) {
                         if (isset($img['png180']) && mb_strlen($img['png180']) > 30) {
                             $award_details['#image'.$i.'#'] = "<div class='cris-image wp-caption " . $param['image_align'] . "'>"
                                 ."<img alt=\"". $award_details['#name#'] ."\" src=\"" . $img['png180'] . "\">"
@@ -532,7 +537,8 @@ class Auszeichnungen
         return do_shortcode($awardlist);
     }
 
-    private function make_gallery($awards, $name = 1, $year = 1, $awardname = 1): string {
+    private function make_gallery($awards, $name = 1, $year = 1, $awardname = 1): string
+    {
         $awardlist = "<ul class=\"cris-awards cris-gallery clear clearfix\">";
 
         foreach ($awards as $award) {
@@ -587,7 +593,8 @@ class Auszeichnungen
         return $awardlist;
     }
 
-    private function get_pic($award): array {
+    private function get_pic($award): array
+    {
 
         $images = array();
         $picString = CRIS_Dicts::$base_uri . "getrelated/Award/" . $award . "/awar_has_pict";
@@ -611,7 +618,6 @@ class Auszeichnungen
         }
         return $images;
     }
-
 }
 
 class CRIS_awards extends CRIS_webservice
@@ -620,7 +626,8 @@ class CRIS_awards extends CRIS_webservice
      * awards/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null): array {
+    public function by_orga_id($orgaID = null, &$filter = null): array
+    {
         if ($orgaID === null || $orgaID === "0") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -636,7 +643,8 @@ class CRIS_awards extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null): array {
+    public function by_pers_id($persID = null, &$filter = null): array
+    {
         if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
         }
@@ -652,7 +660,8 @@ class CRIS_awards extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($awarID = null): array {
+    public function by_id($awarID = null): array
+    {
         if ($awarID === null || $awarID === "0") {
             throw new Exception('Please supply valid award ID');
         }
@@ -668,7 +677,8 @@ class CRIS_awards extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    public function by_awardtype_id($awatID = null): array {
+    public function by_awardtype_id($awatID = null): array
+    {
         if ($awatID === null || $awatID === "0") {
             throw new Exception('Please supply valid award ID');
         }
@@ -684,7 +694,8 @@ class CRIS_awards extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null): array {
+    private function retrieve($reqs, &$filter = null): array
+    {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }
@@ -708,7 +719,6 @@ class CRIS_awards extends CRIS_webservice
         }
         return $awards;
     }
-
 }
 
 class CRIS_award extends CRIS_Entity
@@ -721,5 +731,4 @@ class CRIS_award extends CRIS_Entity
     {
         parent::__construct($data);
     }
-
 }

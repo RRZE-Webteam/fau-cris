@@ -56,7 +56,6 @@ class Publikationen
         }
 
         if (!$this->id) {
-            
             $this->error = new \WP_Error(
                 'cris-orgid-error',
                 __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
@@ -72,7 +71,8 @@ class Publikationen
      * Returns: publications list
      *
      */
-    public function pubListe(array $param = [], string $content = ''): string {
+    public function pubListe(array $param = [], string $content = ''): string
+    {
         $year = $param['year'] ?: '';
         $start = $param['start'] ?: '';
         $end = $param['end'] ?: '';
@@ -502,7 +502,8 @@ class Publikationen
      * Start::projectPub
      */
 
-    public function projectPub($param = array()): string {
+    public function projectPub($param = array()): string
+    {
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
@@ -662,7 +663,8 @@ class Publikationen
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = ''): array {
+    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = ''): array
+    {
         $pubArray = [];
 
         $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
@@ -692,7 +694,8 @@ class Publikationen
      * Ausgabe der Publikationsdetails in Zitierweise (MLA/APA)
      */
 
-    private function make_quotation_list($publications, $quotation, $showimage = 0, $display = 'list'): string {
+    private function make_quotation_list($publications, $quotation, $showimage = 0, $display = 'list'): string
+    {
 
         $quotation = strtolower($quotation);
         $list_class = ($display == 'no-list' ? 'no-list' : '');
@@ -718,7 +721,6 @@ class Publikationen
                             $publication->attributes['image'] .= "<img alt=\"Coverbild: " . $img_description . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3] . ">"
                                 . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
                             //$publication['image'] .= "<img alt=\"". $img->attributes['description'] ."\" src=\"\" width=\"\" height=\"\">" . $img_description;
-
                         }
                         $publication->attributes['image'] .= "</div>";
                     }
@@ -750,13 +752,13 @@ class Publikationen
      * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
      */
 
-    private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top', $display = 'list'): string {
+    private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top', $display = 'list'): string
+    {
 
         $list_class = ($display == 'no-list' ? 'no-list' : '');
         $publist = "<ul class=\"cris-publications $list_class\" lang=\"" . $lang . "\">";
 
         foreach ($publications as $publicationObject) {
-
             $publication = $publicationObject->attributes;
             // id
             $id = $publicationObject->ID;
@@ -853,7 +855,6 @@ class Publikationen
                             $publication['image'] .= "<img alt=\"Coverbild: " . $img_description . "\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" " . $img_size[3] . ">"
                                 . "<p class=\"wp-caption-text\">" . $img_description . "</p>";
                             //$publication['image'] .= "<img alt=\"". $img->attributes['description'] ."\" src=\"\" width=\"\" height=\"\">" . $img_description;
-
                         }
                         $publication['image'] .= "</div>";
                     }
@@ -861,7 +862,6 @@ class Publikationen
             }
 
             switch (strtolower($pubDetails['pubType'])) {
-
                 case "book": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
                     if ($image_position == 'top') {
@@ -1084,7 +1084,8 @@ class Publikationen
         return $publist;
     }
 
-    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright'): string {
+    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright'): string
+    {
         $publist = '';
         $list = (count($publications) > 1) ? true : false;
         if ($list) {
@@ -1230,7 +1231,8 @@ class Publikationen
         }
     }
 
-    private function get_pub_images($pub): array {
+    private function get_pub_images($pub): array
+    {
         $images = array();
         $imgString = CRIS_Dicts::$base_uri . "getrelated/Publication/" . $pub . "/PUBL_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
@@ -1251,7 +1253,8 @@ class CRIS_publications extends CRIS_webservice
      * publication requests, supports multiple organisation ids given as array.
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null): array {
+    public function by_orga_id($orgaID = null, &$filter = null): array
+    {
         if ($orgaID === null || $orgaID === "0" || $orgaID === "") {
             throw new Exception('Please supply valid organisation ID');
         }
@@ -1270,7 +1273,8 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null, $notable = 0): array {
+    public function by_pers_id($persID = null, &$filter = null, $notable = 0): array
+    {
         if ($persID === null || $persID === "0") {
             throw new Exception('Please supply valid person ID');
         }
@@ -1292,7 +1296,8 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($publID = null): array {
+    public function by_id($publID = null): array
+    {
         if ($publID === null || $publID === "0") {
             throw new Exception('Please supply valid publication ID');
         }
@@ -1308,7 +1313,8 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    public function by_project($projID = null, &$filter = null): array {
+    public function by_project($projID = null, &$filter = null): array
+    {
         if ($projID === null || $projID === "0") {
             throw new Exception('Please supply valid publication ID');
         }
@@ -1324,7 +1330,8 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field'): array {
+    public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field'): array
+    {
         if ($fieldID === null || $fieldID === "0") {
             throw new Exception('Please supply valid research field ID');
         }
@@ -1352,7 +1359,8 @@ class CRIS_publications extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_equipment($equiID = null, &$filter = null): array {
+    public function by_equipment($equiID = null, &$filter = null): array
+    {
         if ($equiID === null || $equiID === "0") {
             throw new Exception('Please supply valid equipment ID');
         }
@@ -1369,7 +1377,8 @@ class CRIS_publications extends CRIS_webservice
     }
 
 
-    private function retrieve($reqs, &$filter = null): array {
+    private function retrieve($reqs, &$filter = null): array
+    {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }
@@ -1406,7 +1415,8 @@ class CRIS_publication extends CRIS_Entity
         parent::__construct($data);
     }
 
-    public function insert_quotation_links(): void {
+    public function insert_quotation_links(): void
+    {
         /*
          * Enrich APA/MLA quotation by links to publication details (CRIS
          * website) and DOI (if present, applies only to APA).

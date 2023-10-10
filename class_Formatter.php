@@ -11,9 +11,9 @@ class CRIS_formatter
 
     public function __construct(
         $group_attribute,
-        $group_order=SORT_DESC,
-        $sort_attribute=null,
-        $sort_order=SORT_ASC
+        $group_order = SORT_DESC,
+        $sort_attribute = null,
+        $sort_order = SORT_ASC
     ) {
         /*
          * The method takes up to four arguments. First two group all datasets
@@ -48,7 +48,8 @@ class CRIS_formatter
         }
     }
 
-    public function execute($data): array {
+    public function execute($data): array
+    {
         /*
          * Perform formatting on $data. If $limit is set, return $limit entries
          * at max.
