@@ -635,10 +635,13 @@ class CRIS_equipments extends CRIS_webservice
      * actients/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null): array
+    public function by_orga_id($orgaID = null, &$filter = null): WP_Error
     {
         if ($orgaID === null || $orgaID === "0") {
-            throw new Exception('Please supply valid organisation ID');
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris')
+            );
         }
 
         if (!is_array($orgaID)) {
@@ -655,7 +658,10 @@ class CRIS_equipments extends CRIS_webservice
     public function by_id($awarID = null): array
     {
         if ($awarID === null || $awarID === "0") {
-            throw new Exception('Please supply valid equipment ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($awarID)) {

@@ -629,7 +629,10 @@ class CRIS_awards extends CRIS_webservice
     public function by_orga_id($orgaID = null, &$filter = null): array
     {
         if ($orgaID === null || $orgaID === "0") {
-            throw new Exception('Please supply valid organisation ID');
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Auszeichnung an.', 'fau-cris')
+            );
         }
 
         if (!is_array($orgaID)) {
@@ -643,10 +646,12 @@ class CRIS_awards extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null): array
-    {
+    public function by_pers_id($persID = null, &$filter = null): WP_Error {
         if ($persID === null || $persID === "0") {
-            throw new Exception('Please supply valid person ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Auszeichnung an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($persID)) {
@@ -663,7 +668,10 @@ class CRIS_awards extends CRIS_webservice
     public function by_id($awarID = null): array
     {
         if ($awarID === null || $awarID === "0") {
-            throw new Exception('Please supply valid award ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Auszeichnung an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($awarID)) {
@@ -680,7 +688,10 @@ class CRIS_awards extends CRIS_webservice
     public function by_awardtype_id($awatID = null): array
     {
         if ($awatID === null || $awatID === "0") {
-            throw new Exception('Please supply valid award ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Auszeichnung an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($awatID)) {

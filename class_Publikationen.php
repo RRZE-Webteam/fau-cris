@@ -1252,7 +1252,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_orga_id($orgaID = null, &$filter = null): array
     {
         if ($orgaID === null || $orgaID === "0" || $orgaID === "") {
-            throw new Exception('Please supply valid organisation ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($orgaID)) {
@@ -1272,7 +1275,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_pers_id($persID = null, &$filter = null, $notable = 0): array
     {
         if ($persID === null || $persID === "0") {
-            throw new Exception('Please supply valid person ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($persID)) {
@@ -1295,7 +1301,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_id($publID = null): array
     {
         if ($publID === null || $publID === "0") {
-            throw new Exception('Please supply valid publication ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($publID)) {
@@ -1312,7 +1321,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_project($projID = null, &$filter = null): array
     {
         if ($projID === null || $projID === "0") {
-            throw new Exception('Please supply valid publication ID');
+	       return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($projID)) {
@@ -1329,7 +1341,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field'): array
     {
         if ($fieldID === null || $fieldID === "0") {
-            throw new Exception('Please supply valid research field ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($fieldID)) {
@@ -1358,8 +1373,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_equipment($equiID = null, &$filter = null): array
     {
         if ($equiID === null || $equiID === "0") {
-            throw new Exception('Please supply valid equipment ID');
-        }
+	       return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+	        );        }
 
         if (!is_array($equiID)) {
             $equiID = array($equiID);

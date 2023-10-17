@@ -59,7 +59,8 @@ class Aktivitaeten
      * Ausgabe aller Aktivitäten ohne Gliederung
      */
 
-    public function actiListe($param = array()): string {
+    public function actiListe($param = array()): string
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -95,7 +96,8 @@ class Aktivitaeten
      * Ausgabe aller Aktivitäten nach Jahren gegliedert
      */
 
-    public function actiNachJahr($param = array()): string {
+    public function actiNachJahr($param = array()): string
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -155,7 +157,8 @@ class Aktivitaeten
      * Ausgabe aller Aktivitäten nach Patenttypen gegliedert
      */
 
-    public function actiNachTyp($param = array()): string {
+    public function actiNachTyp($param = array()): string
+    {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -258,7 +261,8 @@ class Aktivitaeten
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_activities($year = '', $start = '', $end = '', $type = ''): array {
+    private function fetch_activities($year = '', $start = '', $end = '', $type = ''): array
+    {
         $filter = Tools::activity_filter($year, $start, $end, $type);
 
         $ws = new CRIS_activities();
@@ -281,7 +285,8 @@ class Aktivitaeten
      * Ausgabe der Patents
      */
 
-    private function make_list($activities, $name = 1, $year = 1, $activityname = 1, $showtype = 1): string {
+    private function make_list($activities, $name = 1, $year = 1, $activityname = 1, $showtype = 1): string
+    {
         if ($this->einheit == "activity") {
             $activitylist = "<div class=\"cris-activities\">";
         } else {
@@ -493,9 +498,13 @@ class CRIS_activities extends CRIS_webservice
      * actients/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null): array {
+    public function by_orga_id($orgaID = null, &$filter = null): WP_Error
+    {
         if ($orgaID === null || $orgaID === "0") {
-            throw new Exception('Please supply valid organisation ID');
+            return  new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($orgaID)) {
@@ -509,9 +518,13 @@ class CRIS_activities extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null): array {
+    public function by_pers_id($persID = null, &$filter = null): array
+    {
         if ($persID === null || $persID === "0") {
-            throw new Exception('Please supply valid person ID');
+            return  new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($persID)) {
@@ -525,9 +538,13 @@ class CRIS_activities extends CRIS_webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($awarID = null): array {
+    public function by_id($awarID = null): array
+    {
         if ($awarID === null || $awarID === "0") {
-            throw new Exception('Please supply valid activity ID');
+            return  new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($awarID)) {
@@ -541,7 +558,8 @@ class CRIS_activities extends CRIS_webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null): array {
+    private function retrieve($reqs, &$filter = null): array
+    {
         if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
         }

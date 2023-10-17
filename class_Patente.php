@@ -355,7 +355,10 @@ class CRIS_patents extends CRIS_webservice
 
     public function by_orga_id($orgaID = null, &$filter = null): array {
         if ($orgaID === null || $orgaID === "0") {
-            throw new Exception('Please supply valid organisation ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($orgaID)) {
@@ -371,7 +374,10 @@ class CRIS_patents extends CRIS_webservice
 
     public function by_pers_id($persID = null, &$filter = null): array {
         if ($persID === null || $persID === "0") {
-            throw new Exception('Please supply valid person ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($persID)) {
@@ -387,7 +393,10 @@ class CRIS_patents extends CRIS_webservice
 
     public function by_id($awarID = null): array {
         if ($awarID === null || $awarID === "0") {
-            throw new Exception('Please supply valid patent ID');
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($awarID)) {

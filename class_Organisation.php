@@ -243,7 +243,10 @@ class CRIS_organisations extends CRIS_webservice
     public function by_id($orgaID = null): array
     {
         if ($orgaID === null || $orgaID === "0") {
-            throw new Exception('Please supply valid organisation ID');
+	       return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation an.', 'fau-cris')
+	        );
         }
 
         if (!is_array($orgaID)) {
