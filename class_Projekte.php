@@ -49,10 +49,15 @@ class Projekte
         }
     }
 
-    /*
-     * Ausgabe aller Projekte ohne Gliederung
+    /**
+     * Name : projListe
+     *
+     * Use: get all project list by organization id or person id
+     *
+     * Returns: Project list in html format
+     *
+     * Start::projListe
      */
-
     public function projListe($param = []): string
     {
         $year = $param['year'] ?: '';
@@ -85,11 +90,18 @@ class Projekte
 
         return $output;
     }
+    //  END::projListe
 
-    /*
-     * Ausgabe aller Projekte nach Rolle (Leiter/Mitarbeit) gegliedert
+
+    /**
+     * Name : projNachRolle
+     *
+     * Use: get all project list by role, leader or collaborator
+     *
+     * Returns: Project list in html format
+     *
+     * Start::projNachRolle
      */
-
     public function projNachRolle($param = array(), $content = ''): string
     {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
@@ -129,9 +141,17 @@ class Projekte
         }
         return $output;
     }
+    //  End::projNachRolle
 
-    /*
-     * Ausgabe aller Projekte nach Jahren gegliedert
+
+    /**
+     * Name : projNachJahr
+     *
+     * Use: get all project list by year
+     *
+     * Returns: Project list in html format
+     *
+     * Start::projNachJahr
      */
 
     public function projNachJahr($param = array(), $content = ''): string
@@ -185,11 +205,17 @@ class Projekte
         }
         return $output;
     }
+    //  End::projNachJahr
 
-    /*
-     * Ausgabe aller Projekte nach Projekttypen gegliedert
+    /**
+     * Name : projNachTyp
+     *
+     * Use: get all project list by type
+     *
+     * Returns: Project list in html format
+     *
+     * Start::projNachTyp
      */
-
     public function projNachTyp($param = array(), $content = ''): string
     {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
@@ -256,9 +282,17 @@ class Projekte
         }
         return $output;
     }
+    //  End::projNachTyp
 
-    /*
-     * Ausgabe eines einzelnen Projektes
+
+    /**
+     * Name : singleProj
+     *
+     * Use: get single project by id
+     *
+     * Returns: single Project array in html format
+     *
+     * Start::singleProj
      */
 
     public function singleProj($param = array())
@@ -283,9 +317,17 @@ class Projekte
 
         return $output;
     }
+    //  End::singleProj
 
-    /*
-     * Ausgabe eines Projektes per Custom-Shortcode
+
+    /**
+     * Name : customProj
+     *
+     * Use: format the customize Project attributes in html
+     *
+     * Returns: custom Project array in html format
+     *
+     * Start::customProj
      */
 
     public function customProj($content = '', $param = array())
@@ -305,11 +347,17 @@ class Projekte
         $output = $this->make_custom_single($projArray, $content, $param);
         return $output;
     }
+    //End::customProj
 
-    /*
-     * Projekt zu einer Publikation
+    /**
+     * Name : pubProj
+     *
+     * Use: get projects of a single publication by publication id
+     *
+     * Returns: Project array in html format
+     *
+     * Start::pubProj
      */
-
     public function pubProj($pub, $seed = false)
     {
         $ws = new CRIS_projects();
@@ -355,6 +403,8 @@ class Projekte
         return $output;
     }
 
+    //  End:pubProj
+
     /* =========================================================================
      * Private Functions
       ======================================================================== */
@@ -363,6 +413,16 @@ class Projekte
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
+
+    /**
+     * Name : fetch_projects
+     *
+     * Use: get all project by_orga_id or by_pers_id
+     *
+     * Returns: project array
+     *
+     * Start::fetch_projects
+     */
     private function fetch_projects($year = '', $start = '', $end = '', $type = '', $role = 'all', $status = ''): array
     {
         $awardArray = [];
@@ -379,9 +439,17 @@ class Projekte
 
         return $awardArray;
     }
+    //End::fetch_projects
 
-    /*
-     * Ausgabe der Projekte
+
+    /**
+     * Name : make_custom_single
+     *
+     * Use: format the single customize Project attributes in html
+     *
+     * Returns: project array in html format
+     *
+     * Start::make_custom_single
      */
 
     private function make_custom_single($projects, $custom_text, $param = array()): string
@@ -460,7 +528,17 @@ class Projekte
         $projlist .= "</div>";
         return $projlist;
     }
+    //  End::make_custom_single
 
+    /**
+     * Name : make_custom_list
+     *
+     * Use: format the customize Project attributes in html
+     *
+     * Returns: project array in html format
+     *
+     * Start::make_custom_list
+     */
     private function make_custom_list($projects, $custom_text, $param = array()): string
     {
         $projlist = "<ul class=\"cris-projects\">";
@@ -523,6 +601,17 @@ class Projekte
         return $projlist;
     }
 
+    //  End::make_custom_list
+
+    /**
+     * Name : make_single
+     *
+     * Use: format the single Project attributes in html
+     *
+     * Returns: project array in html format
+     *
+     * Start::make_single
+     */
     private function make_single($projects, $param = array()): string
     {
 
@@ -644,7 +733,17 @@ class Projekte
         $projlist .= "</div>";
         return $projlist;
     }
+    //  End::make_single
 
+    /**
+     * Name : make_list
+     *
+     * Use: format all Projects attributes in html
+     *
+     * Returns: projects array in html format
+     *
+     * Start::make_list
+     */
     private function make_list($projects, $hide = array(), $showtype = 1, $pubProj = 0): array|string
     {
 
@@ -752,6 +851,8 @@ class Projekte
 
         return $projlist;
     }
+
+    //  End::make_list
 
     private function make_accordion($projects, $hide = array(), $showtype = 1)
     {
@@ -1036,10 +1137,10 @@ class CRIS_projects extends CRIS_webservice
     public function by_orga_id($orgaID = null, &$filter = null): array
     {
         if ($orgaID === null || $orgaID === "0") {
-	        return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($orgaID)) {
@@ -1057,10 +1158,10 @@ class CRIS_projects extends CRIS_webservice
     public function by_pers_id($persID = null, &$filter = null, $role = 'all'): array
     {
         if ($persID === null || $persID === "0") {
-	        return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($persID)) {
@@ -1084,10 +1185,10 @@ class CRIS_projects extends CRIS_webservice
     public function by_id($projID = null): array
     {
         if ($projID === null || $projID === "0") {
-	       return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($projID)) {
@@ -1104,10 +1205,10 @@ class CRIS_projects extends CRIS_webservice
     public function by_field($fieldID = null): array
     {
         if ($fieldID === null || $fieldID === "0") {
-	        return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($fieldID)) {
@@ -1125,10 +1226,10 @@ class CRIS_projects extends CRIS_webservice
     public function by_pub($pubID = null): array
     {
         if ($pubID === null || $pubID === "0") {
-	        return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($pubID)) {
