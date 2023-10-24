@@ -261,7 +261,7 @@ class Publikationen
     /**
     * Name : pubNachTyp
     *
-    * Use: get publication list according by their types
+    * Use: get publication list according to their types
     *
     * Returns: publications list by type
     *
@@ -659,6 +659,17 @@ class Publikationen
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
+
+
+    /**
+     * Name : fetch_publications
+     *
+     * Use: get all publication by_orga_id,by_pers_id,by_project,by_field or by_id
+     *
+     * Returns: publication array
+     *
+     * Start::fetch_publications
+     */
     private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = ''): array
     {
         $pubArray = [];
@@ -685,11 +696,17 @@ class Publikationen
 
         return $pubArray;
     }
+    //  End::fetch_publications
 
-    /*
-     * Ausgabe der Publikationsdetails in Zitierweise (MLA/APA)
+    /**
+     * Name : make_quotation_list
+     *
+     * Use: get all publication with by formatted with (MLA/APA)
+     *
+     * Returns: publication array by quotation
+     *
+     * Start::make_quotation_list
      */
-
     private function make_quotation_list($publications, $quotation, $showimage = 0, $display = 'list'): string
     {
 
@@ -744,8 +761,16 @@ class Publikationen
         return $publist;
     }
 
-    /*
-     * Ausgabe der Publikationsdetails, unterschiedlich nach Publikationstyp
+    //  End::make_quotation_list
+
+    /**
+     * Name : make_list
+     *
+     * Use: format the publications attributes in html
+     *
+     * Returns: html formatted list
+     *
+     * Start::make_list
      */
 
     private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top', $display = 'list'): string
@@ -1079,6 +1104,17 @@ class Publikationen
 
         return $publist;
     }
+    //  End::make_list
+
+    /**
+     * Name : make_custom_list
+     *
+     * Use: format the customize publications attributes in html
+     *
+     * Returns: html formatted list
+     *
+     * Start::make_custom_list
+     */
 
     private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright'): string
     {
@@ -1214,7 +1250,18 @@ class Publikationen
         }
         return $publist;
     }
+    //  End::make_custom_list
 
+
+    /**
+     * Name : get_pub_projects
+     *
+     * Use: get all projects of publications
+     *
+     * Returns: publications project array
+     *
+     * Start::get_pub_projects
+     */
     private function get_pub_projects($pub = null, $item = 'title')
     {
         require_once('class_Projekte.php');
@@ -1227,6 +1274,17 @@ class Publikationen
         }
     }
 
+    //  End::get_pub_projects
+
+    /**
+     * Name : get_pub_images
+     *
+     * Use: get all images of publications
+     *
+     * Returns: publications images array
+     *
+     * Start::get_pub_images
+     */
     private function get_pub_images($pub): array
     {
         $images = array();
@@ -1243,6 +1301,8 @@ class Publikationen
     }
 }
 
+//End::get_pub_images
+
 class CRIS_publications extends CRIS_webservice
 {
     /*
@@ -1252,10 +1312,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_orga_id($orgaID = null, &$filter = null): array
     {
         if ($orgaID === null || $orgaID === "0" || $orgaID === "") {
-	        return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($orgaID)) {
@@ -1275,10 +1335,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_pers_id($persID = null, &$filter = null, $notable = 0): array
     {
         if ($persID === null || $persID === "0") {
-	        return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($persID)) {
@@ -1301,10 +1361,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_id($publID = null): array
     {
         if ($publID === null || $publID === "0") {
-	        return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($publID)) {
@@ -1321,10 +1381,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_project($projID = null, &$filter = null): array
     {
         if ($projID === null || $projID === "0") {
-	       return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($projID)) {
@@ -1341,10 +1401,10 @@ class CRIS_publications extends CRIS_webservice
     public function by_field($fieldID = null, &$filter = null, $fsp = false, $entity = 'field'): array
     {
         if ($fieldID === null || $fieldID === "0") {
-	        return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
         }
 
         if (!is_array($fieldID)) {
@@ -1373,10 +1433,11 @@ class CRIS_publications extends CRIS_webservice
     public function by_equipment($equiID = null, &$filter = null): array
     {
         if ($equiID === null || $equiID === "0") {
-	       return new \WP_Error(
-		        'cris-orgid-error',
-		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
-	        );        }
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
+        }
 
         if (!is_array($equiID)) {
             $equiID = array($equiID);
