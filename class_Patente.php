@@ -5,12 +5,14 @@ require_once("class_Webservice.php");
 require_once("class_Filter.php");
 require_once("class_Formatter.php");
 
-class Patente {
+class Patente
+{
 
-    private $options;
+    private array $options;
     public $output;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
+    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
+    {
 
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
@@ -18,22 +20,24 @@ class Patente {
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
         } else {
             $this->cms = 'wp';
-	        $this->options = (array) FAU_CRIS::get_options();
+            $this->options = (array) FAU_CRIS::get_options();
             $this->pathPersonenseiteUnivis = '/person/';
         }
         $this->orgNr = $this->options['cris_org_nr'];
         $this->suchstring = '';
-        $this->univis = NULL;
+        $this->univis = null;
 
         $this->order = $this->options['cris_patent_order'];
-        $this->cris_patent_link = isset($this->options['cris_patent_link']) ? $this->options['cris_patent_link'] : 'none';
+        $this->cris_patent_link = $this->options['cris_patent_link'] ?? 'none';
         if ($this->cms == 'wbk' && $this->cris_patent_link == 'person') {
             $this->univis = Tools::get_univis();
         }
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris') . '</strong></p>';
-            return;
+            $this->error = new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris')
+            );
         }
         if (in_array($einheit, array("person", "orga", "patent"))) {
             $this->id = $id;
@@ -44,19 +48,19 @@ class Patente {
             $this->einheit = "orga";
         }
         $this->page_lang = $page_lang;
-	    $this->sc_lang = $sc_lang;
-	    $this->langdiv_open = '<div class="cris">';
-	    $this->langdiv_close = '</div>';
-	    if ($sc_lang != $this->page_lang) {
-		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
-	    }
+        $this->sc_lang = $sc_lang;
+        $this->langdiv_open = '<div class="cris">';
+        $this->langdiv_close = '</div>';
+        if ($sc_lang != $this->page_lang) {
+            $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+        }
     }
 
     /*
      * Ausgabe aller Patente ohne Gliederung
      */
 
-    public function patListe($param = array()) {
+    public function patListe($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -75,12 +79,13 @@ class Patente {
         }
 
         $order = "registryear";
-        $formatter = new CRIS_formatter(NULL, NULL, $order, SORT_DESC);
+        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($patentArray);
-        if ($limit != '')
+        if ($limit != '') {
             $patentList = array_slice($res[$order], 0, $limit);
-        else
+        } else {
             $patentList = $res[$order];
+        }
 
         $output = $this->make_list($patentList, $showname, $showyear, $showpatentname);
 
@@ -91,7 +96,7 @@ class Patente {
      * Ausgabe aller Patente nach Jahren gegliedert
      */
 
-    public function patNachJahr($param = array()) {
+    public function patNachJahr($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -132,12 +137,12 @@ class Patente {
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($patents, $showname, $showyear, $showpatentname) . '[/collapse]');
                 $openfirst = '';
             }
-            $output .= do_shortcode('[collapsibles '.$expandall.']' . $shortcode_data . '[/collapsibles]');
+            $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
-                foreach ($patentList as $array_year => $patents) {
+            foreach ($patentList as $array_year => $patents) {
                 if (empty($year)) {
                     $output .= '<h3 class="clearfix clear">';
-                    $output .=!empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
+                    $output .= !empty($array_year) ? $array_year : __('Ohne Jahr', 'fau-cris');
                     $output .= '</h3>';
                 }
                 $output .= $this->make_list($patents, $showname, $showyear, $showpatentname);
@@ -150,7 +155,7 @@ class Patente {
      * Ausgabe aller Patente nach Patenttypen gegliedert
      */
 
-    public function patNachTyp($param = array()) {
+    public function patNachTyp($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -204,7 +209,7 @@ class Patente {
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
-                foreach ($patentList as $array_type => $patents) {
+            foreach ($patentList as $array_type => $patents) {
                 if (empty($type)) {
                     $title = Tools::getTitle('patents', $array_type, $this->sc_lang);
                     $output .= '<h3 class="clearfix clear">';
@@ -221,7 +226,8 @@ class Patente {
      * Ausgabe eines einzelnen Patents
      */
 
-    public function singlePatent($hide = '', $showname = 1, $showyear = 0, $showpatentname = 1) {
+    public function singlePatent($hide = '', $showname = 1, $showyear = 0, $showpatentname = 1)
+    {
         $ws = new CRIS_patents();
 
         try {
@@ -248,7 +254,7 @@ class Patente {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_patents($year = '', $start = '', $end = '', $type = '') {
+    private function fetch_patents($year = '', $start = '', $end = '', $type = ''): array {
         $filter = Tools::patent_filter($year, $start, $end, $type);
 
         $ws = new CRIS_patents();
@@ -271,7 +277,7 @@ class Patente {
      * Ausgabe der Patents
      */
 
-    private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1) {
+    private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1): string {
         global $post;
         $patentlist = "<ul class=\"cris-patents\">";
 
@@ -305,47 +311,59 @@ class Patente {
             $patent_link = $patent['patnrlink'];
             $patent_registered = date_i18n(get_option('date_format'), strtotime($patent['cfregistrdate']));
             $patent_appproved = date_i18n(get_option('date_format'), strtotime($patent['cfapprovdate']));
-            $patent_expiry = date_i18n( get_option( 'date_format' ), strtotime($patent['patexpirydate']));
-            
+            $patent_expiry = date_i18n(get_option('date_format'), strtotime($patent['patexpirydate']));
+
             $patentlist .= "<li>";
 
-            if (!empty($patent_name))
+            if (!empty($patent_name)) {
                 $patentlist .= "<strong><a href=\"" . Tools::get_item_url("cfrespat", $patent_name, $patent_id, $post->ID, $this->page_lang) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $patent_name . "</a></strong>";
-            if (!empty($patent_type) || !empty($patent_number))
-                $patentlist .= " (";
-            if (!empty($patent_type) & $showtype != 0)
-                $patentlist .= $patent_type . ": ";
-            if (!empty($patent_number)) {
-                if (!empty($patent_link))
-                    $patentlist .= '<a href="' . $patent_link . '" target="blank" title="' . __('Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen', 'fau-cris') . '">';
-                $patentlist .= $patent_number;
-                if (!empty($patent_link))
-                    $patentlist .= "</a>";
             }
-            if (!empty($patent_type) && !empty($patent_number))
+            if (!empty($patent_type) || !empty($patent_number)) {
+                $patentlist .= " (";
+            }
+            if (!empty($patent_type) & $showtype != 0) {
+                $patentlist .= $patent_type . ": ";
+            }
+            if (!empty($patent_number)) {
+                if (!empty($patent_link)) {
+                    $patentlist .= '<a href="' . $patent_link . '" target="blank" title="' . __('Eintrag auf DEPATISnet in neuem Fenster &ouml;ffnen', 'fau-cris') . '">';
+                }
+                $patentlist .= $patent_number;
+                if (!empty($patent_link)) {
+                    $patentlist .= "</a>";
+                }
+            }
+            if (!empty($patent_type) && !empty($patent_number)) {
                 $patentlist .= ")";
-            if (!empty($inventors))
+            }
+            if (!empty($inventors)) {
                 $patentlist .= "<br />" . __('Erfinder', 'fau-cris') . ": " . $inventors_html;
-           $patentlist .= "</li>";
+            }
+            $patentlist .= "</li>";
         }
 
         $patentlist .= "</ul>";
         return $patentlist;
     }
-
 }
 
-class CRIS_patents extends CRIS_webservice {
+class CRIS_patents extends CRIS_webservice
+{
     /*
      * patents/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null) {
-        if ($orgaID === null || $orgaID === "0")
-            throw new Exception('Please supply valid organisation ID');
+    public function by_orga_id($orgaID = null, &$filter = null): array {
+        if ($orgaID === null || $orgaID === "0") {
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris')
+	        );
+        }
 
-        if (!is_array($orgaID))
+        if (!is_array($orgaID)) {
             $orgaID = array($orgaID);
+        }
 
         $requests = array();
         foreach ($orgaID as $_o) {
@@ -354,12 +372,17 @@ class CRIS_patents extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null) {
-        if ($persID === null || $persID === "0")
-            throw new Exception('Please supply valid person ID');
+    public function by_pers_id($persID = null, &$filter = null): array {
+        if ($persID === null || $persID === "0") {
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris')
+	        );
+        }
 
-        if (!is_array($persID))
+        if (!is_array($persID)) {
             $persID = array($persID);
+        }
 
         $requests = array();
         foreach ($persID as $_p) {
@@ -368,12 +391,17 @@ class CRIS_patents extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($awarID = null) {
-        if ($awarID === null || $awarID === "0")
-            throw new Exception('Please supply valid patent ID');
+    public function by_id($awarID = null): array {
+        if ($awarID === null || $awarID === "0") {
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Patents an.', 'fau-cris')
+	        );
+        }
 
-        if (!is_array($awarID))
+        if (!is_array($awarID)) {
             $awarID = array($awarID);
+        }
 
         $requests = array();
         foreach ($awarID as $_p) {
@@ -382,9 +410,10 @@ class CRIS_patents extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null) {
-        if ($filter !== null && !$filter instanceof CRIS_filter)
+    private function retrieve($reqs, &$filter = null): array {
+        if ($filter !== null && !$filter instanceof CRIS_filter) {
             $filter = new CRIS_filter($filter);
+        }
 
         $data = array();
         foreach ($reqs as $_i) {
@@ -405,23 +434,24 @@ class CRIS_patents extends CRIS_webservice {
                     $a->attributes['expiryyear'] = $a->attributes['patexpirydate'] != '' ? mb_substr($a->attributes['patexpirydate'], 0, 4) : '';
                 }
 
-                if ($a->ID && ($filter === null || $filter->evaluate($a)))
+                if ($a->ID && ($filter === null || $filter->evaluate($a))) {
                     $patents[$a->ID] = $a;
+                }
             }
         }
 
         return $patents;
     }
-
 }
 
-class CRIS_patent extends CRIS_Entity {
+class CRIS_patent extends CRIS_Entity
+{
     /*
      * object for single patent
      */
 
-    function __construct($data) {
+    public function __construct($data)
+    {
         parent::__construct($data);
     }
-
 }

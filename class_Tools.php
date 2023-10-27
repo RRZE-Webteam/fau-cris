@@ -1,12 +1,15 @@
 <?php
 
-use RRZE\Cris\{RemoteGet, XML};
+use RRZE\Cris\RemoteGet;
+use RRZE\Cris\XML;
 
 require_once("class_Dicts.php");
 
-class Tools {
+class Tools
+{
 
-    public static function getAcronym($acadTitle) {
+    public static function getAcronym($acadTitle): string
+    {
         $acronym = '';
         foreach (explode(' ', $acadTitle) as $actitle) {
             if (array_key_exists($actitle, CRIS_Dicts::$acronyms) && CRIS_Dicts::$acronyms[$actitle] != '') {
@@ -17,13 +20,14 @@ class Tools {
         return $acronym;
     }
 
-    public static function getOrder ($object, $type = '') {
-		if ($type == '' || !isset(CRIS_Dicts::$typeinfos[$object][$type]['subtypes'])) {
+    public static function getOrder($object, $type = ''): array
+    {
+        if ($type == '' || !isset(CRIS_Dicts::$typeinfos[$object][$type]['subtypes'])) {
             foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
                 $order[$v['order']] = $k;
             }
         } else {
-			foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
+            foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
                 $order[$v['order']] = $k;
             }
         }
@@ -31,7 +35,8 @@ class Tools {
         return $order;
     }
 
-    public static function getOptionsOrder($object, $type = '') {
+    public static function getOptionsOrder($object, $type = ''): array
+    {
         $order_raw = self::getOrder($object, $type);
         if ($type == '') {
             foreach ($order_raw as $k => $v) {
@@ -45,24 +50,28 @@ class Tools {
         return $order;
     }
 
-    public static function getType($object, $short, $type = '') {
+    public static function getType($object, $short, $type = '')
+    {
         if ($type == '') {
             foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
-                if($v['short'] == $short)
+                if ($v['short'] == $short) {
                     return $k;
+                }
                 if (array_key_exists('short_alt', $v) && $v['short_alt'] == $short) {
                     return $k;
                 }
             }
         } else {
             foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
-                if($v['short'] == $short)
+                if ($v['short'] == $short) {
                     return $k;
+                }
             }
         }
     }
 
-    public static function getName($object, $type, $lang, $subtype = '') {
+    public static function getName($object, $type, $lang, $subtype = '')
+    {
         $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
         if ($subtype == '') {
             if (array_key_exists($type, CRIS_Dicts::$typeinfos[$object])) {
@@ -80,23 +89,28 @@ class Tools {
         return $type;
     }
 
-    public static function getTitle($object, $name, $lang, $type = '') {
+    public static function getTitle($object, $name, $lang, $type = '')
+    {
         $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
         if ($type == '') {
-            if (isset(CRIS_Dicts::$typeinfos[$object][$name][$lang]['title']))
+            if (isset(CRIS_Dicts::$typeinfos[$object][$name][$lang]['title'])) {
                 return CRIS_Dicts::$typeinfos[$object][$name][$lang]['title'];
+            }
         } else {
-            if (isset(CRIS_Dicts::$typeinfos[$object][$type]['subtypes'][$name][$lang]['title']))
+            if (isset(CRIS_Dicts::$typeinfos[$object][$type]['subtypes'][$name][$lang]['title'])) {
                 return CRIS_Dicts::$typeinfos[$object][$type]['subtypes'][$name][$lang]['title'];
+            }
         }
         return $name;
     }
 
-    public static function getSubtypeAttribute($object, $type) {
+    public static function getSubtypeAttribute($object, $type)
+    {
         return CRIS_Dicts::$typeinfos[$object][$type]['subtypeattribute'];
     }
 
-    public static function getPageLanguage($postID) {
+    public static function getPageLanguage($postID): string
+    {
         $page_lang_meta = get_post_meta($postID, 'fauval_langcode', true);
         if ($page_lang_meta != '') {
             $page_lang = ($page_lang_meta == 'de') ? 'de' : 'en';
@@ -106,7 +120,7 @@ class Tools {
         return $page_lang;
     }
 
-    public static function XML2obj($url)
+    public static function XML2obj($url): WP_Error|SimpleXMLElement|bool
     {
         $content = RemoteGet::retrieveContent($url);
         return XML::element($content);
@@ -116,10 +130,12 @@ class Tools {
      * Array sortieren
      */
 
-    public static function record_sortByName($results) {
+    public static function record_sortByName($results)
+    {
 
         // Define the custom sort function
-        function custom_sort($a, $b) {
+        function custom_sort($a, $b): int
+        {
             return (strcasecmp($a['lastName'], $b['lastName']));
         }
 
@@ -128,10 +144,12 @@ class Tools {
         return $results;
     }
 
-    public static function record_sortByYear($results) {
+    public static function record_sortByYear($results)
+    {
 
         // Define the custom sort function
-        function custom_sort_year($a, $b) {
+        function custom_sort_year($a, $b): bool
+        {
             return $a['publYear'] < $b['publYear'];
         }
 
@@ -140,10 +158,12 @@ class Tools {
         return $results;
     }
 
-    public static function record_sortByVirtualdate($results) {
+    public static function record_sortByVirtualdate($results)
+    {
 
         // Define the custom sort function
-        function custom_sort_virtualdate($a, $b) {
+        function custom_sort_virtualdate($a, $b): bool
+        {
             return $a['virtualdate'] < $b['virtualdate'];
         }
 
@@ -152,13 +172,17 @@ class Tools {
         return $results;
     }
 
-    public static function sort_key(&$sort_array, $keys_array) {
-        if (empty($sort_array) || !is_array($sort_array) || empty($keys_array))
+    public static function sort_key(&$sort_array, $keys_array)
+    {
+        if (empty($sort_array) || !is_array($sort_array) || empty($keys_array)) {
             return;
-        if (!is_array($keys_array))
+        }
+        if (!is_array($keys_array)) {
             $keys_array = explode(',', $keys_array);
-        if (!empty($keys_array))
+        }
+        if (!empty($keys_array)) {
             $keys_array = array_reverse($keys_array);
+        }
         foreach ($keys_array as $n) {
             if (array_key_exists($n, $sort_array)) {
                 $newarray = array($n => $sort_array[$n]); //copy the node before unsetting
@@ -174,7 +198,8 @@ class Tools {
      * Quelle: http://php.net/manual/de/function.array-multisort.php#91638
      */
 
-    public static function array_msort($array, $cols) {
+    public static function array_msort($array, $cols): array
+    {
         $colarr = array();
         foreach ($cols as $col => $order) {
             $colarr[$col] = array();
@@ -192,8 +217,9 @@ class Tools {
         foreach ($colarr as $col => $arr) {
             foreach ($arr as $k => $v) {
                 $k = mb_substr($k, 1);
-                if (!isset($ret[$k]))
+                if (!isset($ret[$k])) {
                     $ret[$k] = $array[$k];
+                }
                 $ret[$k][$col] = $array[$k][$col];
             }
         }
@@ -204,19 +230,23 @@ class Tools {
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = '') {
+    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = ''): WP_Error|array|string|null
+    {
         $filter = array();
-        if ($year !== '' && $year !== NULL)
+        if ($year !== '' && $year !== null) {
             $filter['publyear__eq'] = $year;
-        if ($start !== '' && $start !== NULL)
+        }
+        if ($start !== '' && $start !== null) {
             $filter['publyear__ge'] = $start;
-        if ($end !== '' && $end !== NULL)
+        }
+        if ($end !== '' && $end !== null) {
             $filter['publyear__le'] = $end;
-        if ($type !== '' && $type !== NULL) {
+        }
+        if ($type !== '' && $type !== null) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     if (strpos($v, '-') === 0) {
                         $tmpType = substr($v, 1);
                         $pubTypExclude[] = self::getType('publications', $tmpType);
@@ -234,7 +264,7 @@ class Tools {
             }
             if (empty($pubTyp) && empty($pubTypExclude)) {
                 return new \WP_Error(
-                    'cris-publication-type', 
+                    'cris-publication-type',
                     __('Falscher Parameter für Publikationstyp', 'fau-cris')
                 );
             }
@@ -244,10 +274,10 @@ class Tools {
                 $filter['publication type__not'] = $pubTypExclude;
             }
         }
-        if ($subtype !== '' && $subtype !== NULL) {
+        if ($subtype !== '' && $subtype !== null) {
             $subtype = str_replace(' ', '', $subtype);
             $subtypes = explode(',', $subtype);
-            foreach($subtypes as $v) {
+            foreach ($subtypes as $v) {
                 if (strpos($v, '-') === 0) {
                     $tmpSubType = substr($v, 1);
                     $pubSubTypExclude[] = self::getType('publications', $tmpSubType, $pubTyp[0]);
@@ -279,16 +309,16 @@ class Tools {
                 $filter['peerreviewed__eq'] = 'No';
             }
         }
-        if ($language !== '' && $language !== NULL) {
+        if ($language !== '' && $language !== null) {
             $language = str_replace(' ', '', $language);
             $pubLanguages = explode(',', $language);
             $filter['language__eq'] = $pubLanguages;
         }
-	    if ($curation == 1) {
-		    $filter['relation curationsetting__eq'] = 'curation_accepted';
-	    }
-	    if (count($filter)) {
-	    	return $filter;
+        if ($curation == 1) {
+            $filter['relation curationsetting__eq'] = 'curation_accepted';
+        }
+        if (count($filter)) {
+            return $filter;
         }
         return null;
     }
@@ -297,19 +327,23 @@ class Tools {
      * Array zur Definition des Filters für Awards
      */
 
-    public static function award_filter($year = '', $start = '', $end = '', $type = '') {
+    public static function award_filter($year = '', $start = '', $end = '', $type = ''): array|string|null
+    {
         $filter = array();
-        if ($year !== '' && $year !== NULL)
+        if ($year !== '' && $year !== null) {
             $filter['year award__eq'] = $year;
-        if ($start !== '' && $start !== NULL)
+        }
+        if ($start !== '' && $start !== null) {
             $filter['year award__ge'] = $start;
-        if ($end !== '' && $end !== NULL)
+        }
+        if ($end !== '' && $end !== null) {
             $filter['year award__le'] = $end;
-        if ($type !== '' && $type !== NULL) {
+        }
+        if ($type !== '' && $type !== null) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $awardTyp[] = self::getType('awards', $v);
                 }
             } else {
@@ -321,8 +355,9 @@ class Tools {
             }
             $filter['type of award__eq'] = $awardTyp;
         }
-        if (count($filter))
+        if (count($filter)) {
             return $filter;
+        }
         return null;
     }
 
@@ -330,9 +365,10 @@ class Tools {
      * Array zur Definition des Filters für Projekte
      */
 
-    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = '') {
+    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = ''): WP_Error|array|null
+    {
         $filter = array();
-        if ($year !== '' && $year !== NULL) {
+        if ($year !== '' && $year !== null) {
             if ($year == 'current') {
                 $filter['startyear__le'] = date('Y');
                 $filter['endyear__ge'] = date('Y');
@@ -341,14 +377,16 @@ class Tools {
                 $filter['startyear__le'] = $year;
             }
         }
-        if ($start !== '' && $start !== NULL)
+        if ($start !== '' && $start !== null) {
             $filter['startyear__ge'] = $start;
-        if ($end !== '' && $end !== NULL)
+        }
+        if ($end !== '' && $end !== null) {
             $filter['startyear__le'] = $end;
-        if ($type !== '' && $type !== NULL) {
+        }
+        if ($type !== '' && $type !== null) {
             if (strpos($type, ',') !== false) {
                 $types = explode(',', str_replace(' ', '', $type));
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $projTyp[] = self::getType('projects', $v);
                 }
             } else {
@@ -356,13 +394,13 @@ class Tools {
             }
             if (empty($projTyp)) {
                 return new \WP_Error(
-                    'cris-project-type', 
+                    'cris-project-type',
                     __('Falscher Parameter für Projekttyp', 'fau-cris')
                 );
             }
             $filter['project type__eq'] = $projTyp;
         }
-        if ($status !== '' && $status !== NULL) {
+        if ($status !== '' && $status !== null) {
             if (strpos($status, ',') !== false) {
                 $arrStatus = explode(',', str_replace(' ', '', $status));
             } else {
@@ -383,8 +421,9 @@ class Tools {
                 $filter['virtualenddate__ge'] = $today;
             }
         }
-        if (count($filter))
+        if (count($filter)) {
             return $filter;
+        }
         return null;
     }
 
@@ -392,19 +431,23 @@ class Tools {
      * Array zur Definition des Filters für Patente
      */
 
-    public static function patent_filter($year = '', $start = '', $end = '', $type = '') {
+    public static function patent_filter($year = '', $start = '', $end = '', $type = '')
+    {
         $filter = array();
-        if ($year !== '' && $year !== NULL)
+        if ($year !== '' && $year !== null) {
             $filter['registryear__eq'] = $year;
-        if ($start !== '' && $start !== NULL)
+        }
+        if ($start !== '' && $start !== null) {
             $filter['registryear__ge'] = $start;
-        if ($end !== '' && $end !== NULL)
+        }
+        if ($end !== '' && $end !== null) {
             $filter['registryear__le'] = $end;
-        if ($type !== '' && $type !== NULL) {
+        }
+        if ($type !== '' && $type !== null) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $patTyp[] = self::getType('patents', $v);
                 }
             } else {
@@ -425,19 +468,23 @@ class Tools {
      * Array zur Definition des Filters für Aktivitäten
      */
 
-    public static function activity_filter($year = '', $start = '', $end = '', $type = '') {
+    public static function activity_filter($year = '', $start = '', $end = '', $type = ''): array|string|null
+    {
         $filter = array();
-        if ($year !== '' && $year !== NULL)
+        if ($year !== '' && $year !== null) {
             $filter['year__eq'] = $year;
-        if ($start !== '' && $start !== NULL)
+        }
+        if ($start !== '' && $start !== null) {
             $filter['year__ge'] = $start;
-        if ($end !== '' && $end !== NULL)
+        }
+        if ($end !== '' && $end !== null) {
             $filter['year__le'] = $end;
-        if ($type !== '' && $type !== NULL) {
+        }
+        if ($type !== '' && $type !== null) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $activityTyp[] = self::getType('activities', $v);
                 }
             } else {
@@ -448,8 +495,9 @@ class Tools {
             }
             $filter['type of activity__eq'] = $activityTyp;
         }
-        if (count($filter))
+        if (count($filter)) {
             return $filter;
+        }
         return null;
     }
 
@@ -457,15 +505,19 @@ class Tools {
      * Array zur Definition des Filters für Forschungsbereiche
      */
 
-    public static function field_filter($year = '', $start = '') {
+    public static function field_filter($year = '', $start = ''): ?array
+    {
         $filter = array();
-        if ($year !== '' && $year !== NULL)
+        if ($year !== '' && $year !== null) {
             $filter['startyear__eq'] = $year;
-        if ($start !== '' && $start !== NULL)
+        }
+        if ($start !== '' && $start !== null) {
             $filter['startyear__ge'] = $start;
+        }
 
-        if (count($filter))
+        if (count($filter)) {
             return $filter;
+        }
         return null;
     }
 
@@ -473,11 +525,13 @@ class Tools {
      * Array zur Definition des Filters für Equipment
      */
 
-    public static function equipment_filter($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = '') {
+    public static function equipment_filter($manufacturer = '', $location = '', $constructionYear = '', $constructionYearStart = '', $constructionYearEnd = ''): ?array
+    {
         $filter = array();
-        if ($manufacturer !== '' && $manufacturer !== NULL)
+        if ($manufacturer !== '' && $manufacturer !== null) {
             $filter['hersteller__eq'] = $manufacturer;
-        if ($location !== '' && $location !== NULL) {
+        }
+        if ($location !== '' && $location !== null) {
             if (strpos($location, ',')) {
                 $location = str_replace(' ', '', $location);
                 $locations = explode(',', $location);
@@ -486,7 +540,7 @@ class Tools {
             }
             $filter['location__eq'] = $locations;
         }
-        if ($constructionYear !== '' && $constructionYear !== NULL) {
+        if ($constructionYear !== '' && $constructionYear !== null) {
             if (strpos($constructionYear, ',')) {
                 $constructionYear = str_replace(' ', '', $constructionYear);
                 $constructionYear = explode(',', $constructionYear);
@@ -495,13 +549,16 @@ class Tools {
             }
             $filter['baujahr__eq'] = $constructionYear;
         }
-        if ($constructionYearStart !== '' && $constructionYearStart !== NULL)
+        if ($constructionYearStart !== '' && $constructionYearStart !== null) {
             $filter['baujahr__ge'] = $constructionYearStart;
-        if ($constructionYearEnd !== '' && $constructionYearEnd !== NULL)
+        }
+        if ($constructionYearEnd !== '' && $constructionYearEnd !== null) {
             $filter['baujahr__le'] = $constructionYearEnd;
+        }
 
-        if (count($filter))
+        if (count($filter)) {
             return $filter;
+        }
         return null;
     }
 
@@ -509,19 +566,23 @@ class Tools {
      * Array zur Definition des Filters für Standardisierungen
      */
 
-    public static function standardizations_filter($year = '', $start = '', $end = '', $type = '') {
+    public static function standardizations_filter($year = '', $start = '', $end = '', $type = ''): array|string|null
+    {
         $filter = array();
-        if ($year !== '' && $year !== NULL)
+        if ($year !== '' && $year !== null) {
             $filter['year__eq'] = $year;
-        if ($start !== '' && $start !== NULL)
+        }
+        if ($start !== '' && $start !== null) {
             $filter['year__ge'] = $start;
-        if ($end !== '' && $end !== NULL)
+        }
+        if ($end !== '' && $end !== null) {
             $filter['year__le'] = $end;
-        if ($type !== '' && $type !== NULL) {
+        }
+        if ($type !== '' && $type !== null) {
             if (strpos($type, ',')) {
                 $type = str_replace(' ', '', $type);
                 $types = explode(',', $type);
-                foreach($types as $v) {
+                foreach ($types as $v) {
                     $stanTyp[] = self::getType('standardizations', $v);
                 }
             } else {
@@ -533,8 +594,9 @@ class Tools {
             $filter['subtype__eq'] = $stanTyp;
         }
 
-        if (count($filter))
+        if (count($filter)) {
             return $filter;
+        }
         return null;
     }
 
@@ -542,7 +604,8 @@ class Tools {
      * Anbindung an UnivIS-/FAU-Person-Plugin
      */
 
-    public static function get_univis() {
+    public static function get_univis(): array
+    {
         $univis = [];
         $univisID = self::get_univis_id();
 
@@ -567,7 +630,8 @@ class Tools {
         return $univis;
     }
 
-    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array(), $nameorder = '') {
+    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array(), $nameorder = '')
+    {
         if ($cms == 'wp') {
             // WordPress
             if ($firstname == '' && $lastname == '') {
@@ -603,7 +667,8 @@ class Tools {
         }
     }
 
-    public static function person_id($cms = '', $firstname = '', $lastname = '') {
+    public static function person_id($cms = '', $firstname = '', $lastname = '')
+    {
         if ($cms == 'wp') {
             global $wpdb;
             if ($nameorder == 'lastname-firstname') {
@@ -618,7 +683,8 @@ class Tools {
         return $person_id;
     }
 
-    public static function person_slug($cms = '', $firstname = '', $lastname = '', $nameorder = '') {
+    public static function person_slug($cms = '', $firstname = '', $lastname = '', $nameorder = '')
+    {
         if ($cms == 'wp') {
             // WordPress
             global $wpdb;
@@ -649,7 +715,8 @@ class Tools {
         return $person_slug;
     }
 
-    public static function get_univis_id() {
+    public static function get_univis_id()
+    {
         $fpath = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/tools/univis/univis.conf';
         $fpath_alternative = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/univis.conf';
         if (file_exists($fpath_alternative)) {
@@ -668,10 +735,11 @@ class Tools {
         return $univisID;
     }
 
-    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = '') {
-    	$person = '';
+    public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = ''): string
+    {
+        $person = '';
         switch ($target) {
-            case 'cris' :
+            case 'cris':
                 if (is_numeric($id)) {
                     $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "Person/" . $id . "\" class=\"extern\">";
                     $link_post = "</a>";
@@ -706,7 +774,7 @@ class Tools {
                 $firstnames[] = $firstname;
             }
             foreach ($firstnames as $_fn) {
-                $fn_shorts[] = mb_substr($_fn,0,1);
+                $fn_shorts[] = mb_substr($_fn, 0, 1);
             }
             $firstname = implode('', $fn_shorts) . '.';
         }
@@ -715,12 +783,15 @@ class Tools {
         return $person;
     }
 
-    public static function make_date ($start, $end) {
+    public static function make_date($start, $end): string
+    {
         $date = '';
-        if ($start != '')
-            $start = date_i18n( get_option( 'date_format' ), strtotime($start));
-        if ($end != '')
-            $end = date_i18n( get_option( 'date_format' ), strtotime($end));
+        if ($start != '') {
+            $start = date_i18n(get_option('date_format'), strtotime($start));
+        }
+        if ($end != '') {
+            $end = date_i18n(get_option('date_format'), strtotime($end));
+        }
         if ($start != '' && $end != '') {
             $date = $start . " - " . $end;
         } elseif ($start != '' && $end == '') {
@@ -731,7 +802,8 @@ class Tools {
         return $date;
     }
 
-    public static function get_item_url($item, $title, $cris_id, $page_id = '', $lang = 'de') {
+    public static function get_item_url($item, $title, $cris_id, $page_id = '', $lang = 'de')
+    {
         // First search in subpages
         $pages = get_pages(array('child_of' => $page_id, 'post_status' => 'publish'));
         foreach ($pages as $page) {
@@ -748,7 +820,8 @@ class Tools {
         }
     }
 
-    public static function numeric_xml_encode($text, $double_encode=true){
+    public static function numeric_xml_encode($text, $double_encode = true): string
+    {
         /*
          * Deliver numerically encoded XML representation of special characters.
          * E.g. use &#8211; instead of &ndash;
@@ -762,8 +835,9 @@ class Tools {
          * @return string $encoded Encoded text representation
          */
 
-        if (!$double_encode)
+        if (!$double_encode) {
             $text = html_entity_decode(stripslashes($text), ENT_QUOTES, 'UTF-8');
+        }
 
         $html_specials = array('&', '<', '>', '"');
 
@@ -771,24 +845,26 @@ class Tools {
         $mbchars = preg_split('/(?<!^)(?!$)/u', $text);
 
         $encoded = '';
-        foreach ($mbchars as $char){
+        foreach ($mbchars as $char) {
             if (in_array($char, $html_specials)) {
                 $encoded .= htmlentities($char);
                 continue;
             }
             $o = ord($char);
-            if ( (mb_strlen($char) > 1) || /* multi-byte [unicode] */
+            if ((mb_strlen($char) > 1) || /* multi-byte [unicode] */
                 ($o <32 || $o > 126) || /* <- control / latin weird os -> */
                 ($o >33 && $o < 40) ||/* quotes + ambersand */
                 ($o >59 && $o < 63) /* html */
             ) {
                 // convert to numeric entity
-                $char = mb_encode_numericentity($char,
-                                        array(0x0, 0xffff, 0, 0xffff), 'UTF-8');
+                $char = mb_encode_numericentity(
+                    $char,
+                    array(0x0, 0xffff, 0, 0xffff),
+                    'UTF-8'
+                );
             }
             $encoded .= $char;
         }
         return $encoded;
     }
-
 }

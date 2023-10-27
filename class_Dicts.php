@@ -1,10 +1,11 @@
 <?php
 
-class CRIS_Dicts {
+class CRIS_Dicts
+{
 
-    public static $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
+    public static string $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";
     
-    public static $defaults = array(
+    public static array $defaults = array(
         'show' => 'publications',
         'orderby' => '',
         'year' => '',
@@ -32,7 +33,7 @@ class CRIS_Dicts {
      * Patente:     DE (Prioritätsbegründende Patentanmeldung)
      * Aktivitäten: DE (Sonstige FAU-externe Aktivitäten)
      */
-    public static $typeinfos = array(
+    public static array $typeinfos = array(
         'publications' => array(
             'Journal article' => array(
                 'order' => 2,
@@ -649,16 +650,16 @@ class CRIS_Dicts {
                         )
                     ),
                     'specialissue' => array(
-	                    'order' => 5,
-	                    'short' => 'themenheft_zeitschrift',
-	                    'de' => array(
-		                    'name' => 'Themenheft einer Zeitschrift',
-		                    'title' => 'Themenhefte von Zeitschriften'
-	                    ),
-	                    'en' => array(
-		                    'name' => 'Special issue of a journal',
-		                    'title' => 'Special Issues of Journals'
-	                    )
+                        'order' => 5,
+                        'short' => 'themenheft_zeitschrift',
+                        'de' => array(
+                            'name' => 'Themenheft einer Zeitschrift',
+                            'title' => 'Themenhefte von Zeitschriften'
+                        ),
+                        'en' => array(
+                            'name' => 'Special issue of a journal',
+                            'title' => 'Special Issues of Journals'
+                        )
                     ),
                     'undefined' => array(
                         'order' => 6,
@@ -1502,7 +1503,7 @@ class CRIS_Dicts {
         ),
     );
 
-    public static $pubLanguages = array(
+    public static array $pubLanguages = array(
         'German',
         'English',
         'Arabic',
@@ -1527,5 +1528,4 @@ class CRIS_Dicts {
         'Turkish',
         'Ukrainian'
     );
-
 }

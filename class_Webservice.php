@@ -9,7 +9,8 @@
  * @author Marcus Walther
  */
 
-use RRZE\Cris\{RemoteGet, XML};
+use RRZE\Cris\RemoteGet;
+use RRZE\Cris\XML;
 
 require_once("class_Tools.php");
 
@@ -18,19 +19,19 @@ class CRIS_webservice
     /*
      * generic class for web service access.
      */
-    private $cache = true;
+    private bool $cache = true;
 
     private function fetch($url)
     {
         return RemoteGet::retrieveContent($url);
     }
 
-    public function disable_cache()
+    public function disable_cache(): void
     {
         $this->cache = false;
     }
 
-    public function enable_cache()
+    public function enable_cache(): void
     {
         $this->cache = true;
     }
@@ -49,8 +50,7 @@ class CRIS_webservice
         if ($filter instanceof CRIS_Filter) {
             $remaining = array();
             foreach ($filter->filters as $attr => $value) {
-                if (
-                    strtolower($attr) !== 'publyear' ||
+                if (strtolower($attr) !== 'publyear' ||
                     strtolower($id_parts[1]) !== 'organisation'
                 ) {
                     $remaining[$attr] = $value;
@@ -103,7 +103,7 @@ class CRIS_entity
 
         foreach ($data->attribute as $_a) {
             if ($_a['language'] == 1) {
-                $attr_name = (string) $_a['name'] . '_en';
+                $attr_name = $_a['name'] . '_en';
             } else {
                 $attr_name = (string) $_a['name'];
             }
@@ -116,8 +116,9 @@ class CRIS_entity
             $this->attributes[strtolower($attr_name)] = $attr_value;
         }
         foreach ($data->relation as $_r) {
-            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ", "PROJ_has_PUBL", "FOBE_has_top_PUBL", "FOBE_has_cur_PUBL", "FOBE_has_PICT", "EQUI_has_PICT")))
+            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ", "PROJ_has_PUBL", "FOBE_has_top_PUBL", "FOBE_has_cur_PUBL", "FOBE_has_PICT", "EQUI_has_PICT"))) {
                 continue;
+            }
             foreach ($_r->attribute as $_ra) {
                 if ($_ra['name'] == 'Left seq') {
                     $this->attributes["relation left seq"] = (string) $_ra->data;
