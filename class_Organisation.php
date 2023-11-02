@@ -41,9 +41,7 @@ class Organisation
         }
     }
 
-    /*
-     * Ausgabe einer einzelnen Organisation
-     */
+
 
     public function singleOrganisation($hide = '', $image_align = 'alignright')
     {

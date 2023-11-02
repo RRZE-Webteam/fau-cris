@@ -56,9 +56,14 @@ class Patente
         }
     }
 
-    /*
-     * Ausgabe aller Patente ohne Gliederung
-     */
+	/**
+	 * Name : patListe
+	 *
+	 * Use: get patent list
+	 *
+	 * Returns: patent list
+	 *
+	 */
 
     public function patListe($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
@@ -92,9 +97,15 @@ class Patente
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    /*
-     * Ausgabe aller Patente nach Jahren gegliedert
-     */
+
+	/**
+	 * Name : patNachJahr
+	 *
+	 * Use: get patent list according to registryear
+	 *
+	 * Returns: patent list by registryear
+	 *
+	 */
 
     public function patNachJahr($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
@@ -151,9 +162,14 @@ class Patente
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    /*
-     * Ausgabe aller Patente nach Patenttypen gegliedert
-     */
+	/**
+	 * Name : patNachTyp
+	 *
+	 * Use: get patent list according to patenttype
+	 *
+	 * Returns: patent list by patenttype
+	 *
+	 */
 
     public function patNachTyp($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
@@ -222,10 +238,14 @@ class Patente
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    /*
-     * Ausgabe eines einzelnen Patents
-     */
-
+	/**
+	 * Name : singlePatent
+	 *
+	 * Use: get single patent array
+	 *
+	 * Returns: single patent array
+	 *
+	 */
     public function singlePatent($hide = '', $showname = 1, $showyear = 0, $showpatentname = 1)
     {
         $ws = new CRIS_patents();
@@ -246,13 +266,14 @@ class Patente
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    /* =========================================================================
-     * Private Functions
-      ======================================================================== */
-
-    /*
-     * Holt Daten vom Webservice je nach definierter Einheit.
-     */
+	/**
+	 * Name : fetch_patents
+	 *
+	 * Use: get all patents by orga and person
+	 *
+	 * Returns: patent list
+	 *
+	 */
 
     private function fetch_patents($year = '', $start = '', $end = '', $type = ''): array {
         $filter = Tools::patent_filter($year, $start, $end, $type);
@@ -273,9 +294,14 @@ class Patente
         return $patentArray;
     }
 
-    /*
-     * Ausgabe der Patents
-     */
+	/**
+	 * Name : make_list
+	 *
+	 * Use: format the patent attributes in html
+	 *
+	 * Returns: html formatted list
+	 *
+	 */
 
     private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1): string {
         global $post;
