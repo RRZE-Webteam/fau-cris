@@ -1,9 +1,9 @@
 <?php
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+require_once( "class_Tools.php" );
+require_once( "class_Webservice.php" );
+require_once( "class_Filter.php" );
+require_once( "class_Formatter.php" );
 
 class Standardisierungen
 {
@@ -162,7 +162,8 @@ class Standardisierungen
                     $authorArray[] = array(
                         'id' => $key,
                         'lastname' => $nameparts[0],
-                        'firstname' => array_key_exists(1, $nameparts) ? substr($nameparts[1], 0, 1) . '. ' : '');
+                        'firstname' => array_key_exists(1, $nameparts) ? substr( $nameparts[1],
+		                        0, 1 ) . 'fau-cris ' : '');
                 }
                 $authorList = array();
                 foreach ($authorArray as $v) {

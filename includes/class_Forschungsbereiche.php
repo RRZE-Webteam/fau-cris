@@ -1,9 +1,9 @@
 <?php
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+require_once( "class_Tools.php" );
+require_once( "class_Webservice.php" );
+require_once( "class_Filter.php" );
+require_once( "class_Formatter.php" );
 
 class Forschungsbereiche
 {
@@ -466,7 +466,7 @@ class Forschungsbereiche
 
     private function get_field_projects($field = null)
     {
-        require_once('class_Projekte.php');
+        require_once( 'class_Projekte.php' );
         $liste = new Projekte('field', $field, $this->sc_lang);
         if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
@@ -477,7 +477,7 @@ class Forschungsbereiche
 
     private function get_field_persons($field = null)
     {
-        require_once('class_Projekte.php');
+        require_once( 'class_Projekte.php' );
         $liste = new Projekte('field', $field, $this->sc_lang);
         if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
@@ -488,7 +488,7 @@ class Forschungsbereiche
 
     private function get_field_publications($param = array(), $entity = 'field'): string
     {
-        require_once('class_Publikationen.php');
+        require_once( 'class_Publikationen.php' );
         if ($param['publications_notable'] == '1') {
             $entity = 'field_notable';
         }

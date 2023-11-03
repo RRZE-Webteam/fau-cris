@@ -12,7 +12,7 @@
 use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
 
-require_once("class_Tools.php");
+require_once( "class_Tools.php" );
 
 class CRIS_webservice
 {

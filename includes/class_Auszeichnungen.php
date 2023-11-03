@@ -1,9 +1,9 @@
 <?php
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+require_once( "class_Tools.php" );
+require_once( "class_Webservice.php" );
+require_once( "class_Filter.php" );
+require_once( "class_Formatter.php" );
 
 class Auszeichnungen
 {

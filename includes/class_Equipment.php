@@ -1,9 +1,9 @@
 <?php
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+require_once( "class_Tools.php" );
+require_once( "class_Webservice.php" );
+require_once( "class_Filter.php" );
+require_once( "class_Formatter.php" );
 
 class Equipment
 {
@@ -599,7 +599,7 @@ class Equipment
 
     private function get_equipment_publications($equipment = null, $quotation = ''): ?string
     {
-        require_once('class_Publikationen.php');
+        require_once( 'class_Publikationen.php' );
         $liste = new Publikationen('equipment', $equipment);
         return $liste->equiPub($equipment, $quotation);
     }

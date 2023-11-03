@@ -1,9 +1,9 @@
 <?php
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+require_once( "class_Tools.php" );
+require_once( "class_Webservice.php" );
+require_once( "class_Filter.php" );
+require_once( "class_Formatter.php" );
 
 class Projekte
 {
@@ -1087,7 +1087,7 @@ class Projekte
 
     private function get_project_publications($project = null, $param = array()): string
     {
-        require_once('class_Publikationen.php');
+        require_once( 'class_Publikationen.php' );
         $liste = new Publikationen('project', $project);
         $args = array();
         foreach ($param as $_k => $_v) {

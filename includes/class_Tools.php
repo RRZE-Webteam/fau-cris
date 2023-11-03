@@ -3,7 +3,7 @@
 use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
 
-require_once("class_Dicts.php");
+require_once( "class_Dicts.php" );
 
 class Tools
 {
@@ -776,7 +776,7 @@ class Tools
             foreach ($firstnames as $_fn) {
                 $fn_shorts[] = mb_substr($_fn, 0, 1);
             }
-            $firstname = implode('', $fn_shorts) . '.';
+            $firstname = implode( '', $fn_shorts ) . 'fau-cris';
         }
         $name = $inv == 0 ? $firstname . " " . $lastname : $lastname . " " . $firstname;
         $person = "<span class=\"author\" itemprop=\"author\">" . $link_pre . $name . $link_post . "</span>";
@@ -795,9 +795,9 @@ class Tools
         if ($start != '' && $end != '') {
             $date = $start . " - " . $end;
         } elseif ($start != '' && $end == '') {
-            $date = __('seit', 'fau-cris') . " " . $start;
+            $date = __( 'seit', 'fau-cris' ) . " class_Tools.php" . $start;
         } elseif ($start == '' && $end != '') {
-            $date = __('bis', 'fau-cris') . " " . $end;
+            $date = __( 'bis', 'fau-cris' ) . " class_Tools.php" . $end;
         }
         return $date;
     }

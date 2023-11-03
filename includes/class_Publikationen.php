@@ -1,9 +1,9 @@
 <?php
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+require_once( "class_Tools.php" );
+require_once( "class_Webservice.php" );
+require_once( "class_Filter.php" );
+require_once( "class_Formatter.php" );
 
 class Publikationen
 {
@@ -1264,7 +1264,7 @@ class Publikationen
      */
     private function get_pub_projects($pub = null, $item = 'title')
     {
-        require_once('class_Projekte.php');
+        require_once( 'class_Projekte.php' );
         $liste = new Projekte();
         if (is_wp_error($liste)) {
             return $liste->get_error_message();
@@ -1425,7 +1425,9 @@ class CRIS_publications extends CRIS_webservice
         }
 
         foreach ($fieldID as $_p) {
-            $requests[] = sprintf('getrelated/Forschungsbereich/%d/', $_p) . $relation;
+            $requests[] = class_Publikationen
+                          . phpsprintf( 'getrelated/Forschungsbereich/%d/',
+		            $_p ) . $relation;
         }
         return $this->retrieve($requests, $filter);
     }
