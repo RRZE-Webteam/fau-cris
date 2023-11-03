@@ -11,6 +11,7 @@ namespace RRZE\Cris;
 
 use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
+use RRZE\Cris\Tools;
 
 require_once( "class_Tools.php" );
 

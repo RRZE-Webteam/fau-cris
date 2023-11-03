@@ -1,10 +1,13 @@
 <?php
 namespace RRZE\Cris;
-
-require_once( "class_Tools.php" );
-require_once( "class_Webservice.php" );
-require_once( "class_Filter.php" );
-require_once( "class_Formatter.php" );
+use RRZE\Cris\Tools;
+use RRZE\Cris\CRIS_webservice;
+use RRZE\Cris\CRIS_filter;
+use RRZE\Cris\CRIS_formatter;
+//require_once( "class_Tools.php" );
+//require_once( "class_Webservice.php" );
+//require_once( "class_Filter.php" );
+//require_once( "class_Formatter.php" );
 
 class Auszeichnungen
 {

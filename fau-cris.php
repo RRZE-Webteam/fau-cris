@@ -1,5 +1,17 @@
 <?php
 namespace RRZE\Cris;
+use RRZE\Cris\Tools;
+use \RRZE\Cris\Standardisierungen;
+use RRZE\Cris\Organisation;
+use RRZE\Cris\Equipment;
+use RRZE\Cris\Forschungsbereiche;
+use  RRZE\Cris\Projekte;
+use RRZE\Cris\Auszeichnungen;
+use  RRZE\Cris\Publikationen;
+use  RRZE\Cris\Aktivitaeten;
+use RRZE\Cris\Patente;
+
+
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
@@ -177,7 +189,7 @@ class FAU_CRIS
      */
     private static function default_options(): array
     {
-        require_once( "class_Tools.php" );
+//        require_once( "class_Tools.php" );
         $options = array(
             'cris_org_nr' => '',
             'cris_cache' => '18000',
@@ -879,7 +891,7 @@ class FAU_CRIS
         $page_lang = Tools::getPageLanguage($post->ID);
         if (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
             // Standardisierung
-            require_once( 'class_Standardisierungen.php' );
+//            require_once( 'class_Standardisierungen.php' );
             $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -890,7 +902,7 @@ class FAU_CRIS
             return $liste->standardizationListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'equipment') {
             // Equipment
-            require_once( 'class_Equipment.php' );
+//            require_once( 'class_Equipment.php' );
             $liste = new Equipment($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -910,7 +922,7 @@ class FAU_CRIS
             return $liste->equiListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'organisation') {
             // Forschung
-            require_once( 'class_Organisation.php' );
+//            require_once( 'class_Organisation.php' );
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (is_wp_error(isset($liste->error) && is_wp_error($liste->error))) {
                 return $liste->error->get_error_message();
@@ -918,7 +930,7 @@ class FAU_CRIS
             return $liste->singleOrganisation($parameter['hide'], $parameter['image_align']);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'fields') {
             // Forschungsbereiche
-            require_once( 'class_Forschungsbereiche.php' );
+//            require_once( 'class_Forschungsbereiche.php' );
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -933,7 +945,7 @@ class FAU_CRIS
             return $liste->fieldListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'activities') {
             // Aktivitäten
-            require_once( 'class_Aktivitaeten.php' );
+//            require_once( 'class_Aktivitaeten.php' );
             $liste = new Aktivitaeten($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -954,7 +966,7 @@ class FAU_CRIS
             return $liste->actiListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'patents') {
             // Patente
-            require_once( 'class_Patente.php' );
+//            require_once( 'class_Patente.php' );
             $liste = new Patente($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -974,7 +986,7 @@ class FAU_CRIS
             return $liste->patListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
             // Projekte
-            require_once( 'class_Projekte.php' );
+//            require_once( 'class_Projekte.php' );
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
 
             if (isset($liste->error) && is_wp_error($liste->error)) {
@@ -998,7 +1010,7 @@ class FAU_CRIS
             return $liste->projListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'awards') {
             // Awards
-            require_once( 'class_Auszeichnungen.php' );
+//            require_once( 'class_Auszeichnungen.php' );
             $liste = new Auszeichnungen($parameter['entity'], $parameter['entity_id'], $parameter['display'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -1016,7 +1028,7 @@ class FAU_CRIS
             return $liste->awardsListe($parameter, '');
         } else {
             // Publications
-            require_once( 'class_Publikationen.php' );
+//            require_once( 'class_Publikationen.php' );
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], $parameter['name_order_plugin'], $page_lang, $parameter['display_language']);
 
             if (isset($liste->error) && is_wp_error($liste->error)) {
@@ -1047,7 +1059,7 @@ class FAU_CRIS
 
         // Standardisierung
         if (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
-            require_once( 'class_Standardisierungen.php' );
+//            require_once( 'class_Standardisierungen.php' );
             $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -1055,7 +1067,7 @@ class FAU_CRIS
             return $liste->standardizationListe($parameter, $content);
         } elseif ($parameter['show'] == 'organisation') {
             // Forschung
-            require_once( 'class_Organisation.php' );
+//            require_once( 'class_Organisation.php' );
             $liste = new Organisation($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -1063,7 +1075,7 @@ class FAU_CRIS
             return $liste->customOrganisation($content, $parameter['image_align']);
         } elseif ($parameter['show'] == 'equipment') {
             // Forschungsinfrastruktur
-            require_once( 'class_Equipment.php' );
+//            require_once( 'class_Equipment.php' );
             $liste = new Equipment($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -1071,7 +1083,7 @@ class FAU_CRIS
             return $liste->customEquipment($content, $parameter);
         } elseif ($parameter['show'] == 'fields') {
             // Forschungsbereiche
-            require_once( 'class_Forschungsbereiche.php' );
+//            require_once( 'class_Forschungsbereiche.php' );
             $liste = new Forschungsbereiche($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -1081,7 +1093,7 @@ class FAU_CRIS
             }
         } elseif (isset($parameter['show']) && $parameter['show'] == 'projects') {
             // Projekte
-            require_once( 'class_Projekte.php' );
+//            require_once( 'class_Projekte.php' );
             $liste = new Projekte($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -1091,7 +1103,7 @@ class FAU_CRIS
             }
         } elseif ($parameter['show'] == 'awards') {
             // Auszeichnungen
-            require_once( 'class_Auszeichnungen.php' );
+//            require_once( 'class_Auszeichnungen.php' );
             $liste = new Auszeichnungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
@@ -1102,7 +1114,7 @@ class FAU_CRIS
             return $liste->awardsListe($parameter, $content);
         } elseif ($parameter['show'] == 'publications') {
             // Publikationen
-            require_once( 'class_Publikationen.php' );
+//            require_once( 'class_Publikationen.php' );
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], '', $page_lang);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();

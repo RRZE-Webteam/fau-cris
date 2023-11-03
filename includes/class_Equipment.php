@@ -1,10 +1,14 @@
 <?php
 namespace RRZE\Cris;
-
-require_once( "class_Tools.php" );
-require_once( "class_Webservice.php" );
-require_once( "class_Filter.php" );
-require_once( "class_Formatter.php" );
+use RRZE\Cris\Tools;
+use RRZE\Cris\CRIS_webservice;
+use RRZE\Cris\CRIS_filter;
+use RRZE\Cris\CRIS_formatter;
+use RRZE\Cris\Publikationen;
+//require_once( "class_Tools.php" );
+//require_once( "class_Webservice.php" );
+//require_once( "class_Filter.php" );
+//require_once( "class_Formatter.php" );
 
 class Equipment
 {
@@ -600,7 +604,7 @@ class Equipment
 
     private function get_equipment_publications($equipment = null, $quotation = ''): ?string
     {
-        require_once( 'class_Publikationen.php' );
+//        require_once( 'class_Publikationen.php' );
         $liste = new Publikationen('equipment', $equipment);
         return $liste->equiPub($equipment, $quotation);
     }

@@ -2,8 +2,8 @@
 namespace RRZE\Cris;
 use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
-
-require_once( "class_Dicts.php" );
+use RRZE\Cris\CRIS_Dicts;
+//require_once( "class_Dicts.php" );
 
 class Tools
 {

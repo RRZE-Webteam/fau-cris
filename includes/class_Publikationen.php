@@ -1,9 +1,14 @@
 <?php
 namespace RRZE\Cris;
-require_once( "class_Tools.php" );
-require_once( "class_Webservice.php" );
-require_once( "class_Filter.php" );
-require_once( "class_Formatter.php" );
+use RRZE\Cris\Tools;
+use RRZE\Cris\CRIS_webservice;
+use RRZE\Cris\CRIS_filter;
+use RRZE\Cris\CRIS_formatter;
+use RRZE\Cris\Projekte;
+//require_once( "class_Tools.php" );
+//require_once( "class_Webservice.php" );
+//require_once( "class_Filter.php" );
+//require_once( "class_Formatter.php" );
 
 class Publikationen
 {
@@ -1264,7 +1269,7 @@ class Publikationen
      */
     private function get_pub_projects($pub = null, $item = 'title')
     {
-        require_once( 'class_Projekte.php' );
+//        require_once( 'class_Projekte.php' );
         $liste = new Projekte();
         if (is_wp_error($liste)) {
             return $liste->get_error_message();
