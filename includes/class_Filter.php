@@ -1,5 +1,5 @@
 <?php
-
+namespace RRZE\Cris;
 class CRIS_filter
 {
     /*

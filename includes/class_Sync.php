@@ -1,5 +1,5 @@
 <?php
-
+namespace RRZE\Cris;
 require_once( "class_Organisation.php" );
 require_once( "class_Forschungsbereiche.php" );
 require_once( "class_Projekte.php" );

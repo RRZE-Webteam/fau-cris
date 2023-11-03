@@ -17,7 +17,7 @@
  * Vergleich zwischen generischem Zugang vs. bisherigem
  */
 
-require_once('class_Publikationen.php');
+require_once( 'class_Publikationen.php' );
 
 /*
  * helper methods for testing outside wordpress environment

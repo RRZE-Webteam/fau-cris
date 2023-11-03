@@ -1,4 +1,5 @@
 <?php
+namespace RRZE\Cris;
 
 require_once "class_Tools.php";
 require_once "class_Webservice.php";

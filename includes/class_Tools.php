@@ -1,5 +1,5 @@
 <?php
-
+namespace RRZE\Cris;
 use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
 
