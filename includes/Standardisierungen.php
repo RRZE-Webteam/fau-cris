@@ -419,7 +419,7 @@ class Standardisierungen
     }
 }
 
-class CRIS_standardizations extends CRIS_webservice
+class CRIS_standardizations extends Webservice
 {
     /*
      * actients/grants requests

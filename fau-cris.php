@@ -1,14 +1,14 @@
 <?php
 namespace RRZE\Cris;
 use RRZE\Cris\Tools;
-use \RRZE\Cris\Standardisierungen;
+use RRZE\Cris\Standardisierungen;
 use RRZE\Cris\Organisation;
 use RRZE\Cris\Equipment;
 use RRZE\Cris\Forschungsbereiche;
-use  RRZE\Cris\Projekte;
+use RRZE\Cris\Projekte;
 use RRZE\Cris\Auszeichnungen;
-use  RRZE\Cris\Publikationen;
-use  RRZE\Cris\Aktivitaeten;
+use RRZE\Cris\Publikationen;
+use RRZE\Cris\Aktivitaeten;
 use RRZE\Cris\Patente;
 
 
