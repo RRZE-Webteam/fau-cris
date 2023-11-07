@@ -377,7 +377,7 @@ class Patente
     }
 }
 
-class CRIS_patents extends CRIS_webservice
+class CRIS_patents extends Webservice
 {
     /*
      * patents/grants requests

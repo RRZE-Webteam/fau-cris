@@ -537,7 +537,7 @@ class Forschungsbereiche
     }
 }
 
-class CRIS_fields extends CRIS_webservice
+class CRIS_fields extends Webservice
 {
     /*
      * publication requests, supports multiple organisation ids given as array.

@@ -1134,7 +1134,7 @@ class Projekte
     }
 }
 
-class CRIS_projects extends CRIS_webservice
+class CRIS_projects extends Webservice
 {
     /*
      * projects requests

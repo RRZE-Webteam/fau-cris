@@ -2,11 +2,17 @@
 namespace RRZE\Cris;
 //require_once( "Organisation.php" );
 //require_once( "Forschungsbereiche.php" );
-//require_once( "Projekte.php" );
+require_once( "Projekte.php" );
 
 use  RRZE\Cris\Organisation;
-use RRZE\Cris\Forschungsbereiche;
+use  RRZE\Cris\Forschungsbereiche;
 use RRZE\Cris\Projekte;
+
+
+
+
+
+
 class Sync
 {
 

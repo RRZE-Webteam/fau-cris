@@ -236,7 +236,7 @@ class Organisation
     }
 }
 
-class CRIS_organisations extends CRIS_webservice
+class CRIS_organisations extends Webservice
 {
     /*
      * projects requests

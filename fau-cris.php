@@ -10,6 +10,7 @@ use RRZE\Cris\Auszeichnungen;
 use RRZE\Cris\Publikationen;
 use RRZE\Cris\Aktivitaeten;
 use RRZE\Cris\Patente;
+use RRZE\Cris\Sync;
 
 
 
@@ -273,7 +274,6 @@ class FAU_CRIS
         $tabs = self::options_page_tabs();
         $current = self::current_tab($_GET);
         if (isset($_GET['action']) && $_GET['action'] == 'cris_sync') {
-            include 'Sync.php';
             global $post;
             $page_lang = substr(get_locale(), 0, 2);
             $sync = new Sync($page_lang);
@@ -1418,7 +1418,6 @@ class FAU_CRIS
 
     public static function cris_auto_sync(): void
     {
-        include 'Sync.php';
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
         $sync = new Sync($page_lang);
