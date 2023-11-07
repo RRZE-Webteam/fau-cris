@@ -1,13 +1,13 @@
 <?php
 namespace RRZE\Cris;
 use RRZE\Cris\Tools;
-use RRZE\Cris\CRIS_webservice;
-use RRZE\Cris\CRIS_filter;
-use RRZE\Cris\CRIS_formatter;
-//require_once( "class_Tools.php" );
-//require_once( "class_Webservice.php" );
-//require_once( "class_Filter.php" );
-//require_once( "class_Formatter.php" );
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
+//require_once( "Tools.php" );
+//require_once( "Webservice.php" );
+//require_once( "Filter.php" );
+//require_once( "Formatter.php" );
 
 class Auszeichnungen
 {
@@ -84,7 +84,7 @@ class Auszeichnungen
         }
 
         $order = "year award";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
+        $formatter = new Formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($awardArray);
         if ($limit != '') {
             $awardList = array_slice($res[$order], 0, $limit);
@@ -133,9 +133,9 @@ class Auszeichnungen
         }
 
         if ($order2 == 'year') {
-            $formatter = new CRIS_formatter("year award", SORT_DESC, "year award", SORT_DESC);
+            $formatter = new Formatter("year award", SORT_DESC, "year award", SORT_DESC);
         } else {
-            $formatter = new CRIS_formatter("year award", SORT_DESC, "exportnames", SORT_ASC);
+            $formatter = new Formatter("year award", SORT_DESC, "exportnames", SORT_ASC);
         }
         $awardList = $formatter->execute($awardArray);
 
@@ -205,7 +205,7 @@ class Auszeichnungen
 
         // Auszeichnungstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['awards'], 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(Dicts::$typeinfos['awards'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('awards', $value);
             }
@@ -215,9 +215,9 @@ class Auszeichnungen
 
         // sortiere nach Typenliste, innerhalb des Typs nach Name aufwärts sortieren
         if ($order2 == 'name') {
-            $formatter = new CRIS_formatter("type of award", array_values($order), "exportnames", SORT_ASC);
+            $formatter = new Formatter("type of award", array_values($order), "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("type of award", array_values($order), "year award", SORT_DESC);
+            $formatter = new Formatter("type of award", array_values($order), "year award", SORT_DESC);
         }
         $awardList = $formatter->execute($awardArray);
         $output = '';
@@ -601,7 +601,7 @@ class Auszeichnungen
     {
 
         $images = array();
-        $picString = CRIS_Dicts::$base_uri . "getrelated/Award/" . $award . "/awar_has_pict";
+        $picString = Dicts::$base_uri . "getrelated/Award/" . $award . "/awar_has_pict";
         $picXml = Tools::XML2obj($picString);
         $i = 1;
         if (!is_wp_error($picXml) && !empty($picXml->infoObject)) {
@@ -624,7 +624,7 @@ class Auszeichnungen
     }
 }
 
-class CRIS_awards extends CRIS_webservice
+class CRIS_awards extends Webservice
 {
     /*
      * awards/grants requests

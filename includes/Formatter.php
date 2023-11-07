@@ -1,6 +1,6 @@
 <?php
 namespace RRZE\Cris;
-class CRIS_formatter
+class Formatter
 {
     /*
      * This class provides grouping and sorting methods for any CRIS data.

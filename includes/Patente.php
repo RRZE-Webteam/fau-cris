@@ -1,13 +1,13 @@
 <?php
 namespace RRZE\Cris;
 use RRZE\Cris\Tools;
-use RRZE\Cris\CRIS_webservice;
-use RRZE\Cris\CRIS_filter;
-use RRZE\Cris\CRIS_formatter;
-//require_once( "class_Tools.php" );
-//require_once( "class_Webservice.php" );
-//require_once( "class_Filter.php" );
-//require_once( "class_Formatter.php" );
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
+//require_once( "Tools.php" );
+//require_once( "Webservice.php" );
+//require_once( "Filter.php" );
+//require_once( "Formatter.php" );
 
 class Patente
 {
@@ -88,7 +88,7 @@ class Patente
         }
 
         $order = "registryear";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
+        $formatter = new Formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($patentArray);
         if ($limit != '') {
             $patentList = array_slice($res[$order], 0, $limit);
@@ -131,9 +131,9 @@ class Patente
         }
 
         if ($order2 == 'author') {
-            $formatter = new CRIS_formatter("registryear", SORT_DESC, "exportinventors", SORT_ASC);
+            $formatter = new Formatter("registryear", SORT_DESC, "exportinventors", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("registryear", SORT_DESC, "cfregistrdate", SORT_ASC);
+            $formatter = new Formatter("registryear", SORT_DESC, "cfregistrdate", SORT_ASC);
         }
         $patentList = $formatter->execute($patentArray);
 
@@ -196,7 +196,7 @@ class Patente
 
         // Patenttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(Dicts::$typeinfos['publications'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('patents', $value);
             }
@@ -206,9 +206,9 @@ class Patente
 
         // sortiere nach Typenliste, innerhalb des Typs nach Name aufwärts sortieren
         if ($order2 == 'name') {
-            $formatter = new CRIS_formatter("patenttype", SORT_DESC, "exportinventors", SORT_ASC);
+            $formatter = new Formatter("patenttype", SORT_DESC, "exportinventors", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("patenttype", SORT_DESC, "cfregistrdate", SORT_DESC);
+            $formatter = new Formatter("patenttype", SORT_DESC, "cfregistrdate", SORT_DESC);
         }
         $patentList = $formatter->execute($patentArray);
         $output = '';

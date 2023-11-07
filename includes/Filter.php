@@ -1,6 +1,6 @@
 <?php
 namespace RRZE\Cris;
-class CRIS_filter
+class Filter
 {
     /*
      * This class provides filter options for any CRIS data.

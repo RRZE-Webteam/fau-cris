@@ -2,15 +2,15 @@
 namespace RRZE\Cris;
 
 use RRZE\Cris\Tools;
-use RRZE\Cris\CRIS_webservice;
-use RRZE\Cris\CRIS_filter;
-use RRZE\Cris\CRIS_formatter;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
 use  RRZE\Cris\Publikationen;
 use RRZE\Cris\Projekte;
-//require_once( "class_Tools.php" );
-//require_once( "class_Webservice.php" );
-//require_once( "class_Filter.php" );
-//require_once( "class_Formatter.php" );
+//require_once( "Tools.php" );
+//require_once( "Webservice.php" );
+//require_once( "Filter.php" );
+//require_once( "Formatter.php" );
 
 class Forschungsbereiche
 {
@@ -84,7 +84,7 @@ class Forschungsbereiche
             $orderby = __('O.A.', 'fau-cris');
         }
         $hide = $param['hide'];
-        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
+        $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
         $list = $res[$orderby] ?? [];
         if ($param['limit'] != '') {
@@ -169,7 +169,7 @@ class Forschungsbereiche
             }
         }
 
-        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
+        $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($fieldsArray);
         $fieldList = $res[$orderby] ?? [];
 
@@ -473,7 +473,7 @@ class Forschungsbereiche
 
     private function get_field_projects($field = null)
     {
-//        require_once( 'class_Projekte.php' );
+//        require_once( 'Projekte.php' );
         $liste = new Projekte('field', $field, $this->sc_lang);
         if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
@@ -484,7 +484,7 @@ class Forschungsbereiche
 
     private function get_field_persons($field = null)
     {
-//        require_once( 'class_Projekte.php' );
+//        require_once( 'Projekte.php' );
         $liste = new Projekte('field', $field, $this->sc_lang);
         if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
@@ -495,7 +495,7 @@ class Forschungsbereiche
 
     private function get_field_publications($param = array(), $entity = 'field'): string
     {
-//        require_once( 'class_Publikationen.php' );
+//        require_once( 'Publikationen.php' );
         if ($param['publications_notable'] == '1') {
             $entity = 'field_notable';
         }
@@ -524,7 +524,7 @@ class Forschungsbereiche
     private function get_field_images($field): array
     {
         $images = array();
-        $imgString = CRIS_Dicts::$base_uri . "getrelated/Forschungsbereich/" . $field . "/FOBE_has_PICT";
+        $imgString = Dicts::$base_uri . "getrelated/Forschungsbereich/" . $field . "/FOBE_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
         if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {
@@ -687,10 +687,10 @@ class CRIS_field_image extends CRIS_Entity
 # tests possible if called on command-line
 if (!debug_backtrace()) {
     $p = new CRIS_Publications();
-    $f = new CRIS_Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
+    $f = new Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
     $publs = $p->by_orga_id("142285", $f);
     $order = "virtualdate";
-    $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
+    $formatter = new Formatter(null, null, $order, SORT_DESC);
     $res = $formatter->execute($publs);
     foreach ($res[$order] as $key => $value) {
         echo sprintf("%s: %s\n", $key, $value->attributes[$order]);

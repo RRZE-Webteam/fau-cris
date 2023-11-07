@@ -2,8 +2,8 @@
 namespace RRZE\Cris;
 use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
-use RRZE\Cris\CRIS_Dicts;
-//require_once( "class_Dicts.php" );
+use RRZE\Cris\Dicts;
+//require_once( "Dicts.php" );
 
 class Tools
 {
@@ -12,8 +12,8 @@ class Tools
     {
         $acronym = '';
         foreach (explode(' ', $acadTitle) as $actitle) {
-            if (array_key_exists($actitle, CRIS_Dicts::$acronyms) && CRIS_Dicts::$acronyms[$actitle] != '') {
-                $acronym .= " " . CRIS_Dicts::$acronyms[$actitle];
+            if (array_key_exists($actitle, Dicts::$acronyms) && Dicts::$acronyms[$actitle] != '') {
+                $acronym .= " " . Dicts::$acronyms[$actitle];
             }
             $acronym = trim($acronym);
         }
@@ -22,12 +22,12 @@ class Tools
 
     public static function getOrder($object, $type = ''): array
     {
-        if ($type == '' || !isset(CRIS_Dicts::$typeinfos[$object][$type]['subtypes'])) {
-            foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
+        if ($type == '' || !isset(Dicts::$typeinfos[$object][$type]['subtypes'])) {
+            foreach (Dicts::$typeinfos[$object] as $k => $v) {
                 $order[$v['order']] = $k;
             }
         } else {
-            foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
+            foreach (Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
                 $order[$v['order']] = $k;
             }
         }
@@ -40,11 +40,11 @@ class Tools
         $order_raw = self::getOrder($object, $type);
         if ($type == '') {
             foreach ($order_raw as $k => $v) {
-                $order[] = CRIS_Dicts::$typeinfos[$object][$v]['short'];
+                $order[] = Dicts::$typeinfos[$object][$v]['short'];
             }
         } else {
             foreach ($order_raw as $k => $v) {
-                $order[] = CRIS_Dicts::$typeinfos[$object][$type]['subtypes'][$v]['short'];
+                $order[] = Dicts::$typeinfos[$object][$type]['subtypes'][$v]['short'];
             }
         }
         return $order;
@@ -53,7 +53,7 @@ class Tools
     public static function getType($object, $short, $type = '')
     {
         if ($type == '') {
-            foreach (CRIS_Dicts::$typeinfos[$object] as $k => $v) {
+            foreach (Dicts::$typeinfos[$object] as $k => $v) {
                 if ($v['short'] == $short) {
                     return $k;
                 }
@@ -62,7 +62,7 @@ class Tools
                 }
             }
         } else {
-            foreach (CRIS_Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
+            foreach (Dicts::$typeinfos[$object][$type]['subtypes'] as $k => $v) {
                 if ($v['short'] == $short) {
                     return $k;
                 }
@@ -74,14 +74,14 @@ class Tools
     {
         $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
         if ($subtype == '') {
-            if (array_key_exists($type, CRIS_Dicts::$typeinfos[$object])) {
-                return CRIS_Dicts::$typeinfos[$object][$type][$lang]['name'];
+            if (array_key_exists($type, Dicts::$typeinfos[$object])) {
+                return Dicts::$typeinfos[$object][$type][$lang]['name'];
             } else {
                 return $type;
             }
         } else {
-            if (array_key_exists($subtype, CRIS_Dicts::$typeinfos[$object][$type]['subtypes'])) {
-                return CRIS_Dicts::$typeinfos[$object][$type]['subtypes'][$subtype][$lang]['name'];
+            if (array_key_exists($subtype, Dicts::$typeinfos[$object][$type]['subtypes'])) {
+                return Dicts::$typeinfos[$object][$type]['subtypes'][$subtype][$lang]['name'];
             } else {
                 return $subtype;
             }
@@ -93,12 +93,12 @@ class Tools
     {
         $lang = strpos($lang, 'de') === 0 ? 'de' : 'en';
         if ($type == '') {
-            if (isset(CRIS_Dicts::$typeinfos[$object][$name][$lang]['title'])) {
-                return CRIS_Dicts::$typeinfos[$object][$name][$lang]['title'];
+            if (isset(Dicts::$typeinfos[$object][$name][$lang]['title'])) {
+                return Dicts::$typeinfos[$object][$name][$lang]['title'];
             }
         } else {
-            if (isset(CRIS_Dicts::$typeinfos[$object][$type]['subtypes'][$name][$lang]['title'])) {
-                return CRIS_Dicts::$typeinfos[$object][$type]['subtypes'][$name][$lang]['title'];
+            if (isset(Dicts::$typeinfos[$object][$type]['subtypes'][$name][$lang]['title'])) {
+                return Dicts::$typeinfos[$object][$type]['subtypes'][$name][$lang]['title'];
             }
         }
         return $name;
@@ -106,7 +106,7 @@ class Tools
 
     public static function getSubtypeAttribute($object, $type)
     {
-        return CRIS_Dicts::$typeinfos[$object][$type]['subtypeattribute'];
+        return Dicts::$typeinfos[$object][$type]['subtypeattribute'];
     }
 
     public static function getPageLanguage($postID): string
@@ -795,9 +795,9 @@ class Tools
         if ($start != '' && $end != '') {
             $date = $start . " - " . $end;
         } elseif ($start != '' && $end == '') {
-            $date = __( 'seit', 'fau-cris' ) . " class_Tools.php" . $start;
+            $date = __('seit', 'fau-cris') . " Tools.php" . $start;
         } elseif ($start == '' && $end != '') {
-            $date = __( 'bis', 'fau-cris' ) . " class_Tools.php" . $end;
+            $date = __('bis', 'fau-cris') . " Tools.php" . $end;
         }
         return $date;
     }

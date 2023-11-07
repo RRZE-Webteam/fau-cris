@@ -2,14 +2,14 @@
 namespace RRZE\Cris;
 
 use RRZE\Cris\Tools;
-use RRZE\Cris\CRIS_webservice;
-use RRZE\Cris\CRIS_filter;
-use RRZE\Cris\CRIS_formatter;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
 
-//require_once( "class_Tools.php" );
-//require_once( "class_Webservice.php" );
-//require_once( "class_Filter.php" );
-//require_once( "class_Formatter.php" );
+//require_once( "Tools.php" );
+//require_once( "Webservice.php" );
+//require_once( "Filter.php" );
+//require_once( "Formatter.php" );
 
 class Standardisierungen
 {
@@ -99,7 +99,7 @@ class Standardisierungen
         // sortiere nach Erscheinungsdatum
         $sort = "venue_start";
         $sortOrder = SORT_DESC;
-        $formatter = new CRIS_formatter($group, $groupOrder, $sort, $sortOrder);
+        $formatter = new Formatter($group, $groupOrder, $sort, $sortOrder);
         $standardizations = $formatter->execute($standardizationArray);
         $isGroupAccordion = ($param['display'] == 'accordion' && in_array($param['orderby'], ['year', 'type']));
         $isSingleAccordion = ($param['display'] == 'accordion' && $param['orderby'] == '');

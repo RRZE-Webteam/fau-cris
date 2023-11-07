@@ -1,13 +1,13 @@
 <?php
 namespace RRZE\Cris;
 use RRZE\Cris\Tools;
-use RRZE\Cris\CRIS_webservice;
-use RRZE\Cris\CRIS_filter;
-use RRZE\Cris\CRIS_formatter;
-//require_once( "class_Tools.php" );
-//require_once( "class_Webservice.php" );
-//require_once( "class_Filter.php" );
-//require_once( "class_Formatter.php" );
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
+//require_once( "Tools.php" );
+//require_once( "Webservice.php" );
+//require_once( "Filter.php" );
+//require_once( "Formatter.php" );
 
 class Organisation
 {
@@ -222,8 +222,8 @@ class Organisation
     private function get_research_images($orga): array
     {
         $images = array();
-        //$imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_PICT";
-        $imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
+        //$imgString = Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_PICT";
+        $imgString = Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
         if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {

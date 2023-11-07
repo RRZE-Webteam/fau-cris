@@ -1,14 +1,14 @@
 <?php
 namespace RRZE\Cris;
 use RRZE\Cris\Tools;
-use RRZE\Cris\CRIS_webservice;
-use RRZE\Cris\CRIS_filter;
-use RRZE\Cris\CRIS_formatter;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
 use RRZE\Cris\Publikationen;
-//require_once( "class_Tools.php" );
-//require_once( "class_Webservice.php" );
-//require_once( "class_Filter.php" );
-//require_once( "class_Formatter.php" );
+//require_once( "Tools.php" );
+//require_once( "Webservice.php" );
+//require_once( "Filter.php" );
+//require_once( "Formatter.php" );
 
 class Equipment
 {
@@ -116,7 +116,7 @@ class Equipment
 
         // sortiere nach Erscheinungsdatum
         $order = "cfname";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_ASC);
+        $formatter = new Formatter(null, null, $order, SORT_ASC);
         $res = $formatter->execute($equiArray);
         $equiList = $res[$order];
 
@@ -153,7 +153,7 @@ class Equipment
 
         // sortiere nach Erscheinungsdatum
         $order = "cfname";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_ASC);
+        $formatter = new Formatter(null, null, $order, SORT_ASC);
         $res = $formatter->execute($equiArray);
         $equiList = $res[$order];
 
@@ -604,7 +604,7 @@ class Equipment
 
     private function get_equipment_publications($equipment = null, $quotation = ''): ?string
     {
-//        require_once( 'class_Publikationen.php' );
+//        require_once( 'Publikationen.php' );
         $liste = new Publikationen('equipment', $equipment);
         return $liste->equiPub($equipment, $quotation);
     }
@@ -690,7 +690,7 @@ class Equipment
     }
 }
 
-class CRIS_equipments extends CRIS_webservice
+class CRIS_equipments extends Webservice
 {
     /*
      * actients/grants requests
