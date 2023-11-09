@@ -6,7 +6,7 @@ require_once( "Projekte.php" );
 
 use  RRZE\Cris\Organisation;
 use  RRZE\Cris\Forschungsbereiche;
-use RRZE\Cris\Projekte;
+//use RRZE\Cris\Projekte;
 
 
 

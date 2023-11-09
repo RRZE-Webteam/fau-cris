@@ -120,7 +120,7 @@ class Tools
         return $page_lang;
     }
 
-    public static function XML2obj($url): WP_Error|SimpleXMLElement|bool
+    public static function XML2obj($url): WP_Error|SimpleXMLElement|bool|String
     {
         $content = RemoteGet::retrieveContent($url);
         return XML::element($content);
