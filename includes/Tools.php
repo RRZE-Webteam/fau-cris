@@ -1,5 +1,7 @@
 <?php
 namespace RRZE\Cris;
+defined('ABSPATH') || exit;
+
 use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
 use RRZE\Cris\Dicts;

@@ -1,5 +1,7 @@
 <?php
 namespace RRZE\Cris;
+defined('ABSPATH') || exit;
+
 class Filter
 {
     /*

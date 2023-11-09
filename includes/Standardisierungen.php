@@ -1,5 +1,6 @@
 <?php
 namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
 use RRZE\Cris\Tools;
 use RRZE\Cris\Webservice;

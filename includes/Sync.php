@@ -1,5 +1,7 @@
 <?php
 namespace RRZE\Cris;
+defined('ABSPATH') || exit;
+
 require_once( "Projekte.php" );
 use  RRZE\Cris\Organisation;
 use  RRZE\Cris\Forschungsbereiche;

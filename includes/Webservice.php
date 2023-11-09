@@ -1,5 +1,7 @@
 <?php
 namespace RRZE\Cris;
+defined('ABSPATH') || exit;
+
 /**
  * These classes provide generic access to the CRIS web service data including
  * filter and sorting methods.
