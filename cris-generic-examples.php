@@ -2,12 +2,14 @@
 /*
  * Examples for using the generic CRIS web service access.
  */
+require_once( './includes/Publikationen.php' );
+
 include('cris-generic.php');
 
 $publ = new CRIS_publications();
 
 /*
- * Define filter. You may pass an array or a instance of Filter to a
+ * Define filter. You may pass an array or a instance of CRIS_filter to a
  * CRIS_publications instance. For list of operators see class constructor.
  */
 $filter = array(
