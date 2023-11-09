@@ -7,10 +7,6 @@ use RRZE\Cris\Filter;
 use RRZE\Cris\Formatter;
 use  RRZE\Cris\Publikationen;
 use RRZE\Cris\Projekte;
-//require_once( "Tools.php" );
-//require_once( "Webservice.php" );
-//require_once( "Filter.php" );
-//require_once( "Formatter.php" );
 
 class Forschungsbereiche
 {
@@ -473,7 +469,6 @@ class Forschungsbereiche
 
     private function get_field_projects($field = null)
     {
-//        require_once( 'Projekte.php' );
         $liste = new Projekte('field', $field, $this->sc_lang);
         if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
@@ -484,7 +479,6 @@ class Forschungsbereiche
 
     private function get_field_persons($field = null)
     {
-//        require_once( 'Projekte.php' );
         $liste = new Projekte('field', $field, $this->sc_lang);
         if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
@@ -495,7 +489,7 @@ class Forschungsbereiche
 
     private function get_field_publications($param = array(), $entity = 'field'): string
     {
-//        require_once( 'Publikationen.php' );
+
         if ($param['publications_notable'] == '1') {
             $entity = 'field_notable';
         }

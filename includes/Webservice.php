@@ -13,8 +13,6 @@ use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
 use RRZE\Cris\Tools;
 
-//require_once("Tools.php");
-
 class Webservice
 {
     /*

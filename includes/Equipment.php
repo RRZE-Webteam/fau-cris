@@ -5,10 +5,6 @@ use RRZE\Cris\Webservice;
 use RRZE\Cris\Filter;
 use RRZE\Cris\Formatter;
 use RRZE\Cris\Publikationen;
-//require_once( "Tools.php" );
-//require_once( "Webservice.php" );
-//require_once( "Filter.php" );
-//require_once( "Formatter.php" );
 
 class Equipment
 {
@@ -604,7 +600,6 @@ class Equipment
 
     private function get_equipment_publications($equipment = null, $quotation = ''): ?string
     {
-//        require_once( 'Publikationen.php' );
         $liste = new Publikationen('equipment', $equipment);
         return $liste->equiPub($equipment, $quotation);
     }

@@ -4,10 +4,6 @@ use RRZE\Cris\Tools;
 use RRZE\Cris\Webservice;
 use RRZE\Cris\Filter;
 use RRZE\Cris\Formatter;
-//require_once( "Tools.php" );
-//require_once( "Webservice.php" );
-//require_once( "Filter.php" );
-//require_once( "Formatter.php" );
 
 class Auszeichnungen
 {

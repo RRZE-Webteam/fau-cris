@@ -6,10 +6,6 @@ use RRZE\Cris\Filter;
 use RRZE\Cris\Formatter;
 use RRZE\Cris\Publikationen;
 
-//require_once( "Tools.php" );
-//require_once( "Webservice.php" );
-//require_once( "Filter.php" );
-//require_once( "Formatter.php" );
 
 class Projekte
 {
@@ -1093,7 +1089,7 @@ class Projekte
 
     private function get_project_publications($project = null, $param = array()): string
     {
-//        require_once( 'Publikationen.php' );
+
         $liste = new Publikationen('project', $project);
         $args = array();
         foreach ($param as $_k => $_v) {

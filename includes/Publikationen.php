@@ -7,10 +7,6 @@ use RRZE\Cris\Formatter;
 use RRZE\Cris\Projekte;
 
 
-//require_once( "Tools.php" );
-//require_once( "Webservice.php" );
-//require_once( "Filter.php" );
-//require_once( "Formatter.php" );
 
 class Publikationen
 {
@@ -1271,7 +1267,7 @@ class Publikationen
      */
     private function get_pub_projects($pub = null, $item = 'title')
     {
-//        require_once( 'Projekte.php' );
+
         $liste = new Projekte();
         if (is_wp_error($liste)) {
             return $liste->get_error_message();
