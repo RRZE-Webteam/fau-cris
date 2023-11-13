@@ -1,9 +1,12 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
+use RRZE\Cris\Publikationen;
 
 class Equipment
 {
@@ -45,9 +48,14 @@ class Equipment
         //var_dump($this->page_lang);
     }
 
-    /*
-     * Ausgabe eines einzelnen Equipments
-     */
+	/**
+	 * Name : singleEquipment
+	 *
+	 * Use: make single equipmment array
+	 *
+	 * Returns: single equipment array
+	 *
+	 */
 
     public function singleEquipment($hide = array(), $quotation = '')
     {
@@ -69,6 +77,14 @@ class Equipment
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
+	/**
+	 * Name : customEquipment
+	 *
+	 * Use: make single equipmment array
+	 *
+	 * Returns: custom Equipment array
+	 *
+	 */
     public function customEquipment($content = '', $param = array())
     {
         if ($param['entity'] == 'equipment') {
@@ -98,7 +114,7 @@ class Equipment
 
         // sortiere nach Erscheinungsdatum
         $order = "cfname";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_ASC);
+        $formatter = new Formatter(null, null, $order, SORT_ASC);
         $res = $formatter->execute($equiArray);
         $equiList = $res[$order];
 
@@ -107,6 +123,15 @@ class Equipment
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
+
+	/**
+	 * Name : equiListe
+	 *
+	 * Use: make quipmment list
+	 *
+	 * Returns: Equipment list
+	 *
+	 */
     public function equiListe($param = array()): string
     {
         $constructionYearStart = (isset($param['constructionyearstart']) && $param['constructionyearstart'] != '') ? $param['constructionyearstart'] : '';
@@ -126,7 +151,7 @@ class Equipment
 
         // sortiere nach Erscheinungsdatum
         $order = "cfname";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_ASC);
+        $formatter = new Formatter(null, null, $order, SORT_ASC);
         $res = $formatter->execute($equiArray);
         $equiList = $res[$order];
 
@@ -143,6 +168,14 @@ class Equipment
     {
     }
 
+	/**
+	 * Name : make_list
+	 *
+	 * Use: format the equiment attributes in html
+	 *
+	 * Returns: html formatted equipment list
+	 *
+	 */
     private function make_list($equipments, $hide = array()): string
     {
         $equilist = "<ul class=\"cris-equipment\">";
@@ -207,6 +240,14 @@ class Equipment
         return $equilist;
     }
 
+	/**
+	 * Name : make_single
+	 *
+	 * Use: format the single equiment attributes in html
+	 *
+	 * Returns: html formatted single equipment list
+	 *
+	 */
     private function make_single($equipments, $hide = array(), $quotation = '', $image_align = 'alignright'): string
     {
         $equilist = "<div class=\"cris-equipment\">";
@@ -356,6 +397,14 @@ class Equipment
         return $equilist;
     }
 
+	/**
+	 * Name : make_custom
+	 *
+	 * Use: format the custom equipment attributes in html
+	 *
+	 * Returns: html formatted custom equipment list
+	 *
+	 */
     private function make_custom($equipments, $custom_text = '', $param = array())
     {
 
@@ -515,6 +564,14 @@ class Equipment
         return do_shortcode($equipmentlist);
     }
 
+	/**
+	 * Name : get_equipment_images
+	 *
+	 * Use: fetch the equipment images
+	 *
+	 * Returns: list of eqipment images
+	 *
+	 */
     private function get_equipment_images($equipment): array
     {
         $images = array();
@@ -541,9 +598,10 @@ class Equipment
         return $images;
     }
 
+
+
     private function get_equipment_publications($equipment = null, $quotation = ''): ?string
     {
-        require_once('class_Publikationen.php');
         $liste = new Publikationen('equipment', $equipment);
         return $liste->equiPub($equipment, $quotation);
     }
@@ -629,7 +687,7 @@ class Equipment
     }
 }
 
-class CRIS_equipments extends CRIS_webservice
+class CRIS_equipments extends Webservice
 {
     /*
      * actients/grants requests
@@ -677,8 +735,8 @@ class CRIS_equipments extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null): array
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter) {
-            $filter = new CRIS_filter($filter);
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
         }
 
         $data = array();

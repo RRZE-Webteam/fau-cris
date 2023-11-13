@@ -1,9 +1,11 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
 
 class Organisation
 {
@@ -41,9 +43,7 @@ class Organisation
         }
     }
 
-    /*
-     * Ausgabe einer einzelnen Organisation
-     */
+
 
     public function singleOrganisation($hide = '', $image_align = 'alignright')
     {
@@ -220,8 +220,8 @@ class Organisation
     private function get_research_images($orga): array
     {
         $images = array();
-        //$imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_PICT";
-        $imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
+        //$imgString = Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_PICT";
+        $imgString = Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
         if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {
@@ -234,7 +234,7 @@ class Organisation
     }
 }
 
-class CRIS_organisations extends CRIS_webservice
+class CRIS_organisations extends Webservice
 {
     /*
      * projects requests
@@ -262,8 +262,8 @@ class CRIS_organisations extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null): array
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter) {
-            $filter = new CRIS_filter($filter);
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
         }
 
         $data = array();

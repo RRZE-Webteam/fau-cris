@@ -1,4 +1,6 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
 /**
  * These classes provide generic access to the CRIS web service data including
@@ -11,10 +13,9 @@
 
 use RRZE\Cris\RemoteGet;
 use RRZE\Cris\XML;
+use RRZE\Cris\Tools;
 
-require_once("class_Tools.php");
-
-class CRIS_webservice
+class Webservice
 {
     /*
      * generic class for web service access.
@@ -47,7 +48,7 @@ class CRIS_webservice
 
         $supported = array();
         $id_parts = explode('/', $id);
-        if ($filter instanceof CRIS_Filter) {
+        if ($filter instanceof Filter) {
             $remaining = array();
             foreach ($filter->filters as $attr => $value) {
                 if (strtolower($attr) !== 'publyear' ||
@@ -73,7 +74,7 @@ class CRIS_webservice
             $seed = '?flag=seednow';
         }
 
-        $xml = $this->fetch(CRIS_Dicts::$base_uri . $id . $seed);
+        $xml = $this->fetch(Dicts::$base_uri . $id . $seed);
 
         $xmlobj = XML::element($xml);
         if (is_wp_error($xmlobj)) {

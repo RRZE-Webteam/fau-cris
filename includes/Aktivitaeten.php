@@ -1,9 +1,11 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once "class_Tools.php";
-require_once "class_Webservice.php";
-require_once "class_Filter.php";
-require_once "class_Formatter.php";
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
 
 class Aktivitaeten
 {
@@ -79,7 +81,7 @@ class Aktivitaeten
             return $output;
         }
         $order = "sortdate";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
+        $formatter = new Formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($activityArray);
         if ($limit != '') {
             $activityList = array_slice($res[$order], 0, $limit);
@@ -118,9 +120,9 @@ class Aktivitaeten
         }
 
         if ($order2 == 'author') {
-            $formatter = new CRIS_formatter("year", SORT_DESC, "exportnames", SORT_ASC);
+            $formatter = new Formatter("year", SORT_DESC, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("year", SORT_DESC, "sortdate", SORT_ASC);
+            $formatter = new Formatter("year", SORT_DESC, "sortdate", SORT_ASC);
         }
         $activityList = $formatter->execute($activityArray);
 
@@ -179,7 +181,7 @@ class Aktivitaeten
 
         // Patenttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['activities'], 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(Dicts::$typeinfos['activities'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('activities', $value);
             }
@@ -189,9 +191,9 @@ class Aktivitaeten
 
         // sortiere nach Typenliste, innerhalb des Typs nach Name aufwärts sortieren
         if ($order2 == 'name') {
-            $formatter = new CRIS_formatter("type of activity", $order, "exportnames", SORT_ASC);
+            $formatter = new Formatter("type of activity", $order, "exportnames", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("type of activity", $order, "sortdate", SORT_DESC);
+            $formatter = new Formatter("type of activity", $order, "sortdate", SORT_DESC);
         }
         $activityList = $formatter->execute($activityArray);
         $output = '';
@@ -492,7 +494,7 @@ class Aktivitaeten
     }
 }
 
-class CRIS_activities extends CRIS_webservice
+class CRIS_activities extends Webservice
 {
     /*
      * actients/grants requests
@@ -560,8 +562,8 @@ class CRIS_activities extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null): array
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter) {
-            $filter = new CRIS_filter($filter);
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
         }
 
         $data = array();

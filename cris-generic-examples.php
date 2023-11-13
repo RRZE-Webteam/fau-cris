@@ -2,6 +2,8 @@
 /*
  * Examples for using the generic CRIS web service access.
  */
+require_once( './includes/Publikationen.php' );
+
 include('cris-generic.php');
 
 $publ = new CRIS_publications();

@@ -1,9 +1,13 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
+use RRZE\Cris\Publikationen;
+
 
 class Projekte
 {
@@ -76,7 +80,7 @@ class Projekte
         
         // sortiere nach Erscheinungsdatum
         $order = "cfstartdate";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
+        $formatter = new Formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($projArray);
         if ($limit != '') {
             $projList = array_slice($res[$order], 0, $limit);
@@ -126,7 +130,7 @@ class Projekte
             }
         }
         // sortiere nach Rolle, innerhalb der Rolle nach Startdatum absteigend
-        $formatter = new CRIS_formatter("role", SORT_ASC, "cfstartdate", SORT_DESC);
+        $formatter = new Formatter("role", SORT_ASC, "cfstartdate", SORT_DESC);
         $projList = $formatter->execute($projArray);
 
         $output = '';
@@ -173,7 +177,7 @@ class Projekte
         }
         
         // sortiere nach Erscheinungsjahr, innerhalb des Jahres nach Erstautor
-        $formatter = new CRIS_formatter("startyear", SORT_DESC, "cftitle", SORT_ASC);
+        $formatter = new Formatter("startyear", SORT_DESC, "cftitle", SORT_ASC);
         $projList = $formatter->execute($projArray);
 
         $output = '';
@@ -236,7 +240,7 @@ class Projekte
         
         // Projekttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['projects'], 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(Dicts::$typeinfos['projects'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('projects', $value);
             }
@@ -245,7 +249,7 @@ class Projekte
         }
 
         // sortiere nach Typenliste, innerhalb des Jahres nach Jahr abwärts sortieren
-        $formatter = new CRIS_formatter("project type", array_values($order), "cfstartdate", SORT_DESC);
+        $formatter = new Formatter("project type", array_values($order), "cfstartdate", SORT_DESC);
         $projList = $formatter->execute($projArray);
 
         $output = '';
@@ -393,7 +397,7 @@ class Projekte
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
+        $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($projArray);
         $projList = $res[$orderby] ?? [];
 
@@ -941,7 +945,7 @@ class Projekte
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
+        $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($projArray);
         $projList = $res[$orderby] ?? [];
 
@@ -988,7 +992,7 @@ class Projekte
     public function get_project_leaders($project, $leadIDs): array
     {
         $leaders = array();
-        $leadersString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_card";
+        $leadersString = Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_card";
         $leadersXml = Tools::XML2obj($leadersString);
         if (!is_wp_error($leadersXml) && !empty($leadersXml->infoObject)) {
             $i = 0;
@@ -1025,7 +1029,7 @@ class Projekte
     public function get_project_members($project, $collIDs): array
     {
         $members = array();
-        $membersString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_col_card";
+        $membersString = Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_col_card";
         $membersXml = Tools::XML2obj($membersString);
         if (!is_wp_error($membersXml) && !empty($membersXml->infoObject)) {
             $i = 0;
@@ -1070,7 +1074,7 @@ class Projekte
     private function get_project_funding($project): array
     {
         $funding = array();
-        $fundingString = CRIS_Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_fund";
+        $fundingString = Dicts::$base_uri . "getrelated/Project/" . $project . "/proj_has_fund";
         $fundingXml = Tools::XML2obj($fundingString);
         if (!is_wp_error($fundingXml) && !empty($fundingXml->infoObject)) {
             foreach ($fundingXml->infoObject as $fund) {
@@ -1087,7 +1091,7 @@ class Projekte
 
     private function get_project_publications($project = null, $param = array()): string
     {
-        require_once('class_Publikationen.php');
+
         $liste = new Publikationen('project', $project);
         $args = array();
         foreach ($param as $_k => $_v) {
@@ -1115,7 +1119,7 @@ class Projekte
     private function get_project_images($project): array
     {
         $images = array();
-        $imgString = CRIS_Dicts::$base_uri . "getrelated/project/" . $project . "/PROJ_has_PICT";
+        $imgString = Dicts::$base_uri . "getrelated/project/" . $project . "/PROJ_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
         if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {
@@ -1128,7 +1132,7 @@ class Projekte
     }
 }
 
-class CRIS_projects extends CRIS_webservice
+class CRIS_projects extends Webservice
 {
     /*
      * projects requests
@@ -1245,8 +1249,8 @@ class CRIS_projects extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null): array
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter) {
-            $filter = new CRIS_filter($filter);
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
         }
 
         $data = array();

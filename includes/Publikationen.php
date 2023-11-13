@@ -1,9 +1,14 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
+use RRZE\Cris\Projekte;
+
+
 
 class Publikationen
 {
@@ -103,7 +108,7 @@ class Publikationen
             default:
                 $order = 'virtualdate';
         }
-        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
+        $formatter = new Formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($pubArray);
         if ($limit != '') {
             $pubList = array_slice($res[$order], 0, $limit);
@@ -169,7 +174,7 @@ class Publikationen
 
         // Sorting order
         $typeorder = $this->order; //cris default order given by plugin options
-        if ($typeorder[0] != '' && ((array_search($typeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short')) !== false) || array_search($typeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short_alt')) !== false)) {
+        if ($typeorder[0] != '' && ((array_search($typeorder[0], array_column(Dicts::$typeinfos['publications'], 'short')) !== false) || array_search($typeorder[0], array_column(Dicts::$typeinfos['publications'], 'short_alt')) !== false)) {
             foreach ($typeorder as $key => $value) {
                 $typeorder[$key] = Tools::getType('publications', $value);
             }
@@ -178,16 +183,16 @@ class Publikationen
         }
         switch ($order2) {
             case 'author':
-                $formatter = new CRIS_formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
-                $subformatter = new CRIS_formatter(null, null, "relauthors", SORT_ASC);
+                $formatter = new Formatter("publyear", SORT_DESC, "relauthors", SORT_ASC);
+                $subformatter = new Formatter(null, null, "relauthors", SORT_ASC);
                 break;
             case 'type':
-                $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
-                $subformatter = new CRIS_formatter("publication type", array_values($typeorder), "virtualdate", SORT_DESC);
+                $formatter = new Formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                $subformatter = new Formatter("publication type", array_values($typeorder), "virtualdate", SORT_DESC);
                 break;
             default:
-                $formatter = new CRIS_formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
-                $subformatter = new CRIS_formatter(null, null, "virtualdate", SORT_DESC);
+                $formatter = new Formatter("publyear", SORT_DESC, "virtualdate", SORT_DESC);
+                $subformatter = new Formatter(null, null, "virtualdate", SORT_DESC);
                 break;
         }
         $pubList = $formatter->execute($pubArray);
@@ -300,7 +305,7 @@ class Publikationen
 
         // Publikationstypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && ((array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short')) !== false) || array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short_alt')) !== false)) {
+        if ($order[0] != '' && ((array_search($order[0], array_column(Dicts::$typeinfos['publications'], 'short')) !== false) || array_search($order[0], array_column(Dicts::$typeinfos['publications'], 'short_alt')) !== false)) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('publications', $value);
             }
@@ -310,9 +315,9 @@ class Publikationen
 
         // sortiere nach Typenliste, innerhalb des Typs nach $order2 sortieren
         if ($order2 == 'author') {
-            $formatter = new CRIS_formatter("publication type", array_values($order), "relauthors", SORT_ASC);
+            $formatter = new Formatter("publication type", array_values($order), "relauthors", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("publication type", array_values($order), "virtualdate", SORT_DESC);
+            $formatter = new Formatter("publication type", array_values($order), "virtualdate", SORT_DESC);
         }
         $pubList = $formatter->execute($pubArray);
 
@@ -334,7 +339,7 @@ class Publikationen
                 $shortcode_data_other = '';
                 // Weitrere Untergliederung für Subtypen
                 $subtypeorder = $this->subtypeorder;
-                if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
+                if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
                     foreach ($subtypeorder as $key => $value) {
                         $subtypeorder[$key] = Tools::getType('publications', $value, $array_type);
                     }
@@ -343,14 +348,14 @@ class Publikationen
                 }
                 switch ($order2) {
                     case 'subtype':
-                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
+                        $subformatter = new Formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
                         break;
                     case 'year':
-                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, $sortby, $sortorder);
+                        $subformatter = new Formatter("publyear", SORT_DESC, $sortby, $sortorder);
                         break;
                     case 'author':
                     default:
-                        $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
+                        $subformatter = new Formatter(null, null, $sortby, $sortorder);
                         break;
                 }
                 $pubOtherList = $subformatter->execute($publications);
@@ -391,7 +396,7 @@ class Publikationen
                 }
                 // Weitrere Untergliederung (Subtypen)
                 $subtypeorder = $this->subtypeorder;
-                if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(CRIS_Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
+                if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
                     foreach ($subtypeorder as $key => $value) {
                         $subtypeorder[$key] = Tools::getType('publications', $value, $array_type);
                     }
@@ -400,14 +405,14 @@ class Publikationen
                 }
                 switch ($order2) {
                     case 'subtype':
-                        $subformatter = new CRIS_formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
+                        $subformatter = new Formatter("subtype", array_values($subtypeorder), $sortby, $sortorder);
                         break;
                     case 'year':
-                        $subformatter = new CRIS_formatter("publyear", SORT_DESC, $sortby, $sortorder);
+                        $subformatter = new Formatter("publyear", SORT_DESC, $sortby, $sortorder);
                         break;
                     case 'author':
                     default:
-                        $subformatter = new CRIS_formatter(null, null, $sortby, $sortorder);
+                        $subformatter = new Formatter(null, null, $sortby, $sortorder);
                         break;
                 }
                 $pubOtherList = $subformatter->execute($publications);
@@ -519,7 +524,7 @@ class Publikationen
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
+        $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
 
@@ -576,7 +581,7 @@ class Publikationen
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
+        $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
 
@@ -631,7 +636,7 @@ class Publikationen
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-        $formatter = new CRIS_formatter(null, null, $sortby, SORT_ASC);
+        $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
 
@@ -1264,7 +1269,7 @@ class Publikationen
      */
     private function get_pub_projects($pub = null, $item = 'title')
     {
-        require_once('class_Projekte.php');
+
         $liste = new Projekte();
         if (is_wp_error($liste)) {
             return $liste->get_error_message();
@@ -1288,7 +1293,7 @@ class Publikationen
     private function get_pub_images($pub): array
     {
         $images = array();
-        $imgString = CRIS_Dicts::$base_uri . "getrelated/Publication/" . $pub . "/PUBL_has_PICT";
+        $imgString = Dicts::$base_uri . "getrelated/Publication/" . $pub . "/PUBL_has_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
         if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {
@@ -1303,7 +1308,7 @@ class Publikationen
 
 //End::get_pub_images
 
-class CRIS_publications extends CRIS_webservice
+class CRIS_publications extends Webservice
 {
     /*
      * publication requests, supports multiple organisation ids given as array.
@@ -1425,7 +1430,9 @@ class CRIS_publications extends CRIS_webservice
         }
 
         foreach ($fieldID as $_p) {
-            $requests[] = sprintf('getrelated/Forschungsbereich/%d/', $_p) . $relation;
+            $requests[] = class_Publikationen
+                          . phpsprintf( 'getrelated/Forschungsbereich/%d/',
+		            $_p ) . $relation;
         }
         return $this->retrieve($requests, $filter);
     }
@@ -1453,8 +1460,8 @@ class CRIS_publications extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null): array
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter) {
-            $filter = new CRIS_filter($filter);
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
         }
         $data = array();
         foreach ($reqs as $_i) {
@@ -1565,10 +1572,10 @@ if (!debug_backtrace()) {
     $p = new CRIS_Publications();
     // default uses the cache automatically
     // $p->disable_cache();
-    $f = new CRIS_Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
+    $f = new Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
     $publs = $p->by_orga_id("142285", $f);
     $order = "virtualdate";
-    $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
+    $formatter = new Formatter(null, null, $order, SORT_DESC);
     $res = $formatter->execute($publs);
     foreach ($res[$order] as $key => $value) {
         echo sprintf("%s: %s\n", $key, $value->attributes[$order]);

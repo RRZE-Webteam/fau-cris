@@ -1,9 +1,12 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
+
 
 class Standardisierungen
 {
@@ -93,7 +96,7 @@ class Standardisierungen
         // sortiere nach Erscheinungsdatum
         $sort = "venue_start";
         $sortOrder = SORT_DESC;
-        $formatter = new CRIS_formatter($group, $groupOrder, $sort, $sortOrder);
+        $formatter = new Formatter($group, $groupOrder, $sort, $sortOrder);
         $standardizations = $formatter->execute($standardizationArray);
         $isGroupAccordion = ($param['display'] == 'accordion' && in_array($param['orderby'], ['year', 'type']));
         $isSingleAccordion = ($param['display'] == 'accordion' && $param['orderby'] == '');
@@ -162,7 +165,8 @@ class Standardisierungen
                     $authorArray[] = array(
                         'id' => $key,
                         'lastname' => $nameparts[0],
-                        'firstname' => array_key_exists(1, $nameparts) ? substr($nameparts[1], 0, 1) . '. ' : '');
+                        'firstname' => array_key_exists(1, $nameparts) ? substr( $nameparts[1],
+		                        0, 1 ) . 'fau-cris ' : '');
                 }
                 $authorList = array();
                 foreach ($authorArray as $v) {
@@ -412,7 +416,7 @@ class Standardisierungen
     }
 }
 
-class CRIS_standardizations extends CRIS_webservice
+class CRIS_standardizations extends Webservice
 {
     /*
      * actients/grants requests
@@ -480,8 +484,8 @@ class CRIS_standardizations extends CRIS_webservice
 
     private function retrieve($reqs, &$filter = null): array
     {
-        if ($filter !== null && !$filter instanceof CRIS_filter) {
-            $filter = new CRIS_filter($filter);
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
         }
 
         $data = array();

@@ -1,9 +1,11 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
 
 class Patente
 {
@@ -56,9 +58,14 @@ class Patente
         }
     }
 
-    /*
-     * Ausgabe aller Patente ohne Gliederung
-     */
+	/**
+	 * Name : patListe
+	 *
+	 * Use: get patent list
+	 *
+	 * Returns: patent list
+	 *
+	 */
 
     public function patListe($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
@@ -79,7 +86,7 @@ class Patente
         }
 
         $order = "registryear";
-        $formatter = new CRIS_formatter(null, null, $order, SORT_DESC);
+        $formatter = new Formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($patentArray);
         if ($limit != '') {
             $patentList = array_slice($res[$order], 0, $limit);
@@ -92,9 +99,15 @@ class Patente
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    /*
-     * Ausgabe aller Patente nach Jahren gegliedert
-     */
+
+	/**
+	 * Name : patNachJahr
+	 *
+	 * Use: get patent list according to registryear
+	 *
+	 * Returns: patent list by registryear
+	 *
+	 */
 
     public function patNachJahr($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
@@ -116,9 +129,9 @@ class Patente
         }
 
         if ($order2 == 'author') {
-            $formatter = new CRIS_formatter("registryear", SORT_DESC, "exportinventors", SORT_ASC);
+            $formatter = new Formatter("registryear", SORT_DESC, "exportinventors", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("registryear", SORT_DESC, "cfregistrdate", SORT_ASC);
+            $formatter = new Formatter("registryear", SORT_DESC, "cfregistrdate", SORT_ASC);
         }
         $patentList = $formatter->execute($patentArray);
 
@@ -151,9 +164,14 @@ class Patente
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    /*
-     * Ausgabe aller Patente nach Patenttypen gegliedert
-     */
+	/**
+	 * Name : patNachTyp
+	 *
+	 * Use: get patent list according to patenttype
+	 *
+	 * Returns: patent list by patenttype
+	 *
+	 */
 
     public function patNachTyp($param = array()): string {
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
@@ -176,7 +194,7 @@ class Patente
 
         // Patenttypen sortieren
         $order = $this->order;
-        if ($order[0] != '' && array_search($order[0], array_column(CRIS_Dicts::$typeinfos['publications'], 'short'))) {
+        if ($order[0] != '' && array_search($order[0], array_column(Dicts::$typeinfos['publications'], 'short'))) {
             foreach ($order as $key => $value) {
                 $order[$key] = Tools::getType('patents', $value);
             }
@@ -186,9 +204,9 @@ class Patente
 
         // sortiere nach Typenliste, innerhalb des Typs nach Name aufwärts sortieren
         if ($order2 == 'name') {
-            $formatter = new CRIS_formatter("patenttype", SORT_DESC, "exportinventors", SORT_ASC);
+            $formatter = new Formatter("patenttype", SORT_DESC, "exportinventors", SORT_ASC);
         } else {
-            $formatter = new CRIS_formatter("patenttype", SORT_DESC, "cfregistrdate", SORT_DESC);
+            $formatter = new Formatter("patenttype", SORT_DESC, "cfregistrdate", SORT_DESC);
         }
         $patentList = $formatter->execute($patentArray);
         $output = '';
@@ -222,10 +240,14 @@ class Patente
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    /*
-     * Ausgabe eines einzelnen Patents
-     */
-
+	/**
+	 * Name : singlePatent
+	 *
+	 * Use: get single patent array
+	 *
+	 * Returns: single patent array
+	 *
+	 */
     public function singlePatent($hide = '', $showname = 1, $showyear = 0, $showpatentname = 1)
     {
         $ws = new CRIS_patents();
@@ -246,13 +268,14 @@ class Patente
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    /* =========================================================================
-     * Private Functions
-      ======================================================================== */
-
-    /*
-     * Holt Daten vom Webservice je nach definierter Einheit.
-     */
+	/**
+	 * Name : fetch_patents
+	 *
+	 * Use: get all patents by orga and person
+	 *
+	 * Returns: patent list
+	 *
+	 */
 
     private function fetch_patents($year = '', $start = '', $end = '', $type = ''): array {
         $filter = Tools::patent_filter($year, $start, $end, $type);
@@ -273,9 +296,14 @@ class Patente
         return $patentArray;
     }
 
-    /*
-     * Ausgabe der Patents
-     */
+	/**
+	 * Name : make_list
+	 *
+	 * Use: format the patent attributes in html
+	 *
+	 * Returns: html formatted list
+	 *
+	 */
 
     private function make_list($patents, $name = 1, $year = 1, $patentname = 1, $showtype = 1): string {
         global $post;
@@ -347,7 +375,7 @@ class Patente
     }
 }
 
-class CRIS_patents extends CRIS_webservice
+class CRIS_patents extends Webservice
 {
     /*
      * patents/grants requests
@@ -411,8 +439,8 @@ class CRIS_patents extends CRIS_webservice
     }
 
     private function retrieve($reqs, &$filter = null): array {
-        if ($filter !== null && !$filter instanceof CRIS_filter) {
-            $filter = new CRIS_filter($filter);
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
         }
 
         $data = array();

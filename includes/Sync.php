@@ -1,8 +1,13 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Organisation.php");
-require_once("class_Forschungsbereiche.php");
-require_once("class_Projekte.php");
+require_once( "Projekte.php" );
+use  RRZE\Cris\Organisation;
+use  RRZE\Cris\Forschungsbereiche;
+
+
+
 
 class Sync
 {
@@ -93,7 +98,7 @@ class Sync
                 $page_research[] = $research_page;
             }
         }
-        require_once('class_Organisation.php');
+
         $orga = new Organisation();
         $research_contacts = $orga->researchContacts(true);
         if (is_string($research_contacts)) {

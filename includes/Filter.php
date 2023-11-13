@@ -1,6 +1,8 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-class CRIS_filter
+class Filter
 {
     /*
      * This class provides filter options for any CRIS data.

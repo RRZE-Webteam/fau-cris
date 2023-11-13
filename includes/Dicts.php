@@ -1,6 +1,9 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-class CRIS_Dicts
+
+class Dicts
 {
 
     public static string $base_uri = "https://cris.fau.de/ws-cached/1.0/public/infoobject/";

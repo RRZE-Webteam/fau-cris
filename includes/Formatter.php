@@ -1,6 +1,8 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-class CRIS_formatter
+class Formatter
 {
     /*
      * This class provides grouping and sorting methods for any CRIS data.
