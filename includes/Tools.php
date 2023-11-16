@@ -366,7 +366,7 @@ class Tools
      * Array zur Definition des Filters für Projekte
      */
 
-    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = ''): WP_Error|array|null
+    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = '')
     {
         $filter = array();
         if ($year !== '' && $year !== null) {

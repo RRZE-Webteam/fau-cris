@@ -1430,9 +1430,7 @@ class CRIS_publications extends Webservice
         }
 
         foreach ($fieldID as $_p) {
-            $requests[] = class_Publikationen
-                          . phpsprintf( 'getrelated/Forschungsbereich/%d/',
-		            $_p ) . $relation;
+            $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $relation;
         }
         return $this->retrieve($requests, $filter);
     }
