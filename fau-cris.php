@@ -991,6 +991,7 @@ class FAU_CRIS
                 return $liste->error->get_error_message();
             }
             if ($parameter['project'] != '') {
+                echo "single project file";
                 return $liste->singleProj($parameter);
             }
             // if (!empty($parameter['limit'])) {

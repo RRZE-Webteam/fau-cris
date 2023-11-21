@@ -314,8 +314,10 @@ class Projekte
         }
 
         if (is_array($this->id)) {
+            echo  ("make_list");
             $output = $this->make_list($projArray, $param['hide']);
         } else {
+            echo "single list";
             $output = $this->make_single($projArray, $param);
         }
 
