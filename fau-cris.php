@@ -935,14 +935,11 @@ class FAU_CRIS
             }
 
             if ($parameter['field'] != '') {
-                echo "single-field";
                 return $liste->singleField($parameter);
             }
             if (!empty($parameter['limit'])) {
-                echo "field-list";
                 return $liste->fieldListe($parameter);
             }
-            echo "default";
             return $liste->fieldListe($parameter);
         } elseif (isset($parameter['show']) && $parameter['show'] == 'activities') {
             // Aktivitäten

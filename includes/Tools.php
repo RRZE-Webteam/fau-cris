@@ -516,8 +516,6 @@ class Tools
             $filter['startyear__ge'] = $start;
         }
 
-
-
         if (count($filter)) {
             return $filter;
         }
