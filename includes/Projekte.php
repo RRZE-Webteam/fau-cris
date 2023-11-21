@@ -950,7 +950,10 @@ class Projekte
         $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($projArray);
         $projList = $res[$orderby] ?? [];
-
+//        filter the field projects
+//        $projList=$this->fieldProjectStatusFilter($projList,'completed');
+        print_r($projList);
+        die();
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
             $output = $this->make_accordion($projList);
         } else {
@@ -959,7 +962,90 @@ class Projekte
         return $output;
     }
 
-    public function fieldPersons($field)
+
+    /**
+     * Name : fieldProjectStatusFilter
+     *
+     * Use: it will filter the project status by taking project array, eg:current,future..
+     *
+     * Returns: $filteredProjects
+     *
+     *
+     */
+    public function fieldProjectStatusFilter ($projects=array(),$status=''){
+
+// Filter conditions
+        $filter = [];
+        $filteredProjects = [];
+
+        if ($status !== '' && $status !== null) {
+            if (strpos($status, ',') !== false) {
+                $arrStatus = explode(',', str_replace(' ', '', $status));
+            } else {
+                $arrStatus = (array) $status;
+            }
+
+            $today = date('Y-m-d');
+            $statusSet = ['completed', 'current', 'future'];
+
+            foreach ($projects as $project) {
+                foreach ($arrStatus as $selectedStatus) {
+                    if (in_array($selectedStatus, $statusSet)) {
+                        switch ($selectedStatus) {
+                            case 'completed':
+                                if (isset($project->attributes['virtualenddate']) && $project->attributes['virtualenddate'] < $today) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+
+                            case 'current':
+                                if (
+                                    isset($project->attributes['cfstartdate']) &&
+                                    isset($project->attributes['virtualenddate']) &&
+                                    $project->attributes['cfstartdate'] <= $today &&
+                                    $project->attributes['virtualenddate'] >= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+
+                            case 'future':
+                                if (isset($project->attributes['cfstartdate']) && $project->attributes['cfstartdate'] > $today) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+                            case 'completed,current':
+                                if (
+                                    isset($project->attributes['cfstartdate']) &&
+                                    $project->attributes['cfstartdate'] <= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+                            case 'current,future':
+                                if (
+                                    isset($project->attributes['virtualenddate']) &&
+                                    $project->attributes['virtualenddate'] >= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+                            default:
+//                                $filteredProjects[] = $project;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            return $projects;
+        }
+return $filteredProjects;
+}
+
+
+public function fieldPersons($field)
     {
         $ws = new CRIS_projects();
         try {

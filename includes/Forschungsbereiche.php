@@ -66,8 +66,8 @@ class Forschungsbereiche
     {
 
         $fieldsArray = $this->fetch_fields();
-        print_r($fieldsArray);
-        die();
+//        print_r($fieldsArray);
+//        die();
 
         if (!count($fieldsArray)) {
             $output = '<p>' . __('Es wurden leider keine Forschungsbereiche gefunden.', 'fau-cris') . '</p>';
@@ -115,8 +115,8 @@ class Forschungsbereiche
 
         $output = $this->make_single($fieldsArray, $param);
 
-        print_r($output);
-        die();
+//        print_r($output);
+//        die();
 
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
@@ -278,8 +278,6 @@ class Forschungsbereiche
             if (!in_array('projects', $hide)
                 && !is_array($param['field'])) {
                 $projects = $this->get_field_projects($id);
-                print_r($projects);
-                die();
 
                 if ($projects) {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
