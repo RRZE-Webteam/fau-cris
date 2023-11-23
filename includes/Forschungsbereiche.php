@@ -217,6 +217,7 @@ class Forschungsbereiche
     {
         $hide = $param['hide'];
 
+
         $singlefield = "<div class=\"cris-fields\">";
 
         foreach ($fields as $field) {
@@ -270,7 +271,7 @@ class Forschungsbereiche
 
             if (!in_array('projects', $hide)
                 && !is_array($param['field'])) {
-                $projects = $this->get_field_projects($id);
+                $projects = $this->get_field_projects($id,$param);
                 if ($projects) {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
                     $singlefield .= $projects;
@@ -364,7 +365,7 @@ class Forschungsbereiche
             $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = '';
             if (strpos($content, '#projects#') !== false) {
-                $field_details['#projects#'] = $this->get_field_projects($id);
+                $field_details['#projects#'] = $this->get_field_projects($id,$param);
             }
             $field_details['#persons#'] = '';
             if (strpos($content, '#persons#') !== false) {
@@ -468,13 +469,13 @@ class Forschungsbereiche
         return $fieldslist;
     }
 
-    private function get_field_projects($field = null)
+    private function get_field_projects($field = null,$param=array())
     {
         $liste = new Projekte('field', $field, $this->sc_lang);
         if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
         } else {
-            return $liste->fieldProj($field);
+            return $liste->fieldProj($field,$param);
         }
     }
 

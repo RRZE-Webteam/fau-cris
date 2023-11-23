@@ -916,8 +916,9 @@ class Projekte
         return do_shortcode($projlist);
     }
 
-    public function fieldProj($field, $return = 'list', $seed = false)
+    public function fieldProj($field,$param=array(), $return = 'list', $seed = false)
     {
+
         $ws = new CRIS_projects();
         if ($seed) {
             $ws->disable_cache();
@@ -948,6 +949,10 @@ class Projekte
         $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($projArray);
         $projList = $res[$orderby] ?? [];
+
+        if ($param['projects_status'] !== '' && $param['projects_status'] !== null){
+            $projList=Tools::field_project_status_filter($projList,$param['projects_status']);
+        }
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
             $output = $this->make_accordion($projList);

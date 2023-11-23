@@ -868,4 +868,86 @@ class Tools
         }
         return $encoded;
     }
+
+
+    /**
+     * Name : fieldProjectStatusFilter
+     *
+     * Use: it will filter the project status by taking project array, eg:current,future..
+     *
+     * Returns: $filteredProjects
+     *
+     *
+     */
+    public static function field_project_status_filter ($projects=array(),$status=''){
+
+        // Filter conditions
+        $filter = [];
+        $filteredProjects = [];
+
+        if ($status !== '' && $status !== null) {
+            if (strpos($status, ',') !== false) {
+                $arrStatus = explode(',', str_replace(' ', '', $status));
+            } else {
+                $arrStatus = (array) $status;
+            }
+
+            $today = date('Y-m-d');
+            $statusSet = ['completed', 'current', 'future'];
+
+            foreach ($projects as $project) {
+                foreach ($arrStatus as $selectedStatus) {
+                    if (in_array($selectedStatus, $statusSet)) {
+                        switch ($selectedStatus) {
+                            case 'completed':
+                                if (isset($project->attributes['virtualenddate']) && $project->attributes['virtualenddate'] < $today) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+
+                            case 'current':
+                                if (
+                                    isset($project->attributes['cfstartdate']) &&
+                                    isset($project->attributes['virtualenddate']) &&
+                                    $project->attributes['cfstartdate'] <= $today &&
+                                    $project->attributes['virtualenddate'] >= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+
+                            case 'future':
+                                if (isset($project->attributes['cfstartdate']) && $project->attributes['cfstartdate'] > $today) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+                            case 'completed,current':
+                                if (
+                                    isset($project->attributes['cfstartdate']) &&
+                                    $project->attributes['cfstartdate'] <= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+                            case 'current,future':
+                                if (
+                                    isset($project->attributes['virtualenddate']) &&
+                                    $project->attributes['virtualenddate'] >= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+                            default:
+//                                $filteredProjects[] = $project;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            return $projects;
+        }
+        return $filteredProjects;
+    }
 }

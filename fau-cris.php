@@ -1186,7 +1186,8 @@ class FAU_CRIS
             'accordion_color' => '',
             'display_language' => Tools::getPageLanguage($post->ID),
             'organisation' => $options['cris_org_nr'],
-            'standardization' => ''
+            'standardization' => '',
+            'projects_status'=>''
         ];
 
         // Attributes
@@ -1251,6 +1252,7 @@ class FAU_CRIS
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
         $sc_param['standardization'] = sanitize_text_field($standardization);
+        $sc_param['projects_status'] = sanitize_text_field($projects_status);
         switch ($sortby) {
             case 'created':
                 $sc_param['sortby'] = 'updatedon';
