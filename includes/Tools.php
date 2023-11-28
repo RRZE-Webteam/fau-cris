@@ -777,7 +777,7 @@ class Tools
             foreach ($firstnames as $_fn) {
                 $fn_shorts[] = mb_substr($_fn, 0, 1);
             }
-            $firstname = implode( '', $fn_shorts ) . 'fau-cris';
+            $firstname = implode( '', $fn_shorts ) . '.';
         }
         $name = $inv == 0 ? $firstname . " " . $lastname : $lastname . " " . $firstname;
         $person = "<span class=\"author\" itemprop=\"author\">" . $link_pre . $name . $link_post . "</span>";
