@@ -885,6 +885,7 @@ class Tools
         $filter = [];
         $filteredProjects = [];
 
+        if ($projects_status !== '' && $projects_status !== null || $projects_start !== '' && $projects_start !== null){
         if ($projects_status !== '' && $projects_status !== null) {
             if (strpos($projects_status, ',') !== false) {
                 $arrStatus = explode(',', str_replace(' ', '', $projects_status));
@@ -953,7 +954,6 @@ class Tools
             }
         }
 
-        if (!empty($filteredProjects)){
             return $filteredProjects;
         }
         else{
