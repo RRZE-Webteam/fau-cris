@@ -950,9 +950,17 @@ class Projekte
         $res = $formatter->execute($projArray);
         $projList = $res[$orderby] ?? [];
 
+
+
         if ($param['projects_status'] !== '' && $param['projects_status'] !== null){
-            $projList=Tools::field_project_status_filter($projList,$param['projects_status']);
+            $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
         }
+
+        elseif ($param['projects_start'] !== '' && $param['projects_start'] !== null){
+            $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
+        }
+
+
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
             $output = $this->make_accordion($projList);

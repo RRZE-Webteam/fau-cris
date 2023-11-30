@@ -879,17 +879,17 @@ class Tools
      *
      *
      */
-    public static function field_project_status_filter ($projects=array(),$status=''){
+    public static function field_project_status_filter ($projects=array(),$projects_status='',$projects_start=''){
 
         // Filter conditions
         $filter = [];
         $filteredProjects = [];
 
-        if ($status !== '' && $status !== null) {
-            if (strpos($status, ',') !== false) {
-                $arrStatus = explode(',', str_replace(' ', '', $status));
+        if ($projects_status !== '' && $projects_status !== null) {
+            if (strpos($projects_status, ',') !== false) {
+                $arrStatus = explode(',', str_replace(' ', '', $projects_status));
             } else {
-                $arrStatus = (array) $status;
+                $arrStatus = (array) $projects_status;
             }
 
             $today = date('Y-m-d');
@@ -945,9 +945,19 @@ class Tools
                 }
             }
         }
+        if ($projects_start !== '' && $projects_start !== null){
+            foreach ($projects as $project) {
+                if (isset($project->attributes['startyear']) && $project->attributes['startyear'] > $projects_start) {
+                    $filteredProjects[] = $project;
+                }
+            }
+        }
+
+        if (!empty($filteredProjects)){
+            return $filteredProjects;
+        }
         else{
             return $projects;
         }
-        return $filteredProjects;
     }
 }
