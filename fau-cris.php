@@ -1188,7 +1188,8 @@ class FAU_CRIS
             'organisation' => $options['cris_org_nr'],
             'standardization' => '',
             'projects_status'=>'',
-            'projects_start'=>''
+            'projects_start'=>'',
+            'author_postion'=>''
         ];
 
         // Attributes
@@ -1255,6 +1256,7 @@ class FAU_CRIS
         $sc_param['standardization'] = sanitize_text_field($standardization);
         $sc_param['projects_status'] = sanitize_text_field($projects_status);
         $sc_param['projects_start'] = sanitize_text_field($projects_start);
+        $sc_param['author_postion'] = sanitize_text_field($author_postion);
 
         switch ($sortby) {
             case 'created':
@@ -1345,6 +1347,13 @@ class FAU_CRIS
             $sc_param['entity_id'] = $sc_param['awardnameid'];
         } elseif (isset($sc_param['persid']) && $sc_param['persid'] != '') {
             $sc_param['entity'] = 'person';
+            if (isset($sc_param['author_postion']) && $sc_param['author_postion'] != '') {
+                if (strpos($sc_param['author_postion'], ',') !== false) {
+                    $sc_param['author_postion'] = str_replace(' ', '', $sc_param['author_postion']);
+                    $sc_param['author_postion'] = explode(',', $sc_param['author_postion']);
+                }
+                
+            }
             if (strpos($sc_param['persid'], ',') !== false) {
                 $sc_param['persid'] = str_replace(' ', '', $sc_param['persid']);
                 $sc_param['persid'] = explode(',', $sc_param['persid']);
