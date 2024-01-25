@@ -1140,7 +1140,7 @@ class Publikationen
     private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright'): string
     {
         $publist = '';
-        $list = (count($publications) > 1) ? true : false;
+        $list = (count($publications) >= 1) ? true : false;
         if ($list) {
             $publist .= "<ul class=\"cris-publications\" lang=\"" . $lang . "\">";
         } else {
