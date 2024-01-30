@@ -514,7 +514,13 @@ class Publikationen
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
         if (!is_wp_error($filter)) {
             $ws = new CRIS_publications();
-            $pubArray = $ws->by_project($param['project'], $filter);
+            if (isset($this->id) && !empty($this->id)) {
+                $project_id=$this->id;
+            }
+            else{
+                $project_id=$param['project'];
+            }
+            $pubArray = $ws->by_project($project_id, $filter);
         } else {
             return '';
         }
