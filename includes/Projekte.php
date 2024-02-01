@@ -999,6 +999,17 @@ class Projekte
                 }
             }
         }
+
+        $seen = []; // External array to track seen names
+
+         $persList = array_filter($persList, function($person) use (&$seen) {
+         $name_key = $person['lastname'] . '_' . $person['firstname'];
+            if (!in_array($name_key, $seen)) {
+                $seen[] = $name_key; // Mark as seen
+                return true; // Keep in the array
+            }
+            return false; // Remove from the array
+                });   
         return $persList;
     }
 
