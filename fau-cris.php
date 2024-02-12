@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.19.2
+ * Version: 3.20.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -1186,7 +1186,10 @@ class FAU_CRIS
             'accordion_color' => '',
             'display_language' => Tools::getPageLanguage($post->ID),
             'organisation' => $options['cris_org_nr'],
-            'standardization' => ''
+            'standardization' => '',
+            'projects_status'=>'',
+            'projects_start'=>'',
+            'author_postion'=>''
         ];
 
         // Attributes
@@ -1251,6 +1254,10 @@ class FAU_CRIS
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
         $sc_param['standardization'] = sanitize_text_field($standardization);
+        $sc_param['projects_status'] = sanitize_text_field($projects_status);
+        $sc_param['projects_start'] = sanitize_text_field($projects_start);
+        $sc_param['author_postion'] = sanitize_text_field($author_postion);
+
         switch ($sortby) {
             case 'created':
                 $sc_param['sortby'] = 'updatedon';
@@ -1340,6 +1347,13 @@ class FAU_CRIS
             $sc_param['entity_id'] = $sc_param['awardnameid'];
         } elseif (isset($sc_param['persid']) && $sc_param['persid'] != '') {
             $sc_param['entity'] = 'person';
+            if (isset($sc_param['author_postion']) && $sc_param['author_postion'] != '') {
+                if (strpos($sc_param['author_postion'], ',') !== false) {
+                    $sc_param['author_postion'] = str_replace(' ', '', $sc_param['author_postion']);
+                    $sc_param['author_postion'] = explode(',', $sc_param['author_postion']);
+                }
+                
+            }
             if (strpos($sc_param['persid'], ',') !== false) {
                 $sc_param['persid'] = str_replace(' ', '', $sc_param['persid']);
                 $sc_param['persid'] = explode(',', $sc_param['persid']);

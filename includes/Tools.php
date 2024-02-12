@@ -1,5 +1,7 @@
 <?php
+
 namespace RRZE\Cris;
+
 defined('ABSPATH') || exit;
 
 use RRZE\Cris\RemoteGet;
@@ -121,7 +123,7 @@ class Tools
         return $page_lang;
     }
 
-    public static function XML2obj($url): WP_Error|SimpleXMLElement|bool|String
+    public static function XML2obj($url)
     {
         $content = RemoteGet::retrieveContent($url);
         return XML::element($content);
@@ -366,7 +368,7 @@ class Tools
      * Array zur Definition des Filters für Projekte
      */
 
-    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = ''): WP_Error|array|null
+    public static function project_filter($year = '', $start = '', $end = '', $type = '', $status = '')
     {
         $filter = array();
         if ($year !== '' && $year !== null) {
@@ -625,8 +627,10 @@ class Tools
         $daten = $num1 > $num2 ? $daten1 : $daten2;
 
         foreach ($daten->Person as $person) {
-            $univis[] = array('firstname' => (string) $person->firstname,
-                               'lastname' => (string) $person->lastname);
+            $univis[] = array(
+                'firstname' => (string) $person->firstname,
+                'lastname' => (string) $person->lastname
+            );
         }
         return $univis;
     }
@@ -777,7 +781,7 @@ class Tools
             foreach ($firstnames as $_fn) {
                 $fn_shorts[] = mb_substr($_fn, 0, 1);
             }
-            $firstname = implode( '', $fn_shorts ) . 'fau-cris';
+            $firstname = implode('', $fn_shorts) . '.';
         }
         $name = $inv == 0 ? $firstname . " " . $lastname : $lastname . " " . $firstname;
         $person = "<span class=\"author\" itemprop=\"author\">" . $link_pre . $name . $link_post . "</span>";
@@ -853,9 +857,9 @@ class Tools
             }
             $o = ord($char);
             if ((mb_strlen($char) > 1) || /* multi-byte [unicode] */
-                ($o <32 || $o > 126) || /* <- control / latin weird os -> */
-                ($o >33 && $o < 40) ||/* quotes + ambersand */
-                ($o >59 && $o < 63) /* html */
+                ($o < 32 || $o > 126) || /* <- control / latin weird os -> */
+                ($o > 33 && $o < 40) ||/* quotes + ambersand */
+                ($o > 59 && $o < 63) /* html */
             ) {
                 // convert to numeric entity
                 $char = mb_encode_numericentity(
@@ -867,5 +871,126 @@ class Tools
             $encoded .= $char;
         }
         return $encoded;
+    }
+
+
+    /**
+     * Name : fieldProjectStatusFilter
+     *
+     * Use: it will filter the project status by taking project array, eg:current,future..
+     *
+     * Returns: $filteredProjects
+     *
+     *
+     */
+    public static function field_project_status_filter($projects = array(), $projects_status = '', $projects_start = '')
+    {
+
+        // Filter conditions
+        $filter = [];
+        $filteredProjects = [];
+
+        if ($projects_status !== '' && $projects_status !== null || $projects_start !== '' && $projects_start !== null) {
+            if ($projects_status !== '' && $projects_status !== null) {
+                if (strpos($projects_status, ',') !== false) {
+                    $arrStatus = explode(',', str_replace(' ', '', $projects_status));
+                } else {
+                    $arrStatus = (array) $projects_status;
+                }
+
+                $today = date('Y-m-d');
+                $statusSet = ['completed', 'current', 'future'];
+
+                foreach ($projects as $project) {
+                    foreach ($arrStatus as $selectedStatus) {
+                        if (in_array($selectedStatus, $statusSet)) {
+                            switch ($selectedStatus) {
+                                case 'completed':
+                                    if (isset($project->attributes['virtualenddate']) && $project->attributes['virtualenddate'] < $today) {
+                                        $filteredProjects[] = $project;
+                                    }
+                                    break;
+
+                                case 'current':
+                                    if (
+                                        isset($project->attributes['cfstartdate']) &&
+                                        isset($project->attributes['virtualenddate']) &&
+                                        $project->attributes['cfstartdate'] <= $today &&
+                                        $project->attributes['virtualenddate'] >= $today
+                                    ) {
+                                        $filteredProjects[] = $project;
+                                    }
+                                    break;
+
+                                case 'future':
+                                    if (isset($project->attributes['cfstartdate']) && $project->attributes['cfstartdate'] > $today) {
+                                        $filteredProjects[] = $project;
+                                    }
+                                    break;
+                                case 'completed,current':
+                                    if (
+                                        isset($project->attributes['cfstartdate']) &&
+                                        $project->attributes['cfstartdate'] <= $today
+                                    ) {
+                                        $filteredProjects[] = $project;
+                                    }
+                                    break;
+                                case 'current,future':
+                                    if (
+                                        isset($project->attributes['virtualenddate']) &&
+                                        $project->attributes['virtualenddate'] >= $today
+                                    ) {
+                                        $filteredProjects[] = $project;
+                                    }
+                                    break;
+                                default:
+                                    //                                $filteredProjects[] = $project;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            if ($projects_start !== '' && $projects_start !== null) {
+                foreach ($projects as $project) {
+                    if (isset($project->attributes['startyear']) && $project->attributes['startyear'] > $projects_start) {
+                        $filteredProjects[] = $project;
+                    }
+                }
+            }
+
+            return $filteredProjects;
+        } else {
+            return $projects;
+        }
+    }
+
+    public static function filter_publication_bypersonid_postion($pubArray, $persIdArray, $authorPositionArray)
+    {
+        // Filter publications
+        $filteredPublications = array_filter($pubArray, function ($publication) use ($persIdArray, $authorPositionArray) {
+            // Check if relpersid is set and is a string
+            if (isset($publication->attributes['relpersid']) && is_string($publication->attributes['relpersid'])) {
+                // Split the relpersid string into an array
+                $relpersidArray = explode(',', $publication->attributes['relpersid']);
+
+                // Check for each persId and position combination
+                foreach ($persIdArray as $persId) {
+                    foreach ($authorPositionArray as $position) {
+                        // Convert -1 to the last position
+                        $positionToCheck = ($position == -1) ? count($relpersidArray) : $position;
+
+                        // Check if the persId exists at the specified position in relpersid
+                        if ($positionToCheck > 0 && isset($relpersidArray[$positionToCheck - 1]) && $relpersidArray[$positionToCheck - 1] == $persId) {
+                            return true; // Include the publication if the condition is met
+                        }
+                    }
+                }
+            }
+
+            return false; // Exclude the publication if no condition is met
+        });
+
+        return $filteredPublications;
     }
 }

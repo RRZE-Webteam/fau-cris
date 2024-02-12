@@ -90,8 +90,9 @@ class Publikationen
         $peerreviewed = $param['peerreviewed'] ?: '';
         $notable = $param['notable'] ?: 0;
         $language = $param['language'] ?: '';
-
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $language);
+        $authorPositionArray=$param['author_postion'];
+       
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field='',$language,$fsp=false,$project='',$authorPositionArray);
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -163,9 +164,10 @@ class Publikationen
         $format = $param['format'] ?: '';
         $language = $param['language'] ?: '';
         $sortby = $param['sortby'] ?: 'virtualdate';
+        $authorPositionArray=$param['author_postion'];
 
         // fetching the publication
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray );
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -295,8 +297,10 @@ class Publikationen
         $language = $param['language'] ?: '';
         $sortby =  $param['sortby'] ?: 'virtualdate';
         $sortorder =  $param['sortorder'] ?: SORT_DESC;
+        $authorPositionArray=$param['author_postion'];
 
-        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project);
+        $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray);
+        
 
         if (!count($pubArray)) {
             $output = '<p>' . __('Es wurden leider keine Publikationen gefunden.', 'fau-cris') . '</p>';
@@ -510,7 +514,13 @@ class Publikationen
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
         if (!is_wp_error($filter)) {
             $ws = new CRIS_publications();
-            $pubArray = $ws->by_project($param['project'], $filter);
+            if (isset($this->id) && !empty($this->id)) {
+                $project_id=$this->id;
+            }
+            else{
+                $project_id=$param['project'];
+            }
+            $pubArray = $ws->by_project($project_id, $filter);
         } else {
             return '';
         }
@@ -675,7 +685,7 @@ class Publikationen
      *
      * Start::fetch_publications
      */
-    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = ''): array
+    private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = '',$authorPositionArray=''): array
     {
         $pubArray = [];
 
@@ -687,6 +697,18 @@ class Publikationen
             }
             if ($this->einheit === "person") {
                 $pubArray = $ws->by_pers_id($this->id, $filter, $notable);
+
+                if (isset($authorPositionArray) && $authorPositionArray != '') {
+                    if (!is_array($this->id)) {
+                        $persIdArray = array($this->id);
+                    }else{
+                        $persIdArray=$this->id;
+                    }
+                    if (!is_array($authorPositionArray)) {
+                        $authorPositionArray=array($authorPositionArray);
+                    }
+                    $pubArray=Tools::filter_publication_bypersonid_postion($pubArray,$persIdArray,$authorPositionArray);
+                }
             }
             if ($this->einheit === "project") {
                 $pubArray = $ws->by_project($this->id, $filter, $notable);
@@ -1124,7 +1146,7 @@ class Publikationen
     private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright'): string
     {
         $publist = '';
-        $list = (count($publications) > 1) ? true : false;
+        $list = (count($publications) >= 1) ? true : false;
         if ($list) {
             $publist .= "<ul class=\"cris-publications\" lang=\"" . $lang . "\">";
         } else {
@@ -1430,9 +1452,7 @@ class CRIS_publications extends Webservice
         }
 
         foreach ($fieldID as $_p) {
-            $requests[] = class_Publikationen
-                          . phpsprintf( 'getrelated/Forschungsbereich/%d/',
-		            $_p ) . $relation;
+            $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $relation;
         }
         return $this->retrieve($requests, $filter);
     }

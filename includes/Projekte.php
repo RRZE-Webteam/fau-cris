@@ -916,8 +916,9 @@ class Projekte
         return do_shortcode($projlist);
     }
 
-    public function fieldProj($field, $return = 'list', $seed = false)
+    public function fieldProj($field,$param=array(), $return = 'list', $seed = false)
     {
+
         $ws = new CRIS_projects();
         if ($seed) {
             $ws->disable_cache();
@@ -948,6 +949,18 @@ class Projekte
         $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($projArray);
         $projList = $res[$orderby] ?? [];
+
+
+
+        if ($param['projects_status'] !== '' && $param['projects_status'] !== null){
+            $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
+        }
+
+        elseif ($param['projects_start'] !== '' && $param['projects_start'] !== null){
+            $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
+        }
+
+
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
             $output = $this->make_accordion($projList);
@@ -986,6 +999,17 @@ class Projekte
                 }
             }
         }
+
+        $seen = []; // External array to track seen names
+
+         $persList = array_filter($persList, function($person) use (&$seen) {
+         $name_key = $person['lastname'] . '_' . $person['firstname'];
+            if (!in_array($name_key, $seen)) {
+                $seen[] = $name_key; // Mark as seen
+                return true; // Keep in the array
+            }
+            return false; // Remove from the array
+                });   
         return $persList;
     }
 
