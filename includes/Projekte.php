@@ -1178,7 +1178,7 @@ class CRIS_projects extends Webservice
         $requests = array();
         foreach ($orgaID as $_o) {
             $requests[] = sprintf("getautorelated/Organisation/%d/ORGA_2_PROJ_1", $_o);
-            $requests[] = sprintf("getrelated/Organisation/%d/PROJ_has_int_ORGA", $_o);
+            $requests[] = sprintf("getrelated/Organisation/%d/PROJ_has_ORGA", $_o);
         }
         return $this->retrieve($requests, $filter);
     }
