@@ -538,8 +538,8 @@ class Publikationen
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
 
-        if ($param['publications_limit'] != '') {
-            $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
+        if ($param['project_publications_limit'] != '') {
+            $pubList = array_slice($pubList, 0, $param['project_publications_limit'], true);
         }
         if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
             $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_format']);
@@ -595,9 +595,10 @@ class Publikationen
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
 
-        if ($param['publications_limit'] != '') {
-            $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
-        }
+            if ($param['publications_limit'] != '') {
+                $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
+            }
+        
 
         $output = '';
         if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
