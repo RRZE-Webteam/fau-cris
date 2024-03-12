@@ -359,6 +359,10 @@ msgstr ""
 msgid "Reihenfolge der Publikationen"
 msgstr ""
 
+#: fau-cris.php:293
+msgid "Priorisierung des Titel-Links bei Publikationen"
+msgstr ""
+
 #: fau-cris.php:295
 msgid ""
 "Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, "

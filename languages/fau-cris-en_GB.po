@@ -371,6 +371,10 @@ msgstr "You may enter more organization IDs, separated by al comma."
 msgid "Reihenfolge der Publikationen"
 msgstr "Publications Order"
 
+#: fau-cris.php:293
+msgid "Priorisierung des Titel-Links bei Publikationen"
+msgstr "Priority of publication title link"
+
 #: fau-cris.php:295
 msgid ""
 "Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, "

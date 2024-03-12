@@ -993,4 +993,41 @@ class Tools
 
         return $filteredPublications;
     }
+
+
+    public static function get_first_available_link($cris_pub_title_link_order, $pubDetails, $title, $id, $postID, $lang) {
+        foreach ($cris_pub_title_link_order as $linkPriority) {
+            switch ($linkPriority) {
+                case 'internal link':
+                case 'cris':
+                    
+                    $link = Tools::get_item_url("publication", $title, $id, $postID, $lang);
+                    if (!empty($link)) return $link;
+                    break;
+
+                case 'url':
+                    if (!empty($pubDetails['URI'])) {
+                        return $pubDetails['URI'];
+                    }
+                    break;
+    
+                case 'open access link':
+                    if (!empty($pubDetails['OAlink'])) {
+                        return $pubDetails['OAlink'];
+                    }
+                    break;
+    
+                case 'doi':
+                    if (!empty($pubDetails['doi_link'])) {
+                        return $pubDetails['doi_link'];
+                    }
+                    break;
+            }
+        }
+        return Tools::get_item_url("publication", $title, $id, $postID, $lang);
+    }
+
+
+
+
 }
