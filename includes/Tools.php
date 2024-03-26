@@ -994,7 +994,15 @@ class Tools
         return $filteredPublications;
     }
 
-
+/**
+     * Name : get_first_available_link
+     *
+     * Use: it will get the first available link for publication title 
+     *
+     * Returns: link according to priority 
+     *
+     *
+     */
     public static function get_first_available_link($cris_pub_title_link_order, $pubDetails, $title, $id, $postID, $lang) {
         foreach ($cris_pub_title_link_order as $linkPriority) {
             switch ($linkPriority) {
@@ -1025,6 +1033,31 @@ class Tools
             }
         }
         return Tools::get_item_url("publication", $title, $id, $postID, $lang);
+    }
+
+
+/**
+     * Name : project_title_sorting
+     *
+     * Use: it will sort the project array according to title in from A to Z
+     *
+     * Returns: sort title 
+     *
+     *
+     */
+    public static function project_title_filter($a, $b) {
+        // Decide which title to use for each project, with fallback
+        $aTitle = empty($a->attributes['cftitle']) ? $a->attributes['cftitle_en'] : $a->attributes['cftitle'];
+        $bTitle = empty($b->attributes['cftitle']) ? $b->attributes['cftitle_en'] : $b->attributes['cftitle'];
+    
+        // Regular expression to match the numeric prefix and optional dash, e.g., "3D-", "10X-"
+        $pattern = '/^(\d+D?-?|[A-Z]\d+\s)/';
+
+    // Remove the prefix from titles for comparison
+    $aTitleClean = preg_replace($pattern, '', $aTitle);
+    $bTitleClean = preg_replace($pattern, '', $bTitle);
+    
+        return strcmp($aTitleClean, $bTitleClean);
     }
 
 

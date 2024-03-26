@@ -88,6 +88,10 @@ class Projekte
             $projList = $res[$order];
         }
 
+        if (!empty($param['orderby']) && $param['orderby']==='title') {
+            usort($projList, ['RRZE\Cris\Tools','project_title_filter']);
+         }
+        
         $output = '';
 
         $output .= $this->make_list($projList, $hide);
@@ -191,12 +195,18 @@ class Projekte
                 $expandall = '';
             }
             foreach ($projList as $array_year => $projects) {
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    usort($projects, ['RRZE\Cris\Tools','project_title_filter']);
+                }
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_year => $projects) {
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                   usort($projects, ['RRZE\Cris\Tools','project_title_filter']);
+                }
                 if (empty($year)) {
                     $output .= '<h3>' . $array_year . '</h3>';
                 }
@@ -264,6 +274,9 @@ class Projekte
             }
             foreach ($projList as $array_type => $projects) {
                 $title = Tools::getTitle('projects', $array_type, $this->page_lang);
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    usort($projects, ['RRZE\Cris\Tools','project_title_filter']);
+                 }
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
@@ -271,6 +284,9 @@ class Projekte
         } else {
             foreach ($projList as $array_type => $projects) {
                 // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    usort($projects, ['RRZE\Cris\Tools','project_title_filter']);
+                 }
                 if (empty($type)) {
                     $title = Tools::getTitle('projects', $array_type, $this->page_lang);
                     $output .= "<h3>";
