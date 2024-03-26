@@ -371,6 +371,10 @@ msgstr "You may enter more organization IDs, separated by al comma."
 msgid "Reihenfolge der Publikationen"
 msgstr "Publications Order"
 
+#: fau-cris.php:293
+msgid "Priorisierung des Titel-Links bei Publikationen"
+msgstr "Priority of publication title link"
+
 #: fau-cris.php:295
 msgid ""
 "Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, "
@@ -491,17 +495,12 @@ msgid "Anzahl Publikationen"
 msgstr "Number of Publications"
 
 #: fau-cris.php:386
-msgid ""
-"Maximale Anzahl der Publikationen, die in der Detailansicht eines "
-"Forschungsbereichs angezeigt werden."
+msgid "Maximale Anzahl der Publikationen, die in der Detailansicht eines Forschungsbereichs angezeigt werden."
 msgstr "Maximum number of publications to be listed on a research area page."
 
-#: fau-cris.php:386
-msgid ""
-"Maximale Anzahl der Publikationen, die in der Detailansicht eines "
-"Projekte angezeigt werden."
+#: fau-cris.php:568
+msgid "Maximale Anzahl der Publikationen, die in der Detailansicht eines Projekte angezeigt werden."
 msgstr "Maximum number of publications to be listed on a project area page."
-
 
 #: fau-cris.php:390
 msgid "Kontaktpersonen verlinken"

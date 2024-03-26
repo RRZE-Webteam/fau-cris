@@ -164,6 +164,15 @@ div.cris-standardization {
     word-break: break-all;
 }
 
+.cris-fields .cris-image{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+div p{
+    text-align: justify;
+}
+
 @media print {
     .cris-activities a[href]::after,
     .cris-awards a[href]::after,

@@ -1506,6 +1506,14 @@ class Dicts
         ),
     );
 
+    public static array $publicationTitleLinksOptions=array(
+    'internal link',
+    'url',
+    'doi',
+    'cris',
+    'open access link'
+    );
+
     public static array $pubLanguages = array(
         'German',
         'English',

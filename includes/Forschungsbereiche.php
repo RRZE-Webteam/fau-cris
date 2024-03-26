@@ -251,9 +251,9 @@ class Forschungsbereiche
             if (count($imgs)) {
                 $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
                 foreach ($imgs as $img) {
-                    foreach ($imgs as $img) {
+                    // foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
-                        $singlefield = "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";
+                        $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";
                         $img_description = ($img->attributes['description'] ??
                                              '');
                         if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
@@ -262,7 +262,7 @@ class Forschungsbereiche
                             //$publication['image'] .= "<img alt=\"". $img->attributes['description'] ."\" src=\"\" width=\"\" height=\"\">" . $img_description;
                         }
                         $singlefield .= "</div>";
-                    }
+                    // }
                 }
                 $singlefield .= "</div>";
             }

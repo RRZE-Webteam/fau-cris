@@ -359,6 +359,10 @@ msgstr ""
 msgid "Reihenfolge der Publikationen"
 msgstr ""
 
+#: fau-cris.php:293
+msgid "Priorisierung des Titel-Links bei Publikationen"
+msgstr ""
+
 #: fau-cris.php:295
 msgid ""
 "Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, "
@@ -475,9 +479,11 @@ msgid "Anzahl Publikationen"
 msgstr ""
 
 #: fau-cris.php:386
-msgid ""
-"Maximale Anzahl der Publikationen, die in der Detailansicht eines "
-"Forschungsbereichs angezeigt werden."
+msgid "Maximale Anzahl der Publikationen, die in der Detailansicht eines Forschungsbereichs angezeigt werden."
+msgstr ""
+
+#: fau-cris.php:568
+msgid "Maximale Anzahl der Publikationen, die in der Detailansicht eines Projekte angezeigt werden."
 msgstr ""
 
 #: fau-cris.php:390
