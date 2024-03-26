@@ -479,9 +479,11 @@ msgid "Anzahl Publikationen"
 msgstr ""
 
 #: fau-cris.php:386
-msgid ""
-"Maximale Anzahl der Publikationen, die in der Detailansicht eines "
-"Forschungsbereichs angezeigt werden."
+msgid "Maximale Anzahl der Publikationen, die in der Detailansicht eines Forschungsbereichs angezeigt werden."
+msgstr ""
+
+#: fau-cris.php:568
+msgid "Maximale Anzahl der Publikationen, die in der Detailansicht eines Projekte angezeigt werden."
 msgstr ""
 
 #: fau-cris.php:390
