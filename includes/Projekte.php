@@ -53,6 +53,45 @@ class Projekte
         }
     }
 
+
+
+   /**
+     * Name : project_title_sorting
+     *
+     * Use: it will sort the project array according to title in from A to Z
+     *
+     * Returns: sort title 
+     *
+     *
+     */
+    public function project_title_filter($a, $b) {
+            $a_cftitle_en=$this->normalizeTitle($a->attributes['cftitle_en']);
+            $a_cftitle_de=$this->normalizeTitle($a->attributes['cftitle']);
+             $b_cftitle_en=$this->normalizeTitle($b->attributes['cftitle_en']);
+            $b_cftitle_de=$this->normalizeTitle($b->attributes['cftitle']);
+
+      switch ($this->page_lang) {
+                case 'en':
+                    $aTitle = ($a_cftitle_en != '') ? $a_cftitle_en : $a_cftitle_de;
+                    $bTitle = ($b_cftitle_en != '') ?  $b_cftitle_en : $b_cftitle_de;
+                    break;
+                case 'de':
+                default:
+                    $aTitle = ($a_cftitle_de) ? $a_cftitle_de : $a_cftitle_en;
+                    $bTitle = ($b_cftitle_de != '') ? $b_cftitle_de : $b_cftitle_en;
+                    break;
+            }
+
+        return strcmp($aTitle,$bTitle);
+    }
+
+
+    function normalizeTitle($title) {
+    $title = iconv('UTF-8', 'ASCII//TRANSLIT', $title); // Transliterate characters to ASCII
+    $title = preg_replace('/[^A-Za-z0-9 ]/', '', $title); // Remove non-alphanumeric characters
+    return strtolower($title); // Convert to lowercase to ensure case-insensitive comparison
+}
+
     /**
      * Name : projListe
      *
@@ -88,8 +127,9 @@ class Projekte
             $projList = $res[$order];
         }
 
+
         if (!empty($param['orderby']) && $param['orderby']==='title') {
-            usort($projList, ['RRZE\Cris\Tools','project_title_filter']);
+            uasort($projList, [$this,'project_title_filter']);
          }
         
         $output = '';
@@ -196,7 +236,7 @@ class Projekte
             }
             foreach ($projList as $array_year => $projects) {
                 if (!empty($param['order2']) && $param['order2']==='title') {
-                    usort($projects, ['RRZE\Cris\Tools','project_title_filter']);
+                    uasort($projects, [$this,'project_title_filter']);
                 }
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
@@ -205,7 +245,7 @@ class Projekte
         } else {
             foreach ($projList as $array_year => $projects) {
                 if (!empty($param['order2']) && $param['order2']==='title') {
-                   usort($projects, ['RRZE\Cris\Tools','project_title_filter']);
+                   uasort($projects, [$this,'project_title_filter']);
                 }
                 if (empty($year)) {
                     $output .= '<h3>' . $array_year . '</h3>';
@@ -275,7 +315,7 @@ class Projekte
             foreach ($projList as $array_type => $projects) {
                 $title = Tools::getTitle('projects', $array_type, $this->page_lang);
                 if (!empty($param['order2']) && $param['order2']==='title') {
-                    usort($projects, ['RRZE\Cris\Tools','project_title_filter']);
+                    uasort($projects, [$this,'project_title_filter']);
                  }
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
@@ -285,7 +325,7 @@ class Projekte
             foreach ($projList as $array_type => $projects) {
                 // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde
                 if (!empty($param['order2']) && $param['order2']==='title') {
-                    usort($projects, ['RRZE\Cris\Tools','project_title_filter']);
+                    uasort($projects, [$this,'project_title_filter']);
                  }
                 if (empty($type)) {
                     $title = Tools::getTitle('projects', $array_type, $this->page_lang);
