@@ -1183,6 +1183,7 @@ class FAU_CRIS
             'display' => 'list',
             'project' => '',
             'hide' => '',
+            'projects_hide'=>'',
             'role' => 'all',
             'status' => '',
             'patent' => '',
@@ -1331,6 +1332,8 @@ class FAU_CRIS
         $sc_param['display_language'] = ($display_language == 'en') ? 'en' : 'de';
         $hide = str_replace(' ', '', sanitize_text_field($hide));
         $sc_param['hide'] = explode(',', $hide);
+        $projects_hide = str_replace(' ', '', sanitize_text_field($projects_hide));
+        $sc_param['projects_hide'] = explode(',', $projects_hide);
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {

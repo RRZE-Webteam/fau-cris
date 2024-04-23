@@ -357,6 +357,7 @@ class Projekte
 
     public function singleProj($param = array())
     {
+       
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -805,8 +806,7 @@ class Projekte
      * Start::make_list
      */
     private function make_list($projects, $hide = array(), $showtype = 1, $pubProj = 0): array|string
-    {
-
+    {   
         global $post;
         $projlist = "<ul class=\"cris-projects\">";
 
@@ -958,6 +958,46 @@ class Projekte
 
 
             $projlist .= "[collapse title=\"" . ((!empty($acronym)) ? $acronym . ": " : "") . $title . "\"]";
+            
+            if (!in_array('date', $hide)) {            
+            $start = $project['cfstartdate'];
+            if (!in_array('end', $hide)) {
+                $end = (!empty($project['extension date'])) ? $project['extension date'] : ((!empty($project['cfenddate'])) ? $project['cfenddate'] : '');
+            } else {
+                $end = '';
+            }
+            $date = Tools::make_date($start, $end);
+            if (!empty($date)) {
+                $projlist .= "<strong>" . __('Laufzeit', 'fau-cris') . ': </strong>' . $date . '<br />';
+            }
+            
+            }
+            if (!in_array('funding', $hide)) {
+            $funding = $this->get_project_funding($id);
+            if (!empty($funding)) {
+                $projlist .= "<strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
+                $projlist .= implode(', ', $funding) . '<br />';
+            }
+            }
+
+            if (!in_array('leader', $hide)) {
+            $leaderIDs = explode(",", $project['relpersidlead']);
+                  $leaderArray = $this->get_project_leaders($id, $leaderIDs);
+                  $leaders = array();
+                  foreach ($leaderArray as $l_id => $l_names) {
+                  $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                  $fcid = Tools::person_exists('wp', 'Manfred', 'Pirner');
+                //   print_r($fcid);
+                //   die();
+
+                  }
+
+                  if (isset($leaders) && !empty($leaders)) {
+                    $projlist .= "<strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
+                    $projlist .= implode(', ', $leaders) . '<br />';
+                }
+            }
+            
             if (!in_array('abstract', $hide) && !empty($description)) {
                 $projlist .= "<p class=\"abstract\">" . $description . '</p>';
             }
@@ -1019,9 +1059,9 @@ class Projekte
 
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
-            $output = $this->make_accordion($projList);
+            $output = $this->make_accordion($projList,$hide=$param['projects_hide']);
         } else {
-            $output = $this->make_list($projList);
+            $output = $this->make_list($projList,$hide=$param['projects_hide']);
         }
         return $output;
     }
