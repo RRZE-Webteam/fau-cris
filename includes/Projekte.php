@@ -786,8 +786,11 @@ class Projekte
             }
             if (!in_array('publications', $param['hide'])) {
                 $publications = $this->get_project_publications($id, $param);
-                if ($publications) {
-                    $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+                if (!empty($publications) && $publications!='') {
+                    if (strpos($publications, '<li>') !== false) {
+                        $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+
+                    }
                 }
             }
         }
