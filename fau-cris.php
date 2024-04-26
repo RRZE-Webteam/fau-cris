@@ -87,7 +87,7 @@ class FAU_CRIS
     const php_version = '7.1'; // Minimal erforderliche PHP-Version
     const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
     const cris_publicweb = 'https://cris.fau.de/converis/portal/';
-    const doi = 'https://dx.doi.org/';
+    const doi = 'https://doi.org/';
 
     protected static $instance = null;
     private static $cris_option_page = null;

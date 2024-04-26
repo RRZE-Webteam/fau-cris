@@ -1524,7 +1524,9 @@ class CRIS_publication extends CRIS_Entity
          * website) and DOI (if present, applies only to APA).
          */
 
-        $doilink = preg_quote("https://dx.doi.org/", "/");
+        $doilink = preg_quote("https://doi.org/", "/");
+        $doilinkdx = preg_quote("https://dx.doi.org/", "/");
+
         $title = preg_quote(Tools::numeric_xml_encode($this->attributes["cftitle"]), "/");
 
         $cristmpl = '<a href="' . FAU_CRIS::cris_publicweb . 'publication/%d" target="_blank">%s</a>';
@@ -1533,7 +1535,14 @@ class CRIS_publication extends CRIS_Entity
         $mla = $this->attributes["quotationmla"];
 
         $matches = array();
+        $matchesdx = array();
+
         $splitapa = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilink . ".+)?$/Uu", $apa, $matches);
+        $splitapadx = preg_match("/^(.+)(" . $title . ")(.+)(" . $doilinkdx . ".+)?$/Uu", $apa, $matchesdx);
+
+        // use old format if present
+        if (count($matchesdx) > count($matches))
+                $matches = $matchesdx;
 
         if ($splitapa === 1 && isset($matches[2])) {
             $apalink = $matches[1] . sprintf($cristmpl, $this->ID, $matches[2]) . $matches[3];
