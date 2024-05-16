@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.20.0
+ * Version: 3.21.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,14 +80,14 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.20.0';
+    const version = '3.21.0';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
     const php_version = '7.1'; // Minimal erforderliche PHP-Version
     const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
     const cris_publicweb = 'https://cris.fau.de/converis/portal/';
-    const doi = 'https://dx.doi.org/';
+    const doi = 'https://doi.org/';
 
     protected static $instance = null;
     private static $cris_option_page = null;
@@ -223,6 +223,7 @@ class FAU_CRIS
                 'projects' => 0,
             ),
             'cris_fields_num_pub' => 5,
+            'cris_project_num_pub'=>5,
             'cris_field_link' => 'none'
         );
         return $options;
@@ -540,6 +541,18 @@ class FAU_CRIS
                         'none' => __('keinen Link setzen', 'fau-cris'))
                     )
                 );
+                add_settings_field(
+                    'cris_project_num_pub', // ID
+                    __('Anzahl Publikationen', 'fau-cris'), // Title
+                    array(__CLASS__, 'cris_textbox_callback'), // Callback
+                    'fau_cris_options', // Page
+                    'cris_projects_section', // Section
+                    array(
+                        'name' => 'cris_project_num_pub',
+                        'description' => __('Maximale Anzahl der Publikationen, die in der Detailansicht eines Projekte angezeigt werden.', 'fau-cris')
+                    )
+                );
+                
                 add_settings_section(
                     'cris_patents_section', // ID
                     __('Patente', 'fau-cris'), // Title
@@ -702,6 +715,7 @@ class FAU_CRIS
                 $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
                 $new_input['cris_award_link'] = in_array($_POST[self::option_name]['cris_award_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_award_link'] : $default_options['cris_award_link'];
                 $new_input['cris_fields_num_pub'] = isset($_POST[self::option_name]['cris_fields_num_pub']) ? sanitize_text_field($_POST[self::option_name]['cris_fields_num_pub']) : 0;
+                $new_input['cris_project_num_pub'] = isset($_POST[self::option_name]['cris_project_num_pub']) ? sanitize_text_field($_POST[self::option_name]['cris_project_num_pub']) : 0;
                 $new_input['cris_field_link'] = in_array($_POST[self::option_name]['cris_field_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_field_link'] : $default_options['cris_field_link'];
                 $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_project_order'])) : $default_options['cris_project_order'];
                 $new_input['cris_project_link'] = in_array($_POST[self::option_name]['cris_project_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_project_link'] : $default_options['cris_project_link'];
@@ -1167,6 +1181,7 @@ class FAU_CRIS
             'peerreviewed' => '',
             'current' => '',
             'publications_limit' => $options['cris_fields_num_pub'] ?: '5',
+            'project_publications_limit'=>$options['cris_project_num_pub'] ?: '5',
             'name_order_plugin' => $options['cris_name_order_plugin'] ?: 'firstname-lastname',
             'notable' => '',
             'publications_year' => '',
@@ -1242,6 +1257,7 @@ class FAU_CRIS
         $sc_param['notable'] = $notable == 1 ? 1 : 0;
         $sc_param['publications_language'] = sanitize_text_field($publications_language);
         $sc_param['publications_limit'] = sanitize_text_field($publications_limit);
+        $sc_param['project_publications_limit'] = sanitize_text_field($project_publications_limit);
         $sc_param['publications_display'] = sanitize_text_field($publications_display);
         $sc_param['publications_format'] = ($publications_format != 'list' ? sanitize_text_field($publications_format) : $sc_param['publications_display']);
         $sc_param['publications_year'] = sanitize_text_field($publications_year);
