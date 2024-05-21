@@ -500,7 +500,7 @@ class CRIS_activities extends Webservice
      * actients/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null): WP_Error
+    public function by_orga_id($orgaID = null, &$filter = null)
     {
         if ($orgaID === null || $orgaID === "0") {
             return  new \WP_Error(

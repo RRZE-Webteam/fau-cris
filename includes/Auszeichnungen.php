@@ -648,7 +648,7 @@ class CRIS_awards extends Webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null): WP_Error {
+    public function by_pers_id($persID = null, &$filter = null) {
         if ($persID === null || $persID === "0") {
 	        return new \WP_Error(
 		        'cris-orgid-error',
