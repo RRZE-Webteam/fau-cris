@@ -508,6 +508,9 @@ class Forschungsbereiche
         $args['image_align'] = $param['image_align'];
         $args['image_position'] = $param['image_position'];
         $args['format'] = $param['publications_format'];
+        $args['order2']=$param['order2'];
+        $args['sortby']=$param['sortby'];
+        $args['author_postion']=$param['author_postion'];
         if ($param['publications_orderby'] == 'year') {
             return $liste->pubNachJahr($args, $param['field'], '', $param['fsp']);
         }
