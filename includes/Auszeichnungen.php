@@ -12,7 +12,19 @@ class Auszeichnungen
 
     private array $options;
     public $output;
-
+    public $cms;
+    public $pathPersonenseiteUnivis;
+    public $orgNr;
+    public $suchstring;
+    public $order;
+    public $univis;
+    public $cris_award_link;
+    public $id;
+    public $einheit;
+    public $page_lang;
+    public $langdiv_open;
+    public $sc_lang;
+    public $langdiv_close;
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
     {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {

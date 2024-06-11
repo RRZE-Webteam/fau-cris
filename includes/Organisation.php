@@ -12,6 +12,15 @@ class Organisation
 
     private array $options;
     public $output;
+    public $cms;
+    public $orgNr;
+    public $id;
+    public $einheit;
+    public $page_lang;
+    public $langdiv_open;
+    public $sc_lang;
+    public $langdiv_close;
+
 
     public function __construct($einheit = 'orga', $id = '', $page_lang = 'de', $sc_lang = 'de')
     {
