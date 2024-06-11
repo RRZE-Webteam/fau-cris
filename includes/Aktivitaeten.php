@@ -12,6 +12,20 @@ class Aktivitaeten
 
     private array $options;
     public $output;
+    public $cms;
+    public $pathPersonenseiteUnivis;
+    public $orgNr;
+    public $suchstring;
+    public $univis;
+    public $order;
+    public $cris_activities_link;
+    public $id;
+    public $einheit;
+    public $page_lang;
+    public $langdiv_open;
+    public $sc_lang;
+    public $langdiv_close;
+
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
     {
