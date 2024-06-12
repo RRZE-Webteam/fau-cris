@@ -7,6 +7,10 @@ class Filter
     /*
      * This class provides filter options for any CRIS data.
      */
+    public $filters;
+    public $skip;
+
+
     public function __construct($definitions)
     {
         /*

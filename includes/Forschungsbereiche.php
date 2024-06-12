@@ -14,6 +14,18 @@ class Forschungsbereiche
 
     private array $options;
     public $output;
+    public $cms;
+    public $pathPersonenseiteUnivis;
+    public $orgNr;
+    public $suchstring;
+    public $univis;
+    public $cris_field_link;
+    public $id;
+    public $einheit;
+    public $page_lang;
+    public $langdiv_open;
+    public $sc_lang;
+    public $langdiv_close;
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
     {
@@ -508,6 +520,9 @@ class Forschungsbereiche
         $args['image_align'] = $param['image_align'];
         $args['image_position'] = $param['image_position'];
         $args['format'] = $param['publications_format'];
+        $args['order2']=$param['order2'];
+        $args['sortby']=$param['sortby'];
+        $args['author_postion']=$param['author_postion'];
         if ($param['publications_orderby'] == 'year') {
             return $liste->pubNachJahr($args, $param['field'], '', $param['fsp']);
         }

@@ -12,6 +12,18 @@ class Equipment
 {
     private array $options;
     public $output;
+    public $pathPersonenseiteUnivis;
+    public $orgNr;
+    public $suchstring;
+    public $univis;
+    public $cris_equipment_link;
+    public $id;
+    public $einheit;
+    public $page_lang;
+    public $langdiv_open;
+    public $sc_lang;
+    public $langdiv_close;
+
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
     {
@@ -575,7 +587,7 @@ class Equipment
     private function get_equipment_images($equipment): array
     {
         $images = array();
-        $imgString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/equi_has_pict";
+        $imgString = Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/equi_has_pict";
         $imgXml = Tools::XML2obj($imgString);
         $i = 1;
         if (!is_wp_error($imgXml) && !empty($imgXml->infoObject)) {
@@ -609,7 +621,7 @@ class Equipment
     private function get_equipment_funding($equipment = null): array
     {
         $funding = array();
-        $fundingString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_FUND";
+        $fundingString = Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_FUND";
         $fundingXml = Tools::XML2obj($fundingString);
         if (!is_wp_error($fundingXml) && !empty($fundingXml->infoObject)) {
             foreach ($fundingXml->infoObject as $fund) {
@@ -627,7 +639,7 @@ class Equipment
     private function get_equipment_fields($equipment): array
     {
         $fields = array();
-        $fieldsString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/FOBE_has_EQUI";
+        $fieldsString = Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/FOBE_has_EQUI";
         $fieldsXml = Tools::XML2obj($fieldsString);
         if (!is_wp_error($fieldsXml) && !empty($fieldsXml->infoObject)) {
             foreach ($fieldsXml->infoObject as $field) {
@@ -647,7 +659,7 @@ class Equipment
     private function get_equipment_projects($equipment): array
     {
         $projects = array();
-        $projectsString = CRIS_Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_PROJ";
+        $projectsString = Dicts::$base_uri . "getrelated/equipment/" . $equipment . "/EQUI_has_PROJ";
         $projectsXml = Tools::XML2obj($projectsString);
         if (!is_wp_error($projectsXml) && !empty($projectsXml->infoObject)) {
             foreach ($projectsXml->infoObject as $project) {
@@ -693,7 +705,7 @@ class CRIS_equipments extends Webservice
      * actients/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null): WP_Error
+    public function by_orga_id($orgaID = null, &$filter = null) 
     {
         if ($orgaID === null || $orgaID === "0") {
             return new \WP_Error(

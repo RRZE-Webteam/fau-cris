@@ -95,6 +95,8 @@ class CRIS_entity
     /*
      * basic object for all CRIS webservice objects
      */
+    public $ID;
+    public $attributes=[];
     public function __construct($data)
     {
         $this->ID = (string) $data['id'];
