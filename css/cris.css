@@ -167,9 +167,9 @@ div.cris-standardization {
 @media print {
     .cris-activities a[href]::after,
     .cris-awards a[href]::after,
-    .cris-fields a[href]::after, 
+    .cris-fields a[href]::after,
     .cris-organisation a[href]::after,
-    .cris-patents a[href]::after, 
+    .cris-patents a[href]::after,
     .cris-projects a[href]::after,
     .cris-publications a[href]::after {
         content: '' !important;

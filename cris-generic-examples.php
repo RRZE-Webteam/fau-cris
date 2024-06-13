@@ -2,6 +2,8 @@
 /*
  * Examples for using the generic CRIS web service access.
  */
+require_once( './includes/Publikationen.php' );
+
 include('cris-generic.php');
 
 $publ = new CRIS_publications();
@@ -69,8 +71,12 @@ foreach ($data as $group => $publs) {
     printf("%s\n", $group);
 
     foreach ($publs as $p) {
-        printf("%7d - %s %s\n", 
-                $p->ID, $p->attributes["publyear"], $p->attributes["cftitle"]);
+        printf(
+            "%7d - %s %s\n",
+            $p->ID,
+            $p->attributes["publyear"],
+            $p->attributes["cftitle"]
+        );
     }
 }
 
@@ -80,13 +86,13 @@ $res = $publ->by_id(array(36722, 1036431));
 $p = $res[36722];
 $p->insert_quotation_links();
 print_r(array(
-    $p->attributes["quotationapa"], $p->attributes["quotationapalink"], 
+    $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
     $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
 ));
 
 $p = $res[1036431];
 $p->insert_quotation_links();
 print_r(array(
-    $p->attributes["quotationapa"], $p->attributes["quotationapalink"], 
+    $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
     $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
 ));

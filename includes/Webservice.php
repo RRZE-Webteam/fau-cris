@@ -1,4 +1,6 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
 /**
  * These classes provide generic access to the CRIS web service data including
@@ -9,28 +11,28 @@
  * @author Marcus Walther
  */
 
-use RRZE\Cris\{RemoteGet, XML};
+use RRZE\Cris\RemoteGet;
+use RRZE\Cris\XML;
+use RRZE\Cris\Tools;
 
-require_once("class_Tools.php");
-
-class CRIS_webservice
+class Webservice
 {
     /*
      * generic class for web service access.
      */
-    private $cache = true;
+    private bool $cache = true;
 
     private function fetch($url)
     {
         return RemoteGet::retrieveContent($url);
     }
 
-    public function disable_cache()
+    public function disable_cache(): void
     {
         $this->cache = false;
     }
 
-    public function enable_cache()
+    public function enable_cache(): void
     {
         $this->cache = true;
     }
@@ -46,11 +48,10 @@ class CRIS_webservice
 
         $supported = array();
         $id_parts = explode('/', $id);
-        if ($filter instanceof CRIS_Filter) {
+        if ($filter instanceof Filter) {
             $remaining = array();
             foreach ($filter->filters as $attr => $value) {
-                if (
-                    strtolower($attr) !== 'publyear' ||
+                if (strtolower($attr) !== 'publyear' ||
                     strtolower($id_parts[1]) !== 'organisation'
                 ) {
                     $remaining[$attr] = $value;
@@ -73,7 +74,7 @@ class CRIS_webservice
             $seed = '?flag=seednow';
         }
 
-        $xml = $this->fetch(CRIS_Dicts::$base_uri . $id . $seed);
+        $xml = $this->fetch(Dicts::$base_uri . $id . $seed);
 
         $xmlobj = XML::element($xml);
         if (is_wp_error($xmlobj)) {
@@ -94,6 +95,8 @@ class CRIS_entity
     /*
      * basic object for all CRIS webservice objects
      */
+    public $ID;
+    public $attributes=[];
     public function __construct($data)
     {
         $this->ID = (string) $data['id'];
@@ -103,7 +106,7 @@ class CRIS_entity
 
         foreach ($data->attribute as $_a) {
             if ($_a['language'] == 1) {
-                $attr_name = (string) $_a['name'] . '_en';
+                $attr_name = $_a['name'] . '_en';
             } else {
                 $attr_name = (string) $_a['name'];
             }
@@ -116,8 +119,9 @@ class CRIS_entity
             $this->attributes[strtolower($attr_name)] = $attr_value;
         }
         foreach ($data->relation as $_r) {
-            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ", "PROJ_has_PUBL", "FOBE_has_top_PUBL", "FOBE_has_cur_PUBL", "FOBE_has_PICT", "EQUI_has_PICT")))
+            if (!in_array($_r['type'], array("FOBE_has_ORGA", "FOBE_has_PROJ", "FOBE_FAC_has_PROJ", "PROJ_has_PUBL", "FOBE_has_top_PUBL", "FOBE_has_cur_PUBL", "FOBE_has_PICT", "EQUI_has_PICT"))) {
                 continue;
+            }
             foreach ($_r->attribute as $_ra) {
                 if ($_ra['name'] == 'Left seq') {
                     $this->attributes["relation left seq"] = (string) $_ra->data;

@@ -1,47 +1,61 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
 
-class Organisation {
+class Organisation
+{
 
-    private $options;
+    private array $options;
     public $output;
+    public $cms;
+    public $orgNr;
+    public $id;
+    public $einheit;
+    public $page_lang;
+    public $langdiv_open;
+    public $sc_lang;
+    public $langdiv_close;
 
-    public function __construct($einheit = 'orga', $id = '', $page_lang = 'de', $sc_lang = 'de') {
+
+    public function __construct($einheit = 'orga', $id = '', $page_lang = 'de', $sc_lang = 'de')
+    {
 
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
         } else {
             $this->cms = 'wp';
-	        $this->options = (array) FAU_CRIS::get_options();
+            $this->options = (array) FAU_CRIS::get_options();
         }
         $this->orgNr = $this->options['cris_org_nr'];
 
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation an.', 'fau-cris') . '</strong></p>';
-            return;
+            $this->error = new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation an.', 'fau-cris')
+            );
         }
 
         $this->id = ($id != '' ? $id : $this->orgNr);
         $this->einheit = "orga";
         $this->page_lang = $page_lang;
-	    $this->sc_lang = $sc_lang;
-	    $this->langdiv_open = '<div class="cris">';
-	    $this->langdiv_close = '</div>';
-	    if ($sc_lang != $this->page_lang) {
-		    $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
-	    }
+        $this->sc_lang = $sc_lang;
+        $this->langdiv_open = '<div class="cris">';
+        $this->langdiv_close = '</div>';
+        if ($sc_lang != $this->page_lang) {
+            $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+        }
     }
 
-    /*
-     * Ausgabe einer einzelnen Organisation
-     */
 
-    public function singleOrganisation($hide = '', $image_align  = 'alignright') {
+
+    public function singleOrganisation($hide = '', $image_align = 'alignright')
+    {
         $ws = new CRIS_organisations();
         try {
             $orgaArray = $ws->by_id($this->id);
@@ -53,7 +67,7 @@ class Organisation {
             $output = '<p>' . __('Es wurden leider keine Informationen gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-	    $output = $this->make_single($orgaArray, $hide, $image_align);
+        $output = $this->make_single($orgaArray, $hide, $image_align);
 
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
@@ -62,7 +76,8 @@ class Organisation {
      * Ausgabe eines Organisation per Custom-Shortcode
      */
 
-    public function customOrganisation($content = '', $image_align = 'alignright') {
+    public function customOrganisation($content = '', $image_align = 'alignright')
+    {
         $ws = new CRIS_organisations();
         try {
             $orgaArray = $ws->by_id($this->id);
@@ -75,13 +90,15 @@ class Organisation {
             return $output;
         }
         $output = $this->make_custom_single($orgaArray, $content, $image_align);
-	    return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-    public function researchContacts($seed=false) {
+    public function researchContacts($seed = false)
+    {
         $ws = new CRIS_organisations();
-        if($seed)
+        if ($seed) {
             $ws->disable_cache();
+        }
         try {
             $orgaArray = $ws->by_id($this->id);
         } catch (Exception $ex) {
@@ -120,7 +137,8 @@ class Organisation {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_organisation() {
+    private function fetch_organisation(): array
+    {
 
         $ws = new CRIS_organisations();
         $orgaArray = array();
@@ -137,10 +155,10 @@ class Organisation {
      * Ausgabe der Organisation
      */
 
-    private function make_single($organisations, $image_align) {
-	    $image_align = 'alignright';
-	    $output = '';
-        $output .= "<div class=\"cris-organisation\">";
+    private function make_single($organisations, $image_align): string
+    {
+        $image_align = 'alignright';
+        $output      = "<div class=\"cris-organisation\">";
 
         foreach ($organisations as $organisation) {
             $organisation = (array) $organisation;
@@ -151,15 +169,15 @@ class Organisation {
             $research_imgs = self::get_research_images($organisation['ID']);
 
             if (count($research_imgs)) {
-		        $output .= "<div class=\"cris-image wp-caption " . $image_align .  "\">";
-		        foreach($research_imgs as $img) {
-			        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-				        $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
-				        $output .= "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description;
-			        }
-		        }
-		        $output .= "</div>";
-	        }
+                $output .= "<div class=\"cris-image wp-caption " . $image_align .  "\">";
+                foreach ($research_imgs as $img) {
+                    if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+                        $img_description = (isset($img->attributes['description']) ? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
+                        $output .= "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description;
+                    }
+                }
+                $output .= "</div>";
+            }
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
                 $research = ($this->page_lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
                 $output .= "<p class=\"cris-research\">" . $research . "</p>";
@@ -170,9 +188,9 @@ class Organisation {
         return $output;
     }
 
-    private function make_custom_single($organisations, $custom_text, $image_align = 'alignright') {
-        $output = '';
-        $output .= "<div class=\"cris-organisation\">";
+    private function make_custom_single($organisations, $custom_text, $image_align = 'alignright'): string
+    {
+        $output = "<div class=\"cris-organisation\">";
 
         foreach ($organisations as $organisation) {
             $organisation = (array) $organisation;
@@ -180,23 +198,23 @@ class Organisation {
                 $organisation[$attribut] = $v;
             }
             unset($organisation['attributes']);
-	        $details['#image1#'] = '';
-	        $details['#images#'] = '';
-	        if (strpos($custom_text, '#image' ) !== false) {
-		        $imgs = self::get_research_images($organisation['ID']);
-		        if (count($imgs)) {
-			        $i = 1;
-			        foreach($imgs as $img) {
-				        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
-					        $img_description = (isset($img->attributes['description'])? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
-					        $details['#image'.$i.'#'] = "<div class=\"cris-image wp-caption " . $image_align .  "\">" . "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description . "</div>";
-					        $details['#images#'] .= $details['#image'.$i.'#'];
-				        }
-				        $i++;
-			        }
-		        }
-	        }
-	        $details['#image#'] = $details['#image1#'];
+            $details['#image1#'] = '';
+            $details['#images#'] = '';
+            if (strpos($custom_text, '#image') !== false) {
+                $imgs = self::get_research_images($organisation['ID']);
+                if (count($imgs)) {
+                    $i = 1;
+                    foreach ($imgs as $img) {
+                        if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
+                            $img_description = (isset($img->attributes['description']) ? "<p class=\"wp-caption-text\">" . $img->attributes['description'] . "</p>" : '');
+                            $details['#image' . $i . '#'] = "<div class=\"cris-image wp-caption " . $image_align .  "\">" . "<img alt=\"\" src=\"data:image/PNG;base64," . $img->attributes['png180'] . "\" width=\"\" height=\"\">" . $img_description . "</div>";
+                            $details['#images#'] .= $details['#image' . $i . '#'];
+                        }
+                        $i++;
+                    }
+                }
+            }
+            $details['#image#'] = $details['#image1#'];
             $details['#description#'] = '';
             if (!empty($organisation['research_desc']) || !empty($organisation['research_desc_en'])) {
                 $research = ($this->page_lang == 'en' && !empty($organisation['research_desc_en'])) ? $organisation['research_desc_en'] : $organisation['research_desc'];
@@ -208,10 +226,11 @@ class Organisation {
         return $output;
     }
 
-    private function get_research_images($orga) {
+    private function get_research_images($orga): array
+    {
         $images = array();
-        //$imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_PICT";
-	    $imgString = CRIS_Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
+        //$imgString = Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_PICT";
+        $imgString = Dicts::$base_uri . "getrelated/Organisation/" . $orga . "/ORGA_has_research_PICT";
         $imgXml = Tools::XML2obj($imgString);
 
         if (!is_wp_error($imgXml) && isset($imgXml['size']) && $imgXml['size'] != 0) {
@@ -224,17 +243,24 @@ class Organisation {
     }
 }
 
-class CRIS_organisations extends CRIS_webservice {
+class CRIS_organisations extends Webservice
+{
     /*
      * projects requests
      */
 
-    public function by_id($orgaID = null) {
-        if ($orgaID === null || $orgaID === "0")
-            throw new Exception('Please supply valid organisation ID');
+    public function by_id($orgaID = null): array
+    {
+        if ($orgaID === null || $orgaID === "0") {
+	       return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation an.', 'fau-cris')
+	        );
+        }
 
-        if (!is_array($orgaID))
+        if (!is_array($orgaID)) {
             $orgaID = array($orgaID);
+        }
 
         $requests = array();
         foreach ($orgaID as $_o) {
@@ -243,9 +269,11 @@ class CRIS_organisations extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null) {
-        if ($filter !== null && !$filter instanceof CRIS_filter)
-            $filter = new CRIS_filter($filter);
+    private function retrieve($reqs, &$filter = null): array
+    {
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
+        }
 
         $data = array();
         foreach ($reqs as $_i) {
@@ -260,8 +288,9 @@ class CRIS_organisations extends CRIS_webservice {
         foreach ($data as $_d) {
             foreach ($_d as $organisation) {
                 $a = new CRIS_organisation($organisation);
-                if ($a->ID && ($filter === null || $filter->evaluate($a)))
+                if ($a->ID && ($filter === null || $filter->evaluate($a))) {
                     $organisations[$a->ID] = $a;
+                }
             }
         }
 
@@ -269,29 +298,33 @@ class CRIS_organisations extends CRIS_webservice {
     }
 }
 
-class CRIS_organisation extends CRIS_Entity {
+class CRIS_organisation extends CRIS_Entity
+{
     /*
      * object for single award
      */
 
-    function __construct($data) {
+    public function __construct($data)
+    {
         parent::__construct($data);
     }
-
 }
 
-class CRIS_research_image extends CRIS_Entity {
+class CRIS_research_image extends CRIS_Entity
+{
     /*
      * object for single publication
      */
 
-    public function __construct($data) {
+    public function __construct($data)
+    {
         parent::__construct($data);
 
         foreach ($data->relation as $_r) {
-            if ($_r['type'] != "ORGA_has_research_PICT")
+            if ($_r['type'] != "ORGA_has_research_PICT") {
                 continue;
-            foreach($_r->attribute as $_a) {
+            }
+            foreach ($_r->attribute as $_a) {
                 if ($_a['name'] == 'description') {
                     $this->attributes["description"] = (string) $_a->data;
                 }

@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 class RemoteGet
 {
-    private static $defaultArgs = [
+    private static array $defaultArgs = [
         'timeout' => 5,
         'sslverify' => true,
         'method' => 'GET',

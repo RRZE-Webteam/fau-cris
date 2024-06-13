@@ -1,27 +1,50 @@
 <?php
+namespace RRZE\Cris;
+defined('ABSPATH') || exit;
 
-require_once("class_Tools.php");
-require_once("class_Webservice.php");
-require_once("class_Filter.php");
-require_once("class_Formatter.php");
+use RRZE\Cris\Tools;
+use RRZE\Cris\Webservice;
+use RRZE\Cris\Filter;
+use RRZE\Cris\Formatter;
 
-class Standardisierungen {
-    private $options;
+
+class Standardisierungen
+{
+    private array $options;
     public $output;
+    public $cms;
+    public $pathPersonenseiteUnivis;
+    public $orgNr;
+    public $suchstring;
+    public $univis;
+    public $cris_standardizations_link;
+    public $id;
+    public $einheit;
+    public $page_lang;
+    public $langdiv_open;
+    public $sc_lang;
+    public $langdiv_close;
 
-    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de') {
-	    $this->options = (array) FAU_CRIS::get_options();
-	    $this->cms = 'wp';
+
+
+    public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
+    {
+        $this->options = (array) FAU_CRIS::get_options();
+        $this->cms = 'wp';
         $this->pathPersonenseiteUnivis = '/person/';
         $this->orgNr = $this->options['cris_org_nr'];
         $this->suchstring = '';
-        $this->univis = NULL;
+        $this->univis = null;
 
         //$this->order = $this->options['cris_standardization_order'];
-        $this->cris_standardizations_link = isset($this->options['cris_standardizations_link']) ? $this->options['cris_standardizations_link'] : 'none';
+        $this->cris_standardizations_link = $this->options['cris_standardizations_link'] ?? 'none';
         if ((!$this->orgNr || $this->orgNr == 0) && $id == '') {
-            print '<p><strong>' . __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris') . '</strong></p>';
+            $this->error= new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris')
+            );
         }
+        
         if (in_array($einheit, array("person", "orga", "standardization"))) {
             $this->id = $id;
             $this->einheit = $einheit;
@@ -31,19 +54,20 @@ class Standardisierungen {
             $this->einheit = "orga";
         }
         $this->page_lang = $page_lang;
-	    $this->sc_lang = $sc_lang;
-	    $this->langdiv_open = '<div class="cris">';
-	    $this->langdiv_close = '</div>';
-	    if ($sc_lang != $this->page_lang) {
-	        $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
-	    }
+        $this->sc_lang = $sc_lang;
+        $this->langdiv_open = '<div class="cris">';
+        $this->langdiv_close = '</div>';
+        if ($sc_lang != $this->page_lang) {
+            $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
+        }
     }
 
     /*
      * Ausgabe einer einzelnen Standardisierung
      */
 
-    public function singleStandardization($hide = array()) {
+    public function singleStandardization($hide = array())
+    {
         $ws = new CRIS_standardizations();
 
         try {
@@ -62,7 +86,8 @@ class Standardisierungen {
         return $this->langdiv_open . $output . $this->langdiv_close;
     }
 
-	public function standardizationListe($param = array(), $custom_text = '') {
+    public function standardizationListe($param = array(), $custom_text = '')
+    {
 
         $standardizationArray = $this->fetch_standardizations($param['year'], $param['start'], $param['end'], $param['type']);
 
@@ -79,13 +104,13 @@ class Standardisierungen {
             $group = 'subtype';
             $groupOrder = SORT_ASC;
         } else {
-            $group = NULL;
-            $groupOrder = NULL;
+            $group = null;
+            $groupOrder = null;
         }
         // sortiere nach Erscheinungsdatum
         $sort = "venue_start";
         $sortOrder = SORT_DESC;
-        $formatter = new CRIS_formatter($group, $groupOrder, $sort, $sortOrder);
+        $formatter = new Formatter($group, $groupOrder, $sort, $sortOrder);
         $standardizations = $formatter->execute($standardizationArray);
         $isGroupAccordion = ($param['display'] == 'accordion' && in_array($param['orderby'], ['year', 'type']));
         $isSingleAccordion = ($param['display'] == 'accordion' && $param['orderby'] == '');
@@ -129,11 +154,13 @@ class Standardisierungen {
         return do_shortcode($this->langdiv_open . $output . $this->langdiv_close);
     }
 
-    private function make_list($standardizations, $param = array(), $isSingleAccordion = false) {
+    private function make_list($standardizations, $param = array(), $isSingleAccordion = false): string
+    {
         global $post;
         $hide = $param['hide'];
-        $standardizationList = '';
-        $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<ul class=\"cris-standardizations\">");
+        $standardizationList = ($isSingleAccordion
+            ? '[collapsibles expand-all-link="true"]'
+            : "<ul class=\"cris-standardizations\">");
 
         foreach($standardizations as $standardization) {
             $standardization = (array) $standardization;
@@ -152,7 +179,8 @@ class Standardisierungen {
                     $authorArray[] = array(
                         'id' => $key,
                         'lastname' => $nameparts[0],
-                        'firstname' => array_key_exists(1, $nameparts) ? substr($nameparts[1], 0,1) . '. ' : '');
+                        'firstname' => array_key_exists(1, $nameparts) ? substr( $nameparts[1],
+		                        0, 1 ) . 'fau-cris ' : '');
                 }
                 $authorList = array();
                 foreach ($authorArray as $v) {
@@ -196,7 +224,8 @@ class Standardisierungen {
         return $standardizationList;
     }
 
-    private function make_custom($standardizations, $param = array(), $custom_text = '', $isSingleAccordion = false) {
+    private function make_custom($standardizations, $param = array(), $custom_text = '', $isSingleAccordion = false)
+    {
         if  ($param['display'] == 'no-list') {
             $tag_open = '<div class="cris-standardizations">';
             $tag_close = '</div>';
@@ -214,8 +243,7 @@ class Standardisierungen {
             $item_close = '</li>';
         }
 
-        $standardizationList = '';
-        $standardizationList .= $tag_open;
+        $standardizationList = $tag_open;
 
         foreach($standardizations as $standardization) {
             $standardization = (array)$standardization;
@@ -268,14 +296,16 @@ class Standardisierungen {
         return do_shortcode($standardizationList);
     }
 
-    private function make_single($standardizations, $param = array(), $isSingleAccordion = false) {
+    private function make_single($standardizations, $param = array(), $isSingleAccordion = false): string
+    {
         $hide = (isset($param['hide']) && is_array($param['hide'])) ? $param['hide'] : [];
         if ($isSingleAccordion) {
             array_push($hide, ['hide']);
         }
 
-        $standardizationList = '';
-        $standardizationList .= ($isSingleAccordion ? '[collapsibles expand-all-link="true"]': "<div class=\"cris-standardizations\">");
+        $standardizationList = ($isSingleAccordion
+            ? '[collapsibles expand-all-link="true"]'
+            : "<div class=\"cris-standardizations\">");
 
         foreach($standardizations as $standardization) {
             $standardization = (array) $standardization;
@@ -287,8 +317,8 @@ class Standardisierungen {
             $standardizationList .= ($isSingleAccordion ? sprintf('[collapse title="%1s" color="%2s" name="%3s"]', $standardization['title'], $param['accordion_color'], sanitize_title($standardization['title'])) : "<div class=\"cris-standardization\">");
 
             if (!in_array('title', (array)$hide)) {
-		        $standardizationList .= "<h3>" . htmlentities($standardization['title'], ENT_QUOTES) . "</h3>";
-	        }
+                $standardizationList .= "<h3>" . htmlentities($standardization['title'], ENT_QUOTES) . "</h3>";
+            }
 
             if (!in_array('type', (array)$hide)) {
                 $type = Tools::getName('standardizations', $standardization['subtype'], $this->sc_lang);
@@ -348,8 +378,8 @@ class Standardisierungen {
             if (!in_array('meeting', $hide)) {
                 $standardizationList .= '<h4>' . __('Meeting') . '</h4>';
                 if (!in_array('date', (array)$hide) && (!empty($standardization['venue_start']) || !empty($standardization['venue_end']))) {
-                    $startDate = date_i18n(get_option('date_format') , strtotime($standardization['venue_start']));
-                    $endDate = date_i18n(get_option('date_format') , strtotime($standardization['venue_end']));
+                    $startDate = date_i18n(get_option('date_format'), strtotime($standardization['venue_start']));
+                    $endDate = date_i18n(get_option('date_format'), strtotime($standardization['venue_end']));
                     $standardizationList .= "<br /><strong>" . __('Datum', 'fau-cris') . ': </strong>';
                     if (!empty($standardization['venue_start']) && !empty($standardization['venue_end'])) {
                         $standardizationList .= $startDate . ' &mdash; ' . $endDate;
@@ -379,7 +409,8 @@ class Standardisierungen {
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_standardizations($year = '', $start = '', $end = '', $type = '') {
+    private function fetch_standardizations($year = '', $start = '', $end = '', $type = ''): array
+    {
 
         $filter = Tools::standardizations_filter($year, $start, $end, $type, );
         $ws = new CRIS_standardizations();
@@ -399,17 +430,24 @@ class Standardisierungen {
     }
 }
 
-class CRIS_standardizations extends CRIS_webservice {
+class CRIS_standardizations extends Webservice
+{
     /*
      * actients/grants requests
      */
 
-    public function by_orga_id($orgaID = null, &$filter = null) {
-        if ($orgaID === null || $orgaID === "0")
-            throw new Exception('Please supply valid organisation ID');
+    public function by_orga_id($orgaID = null, &$filter = null): WP_Error
+    {
+        if ($orgaID === null || $orgaID === "0") {
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris')
+            );
+        }
 
-        if (!is_array($orgaID))
+        if (!is_array($orgaID)) {
             $orgaID = array($orgaID);
+        }
 
         $requests = array();
         foreach ($orgaID as $_o) {
@@ -418,12 +456,18 @@ class CRIS_standardizations extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null, $role = 'all') {
-        if ($persID === null || $persID === "0")
-            throw new Exception('Please supply valid person ID');
+    public function by_pers_id($persID = null, &$filter = null, $role = 'all'): array
+    {
+        if ($persID === null || $persID === "0") {
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris')
+	        );
+        }
 
-        if (!is_array($persID))
+        if (!is_array($persID)) {
             $persID = array($persID);
+        }
 
         $requests = array();
         foreach ($persID as $_p) {
@@ -432,12 +476,18 @@ class CRIS_standardizations extends CRIS_webservice {
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_id($stanID = null) {
-        if ($stanID === null || $stanID === "0")
-            throw new Exception('Please supply valid standardization ID');
+    public function by_id($stanID = null): array
+    {
+        if ($stanID === null || $stanID === "0") {
+	        return new \WP_Error(
+		        'cris-orgid-error',
+		        __('Bitte geben Sie die CRIS-ID der Organisation, Person oder Forschungsaktivität an.', 'fau-cris')
+	        );
+        }
 
-        if (!is_array($stanID))
+        if (!is_array($stanID)) {
             $stanID = array($stanID);
+        }
 
         $requests = array();
         foreach ($stanID as $_p) {
@@ -446,9 +496,11 @@ class CRIS_standardizations extends CRIS_webservice {
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null) {
-        if ($filter !== null && !$filter instanceof CRIS_filter)
-            $filter = new CRIS_filter($filter);
+    private function retrieve($reqs, &$filter = null): array
+    {
+        if ($filter !== null && !$filter instanceof Filter) {
+            $filter = new Filter($filter);
+        }
 
         $data = array();
         foreach ($reqs as $_i) {
@@ -463,8 +515,9 @@ class CRIS_standardizations extends CRIS_webservice {
         foreach ($data as $_d) {
             foreach ($_d as $standardization) {
                 $a = new CRIS_standardization($standardization);
-                if ($a->ID && ($filter === null || $filter->evaluate($a)))
+                if ($a->ID && ($filter === null || $filter->evaluate($a))) {
                     $standardizations[$a->ID] = $a;
+                }
             }
         }
 
@@ -473,14 +526,14 @@ class CRIS_standardizations extends CRIS_webservice {
 
 }
 
-class CRIS_standardization extends CRIS_Entity {
+class CRIS_standardization extends CRIS_Entity
+{
     /*
      * object for single standardization
      */
 
-    function __construct($data) {
+    public function __construct($data)
+    {
         parent::__construct($data);
     }
 }
-
-
