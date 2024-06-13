@@ -953,7 +953,7 @@ class Tools
             }
             if ($projects_start !== '' && $projects_start !== null) {
                 foreach ($projects as $project) {
-                    if (isset($project->attributes['startyear']) && $project->attributes['startyear'] > $projects_start) {
+                    if (isset($project->attributes['startyear']) && $project->attributes['startyear'] >= $projects_start) {
                         $filteredProjects[] = $project;
                     }
                 }

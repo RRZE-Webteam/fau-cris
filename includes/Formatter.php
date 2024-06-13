@@ -9,13 +9,17 @@ class Formatter
      * It will return reformatted data.
      */
     private $sortkey;
+    private $group;
+    private $sort_order;
     private $sortvalues;
-
+    private $group_order;
+    private $sort;
     public function __construct(
         $group_attribute,
         $group_order = SORT_DESC,
         $sort_attribute = null,
         $sort_order = SORT_ASC
+
     ) {
         /*
          * The method takes up to four arguments. First two group all datasets
@@ -95,7 +99,7 @@ class Formatter
             # user-defined array for sorting
             $this->sortkey = $group_key;
             $this->sortvalues = $this->group_order;
-            uksort($final, "self::compare_group");
+            uksort($final, [Formatter::class, 'compare_group']);
         } elseif ($this->group_order === SORT_ASC) {
             ksort($final);
         } elseif ($this->group_order === SORT_DESC) {
@@ -111,7 +115,7 @@ class Formatter
                 $final[$_k] = $group;
             } else {
                 $this->sortkey = $this->sort;
-                uasort($group, "self::compare_attributes");
+                uasort($group,[Formatter::class,'compare_attributes']);
                 if ($this->sort_order === SORT_DESC) {
                     $final[$_k] = array_reverse($group, true);
                 } else {

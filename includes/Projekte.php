@@ -14,6 +14,15 @@ class Projekte
 
     private array $options;
     public $output;
+    public $cms;
+    public $pathPersonenseiteUnivis;
+    public $id;
+    public $suchstring;
+    public $univis;
+    public $order;
+    public $cris_project_link;
+    public $page_lang;
+    public $einheit;
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de')
     {

@@ -15,6 +15,23 @@ class Publikationen
 
     private array $options;
     public $output;
+    public $cms; 
+    public $pathPersonenseiteUnivis;
+    public $id;
+    public $suchstring;
+    public $univis; 
+    public $order; 
+    public $subtypeorder; 
+    public $univisLink; 
+    public $bibtex; 
+    public $bibtexlink; 
+    public $nameorder; 
+    public $page_lang; 
+    public $sc_lang; 
+    public $langdiv_open; 
+    public $langdiv_close; 
+    public $einheit; 
+    public $error; 
 
     public function __construct($einheit = '', $id = '', $nameorder = '', $page_lang = 'de', $sc_lang = 'de')
     {
