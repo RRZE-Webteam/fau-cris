@@ -1060,13 +1060,7 @@ class Projekte
 
 
 
-        if ($param['projects_status'] !== '' && $param['projects_status'] !== null){
             $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
-        }
-
-        elseif ($param['projects_start'] !== '' && $param['projects_start'] !== null){
-            $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
-        }
 
 
 
