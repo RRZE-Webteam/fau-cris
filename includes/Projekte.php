@@ -62,6 +62,45 @@ class Projekte
         }
     }
 
+
+
+   /**
+     * Name : project_title_sorting
+     *
+     * Use: it will sort the project array according to title in from A to Z
+     *
+     * Returns: sort title 
+     *
+     *
+     */
+    public function project_title_filter($a, $b) {
+            $a_cftitle_en=$this->normalizeTitle($a->attributes['cftitle_en']);
+            $a_cftitle_de=$this->normalizeTitle($a->attributes['cftitle']);
+             $b_cftitle_en=$this->normalizeTitle($b->attributes['cftitle_en']);
+            $b_cftitle_de=$this->normalizeTitle($b->attributes['cftitle']);
+
+      switch ($this->page_lang) {
+                case 'en':
+                    $aTitle = ($a_cftitle_en != '') ? $a_cftitle_en : $a_cftitle_de;
+                    $bTitle = ($b_cftitle_en != '') ?  $b_cftitle_en : $b_cftitle_de;
+                    break;
+                case 'de':
+                default:
+                    $aTitle = ($a_cftitle_de) ? $a_cftitle_de : $a_cftitle_en;
+                    $bTitle = ($b_cftitle_de != '') ? $b_cftitle_de : $b_cftitle_en;
+                    break;
+            }
+
+        return strcmp($aTitle,$bTitle);
+    }
+
+
+    function normalizeTitle($title) {
+    $title = iconv('UTF-8', 'ASCII//TRANSLIT', $title); // Transliterate characters to ASCII
+    $title = preg_replace('/[^A-Za-z0-9 ]/', '', $title); // Remove non-alphanumeric characters
+    return strtolower($title); // Convert to lowercase to ensure case-insensitive comparison
+}
+
     /**
      * Name : projListe
      *
@@ -97,6 +136,11 @@ class Projekte
             $projList = $res[$order];
         }
 
+
+        if (!empty($param['orderby']) && $param['orderby']==='title') {
+            uasort($projList, [$this,'project_title_filter']);
+         }
+        
         $output = '';
 
         $output .= $this->make_list($projList, $hide);
@@ -200,12 +244,18 @@ class Projekte
                 $expandall = '';
             }
             foreach ($projList as $array_year => $projects) {
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    uasort($projects, [$this,'project_title_filter']);
+                }
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_year => $projects) {
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                   uasort($projects, [$this,'project_title_filter']);
+                }
                 if (empty($year)) {
                     $output .= '<h3>' . $array_year . '</h3>';
                 }
@@ -273,6 +323,9 @@ class Projekte
             }
             foreach ($projList as $array_type => $projects) {
                 $title = Tools::getTitle('projects', $array_type, $this->page_lang);
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    uasort($projects, [$this,'project_title_filter']);
+                 }
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
@@ -280,6 +333,9 @@ class Projekte
         } else {
             foreach ($projList as $array_type => $projects) {
                 // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    uasort($projects, [$this,'project_title_filter']);
+                 }
                 if (empty($type)) {
                     $title = Tools::getTitle('projects', $array_type, $this->page_lang);
                     $output .= "<h3>";
@@ -310,6 +366,7 @@ class Projekte
 
     public function singleProj($param = array())
     {
+       
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -738,8 +795,11 @@ class Projekte
             }
             if (!in_array('publications', $param['hide'])) {
                 $publications = $this->get_project_publications($id, $param);
-                if ($publications) {
-                    $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+                if (!empty($publications) && $publications!='') {
+                    if (strpos($publications, '<li>') !== false) {
+                        $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+
+                    }
                 }
             }
         }
@@ -758,8 +818,7 @@ class Projekte
      * Start::make_list
      */
     private function make_list($projects, $hide = array(), $showtype = 1, $pubProj = 0): array|string
-    {
-
+    {   
         global $post;
         $projlist = "<ul class=\"cris-projects\">";
 
@@ -911,6 +970,46 @@ class Projekte
 
 
             $projlist .= "[collapse title=\"" . ((!empty($acronym)) ? $acronym . ": " : "") . $title . "\"]";
+            
+            if (!in_array('date', $hide)) {            
+            $start = $project['cfstartdate'];
+            if (!in_array('end', $hide)) {
+                $end = (!empty($project['extension date'])) ? $project['extension date'] : ((!empty($project['cfenddate'])) ? $project['cfenddate'] : '');
+            } else {
+                $end = '';
+            }
+            $date = Tools::make_date($start, $end);
+            if (!empty($date)) {
+                $projlist .= "<strong>" . __('Laufzeit', 'fau-cris') . ': </strong>' . $date . '<br />';
+            }
+            
+            }
+            if (!in_array('funding', $hide)) {
+            $funding = $this->get_project_funding($id);
+            if (!empty($funding)) {
+                $projlist .= "<strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
+                $projlist .= implode(', ', $funding) . '<br />';
+            }
+            }
+
+            if (!in_array('leader', $hide)) {
+            $leaderIDs = explode(",", $project['relpersidlead']);
+                  $leaderArray = $this->get_project_leaders($id, $leaderIDs);
+                  $leaders = array();
+                  foreach ($leaderArray as $l_id => $l_names) {
+                  $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                  $fcid = Tools::person_exists('wp', 'Manfred', 'Pirner');
+                //   print_r($fcid);
+                //   die();
+
+                  }
+
+                  if (isset($leaders) && !empty($leaders)) {
+                    $projlist .= "<strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
+                    $projlist .= implode(', ', $leaders) . '<br />';
+                }
+            }
+            
             if (!in_array('abstract', $hide) && !empty($description)) {
                 $projlist .= "<p class=\"abstract\">" . $description . '</p>';
             }
@@ -961,20 +1060,14 @@ class Projekte
 
 
 
-        if ($param['projects_status'] !== '' && $param['projects_status'] !== null){
             $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
-        }
-
-        elseif ($param['projects_start'] !== '' && $param['projects_start'] !== null){
-            $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
-        }
 
 
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
-            $output = $this->make_accordion($projList);
+            $output = $this->make_accordion($projList,$hide=$param['projects_hide']);
         } else {
-            $output = $this->make_list($projList);
+            $output = $this->make_list($projList,$hide=$param['projects_hide']);
         }
         return $output;
     }
