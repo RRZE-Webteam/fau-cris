@@ -233,7 +233,7 @@ class Tools
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = ''): WP_Error|array|string|null
+    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = '')
     {
         $filter = array();
         if ($year !== '' && $year !== null) {
