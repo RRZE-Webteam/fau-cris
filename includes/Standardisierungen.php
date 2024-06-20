@@ -180,7 +180,7 @@ class Standardisierungen
                         'id' => $key,
                         'lastname' => $nameparts[0],
                         'firstname' => array_key_exists(1, $nameparts) ? substr( $nameparts[1],
-		                        0, 1 ) . 'fau-cris ' : '');
+		                        0, 1 ) . '. ' : '');
                 }
                 $authorList = array();
                 foreach ($authorArray as $v) {
