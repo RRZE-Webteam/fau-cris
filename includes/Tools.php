@@ -800,9 +800,9 @@ class Tools
         if ($start != '' && $end != '') {
             $date = $start . " - " . $end;
         } elseif ($start != '' && $end == '') {
-            $date = __('seit', 'fau-cris') . " Tools.php" . $start;
+            $date = __('seit', 'fau-cris') . " " . $start;
         } elseif ($start == '' && $end != '') {
-            $date = __('bis', 'fau-cris') . " Tools.php" . $end;
+            $date = __('bis', 'fau-cris') . " " . $end;
         }
         return $date;
     }
