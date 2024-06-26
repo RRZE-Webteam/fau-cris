@@ -233,7 +233,7 @@ class Tools
      * Array zur Definition des Filters für Publikationen
      */
 
-    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = ''): WP_Error|array|string|null
+    public static function publication_filter($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $language = '', $curation = '')
     {
         $filter = array();
         if ($year !== '' && $year !== null) {
@@ -800,9 +800,9 @@ class Tools
         if ($start != '' && $end != '') {
             $date = $start . " - " . $end;
         } elseif ($start != '' && $end == '') {
-            $date = __('seit', 'fau-cris') . " Tools.php" . $start;
+            $date = __('seit', 'fau-cris') . " " . $start;
         } elseif ($start == '' && $end != '') {
-            $date = __('bis', 'fau-cris') . " Tools.php" . $end;
+            $date = __('bis', 'fau-cris') . " " . $end;
         }
         return $date;
     }
