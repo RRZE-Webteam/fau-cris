@@ -32,7 +32,7 @@ class Publikationen
     public $langdiv_close; 
     public $einheit; 
     public $error; 
-
+    public $cris_pub_title_link_order;
     public function __construct($einheit = '', $id = '', $nameorder = '', $page_lang = 'de', $sc_lang = 'de')
     {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
