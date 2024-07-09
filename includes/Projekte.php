@@ -791,17 +791,17 @@ class Projekte
                 $projlist .= "</p>";
             }
 
-            if (!in_array(' ', $param['hide'])) {
+            if (!in_array('abstract', $param['hide'])) {
                 if ($description) {
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
                 }
             }
 
-             if (!in_array('external_partners', $param['hide'])) {
+             if (!in_array('externalpartners', $param['hide'])) {
 
                 $externalPartneName=Tools::get_external_project_partner_name($externalPartnerArray);
 
-                if (!is_wp_error($externalPartneName)) {
+                if (!empty($externalPartneName)) {
                     $projlist .= "<h3>" . __('Externe Partner', 'fau-cris') . ": </h3>";
                     $projlist .= "<ul>";
                     foreach ($externalPartneName as $partnerName) {
