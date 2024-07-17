@@ -1112,7 +1112,31 @@ public static function sortByKey(array &$array, string $key): void {
         return Tools::get_item_url("publication", $title, $id, $postID, $lang);
     }
 
+/**
+     * Name : get_external_project_partner_name
+     *
+     * Use: it will get all the external partner name for a project
+     *
+     * Returns: array of externalPartneName
+     *
+     *
+     */
+        public static function get_external_project_partner_name($externalPartnerArray=array())
+        {
 
+          $externalPartneName=array(); 
+          foreach ($externalPartnerArray as $partner) {
+            $partner = (array) $partner;
+            foreach ($partner['attributes'] as $attribut => $v) {
+                $partner[$attribut] = $v;
+            }
+            unset($partner['attributes']);
+            $externalPartneName[]=$partner["name"];
+            
+            }  
+
+        return $externalPartneName;
+        }
 
 
 

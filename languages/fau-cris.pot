@@ -812,3 +812,7 @@ msgstr ""
 #. Author URI of the plugin
 msgid "http://blogs.fau.de/webworking/"
 msgstr ""
+
+#: Projekte.php:805 
+msgid "Externe Partner"
+msgstr "External Partners"

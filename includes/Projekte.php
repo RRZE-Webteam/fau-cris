@@ -379,10 +379,12 @@ class Projekte
             return $output;
         }
 
+        $externalPartnerArray=$ws->by_proj_has_eorg($this->id);
+
         if (is_array($this->id)) {
             $output = $this->make_list($projArray, $param['hide']);
         } else {
-            $output = $this->make_single($projArray, $param);
+            $output = $this->make_single($projArray, $param,$externalPartnerArray);
         }
 
         return $output;
@@ -682,10 +684,11 @@ class Projekte
      *
      * Start::make_single
      */
-    private function make_single($projects, $param = array()): string
+    private function make_single($projects, $param = array(),$externalPartnerArray=array()): string
     {
-
         $projlist = "<div class=\"cris-projects\">";
+
+        
 
         foreach ($projects as $project) {
             $project = (array) $project;
@@ -793,11 +796,28 @@ class Projekte
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
                 }
             }
+
+             if (!in_array('externalpartners', $param['hide'])) {
+
+                $externalPartneName=Tools::get_external_project_partner_name($externalPartnerArray);
+
+                if (!empty($externalPartneName)) {
+                    $projlist .= "<h3>" . __('Externe Partner', 'fau-cris') . ": </h3>";
+                    $projlist .= "<ul>";
+                    foreach ($externalPartneName as $partnerName) {
+                        $projlist .= "<li>";
+                        $projlist .= $partnerName;
+                        $projlist .= "</li>";
+                    }
+                    $projlist .= "</ul>";
+                }
+            } 
+
             if (!in_array('publications', $param['hide'])) {
                 $publications = $this->get_project_publications($id, $param);
                 if (!empty($publications) && $publications!='') {
-                    if (strpos($publications, '<li>') !== false) {
-                        $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+                    if (!empty($publications) && trim(strip_tags($publications)) !== '') {
+                        $projlist  .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
 
                     }
                 }
@@ -1373,6 +1393,28 @@ class CRIS_projects extends Webservice
         return $this->retrieve($requests);
     }
 
+
+    public function by_proj_has_eorg($projID = null){
+
+         if ($projID === null || $projID === "0") {
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
+        }
+
+        if (!is_array($projID)) {
+            $projID = array($projID);
+        }
+
+        $requests = array();
+        foreach ($projID as $_f) {
+            $requests[] = sprintf('getrelated/Project/%d/proj_has_eorg', $_f);
+        }
+        return $this->retrieve($requests);
+
+    }
+
     private function retrieve($reqs, &$filter = null): array
     {
         if ($filter !== null && !$filter instanceof Filter) {
@@ -1393,9 +1435,21 @@ class CRIS_projects extends Webservice
             foreach ($_d as $project) {
                 $a = new CRIS_project($project);
                 if ($a->ID) {
+
+                    // Check and handle 'cfstartdate'
+                if (isset($a->attributes['cfstartdate']) && !is_null($a->attributes['cfstartdate'])) {
                     $a->attributes['startyear'] = mb_substr($a->attributes['cfstartdate'], 0, 4);
+                } else {
+                    $a->attributes['startyear'] = ''; // or any default value you prefer
+                }
+
+                    // Check and handle 'virtualenddate'
+                if (isset($a->attributes['virtualenddate']) && !is_null($a->attributes['virtualenddate'])) {
                     $a->attributes['endyear'] = mb_substr($a->attributes['virtualenddate'], 0, 4);
-                    //$a->attributes['endyear'] = $a->attributes['cfenddate'] != '' ? mb_substr($a->attributes['cfenddate'], 0, 4) : mb_substr($a->attributes['virtualenddate'], 0, 4);
+                } else {
+                    $a->attributes['endyear'] = ''; // or any default value you prefer
+                }
+                
                 }
                 if ($a->ID && ($filter === null || $filter->evaluate($a))) {
                     $projects[$a->ID] = $a;

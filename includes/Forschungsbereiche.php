@@ -284,7 +284,8 @@ class Forschungsbereiche
             if (!in_array('projects', $hide)
                 && !is_array($param['field'])) {
                 $projects = $this->get_field_projects($id,$param);
-                if ($projects) {
+
+                if (!empty($projects) && trim(strip_tags($projects)) !== '') {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
                     $singlefield .= $projects;
                 }
@@ -327,7 +328,8 @@ class Forschungsbereiche
                     }
                     $singlefield .= "</ul>";
                 }
-            }
+            } 
+
             if (!in_array('publications', $hide)
                 && !is_array($param['field'])) {
                 $publications = $this->get_field_publications($param);
@@ -522,7 +524,7 @@ class Forschungsbereiche
         $args['format'] = $param['publications_format'];
         $args['order2']=$param['order2'];
         $args['sortby']=$param['sortby'];
-        $args['author_postion']=$param['author_postion'];
+        $args['author_position']=$param['author_position'];
         if ($param['publications_orderby'] == 'year') {
             return $liste->pubNachJahr($args, $param['field'], '', $param['fsp']);
         }
