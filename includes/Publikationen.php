@@ -107,7 +107,7 @@ class Publikationen
         $peerreviewed = $param['peerreviewed'] ?: '';
         $notable = $param['notable'] ?: 0;
         $language = $param['language'] ?: '';
-        $authorPositionArray=$param['author_postion'];
+        $authorPositionArray=$param['author_position'];
        
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field='',$language,$fsp=false,$project='',$authorPositionArray);
 
@@ -181,7 +181,7 @@ class Publikationen
         $format = $param['format'] ?: '';
         $language = $param['language'] ?: '';
         $sortby = $param['sortby'] ?: 'virtualdate';
-        $authorPositionArray=$param['author_postion'];
+        $authorPositionArray=$param['author_position'];
 
         // fetching the publication
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray );
@@ -314,7 +314,7 @@ class Publikationen
         $language = $param['language'] ?: '';
         $sortby =  $param['sortby'] ?: 'virtualdate';
         $sortorder =  $param['sortorder'] ?: SORT_DESC;
-        $authorPositionArray=$param['author_postion'];
+        $authorPositionArray=$param['author_position'];
 
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray);
         

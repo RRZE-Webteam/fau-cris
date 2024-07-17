@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.22.4
+ * Version: 3.22.5
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.22.4';
+    const version = '3.22.5';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -1204,7 +1204,7 @@ class FAU_CRIS
             'standardization' => '',
             'projects_status'=>'',
             'projects_start'=>'',
-            'author_postion'=>''
+            'author_position'=>''
         ];
 
         // Attributes
@@ -1272,7 +1272,7 @@ class FAU_CRIS
         $sc_param['standardization'] = sanitize_text_field($standardization);
         $sc_param['projects_status'] = sanitize_text_field($projects_status);
         $sc_param['projects_start'] = sanitize_text_field($projects_start);
-        $sc_param['author_postion'] = sanitize_text_field($author_postion);
+        $sc_param['author_position'] = sanitize_text_field($author_position);
 
         switch ($sortby) {
             case 'created':
@@ -1363,10 +1363,10 @@ class FAU_CRIS
             $sc_param['entity_id'] = $sc_param['awardnameid'];
         } elseif (isset($sc_param['persid']) && $sc_param['persid'] != '') {
             $sc_param['entity'] = 'person';
-            if (isset($sc_param['author_postion']) && $sc_param['author_postion'] != '') {
-                if (strpos($sc_param['author_postion'], ',') !== false) {
-                    $sc_param['author_postion'] = str_replace(' ', '', $sc_param['author_postion']);
-                    $sc_param['author_postion'] = explode(',', $sc_param['author_postion']);
+            if (isset($sc_param['author_position']) && $sc_param['author_position'] != '') {
+                if (strpos($sc_param['author_position'], ',') !== false) {
+                    $sc_param['author_position'] = str_replace(' ', '', $sc_param['author_position']);
+                    $sc_param['author_position'] = explode(',', $sc_param['author_position']);
                 }
                 
             }
