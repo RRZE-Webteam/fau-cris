@@ -1079,9 +1079,9 @@ class Projekte
         $projList = $res[$orderby] ?? [];
 
 
-
+        if ($param['projects_status'] !== '' || $param['projects_start'] !== ''){
             $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
-
+        }
 
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
