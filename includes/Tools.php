@@ -756,7 +756,7 @@ public static function sortByKey(array &$array, string $key): void {
         switch ($target) {
             case 'cris':
                 if (is_numeric($id)) {
-                    $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "Person/" . $id . "\" class=\"extern\">";
+                    $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "persons/" . $id . "\" class=\"extern\">";
                     $link_post = "</a>";
                 } else {
                     $link_pre = '';
@@ -1086,7 +1086,7 @@ public static function sortByKey(array &$array, string $key): void {
                 case 'internal link':
                 case 'cris':
                     
-                    $link = Tools::get_item_url("publication", $title, $id, $postID, $lang);
+                    $link = Tools::get_item_url("publications", $title, $id, $postID, $lang);
                     if (!empty($link)) return $link;
                     break;
 
@@ -1109,7 +1109,7 @@ public static function sortByKey(array &$array, string $key): void {
                     break;
             }
         }
-        return Tools::get_item_url("publication", $title, $id, $postID, $lang);
+        return Tools::get_item_url("publications", $title, $id, $postID, $lang);
     }
 
 /**

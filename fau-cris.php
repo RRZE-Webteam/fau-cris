@@ -86,7 +86,7 @@ class FAU_CRIS
     const textdomain = 'fau-cris';
     const php_version = '7.1'; // Minimal erforderliche PHP-Version
     const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
-    const cris_publicweb = 'https://cris.fau.de/converis/portal/';
+    const cris_publicweb = 'https://cris.fau.de/';
     const doi = 'https://doi.org/';
 
     protected static $instance = null;
@@ -1507,7 +1507,7 @@ class FAU_CRIS
             . '<li>' . __('Auszeichnungen', 'fau-cris') . '</li>'
             . '</ul>'
             . '<p>' . __('Über den Shortcode lassen sich jeweils verschiedene Ausgabeformate einstellen.', 'fau-cris') . '</p>'
-            . '<p>' . __('<strong>CRIS-OrgNr</strong>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. ', 'fau-cris') . FAU_CRIS::cris_publicweb . 'Organisation/<strong><em>141517</em></strong>.' . '</p>'
+            . '<p>' . __('<strong>CRIS-OrgNr</strong>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. ', 'fau-cris') . FAU_CRIS::cris_publicweb . 'organisations/<strong><em>141517</em></strong>.' . '</p>'
         );
 
         $content_shortcode_publikationen = array(
