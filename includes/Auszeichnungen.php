@@ -514,7 +514,7 @@ class Auszeichnungen
             } else {
                 $award_details['#title_pressrelease#'] = $award['url_pressrelease_title'];
             }
-            $award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "Person/" . $award['relpersid'];
+            $award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "persons/" . $award['relpersid'];
 
             if (strpos($custom_text, '#image') !== false) {
                 $imgs = self::get_pic($award['ID']);
@@ -535,7 +535,7 @@ class Auszeichnungen
                 $award_details['#image#'] = $award_details['#image1#'];
                 $award_details['#imagedesc#'] = $award_details['#image1desc#'];
             }
-            $award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "Person/" . $award['relpersid'];
+            $award_details['#url_cris#'] = FAU_CRIS::cris_publicweb . "persons/" . $award['relpersid'];
 
             if ($param['display'] == 'accordion') {
                 $item_open_mod = sprintf($item_open, $param['accordion_title'], $param['accordion_color'], sanitize_title($award_details['#name#']));

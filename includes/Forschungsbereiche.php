@@ -263,9 +263,9 @@ class Forschungsbereiche
             if (count($imgs)) {
                 $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
                 foreach ($imgs as $img) {
-                    foreach ($imgs as $img) {
+                    // foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
-                        $singlefield = "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";
+                        $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";
                         $img_description = ($img->attributes['description'] ??
                                              '');
                         if (isset($img->attributes['png180']) && mb_strlen($img->attributes['png180']) > 30) {
@@ -274,7 +274,7 @@ class Forschungsbereiche
                             //$publication['image'] .= "<img alt=\"". $img->attributes['description'] ."\" src=\"\" width=\"\" height=\"\">" . $img_description;
                         }
                         $singlefield .= "</div>";
-                    }
+                    // }
                 }
                 $singlefield .= "</div>";
             }
@@ -284,7 +284,8 @@ class Forschungsbereiche
             if (!in_array('projects', $hide)
                 && !is_array($param['field'])) {
                 $projects = $this->get_field_projects($id,$param);
-                if ($projects) {
+
+                if (!empty($projects) && trim(strip_tags($projects)) !== '') {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
                     $singlefield .= $projects;
                 }
@@ -327,7 +328,8 @@ class Forschungsbereiche
                     }
                     $singlefield .= "</ul>";
                 }
-            }
+            } 
+
             if (!in_array('publications', $hide)
                 && !is_array($param['field'])) {
                 $publications = $this->get_field_publications($param);
@@ -338,7 +340,7 @@ class Forschungsbereiche
             }
             if (is_array($param['field'])) {
                 global $post;
-                $singlefield .= "<p></p><a href=\"" . Tools::get_item_url("forschungsbereich", $title, $field['ID'], $post->ID, $this->page_lang) . "\">" . __('Mehr Informationen', 'fau-cris') . " &#8594;</a></p>";
+                $singlefield .= "<p></p><a href=\"" . Tools::get_item_url("researchAreas", $title, $field['ID'], $post->ID, $this->page_lang) . "\">" . __('Mehr Informationen', 'fau-cris') . " &#8594;</a></p>";
             }
         }
         $singlefield .= "</div>";
@@ -471,7 +473,7 @@ class Forschungsbereiche
             }
             $title = htmlentities($title, ENT_QUOTES);
             global $post;
-            $title = "<a href=\"" . Tools::get_item_url("forschungsbereich", $title, $field['ID'], $post->ID, $this->page_lang) . "\">" . $title . "</a>";
+            $title = "<a href=\"" . Tools::get_item_url("researchAreas", $title, $field['ID'], $post->ID, $this->page_lang) . "\">" . $title . "</a>";
 
             $fieldslist .= "<li>" . $title . "</li>";
         }
