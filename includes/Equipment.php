@@ -350,17 +350,17 @@ class Equipment
                         switch ($this->sc_lang) {
                             case 'en':
                                 if (!empty($field['cfname_en'])) {
-                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname_en']);
+                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/researchAreas/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname_en']);
                                 } else {
-                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname']);
+                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/researchAreas/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname']);
                                 }
                                 break;
                             case 'de':
                             default:
                                 if (!empty($field['cfname'])) {
-                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s">%s</a></li>', $_k, $field['cfname']);
+                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/researchAreas/%s">%s</a></li>', $_k, $field['cfname']);
                                 } else {
-                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s">%s</a></li>', $_k, $field['cfname_en']);
+                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/researchAreas/%s">%s</a></li>', $_k, $field['cfname_en']);
                                 }
                                 break;
                         }
@@ -378,17 +378,17 @@ class Equipment
                         switch ($this->sc_lang) {
                             case 'en':
                                 if (!empty($project['cfTitle_en'])) {
-                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle_en']);
+                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/projects/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle_en']);
                                 } else {
-                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle']);
+                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/projects/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle']);
                                 }
                                 break;
                             case 'de':
                             default:
                                 if (!empty($project['cfTitle'])) {
-                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s">%s</a></li>', $_k, $project['cfTitle']);
+                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/projects/%s">%s</a></li>', $_k, $project['cfTitle']);
                                 } else {
-                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s">%s</a></li>', $_k, $project['cfTitle_en']);
+                                    $equilist .= sprintf('<li><a href="https://cris.fau.de/projects/%s">%s</a></li>', $_k, $project['cfTitle_en']);
                                 }
                                 break;
                         }
@@ -507,17 +507,17 @@ class Equipment
                         switch ($this->sc_lang) {
                             case 'en':
                                 if (!empty($field['cfname_en'])) {
-                                    $equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname_en']);
+                                    $equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/researchAreas/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname_en']);
                                 } else {
-                                    $equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname']);
+                                    $equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/researchAreas/%s?lang=en_GB">%s</a></li>', $_k, $field['cfname']);
                                 }
                                 break;
                             case 'de':
                             default:
                                 if (!empty($field['cfname'])) {
-                                    $equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s">%s</a></li>', $_k, $field['cfname']);
+                                    $equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/researchAreas/%s">%s</a></li>', $_k, $field['cfname']);
                                 } else {
-                                    $equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Forschungsbereich/%s">%s</a></li>', $_k, $field['cfname_en']);
+                                    $equipment_details['#fields#'] .= sprintf('<li><a href="https://cris.fau.de/researchAreas/%s">%s</a></li>', $_k, $field['cfname_en']);
                                 }
                                 break;
                         }
@@ -535,17 +535,17 @@ class Equipment
                         switch ($this->sc_lang) {
                             case 'en':
                                 if (!empty($project['cfTitle_en'])) {
-                                    $equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle_en']);
+                                    $equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/projects/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle_en']);
                                 } else {
-                                    $equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle']);
+                                    $equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/projects/%s?lang=en_GB">%s</a></li>', $_k, $project['cfTitle']);
                                 }
                                 break;
                             case 'de':
                             default:
                                 if (!empty($project['cfTitle'])) {
-                                    $equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s">%s</a></li>', $_k, $project['cfTitle']);
+                                    $equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/projects/%s">%s</a></li>', $_k, $project['cfTitle']);
                                 } else {
-                                    $equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/converis/portal/Project/%s">%s</a></li>', $_k, $project['cfTitle_en']);
+                                    $equipment_details['#projects#'] .= sprintf('<li><a href="https://cris.fau.de/projects/%s">%s</a></li>', $_k, $project['cfTitle_en']);
                                 }
                                 break;
                         }

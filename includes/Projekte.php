@@ -924,7 +924,7 @@ class Projekte
                         . '</div>';
             }
             if (!in_array('link', $hide) && !empty($id)) {
-                $link = Tools::get_item_url("project", $title, $id, $post->ID, $this->page_lang);
+                $link = Tools::get_item_url("projects", $title, $id, $post->ID, $this->page_lang);
                 $projlist .= "<div>" . " &#8594;<a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </div>";
             }
             $projlist .= "</li>";
@@ -1034,7 +1034,7 @@ class Projekte
                 $projlist .= "<p class=\"abstract\">" . $description . '</p>';
             }
             if (!in_array('link', $hide) && !empty($id)) {
-                $link = Tools::get_item_url("project", $title, $id, $post->ID, $this->page_lang);
+                $link = Tools::get_item_url("projects", $title, $id, $post->ID, $this->page_lang);
             }
             $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
             $projlist .= "[/collapse]";
@@ -1079,9 +1079,9 @@ class Projekte
         $projList = $res[$orderby] ?? [];
 
 
-
+        if ($param['projects_status'] !== '' || $param['projects_start'] !== ''){
             $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
-
+        }
 
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
