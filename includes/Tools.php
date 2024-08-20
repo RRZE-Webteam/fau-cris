@@ -755,7 +755,7 @@ public static function sortByKey(array &$array, string $key): void {
         $person = '';
         switch ($target) {
             case 'cris':
-                if (is_numeric($id)) {
+                if (is_numeric($id) && strlen($id) > 2) {
                     $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "persons/" . $id . "\" class=\"extern\">";
                     $link_post = "</a>";
                 } else {
