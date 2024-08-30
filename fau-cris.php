@@ -1222,7 +1222,8 @@ class FAU_CRIS
             'standardization' => '',
             'projects_status'=>'',
             'projects_start'=>'',
-            'author_position'=>''
+            'author_position'=>'',
+            'publicationsum'=>''
         ];
 
         // Attributes
@@ -1291,6 +1292,7 @@ class FAU_CRIS
         $sc_param['projects_status'] = sanitize_text_field($projects_status);
         $sc_param['projects_start'] = sanitize_text_field($projects_start);
         $sc_param['author_position'] = sanitize_text_field($author_position);
+        $sc_param['publicationsum'] = sanitize_text_field($publicationsum);
 
         switch ($sortby) {
             case 'created':
@@ -1416,6 +1418,14 @@ class FAU_CRIS
 
         $sc_param['order1'] = '';
         $sc_param['order2'] = '';
+
+        if (isset($sc_param['publicationsum']) && $sc_param['publicationsum'] != '') {
+            if (strpos($sc_param['publicationsum'], ',') !== false) {
+                $sc_param['publicationsum'] = str_replace(' ', '', $sc_param['publicationsum']);
+                $sc_param['publicationsum'] = explode(',', $sc_param['publicationsum']);
+            }
+            
+        }
 
         if (!empty($orderby)) {
             if (strpos($orderby, ',') !== false) {

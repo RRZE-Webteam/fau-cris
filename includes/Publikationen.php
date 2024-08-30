@@ -183,6 +183,12 @@ class Publikationen
         $language = $param['language'] ?: '';
         $sortby = $param['sortby'] ?: 'virtualdate';
         $authorPositionArray=$param['author_position'];
+        // it will use for showing number of publication by year or in total
+        if (!is_array($param['publicationsum'])) {
+            $publicationSumArray=array($param['publicationsum']);
+        }else{
+            $publicationSumArray=$param['publicationsum'];
+        }
 
         // fetching the publication
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray );
@@ -249,15 +255,27 @@ class Publikationen
                         }
                     }
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year.'('. count($publications). ')' . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
+            
+            
+            $total_number_publication=0;
             foreach ($pubList as $array_year => $publications) {
-                if (empty($year)) {
-                    $output .= '<h3>' . $array_year . '</h3>';
+                $number_of_pub=count($publications);
+
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
                 }
+                else{
+                    $subtotal_publication_html='';
+                }
+                if (empty($year)) {
+                    $output .= '<h3>' . $array_year . $subtotal_publication_html .'</h3>';
+                }
+                
                 $pubSubList = $subformatter->execute($publications);
                 foreach ($pubSubList as $array_subtype => $publications_sub) {
                     // Zwischenüberschrift
@@ -277,9 +295,17 @@ class Publikationen
                         }
                     }
                 }
+                $total_number_publication += $number_of_pub;
+            }
+            // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
+            }
+            else{
+                $total_publication_html='';
             }
         }
-        return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $total_publication_html .$output . $this->langdiv_close;
     }
     //End ::pubNachJahr
 
