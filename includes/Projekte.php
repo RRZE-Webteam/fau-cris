@@ -1092,7 +1092,7 @@ class Projekte
         return $output;
     }
 
-    public function fieldPersons($field)
+    public function fieldPersons($field,$param=array())
     {
         $ws = new CRIS_projects();
         try {
@@ -1103,6 +1103,11 @@ class Projekte
         if (!count($projArray)) {
             return;
         }
+
+        if ($param['projects_status'] !== '' || $param['projects_start'] !== ''){
+            $projArray=Tools::field_project_status_filter($projArray,$param['projects_status'],$param['projects_start']);
+        }
+
         $persList = array();
         foreach ($projArray as $project) {
             $project = (array) $project;
