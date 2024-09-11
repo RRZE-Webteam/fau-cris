@@ -682,7 +682,7 @@ public static function sortByKey(array &$array, string $key): void {
         }
     }
 
-    public static function person_id($cms = '', $firstname = '', $lastname = '')
+    public static function person_id($cms = '', $firstname = '', $lastname = '',$nameorder = '')
     {
         if ($cms == 'wp') {
             global $wpdb;
