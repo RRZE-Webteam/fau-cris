@@ -8,7 +8,7 @@ use RRZE\Cris\Filter;
 use RRZE\Cris\Formatter;
 use RRZE\Cris\Projekte;
 
-
+ 
 class Publikationen
 {
 
