@@ -3,6 +3,8 @@ Do Not Use This Fork
 
 This fork is meant for development only. If you are looking for the *FAU CRIS Wordpress plug-in*, you will find the official release at https://github.com/RRZE-Webteam/fau-cris.
 
+Why There Is This Fork 
+======================
 The purpose here is that we want to generate lists of publications by field of research that include top level publications als well as publications associated with projects within the respective field. We believe that this is a commonly desired feature; see also https://github.com/RRZE-Webteam/fau-cris/issues/317. Referring to the CRIS API, we want to merge the results from *getrelated/Forschungsbereich/.../fobe_has_top_publ* with *getrelated/Forschungsbereich/.../fobe_proj_publ*.
 
 We have added the following features:
