@@ -9,7 +9,7 @@ The purpose here is that we want to generate lists of publications by field of r
 
 We have added the following features:
 - the shortcut option *field_incl_proj* as an alternative to *field*; it is operational in conjunction with *show="publications"* to get the listing we are aiming for;
-- the shortcut option *muteheadings* that mutes the automatic year headings; the rational here is that want to use the existing sorting by year/author already implemented by *pubNachJahr* over a number of years without the sometimes annoing intermediate headings;
+- the shortcut option *muteheadings* that mutes the automatic year headings; the rational here is that we want to use the existing sorting by year/author already implemented by *pubNachJahr* over a small number of years without the sometimes annoing intermediate headings;
 - the custom substitution pattern *#publications_incl_projects#* as an alternative to the existing *#publications#* and *#project_publications#* to get the list we are aiming for; relative to our needs this is optional and we are happy to remove it should it be an obstacle for a merge.
 
 Example of ussage
