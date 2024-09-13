@@ -133,6 +133,8 @@ class Forschungsbereiche
 
     public function customField($content = '', $param = array())
     {
+
+        error_log($content);
         $ws = new CRIS_fields();
 
         try {
@@ -427,6 +429,16 @@ class Forschungsbereiche
                     $field_details['#project_publications#'] = $project_publications;
                 }
             }
+	    /* LRT vvv */
+            $field_details['#publications_incl_projects#'] = '';
+            if (strpos($content, '#publications_incl_projects#') !== false) {
+	        error_log('LRT custom content');  
+                $project_publications = $this->get_field_publications($param, 'field_incl_proj');
+                if ($project_publications) {
+                    $field_details['#publications_incl_projects#'] = $project_publications;
+                }
+            }
+	    /* LRT ^^^ */
             $field_details['#image1#'] = '';
             $field_details['#images#'] = '';
             if (strpos($content, '#image') !== false) {
@@ -507,6 +519,7 @@ class Forschungsbereiche
         if ($param['publications_notable'] == '1') {
             $entity = 'field_notable';
         }
+	error_log(sprintf("get_field_publications entity %s id %s limit %s",$entity,$param['field'],$param['publications_limit'])); //LRT
         $liste = new Publikationen($entity, $param['field'], '', $this->page_lang, $this->sc_lang);
         foreach ($param as $_k => $_v) {
             if (substr($_k, 0, 13) == 'publications_') {

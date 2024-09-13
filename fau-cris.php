@@ -1171,6 +1171,8 @@ class FAU_CRIS
             'patent' => '',
             'activity' => '',
             'field' => '',
+	    'muteheadings' => 0, // LRT
+            'field_incl_proj' => '', //LRT
             'fau' => '',
             'equipment' => '',
             'manufacturer' => '',
@@ -1224,6 +1226,7 @@ class FAU_CRIS
         $sc_param['patent'] = sanitize_text_field($patent);
         $sc_param['activity'] = sanitize_text_field($activity);
         $sc_param['field'] = sanitize_text_field($field);
+        $sc_param['field_incl_proj'] = sanitize_text_field($field_incl_proj); //LRT
         $sc_param['show'] = sanitize_text_field($show);
         if ($type == 'weitere') {
             $type = 'andere';
@@ -1246,6 +1249,7 @@ class FAU_CRIS
         $sc_param['display'] = sanitize_text_field($display);
         $sc_param['role'] = sanitize_text_field($role);
         $sc_param['fau'] = sanitize_text_field($fau);
+        $sc_param['muteheadings'] = sanitize_text_field($muteheadings);//LRT
         $sc_param['equipment'] = sanitize_text_field($equipment);
         $sc_param['manufacturer'] = sanitize_text_field($manufacturer);
         $sc_param['constructionyear'] = sanitize_text_field($constructionyear);
@@ -1342,6 +1346,15 @@ class FAU_CRIS
                 $sc_param['field'] = explode(',', $sc_param['field']);
             }
             $sc_param['entity_id'] = $sc_param['field'];
+	// LRT vvv    
+        } elseif ($sc_param['field_incl_proj'] != '') {
+            $sc_param['entity'] = 'field_incl_proj';
+            if (strpos($sc_param['field_incl_proj'], ',') !== false) {
+                $sc_param['field_incl_proj'] = str_replace(' ', '', $sc_param['field_incl_proj']);
+                $sc_param['field_incl_proj'] = explode(',', $sc_param['field_incl_proj']);
+            }
+            $sc_param['entity_id'] = $sc_param['field_incl_proj'];
+	// LRT ^^^    
         } elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
             $sc_param['entity'] = 'activity';
             $sc_param['entity_id'] = $sc_param['activity'];
