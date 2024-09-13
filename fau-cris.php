@@ -15,6 +15,15 @@ use RRZE\Cris\Patente;
 use RRZE\Cris\Sync;
 
 
+/*
+******************************************************
+******************************************************
+******************************************************
+This is an experimental fork. All changes signed "LRT"
+******************************************************
+******************************************************
+******************************************************
+*/
 
 /**
  * Plugin Name: FAU CRIS
@@ -1171,7 +1180,7 @@ class FAU_CRIS
             'patent' => '',
             'activity' => '',
             'field' => '',
-	    'muteheadings' => 0, // LRT
+	    'muteheadings' => 0, //LRT
             'field_incl_proj' => '', //LRT
             'fau' => '',
             'equipment' => '',
@@ -1346,7 +1355,7 @@ class FAU_CRIS
                 $sc_param['field'] = explode(',', $sc_param['field']);
             }
             $sc_param['entity_id'] = $sc_param['field'];
-	// LRT vvv    
+	//LRT vvv    
         } elseif ($sc_param['field_incl_proj'] != '') {
             $sc_param['entity'] = 'field_incl_proj';
             if (strpos($sc_param['field_incl_proj'], ',') !== false) {
@@ -1354,7 +1363,7 @@ class FAU_CRIS
                 $sc_param['field_incl_proj'] = explode(',', $sc_param['field_incl_proj']);
             }
             $sc_param['entity_id'] = $sc_param['field_incl_proj'];
-	// LRT ^^^    
+	//LRT ^^^    
         } elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
             $sc_param['entity'] = 'activity';
             $sc_param['entity_id'] = $sc_param['activity'];

@@ -8,6 +8,15 @@ use RRZE\Cris\Filter;
 use RRZE\Cris\Formatter;
 use RRZE\Cris\Projekte;
 
+/*
+******************************************************
+******************************************************
+******************************************************
+This is an experimental fork. All changes signed "LRT"
+******************************************************
+******************************************************
+******************************************************
+*/
 
 
 class Publikationen
@@ -35,7 +44,6 @@ class Publikationen
 
     public function __construct($einheit = '', $id = '', $nameorder = '', $page_lang = 'de', $sc_lang = 'de')
     {
-        error_log(sprintf("Publications, entity %s id %s",$einheit,$id));//LRT
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -72,7 +80,7 @@ class Publikationen
             $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
         }
  
-        /* LRT : added "field_incl_proj", should propably also have "field_proj" */
+        //LRT: added "field_incl_proj" (rem: should propably also have "field_proj") 
         if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field", "field_incl_proj"))) {
             $this->einheit = $einheit;
         } else {
@@ -170,9 +178,6 @@ class Publikationen
         $project = ''
     ): string {
 
-        error_log(sprintf("pubNachJahr, field %s",$field));//LRT
-	//error_log(var_dump($param));//LRT
-
         // Extracting parameters from the $param array
 
         $year = $param['year'] ?: ''; // The year of publication
@@ -190,7 +195,6 @@ class Publikationen
         $sortby = $param['sortby'] ?: 'virtualdate';
         $authorPositionArray=$param['author_position'];
         $muteheadings = $param['muteheadings'] ?? 0; //LRT
-	error_log(sprintf("show year headlines %s",$muteheadings));//LRT
 
         // fetching the publication
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray );
@@ -263,7 +267,7 @@ class Publikationen
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($pubList as $array_year => $publications) {
-                if (empty($year) && ($muteheadings!=1)) { //LRT rem: why not test for a list of years as above?
+                if (empty($year) && ($muteheadings!=1)) { //LRT (rem: why not test for a list of years as above?)
                     $output .= '<h3>' . $array_year . '</h3>'; // 
                 }
                 $pubSubList = $subformatter->execute($publications);
@@ -592,7 +596,6 @@ class Publikationen
         $param = array(),
         $seed = false
     ): string {
-        error_log(sprintf("fieldPub %s",$this->einheit));//LRT
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
@@ -618,30 +621,18 @@ class Publikationen
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
-	// LRT vvv
+	//LRT vvv
 	if ($this->einheit == 'field_incl_proj') {
-          //$sortby = 'publyear';
-          //$orderby = 'publyear';
           $sortby = 'relauthors';
           $orderby = 'relauthors';
-          //$sortby = null;
-          //$orderby = __('O.A.', 'fau-cris');
 	}
-	// LRT ^^^
+	//LRT ^^^
         $formatter = new Formatter(null, null, $sortby, SORT_DESC);
-        error_log(sprintf("fieldPub: sort by %s",$sortby)); //LRT
         $res = $formatter->execute($pubArray);
-        error_log("fieldPub: sort ok"); //LRT
         $pubList = $res[$orderby] ?? [];
         if ($param['publications_limit'] != '') {
             $pubList = array_slice($pubList, 0, $param['publications_limit'], true);
         }        
-	// LRT vvv
-  	error_log("list A");
-        foreach ($pubList as $_p) {
-	  error_log(sprintf("%s %s",$_p->attributes['publyear'],$_p->attributes['cftitle']));
-	}
-	// LRT ^^^
         $output = '';
         if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
             $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_format']);
@@ -731,7 +722,6 @@ class Publikationen
     private function fetch_publications($year = '', $start = '', $end = '', $type = '', $subtype = '', $fau = '', $peerreviewed = '', $notable = 0, $field = '', $language = '', $fsp = false, $project = '',$authorPositionArray=''): array
     {
 
-        error_log(sprintf("fetch_publications: %s %s %s",$this->einheit,$this->id,$field)); //LRT
         $pubArray = [];
 
         $filter = Tools::publication_filter($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $language);
@@ -1483,9 +1473,7 @@ class CRIS_publications extends Webservice
             $fieldID = array($fieldID);
         }
 
-        /* LRT vvv */
-  	error_log(sprintf("by_field: %s",$entity));
-	error_log(print_r($fieldID,1));
+        //LRT vvv 
         $requests = array();
 	$retaions = array();
         switch ($entity) {
@@ -1505,19 +1493,11 @@ class CRIS_publications extends Webservice
         }	
         foreach ($fieldID as $_p) {
             foreach ($relations as $_r) {
-  	        error_log(sprintf("%s %s",$_p, $_r));
                 $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $_r;
             }
 	}
-	error_log( implode(',', $requests) );
 	$publs=$this->retrieve($requests, $filter);
-	error_log(sprintf("retrieve ok %d",sizeof($publs)));
-        foreach ($publs as $_p) {
-	  error_log(sprintf("%s %s",$_p->attributes['publyear'],$_p->attributes['cftitle']));
-	}  
-	error_log(sprintf("list ok %d",sizeof($publs)));
-	//error_log(print_r($publs,1));
-	/* LRT ^^^ */
+	//LRT ^^^
         return $publs; 
     }
 
@@ -1561,12 +1541,10 @@ class CRIS_publications extends Webservice
             foreach ($_d as $publ) {
                 $p = new CRIS_publication($publ);
                 if ($p->ID && ($filter === null || $filter->evaluate($p))) {
-    		    error_log($p->ID);//LRT
                     $publs[$p->ID] = $p;
                 }
             }
         }
-	error_log(sprintf("found XML records #%d",sizeof($publs)));//LRT
         return $publs;
     }
 }
