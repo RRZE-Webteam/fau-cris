@@ -429,7 +429,7 @@ class Forschungsbereiche
                     $field_details['#project_publications#'] = $project_publications;
                 }
             }
-	    //LRT vvv 
+	    //LRT vvv  
             $field_details['#publications_incl_projects#'] = '';
             if (strpos($content, '#publications_incl_projects#') !== false) {
                 $project_publications = $this->get_field_publications($param, 'field_incl_proj');

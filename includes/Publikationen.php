@@ -184,7 +184,7 @@ class Publikationen
         $language = $param['language'] ?: '';
         $sortby = $param['sortby'] ?: 'virtualdate';
         $authorPositionArray=$param['author_position'];
-        $muteheadings = $param['muteheadings'] ?? 0; //LRT
+        $muteheadings = $param['muteheadings'] ?? 0; //LRT 
 
         // fetching the publication
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray );

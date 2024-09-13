@@ -29,6 +29,7 @@ use RRZE\Cris\Sync;
  * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris
  * GitHub Branch: master
  */
+
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
