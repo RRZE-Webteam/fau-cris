@@ -429,7 +429,7 @@ class Forschungsbereiche
                     $field_details['#project_publications#'] = $project_publications;
                 }
             }
-	    //LRT vvv  
+	    //LRT vvv (OPTIONAL)  
             $field_details['#publications_incl_projects#'] = '';
             if (strpos($content, '#publications_incl_projects#') !== false) {
                 $project_publications = $this->get_field_publications($param, 'field_incl_proj');
@@ -437,7 +437,7 @@ class Forschungsbereiche
                     $field_details['#publications_incl_projects#'] = $project_publications;
                 }
             }
-	    //LRT ^^^ 
+	    //LRT ^^^ (OPTIONAL)
             $field_details['#image1#'] = '';
             $field_details['#images#'] = '';
             if (strpos($content, '#image') !== false) {
