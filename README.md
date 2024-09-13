@@ -14,4 +14,4 @@ Example of ussage
 
     [cris show="publications" field_incl_proj="123456789" start="2022" muteheadings="1" quotation="apa"]
 
-Our edits to the original code are worth as little as about 20 lines and systematically follow the observed coding style. All edits are signed "LRT" for easy inspection. We hope for a merge in near future. 
+Our edits to the original code are worth as little as about 20 lines and systematically follow the observed coding style. The edits are exclusive to *fau-cris.php*, *Publikationen.php* and *Forschungsbereiche.php*. They are all signed "LRT" for easy inspection. We hope for a merge in near future. 
