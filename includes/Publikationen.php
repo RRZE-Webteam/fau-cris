@@ -35,6 +35,9 @@ class Publikationen
     public $cris_pub_title_link_order;
     public function __construct($einheit = '', $id = '', $nameorder = '', $page_lang = 'de', $sc_lang = 'de')
     {
+
+
+        
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -59,6 +62,8 @@ class Publikationen
             $this->univis = Tools::get_univis();
         }
 
+
+       
         if (strlen(trim($nameorder))) {
             $this->nameorder = $nameorder;
         } else {
@@ -72,7 +77,7 @@ class Publikationen
             $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
         }
 
-        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field"))) {
+        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field","field_incl_proj"))) {
             $this->einheit = $einheit;
         } else {
             $this->einheit = "orga";
@@ -84,6 +89,9 @@ class Publikationen
                 __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
             );
         }
+
+
+
     }
 
     /**
@@ -168,7 +176,7 @@ class Publikationen
         $project = ''
     ): string {
         // Extracting parameters from the $param array
-
+        error_log(sprintf("pubNachJahr, field %s",$field));
         $year = $param['year'] ?: ''; // The year of publication
         $start = $param['start'] ?: ''; // The start of year from where publication is needed
         $end = $param['end'] ?: ''; // The end of year from where publication is needed
@@ -183,6 +191,7 @@ class Publikationen
         $language = $param['language'] ?: '';
         $sortby = $param['sortby'] ?: 'virtualdate';
         $authorPositionArray=$param['author_position'];
+        $muteheadings = $param['muteheadings'] ?? 0; 
         // it will use for showing number of publication by year or in total
         $total_publication_html='';
         if (!is_array($param['publicationsum'])) {
@@ -190,7 +199,7 @@ class Publikationen
         }else{
             $publicationSumArray=$param['publicationsum'];
         }
-
+        
         // fetching the publication
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray );
 
@@ -227,11 +236,12 @@ class Publikationen
         $output = '';
         $showsubtype = ($subtype == '') ? 1 : 0;
 
-        if (shortcode_exists('collapsibles') && $format == 'accordion') {
-
+        if (shortcode_exists('collapsibles') && $format == 'accordion'){
+            
             $total_number_publication_in_accordion=0;
             $shortcode_data = '';
-            if (empty($year) || strpos($year, ',') !== false) {
+            if ((empty($year) || strpos($year, ',') !== false) && ($muteheadings!=1))
+             {
                 $openfirst = ' load="open"';
                 $expandall = ' expand-all-link="true"';
             } else {
@@ -294,7 +304,7 @@ class Publikationen
                 else{
                     $subtotal_publication_html='';
                 }
-                if (empty($year)) {
+                if (empty($year)  && ($muteheadings!=1)) {
                     $output .= '<h3>' . $array_year . $subtotal_publication_html .'</h3>';
                 }
                 
@@ -673,6 +683,7 @@ class Publikationen
         $param = array(),
         $seed = false
     ): string {
+
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
@@ -698,6 +709,12 @@ class Publikationen
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
+        
+        if ($this->einheit == 'field_incl_proj') {
+          $sortby = 'relauthors';
+          $orderby = 'relauthors';
+        }
+
         $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
@@ -821,8 +838,8 @@ class Publikationen
             if ($this->einheit === "project") {
                 $pubArray = $ws->by_project($this->id, $filter, $notable);
             }
-            if ($this->einheit === "field" || $this->einheit === "field_proj") {
-                $pubArray = $ws->by_field($field, $filter, $fsp, $this->einheit);
+            if ($this->einheit === "field" || $this->einheit === "field_proj" || $this->einheit === "field_incl_proj") {
+                $pubArray = $ws->by_field($this->id, $filter, $fsp, $this->einheit);
             }
             if ($this->einheit === "publication") {
                 $pubArray = $ws->by_id($this->id);
@@ -1569,22 +1586,30 @@ class CRIS_publications extends Webservice
         }
 
         $requests = array();
+        $retaions = array();
         switch ($entity) {
             case 'field_proj':
-                $relation = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
+                $relations[] = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
                 break;
             case 'field_notable':
-                $relation = 'FOBE_has_cur_PUBL';
+                $relations[] = 'FOBE_has_cur_PUBL';
+                break;
+            case 'field_incl_proj':
+                $relations[] = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
+                $relations[] = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ'; 
                 break;
             case 'field':
             default:
-                $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
-        }
-
+                $relations[] = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
+        }   
         foreach ($fieldID as $_p) {
-            $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $relation;
-        }
-        return $this->retrieve($requests, $filter);
+            foreach ($relations as $_r) {
+                $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $_r;
+            }
+    }
+    $publs=$this->retrieve($requests, $filter);
+    
+    return $publs;
     }
 
     public function by_equipment($equiID = null, &$filter = null): array

@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.24.1
+ * Version: 3.24.2
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.24.1';
+    const version = '3.24.2';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -1223,7 +1223,8 @@ class FAU_CRIS
             'projects_status'=>'',
             'projects_start'=>'',
             'author_position'=>'',
-            'publicationsum'=>''
+            'publicationsum'=>'',
+            'useprojpubls'=>'false'
         ];
 
         // Attributes
@@ -1293,6 +1294,7 @@ class FAU_CRIS
         $sc_param['projects_start'] = sanitize_text_field($projects_start);
         $sc_param['author_position'] = sanitize_text_field($author_position);
         $sc_param['publicationsum'] = sanitize_text_field($publicationsum);
+        $sc_param['useprojpubls'] = strtolower(sanitize_text_field($useprojpubls));
 
         switch ($sortby) {
             case 'created':
@@ -1357,14 +1359,22 @@ class FAU_CRIS
                 $sc_param['equipment'] = explode(',', $sc_param['equipment']);
             }
             $sc_param['entity_id'] = $sc_param['equipment'];
-        } elseif ($sc_param['field'] != '') {
+        } elseif ($sc_param['field'] != '' && $sc_param['useprojpubls'] == 'false') {
             $sc_param['entity'] = 'field';
             if (strpos($sc_param['field'], ',') !== false) {
                 $sc_param['field'] = str_replace(' ', '', $sc_param['field']);
                 $sc_param['field'] = explode(',', $sc_param['field']);
             }
-            $sc_param['entity_id'] = $sc_param['field'];
-        } elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
+            $sc_param['entity_id'] = $sc_param['field']; } 
+            elseif ($sc_param['field'] != '' && $sc_param['useprojpubls'] == 'true') {  
+            $sc_param['entity'] = 'field_incl_proj';
+            if (strpos($sc_param['field'], ',') !== false) {
+                $sc_param['field'] = str_replace(' ', '', $sc_param['field']);
+                $sc_param['field'] = explode(',', $sc_param['field']);
+            }
+            $sc_param['entity_id'] = $sc_param['field'];    
+        }
+        elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
             $sc_param['entity'] = 'activity';
             $sc_param['entity_id'] = $sc_param['activity'];
         } elseif (isset($sc_param['patent']) && $sc_param['patent'] != '') {

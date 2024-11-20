@@ -429,6 +429,13 @@ class Forschungsbereiche
                     $field_details['#project_publications#'] = $project_publications;
                 }
             }
+            // $field_details['#publications_incl_projects#'] = '';
+            // if (strpos($content, '#publications_incl_projects#') !== false) {
+            //     $project_publications = $this->get_field_publications($param, 'field_incl_proj');
+            //     if ($project_publications) {
+            //         $field_details['#publications_incl_projects#'] = $project_publications;
+            //     }
+            // }
             $field_details['#image1#'] = '';
             $field_details['#images#'] = '';
             if (strpos($content, '#image') !== false) {
