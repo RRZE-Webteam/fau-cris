@@ -229,6 +229,16 @@ class Tools
         return $ret;
     }
 
+
+// Function to sort by a specific key
+
+public static function sortByKey(array &$array, string $key): void {
+    usort($array, fn($a, $b) => $a->attributes[$key] <=> $b->attributes[$key]);
+}
+
+
+
+
     /*
      * Array zur Definition des Filters für Publikationen
      */
@@ -749,7 +759,7 @@ class Tools
         switch ($target) {
             case 'cris':
                 if (is_numeric($id)) {
-                    $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "Person/" . $id . "\" class=\"extern\">";
+                    $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "persons/" . $id . "\" class=\"extern\">";
                     $link_post = "</a>";
                 } else {
                     $link_pre = '';
@@ -890,82 +900,149 @@ class Tools
     {
 
         // Filter conditions
-        $filter = [];
         $filteredProjects = [];
+        $statusFilteredProjects = [];
+        $today = date('Y-m-d');
+        $statusSet = ['completed', 'current', 'future'];
 
-        if ($projects_status !== '' && $projects_status !== null || $projects_start !== '' && $projects_start !== null) {
-            if ($projects_status !== '' && $projects_status !== null) {
-                if (strpos($projects_status, ',') !== false) {
-                    $arrStatus = explode(',', str_replace(' ', '', $projects_status));
-                } else {
-                    $arrStatus = (array) $projects_status;
-                }
+         // Condition 1: Filter by status only if start is null
 
-                $today = date('Y-m-d');
-                $statusSet = ['completed', 'current', 'future'];
+         if ($projects_status !== '' && $projects_status !== null && ($projects_start === '' || $projects_start === null)) {
+            if (strpos($projects_status, ',') !== false) {
+                $arrStatus = explode(',', str_replace(' ', '', $projects_status));
+            } else {
+                $arrStatus = (array) $projects_status;
+            }
+            foreach ($projects as $project) {
+                foreach ($arrStatus as $selectedStatus) {
+                    if (in_array($selectedStatus, $statusSet)) {
+                        switch ($selectedStatus) {
+                            case 'completed':
+                                if (isset($project->attributes['virtualenddate']) && $project->attributes['virtualenddate'] < $today) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
 
-                foreach ($projects as $project) {
-                    foreach ($arrStatus as $selectedStatus) {
-                        if (in_array($selectedStatus, $statusSet)) {
-                            switch ($selectedStatus) {
-                                case 'completed':
-                                    if (isset($project->attributes['virtualenddate']) && $project->attributes['virtualenddate'] < $today) {
-                                        $filteredProjects[] = $project;
-                                    }
-                                    break;
+                            case 'current':
+                                if (
+                                    isset($project->attributes['cfstartdate']) &&
+                                    isset($project->attributes['virtualenddate']) &&
+                                    $project->attributes['cfstartdate'] <= $today &&
+                                    $project->attributes['virtualenddate'] >= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
 
-                                case 'current':
-                                    if (
-                                        isset($project->attributes['cfstartdate']) &&
-                                        isset($project->attributes['virtualenddate']) &&
-                                        $project->attributes['cfstartdate'] <= $today &&
-                                        $project->attributes['virtualenddate'] >= $today
-                                    ) {
-                                        $filteredProjects[] = $project;
-                                    }
-                                    break;
-
-                                case 'future':
-                                    if (isset($project->attributes['cfstartdate']) && $project->attributes['cfstartdate'] > $today) {
-                                        $filteredProjects[] = $project;
-                                    }
-                                    break;
-                                case 'completed,current':
-                                    if (
-                                        isset($project->attributes['cfstartdate']) &&
-                                        $project->attributes['cfstartdate'] <= $today
-                                    ) {
-                                        $filteredProjects[] = $project;
-                                    }
-                                    break;
-                                case 'current,future':
-                                    if (
-                                        isset($project->attributes['virtualenddate']) &&
-                                        $project->attributes['virtualenddate'] >= $today
-                                    ) {
-                                        $filteredProjects[] = $project;
-                                    }
-                                    break;
-                                default:
-                                    //                                $filteredProjects[] = $project;
-                                    break;
-                            }
+                            case 'future':
+                                if (isset($project->attributes['cfstartdate']) && $project->attributes['cfstartdate'] > $today) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+                            case 'completed,current':
+                                if (
+                                    isset($project->attributes['cfstartdate']) &&
+                                    $project->attributes['cfstartdate'] <= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
+                            case 'current,future':
+                                if (
+                                    isset($project->attributes['virtualenddate']) &&
+                                    $project->attributes['virtualenddate'] >= $today
+                                ) {
+                                    $filteredProjects[] = $project;
+                                }
+                                break;
                         }
                     }
                 }
             }
-            if ($projects_start !== '' && $projects_start !== null) {
-                foreach ($projects as $project) {
-                    if (isset($project->attributes['startyear']) && $project->attributes['startyear'] >= $projects_start) {
-                        $filteredProjects[] = $project;
+         }
+
+
+    // Condition 2: Filter by start year only if status is null
+    if ($projects_start !== '' && $projects_start !== null && ($projects_status === '' || $projects_status === null)) {
+        foreach ($projects as $project) {
+            if (isset($project->attributes['startyear']) && $project->attributes['startyear'] >= $projects_start) {
+                $filteredProjects[] = $project;
+            }
+        }
+    }
+
+    // Condition 3: Filter by both if both are not null
+    if ($projects_status !== '' && $projects_status !== null && $projects_start !== '' && $projects_start !== null) {
+        if (strpos($projects_status, ',') !== false) {
+            $arrStatus = explode(',', str_replace(' ', '', $projects_status));
+        } else {
+            $arrStatus = (array) $projects_status;
+        }
+
+        foreach ($projects as $project) {
+                foreach ($arrStatus as $selectedStatus) {
+                    if (in_array($selectedStatus, $statusSet)) {
+                        switch ($selectedStatus) {
+                            case 'completed':
+                                if (isset($project->attributes['virtualenddate']) && $project->attributes['virtualenddate'] < $today) {
+                                    $statusFilteredProjects[] = $project;
+                                }
+                                break;
+
+                            case 'current':
+                                if (
+                                    isset($project->attributes['cfstartdate']) &&
+                                    isset($project->attributes['virtualenddate']) &&
+                                    $project->attributes['cfstartdate'] <= $today &&
+                                    $project->attributes['virtualenddate'] >= $today
+                                ) {
+                                    $statusFilteredProjects[] = $project;
+                                }
+                                break;
+
+                            case 'future':
+                                if (isset($project->attributes['cfstartdate']) && $project->attributes['cfstartdate'] > $today) {
+                                    $statusFilteredProjects[] = $project;
+                                }
+                                break;
+                            case 'completed,current':
+                                if (
+                                    isset($project->attributes['cfstartdate']) &&
+                                    $project->attributes['cfstartdate'] <= $today
+                                ) {
+                                    $statusFilteredProjects[] = $project;
+                                }
+                                break;
+                            case 'current,future':
+                                if (
+                                    isset($project->attributes['virtualenddate']) &&
+                                    $project->attributes['virtualenddate'] >= $today
+                                ) {
+                                    $statusFilteredProjects[] = $project;
+                                }
+                                break;
+                        }
                     }
                 }
             }
+        
+            
 
-            return $filteredProjects;
-        } else {
-            return $projects;
-        }
+        // Further filter these status-filtered projects by start year
+        $filteredProjects = array_filter($statusFilteredProjects, function ($project) use ($projects_start) {
+            return isset($project->attributes['startyear']) && $project->attributes['startyear'] >= $projects_start;
+        });
+
+      
+     
+    }
+    
+
+                // Sort the array by the 'startyear' key
+
+                Tools::sortByKey($filteredProjects, 'startyear');
+
+    return $filteredProjects;
     }
 
     public static function filter_publication_bypersonid_postion($pubArray, $persIdArray, $authorPositionArray)
@@ -996,4 +1073,79 @@ class Tools
 
         return $filteredPublications;
     }
+
+/**
+     * Name : get_first_available_link
+     *
+     * Use: it will get the first available link for publication title 
+     *
+     * Returns: link according to priority 
+     *
+     *
+     */
+    public static function get_first_available_link($cris_pub_title_link_order, $pubDetails, $title, $id, $postID, $lang) {
+        foreach ($cris_pub_title_link_order as $linkPriority) {
+            switch ($linkPriority) {
+                case 'internal link':
+                case 'cris':
+                    
+                    $link = Tools::get_item_url("publications", $title, $id, $postID, $lang);
+                    if (!empty($link)) return $link;
+                    break;
+
+                case 'url':
+                    if (!empty($pubDetails['URI'])) {
+                        return $pubDetails['URI'];
+                    }
+                    break;
+    
+                case 'open access link':
+                    if (!empty($pubDetails['OAlink'])) {
+                        return $pubDetails['OAlink'];
+                    }
+                    break;
+    
+                case 'doi':
+                    if (!empty($pubDetails['doi_link'])) {
+                        return $pubDetails['doi_link'];
+                    }
+                    break;
+            }
+        }
+        return Tools::get_item_url("publications", $title, $id, $postID, $lang);
+    }
+
+/**
+     * Name : get_external_project_partner_name
+     *
+     * Use: it will get all the external partner name for a project
+     *
+     * Returns: array of externalPartneName
+     *
+     *
+     */
+        public static function get_external_project_partner_name($externalPartnerArray=array())
+        {
+
+          $externalPartneName=array(); 
+          foreach ($externalPartnerArray as $partner) {
+            $partner = (array) $partner;
+            foreach ($partner['attributes'] as $attribut => $v) {
+                $partner[$attribut] = $v;
+            }
+            unset($partner['attributes']);
+            $externalPartneName[]=$partner["name"];
+            
+            }  
+
+        return $externalPartneName;
+        }
+
+
+
+
+
+
+
+
 }

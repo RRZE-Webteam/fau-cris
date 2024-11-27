@@ -7,10 +7,10 @@ msgstr ""
 "Last-Translator: Barbara\n"
 "Language-Team: English (UK)\n"
 "Language: en_GB\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Poedit-Language: English\n"
@@ -25,7 +25,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Textdomain-Support: yes\n"
 "X-Loco-Target-Locale: en_GBX-Loco-Version: 2.3.0; wp-5.2.2\n"
-"X-Loco-Version: 2.4.4; wp-5.5.3"
+"X-Loco-Version: 2.4.4; wp-5.5.3\n"
 
 #: class_Sync.php:24
 msgid ""
@@ -371,11 +371,15 @@ msgstr "You may enter more organization IDs, separated by al comma."
 msgid "Reihenfolge der Publikationen"
 msgstr "Publications Order"
 
+#: fau-cris.php:293
+msgid "Priorisierung des Titel-Links bei Publikationen"
+msgstr "Priority of publication title link"
+
 #: fau-cris.php:295
 msgid ""
 "Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, "
-"können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden."
-" Eine Liste aller Typen finden Sie im Hilfemenü unter \"Shortcode "
+"können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet "
+"werden. Eine Liste aller Typen finden Sie im Hilfemenü unter \"Shortcode "
 "Publikationen\". Ein Eintrag pro Zeile. "
 msgstr ""
 "Choose the publication type order for publication lists ordered by type. One "
@@ -443,8 +447,8 @@ msgstr "Name order in FAU-Person Plugin"
 #: fau-cris.php:345
 msgid "In welcher Reihenfolge sind die Namen im FAU-Person-Plugin angelegt?"
 msgstr ""
-"In which order are the persons' full names provided by the FAU-Person plugin "
-"?"
+"In which order are the persons' full names provided by the FAU-Person "
+"plugin ?"
 
 #: fau-cris.php:347
 msgid "Vorname Nachname"
@@ -496,12 +500,11 @@ msgid ""
 "Forschungsbereichs angezeigt werden."
 msgstr "Maximum number of publications to be listed on a research area page."
 
-#: fau-cris.php:386
+#: fau-cris.php:568
 msgid ""
-"Maximale Anzahl der Publikationen, die in der Detailansicht eines "
-"Projekte angezeigt werden."
+"Maximale Anzahl der Publikationen, die in der Detailansicht eines Projekte "
+"angezeigt werden."
 msgstr "Maximum number of publications to be listed on a project area page."
-
 
 #: fau-cris.php:390
 msgid "Kontaktpersonen verlinken"
@@ -677,8 +680,8 @@ msgid ""
 "<strong>CRIS-OrgNr</strong>:<br>Die Nummer der der Organisationseinheit, für "
 "die die Publikationen und Personendaten ausgegeben werden. Diese erfahren "
 "Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre "
-"Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B."
-" "
+"Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z."
+"B. "
 msgstr "<strong>CRIS Organization ID</strong>"
 
 #: fau-cris.php:1195
@@ -844,3 +847,7 @@ msgstr "RRZE Webteam"
 #. Author URI of the plugin
 msgid "http://blogs.fau.de/webworking/"
 msgstr "http://blogs.fau.de/webworking/"
+
+#: Projekte.php:805
+msgid "Externe Partner"
+msgstr "External Partners"

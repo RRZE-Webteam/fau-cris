@@ -195,7 +195,7 @@ class Standardisierungen
                 $title = $standardization['title'];
                 $title = htmlentities($title, ENT_QUOTES);
                 if ($title) {
-                    $standardizationList .= "<span class=\"standardization-title\"><a href=\"" . Tools::get_item_url("standardization", $title, $standardization['ID'], $post->ID, $this->page_lang) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $title . "</a></span>";
+                    $standardizationList .= "<span class=\"standardization-title\"><a href=\"" . Tools::get_item_url("standards", $title, $standardization['ID'], $post->ID, $this->page_lang) . "\" title=\"" . __('Detailansicht auf cris.fau.de in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $title . "</a></span>";
                 }
             }
             if (!in_array('number', (array)$hide)) {

@@ -62,6 +62,45 @@ class Projekte
         }
     }
 
+
+
+   /**
+     * Name : project_title_sorting
+     *
+     * Use: it will sort the project array according to title in from A to Z
+     *
+     * Returns: sort title 
+     *
+     *
+     */
+    public function project_title_filter($a, $b) {
+            $a_cftitle_en=$this->normalizeTitle($a->attributes['cftitle_en']);
+            $a_cftitle_de=$this->normalizeTitle($a->attributes['cftitle']);
+             $b_cftitle_en=$this->normalizeTitle($b->attributes['cftitle_en']);
+            $b_cftitle_de=$this->normalizeTitle($b->attributes['cftitle']);
+
+      switch ($this->page_lang) {
+                case 'en':
+                    $aTitle = ($a_cftitle_en != '') ? $a_cftitle_en : $a_cftitle_de;
+                    $bTitle = ($b_cftitle_en != '') ?  $b_cftitle_en : $b_cftitle_de;
+                    break;
+                case 'de':
+                default:
+                    $aTitle = ($a_cftitle_de) ? $a_cftitle_de : $a_cftitle_en;
+                    $bTitle = ($b_cftitle_de != '') ? $b_cftitle_de : $b_cftitle_en;
+                    break;
+            }
+
+        return strcmp($aTitle,$bTitle);
+    }
+
+
+    function normalizeTitle($title) {
+    $title = iconv('UTF-8', 'ASCII//TRANSLIT', $title); // Transliterate characters to ASCII
+    $title = preg_replace('/[^A-Za-z0-9 ]/', '', $title); // Remove non-alphanumeric characters
+    return strtolower($title); // Convert to lowercase to ensure case-insensitive comparison
+}
+
     /**
      * Name : projListe
      *
@@ -97,6 +136,11 @@ class Projekte
             $projList = $res[$order];
         }
 
+
+        if (!empty($param['orderby']) && $param['orderby']==='title') {
+            uasort($projList, [$this,'project_title_filter']);
+         }
+        
         $output = '';
 
         $output .= $this->make_list($projList, $hide);
@@ -200,12 +244,18 @@ class Projekte
                 $expandall = '';
             }
             foreach ($projList as $array_year => $projects) {
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    uasort($projects, [$this,'project_title_filter']);
+                }
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_year => $projects) {
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                   uasort($projects, [$this,'project_title_filter']);
+                }
                 if (empty($year)) {
                     $output .= '<h3>' . $array_year . '</h3>';
                 }
@@ -273,6 +323,9 @@ class Projekte
             }
             foreach ($projList as $array_type => $projects) {
                 $title = Tools::getTitle('projects', $array_type, $this->page_lang);
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    uasort($projects, [$this,'project_title_filter']);
+                 }
                 $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
                 $openfirst = '';
             }
@@ -280,6 +333,9 @@ class Projekte
         } else {
             foreach ($projList as $array_type => $projects) {
                 // Zwischenüberschrift (= Projecttyp), außer wenn nur ein Typ gefiltert wurde
+                if (!empty($param['order2']) && $param['order2']==='title') {
+                    uasort($projects, [$this,'project_title_filter']);
+                 }
                 if (empty($type)) {
                     $title = Tools::getTitle('projects', $array_type, $this->page_lang);
                     $output .= "<h3>";
@@ -310,6 +366,7 @@ class Projekte
 
     public function singleProj($param = array())
     {
+       
         $ws = new CRIS_projects();
         try {
             $projArray = $ws->by_id($this->id);
@@ -322,10 +379,12 @@ class Projekte
             return $output;
         }
 
+        $externalPartnerArray=$ws->by_proj_has_eorg($this->id);
+
         if (is_array($this->id)) {
             $output = $this->make_list($projArray, $param['hide']);
         } else {
-            $output = $this->make_single($projArray, $param);
+            $output = $this->make_single($projArray, $param,$externalPartnerArray);
         }
 
         return $output;
@@ -625,10 +684,11 @@ class Projekte
      *
      * Start::make_single
      */
-    private function make_single($projects, $param = array()): string
+    private function make_single($projects, $param = array(),$externalPartnerArray=array()): string
     {
-
         $projlist = "<div class=\"cris-projects\">";
+
+        
 
         foreach ($projects as $project) {
             $project = (array) $project;
@@ -736,10 +796,30 @@ class Projekte
                     $projlist .= "<h4>" . __('Abstract', 'fau-cris') . ": </h4>" . "<p class=\"project-description\">" . $description . '</p>';
                 }
             }
+
+             if (!in_array('externalpartners', $param['hide'])) {
+
+                $externalPartneName=Tools::get_external_project_partner_name($externalPartnerArray);
+
+                if (!empty($externalPartneName)) {
+                    $projlist .= "<h3>" . __('Externe Partner', 'fau-cris') . ": </h3>";
+                    $projlist .= "<ul>";
+                    foreach ($externalPartneName as $partnerName) {
+                        $projlist .= "<li>";
+                        $projlist .= $partnerName;
+                        $projlist .= "</li>";
+                    }
+                    $projlist .= "</ul>";
+                }
+            } 
+
             if (!in_array('publications', $param['hide'])) {
                 $publications = $this->get_project_publications($id, $param);
-                if ($publications) {
-                    $projlist .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+                if (!empty($publications) && $publications!='') {
+                    if (!empty($publications) && trim(strip_tags($publications)) !== '') {
+                        $projlist  .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
+
+                    }
                 }
             }
         }
@@ -758,8 +838,7 @@ class Projekte
      * Start::make_list
      */
     private function make_list($projects, $hide = array(), $showtype = 1, $pubProj = 0): array|string
-    {
-
+    {   
         global $post;
         $projlist = "<ul class=\"cris-projects\">";
 
@@ -845,7 +924,7 @@ class Projekte
                         . '</div>';
             }
             if (!in_array('link', $hide) && !empty($id)) {
-                $link = Tools::get_item_url("project", $title, $id, $post->ID, $this->page_lang);
+                $link = Tools::get_item_url("projects", $title, $id, $post->ID, $this->page_lang);
                 $projlist .= "<div>" . " &#8594;<a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </div>";
             }
             $projlist .= "</li>";
@@ -911,11 +990,51 @@ class Projekte
 
 
             $projlist .= "[collapse title=\"" . ((!empty($acronym)) ? $acronym . ": " : "") . $title . "\"]";
+            
+            if (!in_array('date', $hide)) {            
+            $start = $project['cfstartdate'];
+            if (!in_array('end', $hide)) {
+                $end = (!empty($project['extension date'])) ? $project['extension date'] : ((!empty($project['cfenddate'])) ? $project['cfenddate'] : '');
+            } else {
+                $end = '';
+            }
+            $date = Tools::make_date($start, $end);
+            if (!empty($date)) {
+                $projlist .= "<strong>" . __('Laufzeit', 'fau-cris') . ': </strong>' . $date . '<br />';
+            }
+            
+            }
+            if (!in_array('funding', $hide)) {
+            $funding = $this->get_project_funding($id);
+            if (!empty($funding)) {
+                $projlist .= "<strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
+                $projlist .= implode(', ', $funding) . '<br />';
+            }
+            }
+
+            if (!in_array('leader', $hide)) {
+            $leaderIDs = explode(",", $project['relpersidlead']);
+                  $leaderArray = $this->get_project_leaders($id, $leaderIDs);
+                  $leaders = array();
+                  foreach ($leaderArray as $l_id => $l_names) {
+                  $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
+                  $fcid = Tools::person_exists('wp', 'Manfred', 'Pirner');
+                //   print_r($fcid);
+                //   die();
+
+                  }
+
+                  if (isset($leaders) && !empty($leaders)) {
+                    $projlist .= "<strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
+                    $projlist .= implode(', ', $leaders) . '<br />';
+                }
+            }
+            
             if (!in_array('abstract', $hide) && !empty($description)) {
                 $projlist .= "<p class=\"abstract\">" . $description . '</p>';
             }
             if (!in_array('link', $hide) && !empty($id)) {
-                $link = Tools::get_item_url("project", $title, $id, $post->ID, $this->page_lang);
+                $link = Tools::get_item_url("projects", $title, $id, $post->ID, $this->page_lang);
             }
             $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
             $projlist .= "[/collapse]";
@@ -960,21 +1079,15 @@ class Projekte
         $projList = $res[$orderby] ?? [];
 
 
-
-        if ($param['projects_status'] !== '' && $param['projects_status'] !== null){
+        if ($param['projects_status'] !== '' || $param['projects_start'] !== ''){
             $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
         }
-
-        elseif ($param['projects_start'] !== '' && $param['projects_start'] !== null){
-            $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
-        }
-
 
 
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
-            $output = $this->make_accordion($projList);
+            $output = $this->make_accordion($projList,$hide=$param['projects_hide']);
         } else {
-            $output = $this->make_list($projList);
+            $output = $this->make_list($projList,$hide=$param['projects_hide']);
         }
         return $output;
     }
@@ -1280,6 +1393,28 @@ class CRIS_projects extends Webservice
         return $this->retrieve($requests);
     }
 
+
+    public function by_proj_has_eorg($projID = null){
+
+         if ($projID === null || $projID === "0") {
+            return new \WP_Error(
+                'cris-orgid-error',
+                __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
+            );
+        }
+
+        if (!is_array($projID)) {
+            $projID = array($projID);
+        }
+
+        $requests = array();
+        foreach ($projID as $_f) {
+            $requests[] = sprintf('getrelated/Project/%d/proj_has_eorg', $_f);
+        }
+        return $this->retrieve($requests);
+
+    }
+
     private function retrieve($reqs, &$filter = null): array
     {
         if ($filter !== null && !$filter instanceof Filter) {
@@ -1300,9 +1435,21 @@ class CRIS_projects extends Webservice
             foreach ($_d as $project) {
                 $a = new CRIS_project($project);
                 if ($a->ID) {
+
+                    // Check and handle 'cfstartdate'
+                if (isset($a->attributes['cfstartdate']) && !is_null($a->attributes['cfstartdate'])) {
                     $a->attributes['startyear'] = mb_substr($a->attributes['cfstartdate'], 0, 4);
+                } else {
+                    $a->attributes['startyear'] = ''; // or any default value you prefer
+                }
+
+                    // Check and handle 'virtualenddate'
+                if (isset($a->attributes['virtualenddate']) && !is_null($a->attributes['virtualenddate'])) {
                     $a->attributes['endyear'] = mb_substr($a->attributes['virtualenddate'], 0, 4);
-                    //$a->attributes['endyear'] = $a->attributes['cfenddate'] != '' ? mb_substr($a->attributes['cfenddate'], 0, 4) : mb_substr($a->attributes['virtualenddate'], 0, 4);
+                } else {
+                    $a->attributes['endyear'] = ''; // or any default value you prefer
+                }
+                
                 }
                 if ($a->ID && ($filter === null || $filter->evaluate($a))) {
                     $projects[$a->ID] = $a;

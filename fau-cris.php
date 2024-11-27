@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.22.6
+ * Version: 3.23.1
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,13 +80,13 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.22.6';
+    const version = '3.23.1';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
     const php_version = '7.1'; // Minimal erforderliche PHP-Version
     const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
-    const cris_publicweb = 'https://cris.fau.de/converis/portal/';
+    const cris_publicweb = 'https://cris.fau.de/';
     const doi = 'https://doi.org/';
 
     protected static $instance = null;
@@ -224,7 +224,8 @@ class FAU_CRIS
             ),
             'cris_fields_num_pub' => 5,
             'cris_project_num_pub'=>5,
-            'cris_field_link' => 'none'
+            'cris_field_link' => 'none',
+            'cris_pub_title_link_order'=>Dicts::$publicationTitleLinksOptions
         );
         return $options;
     }
@@ -376,6 +377,19 @@ class FAU_CRIS
                     //'description' => __('Wenn Sie die Publikationsliste nach Publikationstypen geordnet ausgeben, können Sie hier angeben, in welcher Reihenfolge die Typen aufgelistet werden. Eine Liste aller Typen finden Sie im Hilfemenü unter "Shortcode Publikationen". Ein Eintrag pro Zeile. ', 'fau-cris')
                         )
                 );
+
+                add_settings_field(
+                    'cris_pub_title_link_order',
+                    __('Priorisierung des Titel-Links bei Publikationen', 'fau-cris'),
+                    array(__CLASS__, 'cris_textarea_callback'),
+                    'fau_cris_options',
+                    'cris_publications_section',
+                    array(
+                    'name' => 'cris_pub_title_link_order'
+                        )
+                );
+
+
                 add_settings_field(
                     'cris_doi',
                     __('DOI-Link', 'fau-cris'),
@@ -420,6 +434,7 @@ class FAU_CRIS
                     'description' => __('Soll für jede Publikation ein Link zum BibTeX-Export angezeigt werden?', 'fau-cris')
                         )
                 );
+
                 add_settings_field(
                     'cris_univis',
                     __('Autoren verlinken', 'fau-cris'),
@@ -434,6 +449,7 @@ class FAU_CRIS
                         'none' => __('keinen Link setzen', 'fau-cris'))
                     )
                 );
+
                 add_settings_field(
                     'cris_name_order_plugin',
                     __('Namen im FAU-Person-Plugin', 'fau-cris'),
@@ -725,6 +741,7 @@ class FAU_CRIS
                 $new_input['cris_activities_link'] = in_array($_POST[self::option_name]['cris_activities_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_activities_link'] : $default_options['cris_activities_link'];
                 $new_input['cris_standardizations_order'] = isset($_POST[self::option_name]['cris_standardizations_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_standardizations_order'])) : $default_options['cris_standardizations_order'];
                 $new_input['cris_standardizations_link'] = in_array($_POST[self::option_name]['cris_standardizations_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_standardizations_link'] : $default_options['cris_standardizations_link'];
+                $new_input['cris_pub_title_link_order'] = isset($_POST[self::option_name]['cris_pub_title_link_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_title_link_order'])) : $default_options['cris_pub_title_link_order'];
                 break;
             case 'sync':
                 $new_input['cris_sync_check'] = isset($_POST[self::option_name]['cris_sync_check']) ? 1 : 0;
@@ -1166,6 +1183,7 @@ class FAU_CRIS
             'display' => 'list',
             'project' => '',
             'hide' => '',
+            'projects_hide'=>'',
             'role' => 'all',
             'status' => '',
             'patent' => '',
@@ -1314,6 +1332,8 @@ class FAU_CRIS
         $sc_param['display_language'] = ($display_language == 'en') ? 'en' : 'de';
         $hide = str_replace(' ', '', sanitize_text_field($hide));
         $sc_param['hide'] = explode(',', $hide);
+        $projects_hide = str_replace(' ', '', sanitize_text_field($projects_hide));
+        $sc_param['projects_hide'] = explode(',', $projects_hide);
         if ($sc_param['publication'] != '') {
             $sc_param['entity'] = 'publication';
             if (strpos($sc_param['publication'], ',')) {
@@ -1487,7 +1507,7 @@ class FAU_CRIS
             . '<li>' . __('Auszeichnungen', 'fau-cris') . '</li>'
             . '</ul>'
             . '<p>' . __('Über den Shortcode lassen sich jeweils verschiedene Ausgabeformate einstellen.', 'fau-cris') . '</p>'
-            . '<p>' . __('<strong>CRIS-OrgNr</strong>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. ', 'fau-cris') . FAU_CRIS::cris_publicweb . 'Organisation/<strong><em>141517</em></strong>.' . '</p>'
+            . '<p>' . __('<strong>CRIS-OrgNr</strong>:<br>Die Nummer der der Organisationseinheit, für die die Publikationen und Personendaten ausgegeben werden. Diese erfahren Sie, wenn Sie in CRIS eingeloggt sind, oder wenn Sie ich Ihre Organisationseinheit auf http://cris.fau.de anzeigen lassen, in der URL: z.B. ', 'fau-cris') . FAU_CRIS::cris_publicweb . 'organisations/<strong><em>141517</em></strong>.' . '</p>'
         );
 
         $content_shortcode_publikationen = array(

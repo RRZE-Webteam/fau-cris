@@ -32,7 +32,7 @@ class Publikationen
     public $langdiv_close; 
     public $einheit; 
     public $error; 
-
+    public $cris_pub_title_link_order;
     public function __construct($einheit = '', $id = '', $nameorder = '', $page_lang = 'de', $sc_lang = 'de')
     {
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
@@ -51,6 +51,7 @@ class Publikationen
 
         $this->order = $this->options['cris_pub_order'];
         $this->subtypeorder = $this->options['cris_pub_subtypes_order'];
+        $this->cris_pub_title_link_order = $this->options['cris_pub_title_link_order'];
         $this->univisLink = $this->options['cris_univis'] ?? 'none';
         $this->bibtex = $this->options['cris_bibtex'];
         $this->bibtexlink = "https://cris.fau.de/bibtex/publication/%s.bib";
@@ -826,6 +827,8 @@ class Publikationen
 
         foreach ($publications as $publicationObject) {
             $publication = $publicationObject->attributes;
+
+
             // id
             $id = $publicationObject->ID;
             // authors
@@ -854,19 +857,36 @@ class Publikationen
                 }
             }
             // title (bei Rezensionen mit Original-Autor davor)
+
+            if (!empty($publication['doi'])) {
+
+                $doilink=FAU_CRIS::doi . (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris'));
+            }
+            else{
+                $doilink='';
+            }
+
+            $pubTitlePrioLinks=array (
+                'doi_link'=>$doilink,
+                'OAlink'=>(array_key_exists('openaccesslink', $publication) ? strip_tags($publication['openaccesslink']) : ''),
+                'URI'=>(array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+                );
+
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
                 $title = strip_tags($publication['originalauthors']) . ': ';
             }
             $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
+            $link=Tools::get_first_available_link($this->cris_pub_title_link_order,$pubTitlePrioLinks,$title,$id,$post->ID,$lang);
             $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
-                . "<a href=\"" . Tools::get_item_url("publication", $title, $id, $post->ID, $lang) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
-                . $title
-                . "</a></strong></span>";
+            . "<a href=\"" .$link. "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
+            . $title
+            . "</a></strong></span>";
             if ($publication['openaccess'] == "Ja") {
                 $title_html .= "<span aria-hidden=\"true\" tabindex=\"-1\" class=\"oa-icon\" title=\"Open-Access-Publikation\"></span>";
             }
+
             // make array
             $pubDetails = array(
                 'id' => $id,
@@ -906,6 +926,9 @@ class Publikationen
                 'articleNumber' => (array_key_exists('article number', $publication) ? $publication['article number'] : ''),
                 'conferenceProceedingsTitle' => (array_key_exists('conference proceedings title', $publication) ? $publication['conference proceedings title'] : '')
             );
+            
+            
+
             $publication['image'] = '';
             $cleardiv = '';
             if ($showimage == 1) {
@@ -1146,7 +1169,7 @@ class Publikationen
             $publist .= $cleardiv . "</li>";
         }
         $publist .= "</ul>";
-
+        
         return $publist;
     }
     //  End::make_list
@@ -1210,7 +1233,7 @@ class Publikationen
             $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
             $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
-                . "<a href=\"" . Tools::get_item_url("publication", $title, $id, $post->ID, $lang) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
+                . "<a href=\"" . Tools::get_item_url("publications", $title, $id, $post->ID, $lang) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                 . $title
                 . "</a></strong></span>";
             //pubType
@@ -1223,7 +1246,7 @@ class Publikationen
                 '#id#' => $id,
                 '#author#' => $authors_html,
                 '#title#' => $title,
-                '#url#' => Tools::get_item_url("publication", $title, $id, $post->ID, $lang),
+                '#url#' => Tools::get_item_url("publications", $title, $id, $post->ID, $lang),
                 '#city#' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
                 '#publisher#' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
                 '#year#' => (array_key_exists('publyear', $publication) ? strip_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
@@ -1546,7 +1569,7 @@ class CRIS_publication extends CRIS_Entity
 
         $title = preg_quote(Tools::numeric_xml_encode($this->attributes["cftitle"]), "/");
 
-        $cristmpl = '<a href="' . FAU_CRIS::cris_publicweb . 'publication/%d" target="_blank">%s</a>';
+        $cristmpl = '<a href="' . FAU_CRIS::cris_publicweb . 'publications/%d" target="_blank">%s</a>';
 
         $apa = $this->attributes["quotationapa"];
         $mla = $this->attributes["quotationmla"];
