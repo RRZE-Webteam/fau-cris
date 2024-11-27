@@ -481,7 +481,7 @@ public static function sortByKey(array &$array, string $key): void {
      * Array zur Definition des Filters für Aktivitäten
      */
 
-    public static function activity_filter($year = '', $start = '', $end = '', $type = ''): array|string|null
+    public static function activity_filter($year = '', $start = '', $end = '', $type = '')
     {
         $filter = array();
         if ($year !== '' && $year !== null) {
@@ -504,7 +504,10 @@ public static function sortByKey(array &$array, string $key): void {
                 $activityTyp = (array) self::getType('activities', $type);
             }
             if (empty($activityTyp)) {
-                return '<p>' . __('Falscher Parameter für Aktivitätstyp', 'fau-cris') . '</p>';
+                return new \WP_Error(
+                    'invalid-activity-type',  // Unique error code
+               __('Falscher Parameter für Aktivitätstyp', 'fau-cris')  // Error message
+           );
             }
             $filter['type of activity__eq'] = $activityTyp;
         }
@@ -518,7 +521,7 @@ public static function sortByKey(array &$array, string $key): void {
      * Array zur Definition des Filters für Forschungsbereiche
      */
 
-    public static function field_filter($year = '', $start = ''): ?array
+    public static function field_filter($year = '', $start = ''): array
     {
         $filter = array();
         if ($year !== '' && $year !== null) {
