@@ -25,6 +25,7 @@ class Aktivitaeten
     public $langdiv_open;
     public $sc_lang;
     public $langdiv_close;
+    public $error;
 
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
@@ -90,10 +91,14 @@ class Aktivitaeten
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
-        if (!count($activityArray)) {
-            $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
+        if (is_wp_error($activityArray)) {
+            $output = '<div class="error">' . $activityArray->get_error_message() . '</div>';
             return $output;
-        }
+       }
+       elseif(!count($activityArray)){
+           $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
+              return $output;
+       }
         $order = "sortdate";
         $formatter = new Formatter(null, null, $order, SORT_DESC);
         $res = $formatter->execute($activityArray);
@@ -128,10 +133,14 @@ class Aktivitaeten
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
-        if (!count($activityArray)) {
-            $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
+        if (is_wp_error($activityArray)) {
+            $output = '<div class="error">' . $activityArray->get_error_message() . '</div>';
             return $output;
-        }
+       }
+       elseif(!count($activityArray)){
+           $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
+              return $output;
+       }
 
         if ($order2 == 'author') {
             $formatter = new Formatter("year", SORT_DESC, "exportnames", SORT_ASC);
@@ -188,10 +197,14 @@ class Aktivitaeten
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
-        if (!count($activityArray)) {
-            $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
+        if (is_wp_error($activityArray)) {
+            $output = '<div class="error">' . $activityArray->get_error_message() . '</div>';
             return $output;
-        }
+       }
+       elseif(!count($activityArray)){
+           $output = '<p>' . __('Es wurden leider keine Aktivitäten gefunden.', 'fau-cris') . '</p>';
+              return $output;
+       }
 
         // Patenttypen sortieren
         $order = $this->order;
@@ -277,9 +290,11 @@ class Aktivitaeten
      * Holt Daten vom Webservice je nach definierter Einheit.
      */
 
-    private function fetch_activities($year = '', $start = '', $end = '', $type = ''): array
-    {
+    private function fetch_activities($year = '', $start = '', $end = '', $type = ''){
         $filter = Tools::activity_filter($year, $start, $end, $type);
+        if (is_wp_error($filter)) {
+            return $filter;
+       }
 
         $ws = new CRIS_activities();
         $activityArray = array();
@@ -534,7 +549,7 @@ class CRIS_activities extends Webservice
         return $this->retrieve($requests, $filter);
     }
 
-    public function by_pers_id($persID = null, &$filter = null): array
+    public function by_pers_id($persID = null, &$filter = null)
     {
         if ($persID === null || $persID === "0") {
             return  new \WP_Error(
@@ -574,10 +589,13 @@ class CRIS_activities extends Webservice
         return $this->retrieve($requests);
     }
 
-    private function retrieve($reqs, &$filter = null): array
+    private function retrieve($reqs, &$filter = null)
     {
         if ($filter !== null && !$filter instanceof Filter) {
             $filter = new Filter($filter);
+            if (is_wp_error($filter->error)) {
+                return $filter->error;
+            }
         }
 
         $data = array();
