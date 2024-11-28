@@ -521,7 +521,7 @@ public static function sortByKey(array &$array, string $key): void {
      * Array zur Definition des Filters für Forschungsbereiche
      */
 
-    public static function field_filter($year = '', $start = ''): array
+    public static function field_filter($year = '', $start = ''): ?array
     {
         $filter = array();
         if ($year !== '' && $year !== null) {
