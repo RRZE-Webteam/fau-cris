@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.24.2
+ * Version: 3.25.0
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.24.2';
+    const version = '3.25.0';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -148,8 +148,8 @@ class FAU_CRIS
         if (!empty($error)) {
             deactivate_plugins(plugin_basename(__FILE__), false, true);
             wp_die(
-                $error,
-                __('Fehler bei der Aktivierung des Plugins', 'fau-cris'),
+                esc_html($error),
+                esc_html(__('Fehler bei der Aktivierung des Plugins', 'fau-cris')),
                 array(
                 'response' => 500,
                 'back_link' => true
@@ -286,15 +286,15 @@ class FAU_CRIS
         ?>
 
         <div class="wrap">
-            <h2><?php _e('Einstellungen', 'fau-cris'); ?> &rsaquo; CRIS</h2>
+            <h2><?php esc_html_e('Einstellungen', 'fau-cris'); ?> &rsaquo; CRIS</h2>
             <h2 class="nav-tab-wrapper">
                 <?php foreach ($tabs as $tab => $name) {
                     $class = ($tab == $current) ? ' nav-tab-active' : '';
-                    echo "<a class='nav-tab$class' href='?page=options-fau-cris&tab=$tab'>$name</a>";
+                    echo "<a class='nav-tab" . esc_attr( $class ) . "' href='" . esc_url( "?page=options-fau-cris&tab=$tab" ) . "'>" . esc_html( $name ) . "</a>";
                 } ?>
             </h2>
             <?php if (isset($result)) {
-                print $result;
+                print esc_html($result);
             } ?>
             <form method="post" action="options.php">
                 <?php
@@ -302,8 +302,7 @@ class FAU_CRIS
                 do_settings_sections('fau_cris_options');
                 if (isset($current) && $current == 'sync'
                 && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
-                    echo '<a href="?page=options-fau-cris&tab=sync&action=cris_sync" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;" ><span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . __('Jetzt synchronisieren', 'fau-cris') . '</a>';
-                }
+                    echo '<a href="' . esc_url( '?page=options-fau-cris&tab=sync&action=cris_sync' ) . '" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;"> <span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . esc_html( __('Jetzt synchronisieren', 'fau-cris') ) . '</a>'; }
                 submit_button();
                 ?>
             </form>
@@ -773,34 +772,47 @@ class FAU_CRIS
         }
         if ($name == 'cris_sync_check') {
             print "<p>";
-            printf(__('%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3s Benutzerhandbuch! %3s', 'fau-cris'), '<strong>', '</strong>', '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/">', '</a>');
+            printf(
+            esc_html__( '%1$s Wichtig! %2$s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3$s Benutzerhandbuch! %4$s', 'fau-cris' ),
+            '<strong>',
+            '</strong>',
+            '<a href="' . esc_url( 'https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/' ) . '">',
+            '</a>'
+                );
             print "<p>";
         }
         if (array_key_exists('options', $args)) {
             $checks = $args['options'];
             foreach ($checks as $_k => $_v) { ?>
                 <label>
-                    <input name="<?php printf('%s[' . $name . '][' . $_k . ']', self::option_name); ?>"
-                        type='checkbox'
-                        value='1'
-                        <?php
-                        if (array_key_exists($name, $options) && array_key_exists($_k, $options[$name])) {
-                            print checked($options[$name][ $_k], 1, false);
-                        }
+                    <input 
+                        name="<?php echo esc_attr( sprintf('%s[%s][%s]', self::option_name, $name, $_k ) ); ?>" 
+                        type="checkbox" 
+                        value="1"
+                        <?php 
+                        if (isset($options[$name][$_k])) { 
+                            echo checked($options[$name][$_k], 1, false); 
+                        } 
                         ?>
                     >
-                    <?php print $_v; ?>
+                    <?php echo esc_html( $_v ); ?>
                 </label><br />
             <?php }
         } else { ?>
-            <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
-            if (array_key_exists($name, $options)) {
-                print checked($options[$name], 1, false);
-            }
-            ?> >
-            <?php if (isset($description)) { ?>
-                <span class="description"><?php echo $description; ?></span></label>
-            <?php }
+            <label>
+                <input 
+                    name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>" 
+                    type="checkbox" 
+                    value="1" 
+                    <?php
+                    if (isset($options[$name])) {
+                        echo checked($options[$name], 1, false);
+                    }
+                    ?> >
+                <?php if (isset($description)) { ?>
+                    <span class="description"><?php echo esc_html( $description ); ?></span>
+                <?php } ?>
+            </label>
         }
     }
 
@@ -819,20 +831,21 @@ class FAU_CRIS
         }
         foreach ($radios as $_k => $_v) { ?>
             <label>
-                <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>"
-                   type='radio'
-                   value='<?php print $_k; ?>'
-                   <?php
-                    if (array_key_exists($name, $options)) {
-                        checked($options[$name], $_k);
-                    } ?>
-                >
-                <?php print $_v; ?>
+                <input 
+                    name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>" 
+                    type="radio" 
+                    value="<?php echo esc_attr( $_k ); ?>" 
+                    <?php 
+                    if (isset($options[$name])) { 
+                        checked($options[$name], $_k); 
+                    } 
+                    ?> >
+                <?php echo esc_html( $_v ); ?>
             </label><br />
         <?php }
 
         if (isset($description)) { ?>
-            <p class="description"><?php echo $description; ?></p>
+            <p class="description"><?php echo esc_html($description); ?></p>
         <?php }
     }
 
@@ -849,19 +862,19 @@ class FAU_CRIS
         if (array_key_exists('options', $args)) {
             $limit = $args['options'];
         } ?>
-        <select name="<?php printf('%s[' . $name . ']', self::option_name); ?>">
-        <?php foreach ($limit as $_k => $_v) { ?>
-            <option value='<?php print $_k; ?>'
-                <?php if (array_key_exists($name, $options)) {
-                    selected($options[$name], $_k);
-                } ?>>
-                    <?php print $_v; ?>
-            </option>
-        <?php } ?>
+        <select name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>">
+            <?php foreach ($limit as $_k => $_v) { ?>
+                <option value="<?php echo esc_attr( $_k ); ?>" 
+                    <?php if (isset($options[$name])) { 
+                        selected($options[$name], $_k); 
+                    } ?>>
+                    <?php echo esc_html( $_v ); ?>
+                </option>
+            <?php } ?>
         </select>
         <?php
         if (isset($description)) { ?>
-            <p class="description"><?php echo $description; ?></p>
+            <p class="description"><?php echo esc_html($description); ?></p>
         <?php }
     }
 
@@ -876,15 +889,15 @@ class FAU_CRIS
             $description = esc_attr($args['description']);
         }
         ?>
-        <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='text' value="<?php
-        if (array_key_exists($name, $options)) {
-            echo $options[$name];
-        }
-        ?>" ><br />
-               <?php if (isset($description)) { ?>
-            <span class="description"><?php echo $description; ?></span>
-                    <?php
-               }
+       <input 
+            name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>" 
+            type="text" 
+            value="<?php echo esc_attr( isset($options[$name]) ? $options[$name] : '' ); ?>"
+            > <br />
+
+            <?php if (isset($description)) { ?>
+                <span class="description"><?php echo esc_html( $description ); ?></span>
+            <?php } ?>
     }
 
     // Textarea
@@ -899,19 +912,26 @@ class FAU_CRIS
             $description = esc_attr($args['description']);
         }
         ?>
-        <textarea name="<?php printf('%s[' . $name . ']', self::option_name); ?>" cols="30" rows="8"><?php
-        if (array_key_exists($name, $options)) {
-            if (is_array($options[$name]) && count($options[$name])>0 && $options[$name][0] !='') {
-                echo implode("\n", $options[$name]);
-            } else {
-                echo implode("\n", $default_options[$name]);
-            }
-        }
-        ?></textarea><br />
+       <textarea 
+                name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>" 
+                cols="30" 
+                rows="8"
+            >
+                <?php
+                if (array_key_exists($name, $options)) {
+                    if (is_array($options[$name]) && count($options[$name]) > 0 && $options[$name][0] != '') {
+                        echo esc_textarea( implode("\n", $options[$name]) );
+                    } else {
+                        echo esc_textarea( implode("\n", $default_options[$name]) );
+                    }
+                }
+                ?>
+            </textarea><br />
+
         <?php if (isset($description)) { ?>
-            <span class="description"><?php echo $description; ?></span>
-            <?php
-        }
+            <span class="description"><?php echo esc_html( $description ); ?></span>
+        <?php } ?>
+
     }
 
     /**

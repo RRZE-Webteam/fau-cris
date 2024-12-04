@@ -33,7 +33,7 @@ class Filter
             // force lower case statements
             $_op = explode('__', strtolower($_k));
             if (count($_op) != 2) {
-                throw new Exception('invalid filter operator: '. $_k);
+                throw new Exception('invalid filter operator: '. esc_html($_k));
             }
 
             if (!array_key_exists($_op[0], $filterlist)) {
@@ -111,7 +111,7 @@ class Filter
             case "gt":
                 return ($value > $reference);
             default:
-                throw new Exception('invalid compare operator: '. $operator);
+                throw new Exception('invalid compare operator: '. esc_html($operator));
         }
     }
 }

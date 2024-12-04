@@ -1762,6 +1762,11 @@ if (!debug_backtrace()) {
     $formatter = new Formatter(null, null, $order, SORT_DESC);
     $res = $formatter->execute($publs);
     foreach ($res[$order] as $key => $value) {
-        echo sprintf("%s: %s\n", $key, $value->attributes[$order]);
-    }
+        // Escape the key and the value before printing them
+            echo sprintf(
+                "%s: %s\n", 
+                esc_html($key), 
+                esc_html($value->attributes[$order])
+            );
+        }
 }
