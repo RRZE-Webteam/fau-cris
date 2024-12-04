@@ -1012,22 +1012,30 @@ class Projekte
             }
             }
 
-            if (!in_array('leader', $hide)) {
-            $leaderIDs = explode(",", $project['relpersidlead']);
+            if (!in_array('leader', $hide) || !in_array('card', $hide)) {
+                  $leaderIDs = explode(",", $project['relpersidlead']);
                   $leaderArray = $this->get_project_leaders($id, $leaderIDs);
                   $leaders = array();
+                //   $learde_kontakt_card=array();
+                  $learde_kontakt_card = '<div class="person-card">';
                   foreach ($leaderArray as $l_id => $l_names) {
                   $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                  $fcid = Tools::person_exists('wp', 'Manfred', 'Pirner');
-                //   print_r($fcid);
-                //   die();
-
+                  $fcid = Tools::person_exists($this->cms, $l_names['firstname'], $l_names['lastname'],$this->univis);
+                  if (!empty($fcid)) {
+                    $shortcode = '[kontakt id="'.$fcid.'"  format="card" class="card-xsmall shrink-contact"]';
+                    $learde_kontakt_card .= $shortcode;
                   }
+                
+                  }
+                  $learde_kontakt_card .= '</div>';
 
-                  if (isset($leaders) && !empty($leaders)) {
+                  if (isset($leaders) && !empty($leaders) && !in_array('leader', $hide)) {
                     $projlist .= "<strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
-                    $projlist .= implode(', ', $leaders) . '<br />';
+                    $projlist .= implode(', ', $leaders) . '<br />';   
                 }
+                if (isset($learde_kontakt_card) && !empty($learde_kontakt_card) && !in_array('card', $hide)) {
+                        $projlist .= $learde_kontakt_card. '<br />';
+                    }
             }
             
             if (!in_array('abstract', $hide) && !empty($description)) {
@@ -1044,6 +1052,13 @@ class Projekte
         return do_shortcode($projlist);
     }
 
+    function my_plugin_inline_css() {
+        echo '<style>
+        .person-card {
+            justify-content: flex-start !important;
+        }
+        </style>';
+    }
     public function fieldProj($field,$param=array(), $return = 'list', $seed = false)
     {
 
@@ -1092,7 +1107,7 @@ class Projekte
         return $output;
     }
 
-    public function fieldPersons($field)
+    public function fieldPersons($field,$param=array())
     {
         $ws = new CRIS_projects();
         try {
@@ -1103,6 +1118,11 @@ class Projekte
         if (!count($projArray)) {
             return;
         }
+
+        if ($param['projects_status'] !== '' || $param['projects_start'] !== ''){
+            $projArray=Tools::field_project_status_filter($projArray,$param['projects_status'],$param['projects_start']);
+        }
+
         $persList = array();
         foreach ($projArray as $project) {
             $project = (array) $project;

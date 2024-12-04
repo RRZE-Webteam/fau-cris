@@ -317,8 +317,8 @@ class Forschungsbereiche
 
             if (!in_array('persons', $hide)
                 && !is_array($param['field'])) {
-                $persons = $this->get_field_persons($id);
-                if (!is_wp_error($persons)) {
+                $persons = $this->get_field_persons($id,$param);
+                if (!is_wp_error($persons) && count($persons) > 0) {
                     $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
                     $singlefield .= "<ul>";
                     foreach ($persons ?? [] as $p_id => $person) {
@@ -429,6 +429,13 @@ class Forschungsbereiche
                     $field_details['#project_publications#'] = $project_publications;
                 }
             }
+            // $field_details['#publications_incl_projects#'] = '';
+            // if (strpos($content, '#publications_incl_projects#') !== false) {
+            //     $project_publications = $this->get_field_publications($param, 'field_incl_proj');
+            //     if ($project_publications) {
+            //         $field_details['#publications_incl_projects#'] = $project_publications;
+            //     }
+            // }
             $field_details['#image1#'] = '';
             $field_details['#images#'] = '';
             if (strpos($content, '#image') !== false) {
@@ -493,13 +500,13 @@ class Forschungsbereiche
         }
     }
 
-    private function get_field_persons($field = null)
+    private function get_field_persons($field = null,$param=array())
     {
         $liste = new Projekte('field', $field, $this->sc_lang);
         if (isset($liste->error) && is_wp_error($liste->error)) {
             return $liste->error->get_error_message();
         } else {
-            return $liste->fieldPersons($field);
+            return $liste->fieldPersons($field,$param);
         }
     }
 

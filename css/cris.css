@@ -187,3 +187,7 @@ div p{
         display: none !important;
     }
 }
+.person-card {
+    justify-content: flex-start !important; /* Overriding justify-content to left (flex-start) */
+    padding: 20px;
+}

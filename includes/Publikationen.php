@@ -28,13 +28,16 @@ class Publikationen
     public $nameorder; 
     public $page_lang; 
     public $sc_lang; 
-    public $langdiv_open; 
+    public $langdiv_open;
     public $langdiv_close; 
     public $einheit; 
     public $error; 
     public $cris_pub_title_link_order;
     public function __construct($einheit = '', $id = '', $nameorder = '', $page_lang = 'de', $sc_lang = 'de')
     {
+
+
+        
         if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
@@ -59,6 +62,8 @@ class Publikationen
             $this->univis = Tools::get_univis();
         }
 
+
+       
         if (strlen(trim($nameorder))) {
             $this->nameorder = $nameorder;
         } else {
@@ -72,7 +77,7 @@ class Publikationen
             $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
         }
 
-        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field"))) {
+        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field","field_incl_proj"))) {
             $this->einheit = $einheit;
         } else {
             $this->einheit = "orga";
@@ -84,6 +89,9 @@ class Publikationen
                 __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
             );
         }
+
+
+
     }
 
     /**
@@ -168,7 +176,7 @@ class Publikationen
         $project = ''
     ): string {
         // Extracting parameters from the $param array
-
+        error_log(sprintf("pubNachJahr, field %s",$field));
         $year = $param['year'] ?: ''; // The year of publication
         $start = $param['start'] ?: ''; // The start of year from where publication is needed
         $end = $param['end'] ?: ''; // The end of year from where publication is needed
@@ -183,7 +191,15 @@ class Publikationen
         $language = $param['language'] ?: '';
         $sortby = $param['sortby'] ?: 'virtualdate';
         $authorPositionArray=$param['author_position'];
-
+        $muteheadings = $param['muteheadings'] ?? 0; 
+        // it will use for showing number of publication by year or in total
+        $total_publication_html='';
+        if (!is_array($param['publicationsum'])) {
+            $publicationSumArray=array($param['publicationsum']);
+        }else{
+            $publicationSumArray=$param['publicationsum'];
+        }
+        
         // fetching the publication
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray );
 
@@ -220,18 +236,33 @@ class Publikationen
         $output = '';
         $showsubtype = ($subtype == '') ? 1 : 0;
 
-        if (shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion'){
+            
+            $total_number_publication_in_accordion=0;
             $shortcode_data = '';
-            if (empty($year) || strpos($year, ',') !== false) {
+            if ((empty($year) || strpos($year, ',') !== false) && ($muteheadings!=1))
+             {
                 $openfirst = ' load="open"';
                 $expandall = ' expand-all-link="true"';
             } else {
                 $openfirst = '';
                 $expandall = '';
             }
+
             foreach ($pubList as $array_year => $publications) {
                 $shortcode_data_inner = '';
+                $number_of_pub_in_accordion=count($publications);
                 $pubSubList = $subformatter->execute($publications);
+
+
+
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html_in_accordion = '  '.'('. $number_of_pub_in_accordion .' '.'Publications'. ')';
+                }
+                else{
+                    $subtotal_publication_html_in_accordion='';
+                }
+
                 foreach ($pubSubList as $array_subtype => $publications_sub) {
                     if ($order2 == 'type') {
                         $shortcode_data_inner .= "<h4>";
@@ -249,15 +280,34 @@ class Publikationen
                         }
                     }
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year.$subtotal_publication_html_in_accordion . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
                 $openfirst = '';
+                $total_number_publication_in_accordion += count($publications);
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
+
+            // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
+            }
+
         } else {
+            
+            
+            $total_number_publication=0;
             foreach ($pubList as $array_year => $publications) {
-                if (empty($year)) {
-                    $output .= '<h3>' . $array_year . '</h3>';
+                $number_of_pub=count($publications);
+
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
                 }
+                else{
+                    $subtotal_publication_html='';
+                }
+                if (empty($year)  && ($muteheadings!=1)) {
+                    $output .= '<h3>' . $array_year . $subtotal_publication_html .'</h3>';
+                }
+                
                 $pubSubList = $subformatter->execute($publications);
                 foreach ($pubSubList as $array_subtype => $publications_sub) {
                     // Zwischenüberschrift
@@ -277,9 +327,15 @@ class Publikationen
                         }
                     }
                 }
+                $total_number_publication += $number_of_pub;
             }
+            // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
+            }
+
         }
-        return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $total_publication_html .$output . $this->langdiv_close;
     }
     //End ::pubNachJahr
 
@@ -317,6 +373,14 @@ class Publikationen
         $sortorder =  $param['sortorder'] ?: SORT_DESC;
         $authorPositionArray=$param['author_position'];
 
+         // it will use for showing number of publication by year or in total
+        $total_publication_html='';
+        if (!is_array($param['publicationsum'])) {
+            $publicationSumArray=array($param['publicationsum']);
+        }else{
+            $publicationSumArray=$param['publicationsum'];
+        }
+
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray);
         
 
@@ -346,6 +410,7 @@ class Publikationen
         $output = '';
 
         if (shortcode_exists('collapsibles') && $format == 'accordion') {
+            $total_number_publication_in_accordion=0;
             $shortcode_data = '';
             if (!empty($type) && strpos($type, ',') !== false) {
                 $openfirst = ' load="open"';
@@ -361,6 +426,16 @@ class Publikationen
                 $shortcode_data_other = '';
                 // Weitrere Untergliederung für Subtypen
                 $subtypeorder = $this->subtypeorder;
+                //count total number of publication in pub type
+                $number_of_pub_in_accordion=count($publications);
+
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html_in_accordion = '  '.'('. $number_of_pub_in_accordion .' '.'Publications'. ')';
+                }
+                else{
+                    $subtotal_publication_html_in_accordion='';
+                }
+
                 if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
                     foreach ($subtypeorder as $key => $value) {
                         $subtypeorder[$key] = Tools::getType('publications', $value, $array_type);
@@ -401,21 +476,40 @@ class Publikationen
                         $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display']);
                     }
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title. $subtotal_publication_html_in_accordion .  '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
                 $openfirst = '';
+
+                 $total_number_publication_in_accordion += $number_of_pub_in_accordion;
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
+
+            // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
+            }
+
         } else {
             foreach ($pubList as $array_type => $publications) {
+                $total_number_publication=0;
+                 $number_of_pub=count($publications);
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
+                }
+                else{
+                    $subtotal_publication_html='';
+                }
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                 if (empty($type) || strpos($type, '-') === 0 || strpos($type, ',') !== false) {
                     $title = Tools::getTitle('publications', $array_type, $param['display_language']);
                     if (!shortcode_exists('collapsibles') || $format != 'accordion') {
                         $output .= "<h3>";
-                        $output .= $title;
+                        $output .= $title.$subtotal_publication_html;
                         $output .= "</h3>";
                     }
                 }
+
+                 
+
                 // Weitrere Untergliederung (Subtypen)
                 $subtypeorder = $this->subtypeorder;
                 if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
@@ -462,9 +556,14 @@ class Publikationen
                         }
                     }
                 }
+                $total_number_publication += $number_of_pub;
+            }
+             // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
             }
         }
-        return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $total_publication_html . $output . $this->langdiv_close;
     }
 
     // End::pubNachTyp
@@ -584,6 +683,7 @@ class Publikationen
         $param = array(),
         $seed = false
     ): string {
+
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
@@ -609,6 +709,12 @@ class Publikationen
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
+        
+        if ($this->einheit == 'field_incl_proj') {
+          $sortby = 'relauthors';
+          $orderby = 'relauthors';
+        }
+
         $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
@@ -732,8 +838,8 @@ class Publikationen
             if ($this->einheit === "project") {
                 $pubArray = $ws->by_project($this->id, $filter, $notable);
             }
-            if ($this->einheit === "field" || $this->einheit === "field_proj") {
-                $pubArray = $ws->by_field($field, $filter, $fsp, $this->einheit);
+            if ($this->einheit === "field" || $this->einheit === "field_proj" || $this->einheit === "field_incl_proj") {
+                $pubArray = $ws->by_field($this->id, $filter, $fsp, $this->einheit);
             }
             if ($this->einheit === "publication") {
                 $pubArray = $ws->by_id($this->id);
@@ -1480,22 +1586,30 @@ class CRIS_publications extends Webservice
         }
 
         $requests = array();
+        $retaions = array();
         switch ($entity) {
             case 'field_proj':
-                $relation = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
+                $relations[] = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
                 break;
             case 'field_notable':
-                $relation = 'FOBE_has_cur_PUBL';
+                $relations[] = 'FOBE_has_cur_PUBL';
+                break;
+            case 'field_incl_proj':
+                $relations[] = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
+                $relations[] = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ'; 
                 break;
             case 'field':
             default:
-                $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
-        }
-
+                $relations[] = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
+        }   
         foreach ($fieldID as $_p) {
-            $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $relation;
-        }
-        return $this->retrieve($requests, $filter);
+            foreach ($relations as $_r) {
+                $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $_r;
+            }
+    }
+    $publs=$this->retrieve($requests, $filter);
+    
+    return $publs;
     }
 
     public function by_equipment($equiID = null, &$filter = null): array
