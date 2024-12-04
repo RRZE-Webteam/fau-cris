@@ -9,7 +9,7 @@ class Filter
      */
     public $filters;
     public $skip;
-
+    public $error;
 
     public function __construct($definitions)
     {
@@ -33,7 +33,12 @@ class Filter
             // force lower case statements
             $_op = explode('__', strtolower($_k));
             if (count($_op) != 2) {
-                throw new Exception('invalid filter operator: '. esc_html($_k));
+                // Return a WP_Error object instead of throwing an exception
+               $this->error = new \WP_Error(
+                'invalid-filter-operator',
+                sprintf(__('Invalid type filter operator:', 'fau-cris'), $_k)
+            );
+            return $this->error;
             }
 
             if (!array_key_exists($_op[0], $filterlist)) {
