@@ -532,6 +532,7 @@ class Forschungsbereiche
         $args['order2']=$param['order2'];
         $args['sortby']=$param['sortby'];
         $args['author_position']=$param['author_position'];
+        $args['publicationsum']=$param['publicationsum'];
         if ($param['publications_orderby'] == 'year') {
             return $liste->pubNachJahr($args, $param['field'], '', $param['fsp']);
         }
