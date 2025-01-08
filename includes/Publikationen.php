@@ -966,7 +966,7 @@ class Publikationen
 
             if (!empty($publication['doi'])) {
 
-                $doilink=FAU_CRIS::doi . (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris'));
+                $doilink=FAU_CRIS::doi . (array_key_exists('doi', $publication) ? wp_strip_all_tags($publication['doi']) : __('O.A.', 'fau-cris'));
             }
             else{
                 $doilink='';
@@ -974,15 +974,15 @@ class Publikationen
 
             $pubTitlePrioLinks=array (
                 'doi_link'=>$doilink,
-                'OAlink'=>(array_key_exists('openaccesslink', $publication) ? strip_tags($publication['openaccesslink']) : ''),
-                'URI'=>(array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+                'OAlink'=>(array_key_exists('openaccesslink', $publication) ? wp_strip_all_tags($publication['openaccesslink']) : ''),
+                'URI'=>(array_key_exists('cfuri', $publication) ? wp_strip_all_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
                 );
 
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
-                $title = strip_tags($publication['originalauthors']) . ': ';
+                $title = wp_strip_all_tags($publication['originalauthors']) . ': ';
             }
-            $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
+            $title .= (array_key_exists('cftitle', $publication) ? wp_strip_all_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
             $link=Tools::get_first_available_link($this->cris_pub_title_link_order,$pubTitlePrioLinks,$title,$id,$post->ID,$lang);
             $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
@@ -998,34 +998,34 @@ class Publikationen
                 'id' => $id,
                 'authors' => $authors_html,
                 'title' => $title_html,
-                'city' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
-                'publisher' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
-                'year' => (array_key_exists('publyear', $publication) ? strip_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
-                'pubType' => (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? strip_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? strip_tags($publication['publication type']) : __('O.A.', 'fau-cris')),
-                'pubStatus' => (array_key_exists('publstatus', $publication) ? strip_tags($publication['publstatus']) : ''),
-                'pagesTotal' => (array_key_exists('cftotalpages', $publication) ? strip_tags($publication['cftotalpages']) : ''),
-                'pagesRange' => (array_key_exists('pagesrange', $publication) ? strip_tags($publication['pagesrange']) : ''),
-                'lexiconColumn' => (array_key_exists('lexiconcolumn', $publication) ? strip_tags($publication['lexiconcolumn']) : ''),
-                'volume' => (array_key_exists('cfvol', $publication) ? strip_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
-                'series' => (array_key_exists('cfseries', $publication) ? strip_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
-                'seriesNumber' => !empty($publication['book volume']) ? strip_tags($publication['book volume']) : '',
-                'ISBN' => (array_key_exists('cfisbn', $publication) ? strip_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
-                'ISSN' => (array_key_exists('cfissn', $publication) ? strip_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
-                'DOI' => (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris')),
-                'OA' => (array_key_exists('openaccess', $publication) ? strip_tags($publication['openaccess']) : false),
-                'OAlink' => (array_key_exists('openaccesslink', $publication) ? strip_tags($publication['openaccesslink']) : ''),
-                'URI' => (array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
-                'editiors' => (array_key_exists('editor', $publication) ? strip_tags($publication['editor']) : __('O.A.', 'fau-cris')),
-                'booktitle' => (array_key_exists('edited volumes', $publication) ? strip_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
-                'journaltitle' => (array_key_exists('journalname', $publication) ? strip_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
-                'eventtitle' => (array_key_exists('event title', $publication) ? strip_tags($publication['event title']) : ''),
-                'eventlocation' => (array_key_exists('event location', $publication) ? strip_tags($publication['event location']) : ''),
+                'city' => (array_key_exists('cfcitytown', $publication) ? wp_strip_all_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
+                'publisher' => (array_key_exists('publisher', $publication) ? wp_strip_all_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
+                'year' => (array_key_exists('publyear', $publication) ? wp_strip_all_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
+                'pubType' => (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? wp_strip_all_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? wp_strip_all_tags($publication['publication type']) : __('O.A.', 'fau-cris')),
+                'pubStatus' => (array_key_exists('publstatus', $publication) ? wp_strip_all_tags($publication['publstatus']) : ''),
+                'pagesTotal' => (array_key_exists('cftotalpages', $publication) ? wp_strip_all_tags($publication['cftotalpages']) : ''),
+                'pagesRange' => (array_key_exists('pagesrange', $publication) ? wp_strip_all_tags($publication['pagesrange']) : ''),
+                'lexiconColumn' => (array_key_exists('lexiconcolumn', $publication) ? wp_strip_all_tags($publication['lexiconcolumn']) : ''),
+                'volume' => (array_key_exists('cfvol', $publication) ? wp_strip_all_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
+                'series' => (array_key_exists('cfseries', $publication) ? wp_strip_all_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
+                'seriesNumber' => !empty($publication['book volume']) ? wp_strip_all_tags($publication['book volume']) : '',
+                'ISBN' => (array_key_exists('cfisbn', $publication) ? wp_strip_all_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
+                'ISSN' => (array_key_exists('cfissn', $publication) ? wp_strip_all_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
+                'DOI' => (array_key_exists('doi', $publication) ? wp_strip_all_tags($publication['doi']) : __('O.A.', 'fau-cris')),
+                'OA' => (array_key_exists('openaccess', $publication) ? wp_strip_all_tags($publication['openaccess']) : false),
+                'OAlink' => (array_key_exists('openaccesslink', $publication) ? wp_strip_all_tags($publication['openaccesslink']) : ''),
+                'URI' => (array_key_exists('cfuri', $publication) ? wp_strip_all_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+                'editiors' => (array_key_exists('editor', $publication) ? wp_strip_all_tags($publication['editor']) : __('O.A.', 'fau-cris')),
+                'booktitle' => (array_key_exists('edited volumes', $publication) ? wp_strip_all_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
+                'journaltitle' => (array_key_exists('journalname', $publication) ? wp_strip_all_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
+                'eventtitle' => (array_key_exists('event title', $publication) ? wp_strip_all_tags($publication['event title']) : ''),
+                'eventlocation' => (array_key_exists('event location', $publication) ? wp_strip_all_tags($publication['event location']) : ''),
                 'eventstart_raw' => !empty($publication['event start date']) ? $publication['event start date'] : (!empty($publication['publyear']) ? $publication['publyear'] : '-----'),
                 'eventend_raw' => (!empty($publication['event end date']) ? $publication['event end date'] : ''),
-                'eventstart' => !empty($publication['event start date']) ? date_i18n(get_option('date_format'), strtotime(strip_tags($publication['event start date']))) : '',
-                'eventend' => (!empty($publication['event end date']) ? date_i18n(get_option('date_format'), strtotime(strip_tags($publication['event end date']))) : ''),
-                'origTitle' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
-                'language' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
+                'eventstart' => !empty($publication['event start date']) ? date_i18n(get_option('date_format'), strtotime(wp_strip_all_tags($publication['event start date']))) : '',
+                'eventend' => (!empty($publication['event end date']) ? date_i18n(get_option('date_format'), strtotime(wp_strip_all_tags($publication['event end date']))) : ''),
+                'origTitle' => (array_key_exists('originaltitel', $publication) ? wp_strip_all_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
+                'language' => (array_key_exists('language', $publication) ? wp_strip_all_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 'bibtex_link' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
                 'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
                 'thesisSubtype' => (array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
@@ -1334,16 +1334,16 @@ class Publikationen
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
-                $title = strip_tags($publication['originalauthors']) . ': ';
+                $title = wp_strip_all_tags($publication['originalauthors']) . ': ';
             }
-            $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
+            $title .= (array_key_exists('cftitle', $publication) ? wp_strip_all_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
             $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
                 . "<a href=\"" . Tools::get_item_url("publications", $title, $id, $post->ID, $lang) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                 . $title
                 . "</a></strong></span>";
             //pubType
-            $pubTypeRaw = (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? strip_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? strip_tags($publication['publication type']) : __('O.A.', 'fau-cris'));
+            $pubTypeRaw = (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? wp_strip_all_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? wp_strip_all_tags($publication['publication type']) : __('O.A.', 'fau-cris'));
 
             $pubType = Tools::getName('publications', $pubTypeRaw, $lang);
             // make array
@@ -1353,32 +1353,32 @@ class Publikationen
                 '#author#' => $authors_html,
                 '#title#' => $title,
                 '#url#' => Tools::get_item_url("publications", $title, $id, $post->ID, $lang),
-                '#city#' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
-                '#publisher#' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
-                '#year#' => (array_key_exists('publyear', $publication) ? strip_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
+                '#city#' => (array_key_exists('cfcitytown', $publication) ? wp_strip_all_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
+                '#publisher#' => (array_key_exists('publisher', $publication) ? wp_strip_all_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
+                '#year#' => (array_key_exists('publyear', $publication) ? wp_strip_all_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
                 '#pubType#' => $pubType,
-                '#pubStatus#' => (array_key_exists('publstatus', $publication) ? strip_tags($publication['publstatus']) : ''),
-                '#pagesTotal#' => (array_key_exists('cftotalpages', $publication) ? strip_tags($publication['cftotalpages']) : ''),
-                '#pagesRange#' => (array_key_exists('pagesrange', $publication) ? strip_tags($publication['pagesrange']) : ''),
-                '#lexiconColumn#' => (array_key_exists('lexiconcolumn', $publication) ? strip_tags($publication['lexiconcolumn']) : ''),
-                '#volume#' => (array_key_exists('cfvol', $publication) ? strip_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
-                '#series#' => (array_key_exists('cfseries', $publication) ? strip_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
-                '#seriesNumber#' => !empty($publication['book volume']) ? strip_tags($publication['book volume']) : '',
-                '#ISBN#' => (array_key_exists('cfisbn', $publication) ? strip_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
-                '#ISSN#' => (array_key_exists('cfissn', $publication) ? strip_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
-                '#DOI#' => (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris')),
-                '#URI#' => (array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
-                '#editors#' => (array_key_exists('editor', $publication) ? strip_tags($publication['editor']) : __('O.A.', 'fau-cris')),
-                '#bookTitle#' => (array_key_exists('edited volumes', $publication) ? strip_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
-                '#journalTitle#' => (array_key_exists('journalname', $publication) ? strip_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
-                '#eventTitle#' => (array_key_exists('event title', $publication) ? strip_tags($publication['event title']) : ''),
-                '#eventLocation#' => (array_key_exists('event location', $publication) ? strip_tags($publication['event location']) : ''),
+                '#pubStatus#' => (array_key_exists('publstatus', $publication) ? wp_strip_all_tags($publication['publstatus']) : ''),
+                '#pagesTotal#' => (array_key_exists('cftotalpages', $publication) ? wp_strip_all_tags($publication['cftotalpages']) : ''),
+                '#pagesRange#' => (array_key_exists('pagesrange', $publication) ? wp_strip_all_tags($publication['pagesrange']) : ''),
+                '#lexiconColumn#' => (array_key_exists('lexiconcolumn', $publication) ? wp_strip_all_tags($publication['lexiconcolumn']) : ''),
+                '#volume#' => (array_key_exists('cfvol', $publication) ? wp_strip_all_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
+                '#series#' => (array_key_exists('cfseries', $publication) ? wp_strip_all_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
+                '#seriesNumber#' => !empty($publication['book volume']) ? wp_strip_all_tags($publication['book volume']) : '',
+                '#ISBN#' => (array_key_exists('cfisbn', $publication) ? wp_strip_all_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
+                '#ISSN#' => (array_key_exists('cfissn', $publication) ? wp_strip_all_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
+                '#DOI#' => (array_key_exists('doi', $publication) ? wp_strip_all_tags($publication['doi']) : __('O.A.', 'fau-cris')),
+                '#URI#' => (array_key_exists('cfuri', $publication) ? wp_strip_all_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+                '#editors#' => (array_key_exists('editor', $publication) ? wp_strip_all_tags($publication['editor']) : __('O.A.', 'fau-cris')),
+                '#bookTitle#' => (array_key_exists('edited volumes', $publication) ? wp_strip_all_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
+                '#journalTitle#' => (array_key_exists('journalname', $publication) ? wp_strip_all_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
+                '#eventTitle#' => (array_key_exists('event title', $publication) ? wp_strip_all_tags($publication['event title']) : ''),
+                '#eventLocation#' => (array_key_exists('event location', $publication) ? wp_strip_all_tags($publication['event location']) : ''),
                 '#eventstart_raw#' => !empty($publication['event start date']) ? $publication['event start date'] : (!empty($publication['publyear']) ? $publication['publyear'] : '-----'),
                 '#eventend_raw#' => (!empty($publication['event end date']) ? $publication['event end date'] : ''),
-                '#eventStart#' => !empty($publication['event start date']) ? date_i18n(get_option('date_format'), strtotime(strip_tags($publication['event start date']))) : '',
-                '#eventEnd#' => (!empty($publication['event end date']) ? date_i18n(get_option('date_format'), strtotime(strip_tags($publication['event end date']))) : ''),
-                '#originalTitle#' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
-                '#language#' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
+                '#eventStart#' => !empty($publication['event start date']) ? date_i18n(get_option('date_format'), strtotime(wp_strip_all_tags($publication['event start date']))) : '',
+                '#eventEnd#' => (!empty($publication['event end date']) ? date_i18n(get_option('date_format'), strtotime(wp_strip_all_tags($publication['event end date']))) : ''),
+                '#originalTitle#' => (array_key_exists('originaltitel', $publication) ? wp_strip_all_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
+                '#language#' => (array_key_exists('language', $publication) ? wp_strip_all_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 '#bibtexLink#' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
                 '#subtype#' => (array_key_exists('subtype', $publication) ? $publication['subtype'] : ''),
                 '#articleNumber#' => (array_key_exists('article number', $publication) ? $publication['article number'] : ''),

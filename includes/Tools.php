@@ -383,8 +383,8 @@ public static function sortByKey(array &$array, string $key): void {
         $filter = array();
         if ($year !== '' && $year !== null) {
             if ($year == 'current') {
-                $filter['startyear__le'] = date('Y');
-                $filter['endyear__ge'] = date('Y');
+                $filter['startyear__le'] = gmdate('Y');
+                $filter['endyear__ge'] = gmdate('Y');
             } else {
                 $filter['endyear__ge'] = $year;
                 $filter['startyear__le'] = $year;
@@ -419,7 +419,7 @@ public static function sortByKey(array &$array, string $key): void {
             } else {
                 $arrStatus = (array) $status;
             }
-            $today = date('Y-m-d');
+            $today = gmdate('Y-m-d');
             $statusSet = ['completed', 'current', 'future'];
             if (array_intersect($arrStatus, $statusSet) == ['completed']) {
                 $filter['virtualenddate__lt'] = $today;

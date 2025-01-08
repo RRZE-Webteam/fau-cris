@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.25.0
+ * Version: 3.25.1
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.25.0';
+    const version = '3.25.1';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -133,16 +133,26 @@ class FAU_CRIS
         wp_clear_scheduled_hook('cris_auto_update');
     }
 
+
     private static function version_compare(): void
     {
-        $error = '';
+        $error = '';       
+            if (version_compare(PHP_VERSION, self::php_version, '<')) {
 
-        if (version_compare(PHP_VERSION, self::php_version, '<')) {
-            $error = sprintf(__('Ihre PHP-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die PHP-Version %s.', 'fau-cris'), PHP_VERSION, self::php_version);
-        }
+                $error = sprintf(
+                    /* translators: 1: current PHP version, 2: required PHP version */
+                    __('Ihre PHP-Version %1$s ist veraltet. Bitte aktualisieren Sie mindestens auf die PHP-Version %2$s.', 'fau-cris'),
+                    PHP_VERSION,
+                    self::php_version
+                );
+            }
+
+
 
         if (version_compare($GLOBALS['wp_version'], self::wp_version, '<')) {
-            $error = sprintf(__('Ihre Wordpress-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die Wordpress-Version %s.', 'fau-cris'), $GLOBALS['wp_version'], self::wp_version);
+            $error = sprintf(
+                     /* translators: 1: current WordPress version, 2: required WordPress version */
+                __('Ihre Wordpress-Version %1$s ist veraltet. Bitte aktualisieren Sie mindestens auf die Wordpress-Version %2$s.', 'fau-cris'), $GLOBALS['wp_version'], self::wp_version);
         }
 
         if (!empty($error)) {
@@ -272,11 +282,11 @@ class FAU_CRIS
     /**
      * Options page callback
      */
-    public static function options_fau_cris(): void
+public static function options_fau_cris(): void
     {
         $tabs = self::options_page_tabs();
-        $current = self::current_tab($_GET);
-        if (isset($_GET['action']) && $_GET['action'] == 'cris_sync') {
+        $current = sanitize_text_field(wp_unslash(self::current_tab($_GET)));
+        if (isset($_GET['action']) && sanitize_text_field(wp_unslash($_GET['action'])) == 'cris_sync') {
             global $post;
             $page_lang = substr(get_locale(), 0, 2);
             $sync = new Sync($page_lang);
@@ -294,7 +304,7 @@ class FAU_CRIS
                 } ?>
             </h2>
             <?php if (isset($result)) {
-                print esc_html($result);
+                print(esc_html($result));
             } ?>
             <form method="post" action="options.php">
                 <?php
@@ -707,7 +717,7 @@ class FAU_CRIS
 
         $new_input = self::get_options();
         $default_options = self::default_options();
-        $parts = parse_url($_POST['_wp_http_referer']);
+        $parts = wp_parse_url($_POST['_wp_http_referer']);
         parse_str($parts['query'], $query);
         $tab = (array_key_exists('tab', $query)) ? $query['tab'] : 'general';
 
@@ -773,6 +783,7 @@ class FAU_CRIS
         if ($name == 'cris_sync_check') {
             print "<p>";
             printf(
+                /* translators: 1: strong tag, 2: strong tag, 3: link to user manual, 4: closing link tag */
             esc_html__( '%1$s Wichtig! %2$s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3$s Benutzerhandbuch! %4$s', 'fau-cris' ),
             '<strong>',
             '</strong>',
@@ -889,15 +900,15 @@ class FAU_CRIS
             $description = esc_attr($args['description']);
         }
         ?>
-       <input 
-            name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>" 
-            type="text" 
-            value="<?php echo esc_attr( isset($options[$name]) ? $options[$name] : '' ); ?>"
-            > <br />
-
-            <?php if (isset($description)) { ?>
-                <span class="description"><?php echo esc_html( $description ); ?></span>
-            <?php } ?>
+        <input name="<?php printf(esc_attr('%s[' . $name . ']', self::option_name)); ?>" type='text' value="<?php
+        if (array_key_exists($name, $options)) {
+            echo esc_attr($options[$name]);
+        }
+        ?>" ><br />
+               <?php if (isset($description)) { ?>
+            <span class="description"><?php echo esc_attr($description); ?></span>
+                    <?php
+               }
     }
 
     // Textarea
@@ -912,27 +923,21 @@ class FAU_CRIS
             $description = esc_attr($args['description']);
         }
         ?>
-       <textarea 
-                name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>" 
-                cols="30" 
-                rows="8"
-            >
-                <?php
-                if (array_key_exists($name, $options)) {
-                    if (is_array($options[$name]) && count($options[$name]) > 0 && $options[$name][0] != '') {
-                        echo esc_textarea( implode("\n", $options[$name]) );
-                    } else {
-                        echo esc_textarea( implode("\n", $default_options[$name]) );
-                    }
-                }
-                ?>
-            </textarea><br />
-
+        <textarea name="<?php printf(esc_attr('%s[' . $name . ']', self::option_name)); ?>" cols="30" rows="8"><?php
+        if (array_key_exists($name, $options)) {
+            if (is_array($options[$name]) && count($options[$name])>0 && $options[$name][0] !='') {
+                echo esc_attr(implode("\n", $options[$name]));
+            } else {
+                echo esc_attr(implode("\n", $default_options[$name]));
+            }
+        }
+        ?></textarea><br />
         <?php if (isset($description)) { ?>
-            <span class="description"><?php echo esc_html( $description ); ?></span>
-        <?php } ?>
-
+            <span class="description"><?php echo esc_attr($description); ?></span>
+            <?php
+        }
     }
+
 
     /**
      * Add Shortcodes

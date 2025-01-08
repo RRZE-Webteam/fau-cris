@@ -254,7 +254,7 @@ class Standardisierungen
             $stanDetails['#title#'] = htmlentities($standardization['title'], ENT_QUOTES);
             $stanDetails['#name#'] = htmlentities($standardization['title'], ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $standardization['abstract']);
-            $stanDetails['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $stanDetails['#description#'] = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $stanDetails['#documentNumber#'] = $standardization['document_number'];
             $stanDetails['#url#'] = $standardization['uri'];
             $stanDetails['#contributionTo#'] = $standardization['document_contribution'];
@@ -329,7 +329,7 @@ class Standardisierungen
 
             if (!in_array('description', (array)$hide)) {
                 $description = str_replace(["\n", "\t", "\r"], '', $standardization['abstract']);
-                $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+                $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
                 if ($description) {
                     $standardizationList .= "<div class=\"standardization-description\">" . $description . '</div>';
                 }
@@ -367,7 +367,7 @@ class Standardisierungen
                 }
             }
             if (!in_array('committee', $hide)) {
-                $standardizationList .= '<h4>' . __('Gremium') . '</h4>';
+                $standardizationList .= '<h4>' . __('Gremium','fau-cris') . '</h4>';
                 if (!in_array('organization', (array)$hide) && !empty($standardization['ws_organisation'])) {
                     $standardizationList .= "<strong>" . __('Organisation', 'fau-cris') . ': </strong>' . $standardization['ws_organisation'];
                 }
@@ -376,7 +376,7 @@ class Standardisierungen
                 }
             }
             if (!in_array('meeting', $hide)) {
-                $standardizationList .= '<h4>' . __('Meeting') . '</h4>';
+                $standardizationList .= '<h4>' . __('Meeting','fau-cris') . '</h4>';
                 if (!in_array('date', (array)$hide) && (!empty($standardization['venue_start']) || !empty($standardization['venue_end']))) {
                     $startDate = date_i18n(get_option('date_format'), strtotime($standardization['venue_start']));
                     $endDate = date_i18n(get_option('date_format'), strtotime($standardization['venue_end']));

@@ -507,7 +507,7 @@ class Auszeichnungen
             $award_details['#year#'] = $award['year award'];
             $award_details['#subtitle#'] = htmlentities($subtitle, ENT_QUOTES);
             $award_details['#description#'] = $description;
-            //$award_details['#description#'] = strip_tags($description);
+            //$award_details['#description#'] = wp_strip_all_tags($description);
             $award_details['#url_pressrelease#'] = $award['url_pressrelease'];
             if ($this->page_lang == 'en' && $award['url_pressrelease_title_en'] != '') {
                 $award_details['#title_pressrelease#'] = $award['url_pressrelease_title_en'];

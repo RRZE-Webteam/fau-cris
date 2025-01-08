@@ -253,7 +253,7 @@ class Forschungsbereiche
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $param['fsp'] = ($field['selektion'] == 'Forschungsschwerpunkt') ? true : false;
             
             if (!in_array('title', $hide)) {
@@ -285,7 +285,7 @@ class Forschungsbereiche
                 && !is_array($param['field'])) {
                 $projects = $this->get_field_projects($id,$param);
 
-                if (!empty($projects) && trim(strip_tags($projects)) !== '') {
+                if (!empty($projects) && trim(wp_strip_all_tags($projects)) !== '') {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
                     $singlefield .= $projects;
                 }
@@ -376,7 +376,7 @@ class Forschungsbereiche
             $param['field'] = $id;
             
             $field_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $field_details['#description#'] = wp_strip_all_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = '';
             if (strpos($content, '#projects#') !== false) {
                 $field_details['#projects#'] = $this->get_field_projects($id,$param);
