@@ -1530,7 +1530,7 @@ public static function options_fau_cris(): void
                         . '<br />'
                         . __('Nächste automatische Synchronisierung:', 'fau-cris') . ' '
                         //. date ('d.m.Y - h:i', $timestamp)
-                        . get_date_from_gmt(date('Y-m-d H:i:s', $timestamp), 'd.m.Y - H:i');
+                        . get_date_from_gmt(gmdate('Y-m-d H:i:s', $timestamp), 'd.m.Y - H:i');
                 add_settings_error('AutoSyncComplete', 'autosynccomplete', $message, 'updated');
                 settings_errors();
             }
@@ -1558,18 +1558,17 @@ public static function options_fau_cris(): void
         $content_shortcode_publikationen = array(
             '<h1>Shortcodes</h1>'
             . '<ul>'
-            . '<li><code>[cris show="publications"]</code>: ' . __('Publikationsliste (automatisch nach Jahren gegliedert)') . '</li>'
-            . '<li><code>[cris show="awards"]</code>: ' . __('Auszeichnungen (automatisch nach Jahren sortiert)') . '</li>'
+            . '<li><code>[cris show="publications"]</code>: ' . __('Publikationsliste (automatisch nach Jahren gegliedert)','fau-cris') . '</li>'
+            . '<li><code>[cris show="awards"]</code>: ' . __('Auszeichnungen (automatisch nach Jahren sortiert)','fau-cris') . '</li>'
             . '</ul>'
             . '<h2>' . __('Mögliche Zusatzoptionen', 'fau-cris') . '</h2>'
-            . '<p>' . __('Ausgabe lässt sich beliebig anpassen. Eine Übersicht der verschiedenen Shortcode-Parameter zum Filtern, Sortieren und Ändern der Darstellung finden Sie unter: ') . '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/" target="_blank">https://www.wordpress.rrze.fau.de/plugins/fau-cris/</a>'
+            . '<p>' . __('Ausgabe lässt sich beliebig anpassen. Eine Übersicht der verschiedenen Shortcode-Parameter zum Filtern, Sortieren und Ändern der Darstellung finden Sie unter: ','fau-cris') . '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/" target="_blank">https://www.wordpress.rrze.fau.de/plugins/fau-cris/</a>'
 
         );
 
         $content_fauperson = array(
             '<p>' . __('Wenn Sie das <strong>FAU-Person</strong>-Plugin verwenden, können Autoren mit ihrer FAU-Person-Kontaktseite verlinkt werden.', 'fau-cris') . '</p>',
-            '<p>' . __('Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.', 'fau-cris') . '</p>',
-            '<p>' . __('', 'fau-cris') . '</p>'
+            '<p>' . __('Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.', 'fau-cris') . '</p>'
         );
 
         $helptexts = array(
