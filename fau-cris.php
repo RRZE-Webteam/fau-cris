@@ -253,7 +253,27 @@ class FAU_CRIS
             array(__CLASS__, 'options_fau_cris')
         );
         add_action('load-' . self::$cris_option_page, array(__CLASS__, 'cris_help_menu'));
+         // Add nonce to the URL when the page is accessed
+        add_action('admin_init', array(__CLASS__, 'redirect_with_nonce'));
     }
+
+
+public static function redirect_with_nonce(): void
+{
+    // Check if the current page is the CRIS settings page
+    if (isset($_GET['page']) && $_GET['page'] === 'options-fau-cris') {
+        // Check if the nonce is already present in the URL
+        if (!isset($_GET['_wpnonce'])) {
+            // Generate a nonce
+            $nonce = wp_create_nonce('fau_cris_options_nonce');
+
+            // Redirect to the same URL with the nonce added
+            $redirect_url = add_query_arg('_wpnonce', $nonce, admin_url('options-general.php?page=options-fau-cris'));
+            wp_redirect($redirect_url);
+            exit;
+        }
+    }
+}
 
     /*
      * Options page tabs
@@ -285,34 +305,71 @@ class FAU_CRIS
 public static function options_fau_cris(): void
     {
         $tabs = self::options_page_tabs();
-        $current = sanitize_text_field(wp_unslash(self::current_tab($_GET)));
-        if (isset($_GET['action']) && sanitize_text_field(wp_unslash($_GET['action'])) == 'cris_sync') {
-            global $post;
-            $page_lang = substr(get_locale(), 0, 2);
-            $sync = new Sync($page_lang);
-            $result = $sync->do_sync(true);
-        }
+
+        // Initialize WP_Error for handling errors
+        $error = new \WP_Error();
+        // Verify nonce before accessing $_GET['tab']
+    if (isset($_GET['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'fau_cris_options_nonce')) {
+        $current = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : '';
+    }
+    else {
+        // Nonce verification failed
+        $current = '';
+        $error->add('nonce_failed', __('Security check failed!', 'fau-cris'));
+    }
+        // Verify nonce and process action if valid
+            if (isset($_GET['action']) && $_GET['action'] === 'cris_sync') {
+                // Sanitize and verify the nonce
+                $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
+                if (!wp_verify_nonce($nonce, 'fau_cris_options_nonce')) {
+                    $error->add('nonce_failed', __('Security check failed for sync action!', 'fau-cris'));
+                } else {
+                    // Process sync action
+                    global $post;
+                    $page_lang = substr(get_locale(), 0, 2);
+                    $sync = new Sync($page_lang);
+                    $result = $sync->do_sync(true);
+                }
+            }
         $options = self::get_options();
         ?>
 
         <div class="wrap">
             <h2><?php esc_html_e('Einstellungen', 'fau-cris'); ?> &rsaquo; CRIS</h2>
+            
+            <?php 
+            // Display errors if any
+        if (!empty($error->errors)) {
+            foreach ($error->get_error_messages() as $message) {
+                echo '<div class="notice notice-error"><p>' . esc_html($message) . '</p></div>';
+            }
+        }
+                if (isset($result)) {
+                print(esc_html($result));} ?>
+
             <h2 class="nav-tab-wrapper">
                 <?php foreach ($tabs as $tab => $name) {
                     $class = ($tab == $current) ? ' nav-tab-active' : '';
-                    echo "<a class='nav-tab" . esc_attr( $class ) . "' href='" . esc_url( "?page=options-fau-cris&tab=$tab" ) . "'>" . esc_html( $name ) . "</a>";
+                    echo "<a class='nav-tab" . esc_attr( $class ) . "' href='" . esc_url( wp_nonce_url("?page=options-fau-cris&tab=$tab", 'fau_cris_options_nonce', '_wpnonce')) . "'>" . esc_html( $name ) . "</a>";
                 } ?>
             </h2>
-            <?php if (isset($result)) {
-                print(esc_html($result));
-            } ?>
+
             <form method="post" action="options.php">
                 <?php
                 settings_fields('fau_cris_options');
                 do_settings_sections('fau_cris_options');
                 if (isset($current) && $current == 'sync'
                 && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
-                    echo '<a href="' . esc_url( '?page=options-fau-cris&tab=sync&action=cris_sync' ) . '" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;"> <span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . esc_html( __('Jetzt synchronisieren', 'fau-cris') ) . '</a>'; }
+                    $sync_url = wp_nonce_url(
+                    '?page=options-fau-cris&tab=sync&action=cris_sync',
+                    'fau_cris_options_nonce',
+                    '_wpnonce'
+                );
+                echo '<a href="' . esc_url($sync_url) . '" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;">
+                    <span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' .
+                    esc_html(__('Jetzt synchronisieren', 'fau-cris')) . '</a>';
+            }
+                    // echo '<a href="' . esc_url( '?page=options-fau-cris&tab=sync&action=cris_sync' ) . '" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;"> <span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . esc_html( __('Jetzt synchronisieren', 'fau-cris') ) . '</a>'; }
                 submit_button();
                 ?>
             </form>
@@ -821,9 +878,9 @@ public static function options_fau_cris(): void
                     }
                     ?> >
                 <?php if (isset($description)) { ?>
-                    <span class="description"><?php echo esc_html( $description ); ?></span>
-                <?php } ?>
-            </label>
+                    <span class="description"><?php echo esc_html( $description ); ?></span></label>
+                <?php }
+            
         }
     }
 
@@ -900,7 +957,7 @@ public static function options_fau_cris(): void
             $description = esc_attr($args['description']);
         }
         ?>
-        <input name="<?php printf(esc_attr('%s[' . $name . ']', self::option_name)); ?>" type='text' value="<?php
+        <input name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name )); ?>" type='text' value="<?php
         if (array_key_exists($name, $options)) {
             echo esc_attr($options[$name]);
         }
@@ -923,7 +980,7 @@ public static function options_fau_cris(): void
             $description = esc_attr($args['description']);
         }
         ?>
-        <textarea name="<?php printf(esc_attr('%s[' . $name . ']', self::option_name)); ?>" cols="30" rows="8"><?php
+        <textarea name="<?php esc_attr(sprintf('%s[%s]', self::option_name, $name )); ?>" cols="30" rows="8"><?php
         if (array_key_exists($name, $options)) {
             if (is_array($options[$name]) && count($options[$name])>0 && $options[$name][0] !='') {
                 echo esc_attr(implode("\n", $options[$name]));

@@ -5,13 +5,38 @@ defined('ABSPATH') || exit;
 require_once( "Projekte.php" );
 use  RRZE\Cris\Organisation;
 use  RRZE\Cris\Forschungsbereiche;
-
-
-
+    
 
 class Sync
 {
-
+    public $options;
+    public $orgNr;
+    public $page_lang;
+    public $menu_items;
+    public $menu_id;
+    public $portal_items;
+    public $portal_id;
+    public $message;
+    public $menu_position;
+    public $num_created_p;
+    public $num_updated_p;
+    public $num_ok_p;
+    public $num_created_m;
+    public $num_updated_m;
+    public $num_ok_m;
+    public $num_created_mp;
+    public $num_updated_mp;
+    public $num_ok_mp;
+    public $num_errors;
+    public $title_research;
+    public $menu_research;
+    public $title_noFieldsPage;
+    public $page_template_portal;
+    public $page_template_nav;
+    public $num_menu_items;
+    public $menu_count;
+    public $field_projects;
+    
     private int $menu_position_start = 2;
 
     public function __construct($page_lang = 'de')
