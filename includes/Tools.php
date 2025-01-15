@@ -210,12 +210,26 @@ class Tools
                 $colarr[$col]['_' . $k] = strtolower($row[$col]);
             }
         }
-        $eval = 'array_multisort(';
-        foreach ($cols as $col => $order) {
-            $eval .= '$colarr[\'' . $col . '\'],' . $order . ',';
-        }
-        $eval = mb_substr($eval, 0, -1) . ');';
-        eval($eval);
+
+        // $eval = 'array_multisort(';
+        // foreach ($cols as $col => $order) {
+        //     $eval .= '$colarr[\'' . $col . '\'],' . $order . ',';
+        // }
+        // $eval = mb_substr($eval, 0, -1) . ');';
+        // eval($eval);
+        
+         // Prepare arguments for array_multisort
+            $args = [];
+            foreach ($cols as $col => $order) {
+                $args[] = $colarr[$col]; // Add column data
+                $args[] = $order;        // Add sort order (e.g., SORT_ASC, SORT_DESC)
+            }
+            $args[] = &$array;          // Add the original array (by reference)
+
+            // Perform the sort
+            array_multisort(...$args);
+
+
         $ret = array();
         foreach ($colarr as $col => $arr) {
             foreach ($arr as $k => $v) {
@@ -228,6 +242,8 @@ class Tools
         }
         return $ret;
     }
+
+
 
 
 // Function to sort by a specific key
