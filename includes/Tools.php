@@ -751,8 +751,9 @@ public static function sortByKey(array &$array, string $key): void {
 
     public static function get_univis_id()
     {
-        $fpath = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/tools/univis/univis.conf';
-        $fpath_alternative = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/univis.conf';
+         if (isset($_SERVER['DOCUMENT_ROOT']) ) {   
+        $fpath = sanitize_text_field(wp_unslash($_SERVER["DOCUMENT_ROOT"])) . '/vkdaten/tools/univis/univis.conf';
+        $fpath_alternative = sanitize_text_field(wp_unslash($_SERVER["DOCUMENT_ROOT"])) . '/vkdaten/univis.conf';
         if (file_exists($fpath_alternative)) {
             $fpath = $fpath_alternative;
         }
@@ -767,6 +768,7 @@ public static function sortByKey(array &$array, string $key): void {
         }
         fclose($fh);
         return $univisID;
+      }
     }
 
     public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = ''): string

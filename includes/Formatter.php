@@ -66,7 +66,8 @@ class Formatter
             if ($this->group != null) {
                if (!array_key_exists($this->group, $single_dataset->attributes)) {
                     // Escape the group name for security purposes in error messages
-                     trigger_error('Attribute not found: ' . esc_html($this->group));
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                     error_log('Attribute not found: ' . esc_html($this->group));
                     $group_key = $this->sort;
                 } else {
                     $group_key = $this->group;
@@ -107,7 +108,8 @@ class Formatter
         } elseif ($this->group_order === SORT_DESC) {
             krsort($final);
         } elseif ($this->group_order !== null) {
-            trigger_error('Unknown sorting');
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            error_log('Unknown sorting');
         }
 
         # sort data inside groups

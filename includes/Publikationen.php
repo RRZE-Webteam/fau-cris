@@ -38,7 +38,7 @@ class Publikationen
 
 
         
-        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+        if ( isset($_SERVER['PHP_SELF']) && strpos(sanitize_text_field(wp_unslash($_SERVER['PHP_SELF'])), "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
@@ -176,7 +176,7 @@ class Publikationen
         $project = ''
     ): string {
         // Extracting parameters from the $param array
-        error_log(sprintf("pubNachJahr, field %s",$field));
+        // error_log(sprintf("pubNachJahr, field %s",$field));
         $year = $param['year'] ?: ''; // The year of publication
         $start = $param['start'] ?: ''; // The start of year from where publication is needed
         $end = $param['end'] ?: ''; // The end of year from where publication is needed
@@ -375,6 +375,7 @@ class Publikationen
 
          // it will use for showing number of publication by year or in total
         $total_publication_html='';
+        
         if (!is_array($param['publicationsum'])) {
             $publicationSumArray=array($param['publicationsum']);
         }else{
@@ -1752,21 +1753,21 @@ class CRIS_pub_image extends CRIS_Entity
 }
 
 # tests possible if called on command-line
-if (!debug_backtrace()) {
-    $p = new CRIS_Publications();
-    // default uses the cache automatically
-    // $p->disable_cache();
-    $f = new Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
-    $publs = $p->by_orga_id("142285", $f);
-    $order = "virtualdate";
-    $formatter = new Formatter(null, null, $order, SORT_DESC);
-    $res = $formatter->execute($publs);
-    foreach ($res[$order] as $key => $value) {
-        // Escape the key and the value before printing them
-            echo sprintf(
-                "%s: %s\n", 
-                esc_html($key), 
-                esc_html($value->attributes[$order])
-            );
-        }
-}
+// if (!debug_backtrace()) {
+//     $p = new CRIS_Publications();
+//     // default uses the cache automatically
+//     // $p->disable_cache();
+//     $f = new Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
+//     $publs = $p->by_orga_id("142285", $f);
+//     $order = "virtualdate";
+//     $formatter = new Formatter(null, null, $order, SORT_DESC);
+//     $res = $formatter->execute($publs);
+//     foreach ($res[$order] as $key => $value) {
+//         // Escape the key and the value before printing them
+//             echo sprintf(
+//                 "%s: %s\n", 
+//                 esc_html($key), 
+//                 esc_html($value->attributes[$order])
+//             );
+//         }
+// }

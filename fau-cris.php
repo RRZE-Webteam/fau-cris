@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.25.2
+ * Version: 3.25.3
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.25.2';
+    const version = '3.25.3';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -1551,7 +1551,7 @@ public static function options_fau_cris(): void
         if ($post && has_shortcode($post->post_content, 'cris')
                 || $post && has_shortcode($post->post_content, 'cris-custom')) {
             wp_enqueue_style('cris', plugins_url('css/cris.css', __FILE__), array(), self::version);
-            wp_enqueue_script('cris', plugins_url('js/cris.js', __FILE__), array('jquery'), self::version);
+            wp_enqueue_script('cris', plugins_url('js/cris.js', __FILE__), array('jquery'), self::version,false);
         }
     }
 

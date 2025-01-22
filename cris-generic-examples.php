@@ -88,14 +88,14 @@ $publ = new CRIS_publications();
 $res = $publ->by_id(array(36722, 1036431));
 $p = $res[36722];
 $p->insert_quotation_links();
-print_r(array(
-    $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
-    $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
-));
+// print_r(array(
+//     $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
+//     $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
+// ));
 
 $p = $res[1036431];
 $p->insert_quotation_links();
-print_r(array(
-    $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
-    $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
-));
+// print_r(array(
+//     $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
+//     $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
+// ));
