@@ -28,14 +28,17 @@ class Publikationen
     public $nameorder; 
     public $page_lang; 
     public $sc_lang; 
-    public $langdiv_open; 
+    public $langdiv_open;
     public $langdiv_close; 
     public $einheit; 
     public $error; 
     public $cris_pub_title_link_order;
     public function __construct($einheit = '', $id = '', $nameorder = '', $page_lang = 'de', $sc_lang = 'de')
     {
-        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+
+
+        
+        if ( isset($_SERVER['PHP_SELF']) && strpos(sanitize_text_field(wp_unslash($_SERVER['PHP_SELF'])), "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
@@ -59,6 +62,8 @@ class Publikationen
             $this->univis = Tools::get_univis();
         }
 
+
+       
         if (strlen(trim($nameorder))) {
             $this->nameorder = $nameorder;
         } else {
@@ -72,7 +77,7 @@ class Publikationen
             $this->langdiv_open = '<div class="cris" lang="' . $sc_lang . '">';
         }
 
-        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field"))) {
+        if (in_array($einheit, array("person", "orga", "award", "awardnameid", "project", "field","field_incl_proj"))) {
             $this->einheit = $einheit;
         } else {
             $this->einheit = "orga";
@@ -84,6 +89,9 @@ class Publikationen
                 __('Bitte geben Sie die CRIS-ID der Organisation, Person oder des Projektes an.', 'fau-cris')
             );
         }
+
+
+
     }
 
     /**
@@ -168,7 +176,7 @@ class Publikationen
         $project = ''
     ): string {
         // Extracting parameters from the $param array
-
+        // error_log(sprintf("pubNachJahr, field %s",$field));
         $year = $param['year'] ?: ''; // The year of publication
         $start = $param['start'] ?: ''; // The start of year from where publication is needed
         $end = $param['end'] ?: ''; // The end of year from where publication is needed
@@ -183,7 +191,15 @@ class Publikationen
         $language = $param['language'] ?: '';
         $sortby = $param['sortby'] ?: 'virtualdate';
         $authorPositionArray=$param['author_position'];
-
+        $muteheadings = $param['muteheadings'] ?? 0; 
+        // it will use for showing number of publication by year or in total
+        $total_publication_html='';
+        if (!is_array($param['publicationsum'])) {
+            $publicationSumArray=array($param['publicationsum']);
+        }else{
+            $publicationSumArray=$param['publicationsum'];
+        }
+        
         // fetching the publication
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray );
 
@@ -220,18 +236,33 @@ class Publikationen
         $output = '';
         $showsubtype = ($subtype == '') ? 1 : 0;
 
-        if (shortcode_exists('collapsibles') && $format == 'accordion') {
+        if (shortcode_exists('collapsibles') && $format == 'accordion'){
+            
+            $total_number_publication_in_accordion=0;
             $shortcode_data = '';
-            if (empty($year) || strpos($year, ',') !== false) {
+            if ((empty($year) || strpos($year, ',') !== false) && ($muteheadings!=1))
+             {
                 $openfirst = ' load="open"';
                 $expandall = ' expand-all-link="true"';
             } else {
                 $openfirst = '';
                 $expandall = '';
             }
+
             foreach ($pubList as $array_year => $publications) {
                 $shortcode_data_inner = '';
+                $number_of_pub_in_accordion=count($publications);
                 $pubSubList = $subformatter->execute($publications);
+
+
+
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html_in_accordion = '  '.'('. $number_of_pub_in_accordion .' '.'Publications'. ')';
+                }
+                else{
+                    $subtotal_publication_html_in_accordion='';
+                }
+
                 foreach ($pubSubList as $array_subtype => $publications_sub) {
                     if ($order2 == 'type') {
                         $shortcode_data_inner .= "<h4>";
@@ -249,15 +280,34 @@ class Publikationen
                         }
                     }
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year.$subtotal_publication_html_in_accordion . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
                 $openfirst = '';
+                $total_number_publication_in_accordion += count($publications);
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
+
+            // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
+            }
+
         } else {
+            
+            
+            $total_number_publication=0;
             foreach ($pubList as $array_year => $publications) {
-                if (empty($year)) {
-                    $output .= '<h3>' . $array_year . '</h3>';
+                $number_of_pub=count($publications);
+
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
                 }
+                else{
+                    $subtotal_publication_html='';
+                }
+                if (empty($year)  && ($muteheadings!=1)) {
+                    $output .= '<h3>' . $array_year . $subtotal_publication_html .'</h3>';
+                }
+                
                 $pubSubList = $subformatter->execute($publications);
                 foreach ($pubSubList as $array_subtype => $publications_sub) {
                     // Zwischenüberschrift
@@ -277,9 +327,15 @@ class Publikationen
                         }
                     }
                 }
+                $total_number_publication += $number_of_pub;
             }
+            // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
+            }
+
         }
-        return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $total_publication_html .$output . $this->langdiv_close;
     }
     //End ::pubNachJahr
 
@@ -317,6 +373,15 @@ class Publikationen
         $sortorder =  $param['sortorder'] ?: SORT_DESC;
         $authorPositionArray=$param['author_position'];
 
+         // it will use for showing number of publication by year or in total
+        $total_publication_html='';
+        
+        if (!is_array($param['publicationsum'])) {
+            $publicationSumArray=array($param['publicationsum']);
+        }else{
+            $publicationSumArray=$param['publicationsum'];
+        }
+
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray);
         
 
@@ -346,6 +411,7 @@ class Publikationen
         $output = '';
 
         if (shortcode_exists('collapsibles') && $format == 'accordion') {
+            $total_number_publication_in_accordion=0;
             $shortcode_data = '';
             if (!empty($type) && strpos($type, ',') !== false) {
                 $openfirst = ' load="open"';
@@ -361,6 +427,16 @@ class Publikationen
                 $shortcode_data_other = '';
                 // Weitrere Untergliederung für Subtypen
                 $subtypeorder = $this->subtypeorder;
+                //count total number of publication in pub type
+                $number_of_pub_in_accordion=count($publications);
+
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html_in_accordion = '  '.'('. $number_of_pub_in_accordion .' '.'Publications'. ')';
+                }
+                else{
+                    $subtotal_publication_html_in_accordion='';
+                }
+
                 if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
                     foreach ($subtypeorder as $key => $value) {
                         $subtypeorder[$key] = Tools::getType('publications', $value, $array_type);
@@ -401,21 +477,40 @@ class Publikationen
                         $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display']);
                     }
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title. $subtotal_publication_html_in_accordion .  '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
                 $openfirst = '';
+
+                 $total_number_publication_in_accordion += $number_of_pub_in_accordion;
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
+
+            // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
+            }
+
         } else {
             foreach ($pubList as $array_type => $publications) {
+                $total_number_publication=0;
+                 $number_of_pub=count($publications);
+                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
+                }
+                else{
+                    $subtotal_publication_html='';
+                }
                 // Zwischenüberschrift (= Publikationstyp), außer wenn nur ein Typ gefiltert wurde
                 if (empty($type) || strpos($type, '-') === 0 || strpos($type, ',') !== false) {
                     $title = Tools::getTitle('publications', $array_type, $param['display_language']);
                     if (!shortcode_exists('collapsibles') || $format != 'accordion') {
                         $output .= "<h3>";
-                        $output .= $title;
+                        $output .= $title.$subtotal_publication_html;
                         $output .= "</h3>";
                     }
                 }
+
+                 
+
                 // Weitrere Untergliederung (Subtypen)
                 $subtypeorder = $this->subtypeorder;
                 if ($array_type == 'Other' && $subtypeorder[0] != '' && array_search($subtypeorder[0], array_column(Dicts::$typeinfos['publications'][$array_type]['subtypes'], 'short'))) {
@@ -462,9 +557,14 @@ class Publikationen
                         }
                     }
                 }
+                $total_number_publication += $number_of_pub;
+            }
+             // To show total number of publication
+            if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
             }
         }
-        return $this->langdiv_open . $output . $this->langdiv_close;
+        return $this->langdiv_open . $total_publication_html . $output . $this->langdiv_close;
     }
 
     // End::pubNachTyp
@@ -584,6 +684,7 @@ class Publikationen
         $param = array(),
         $seed = false
     ): string {
+
         $pubArray = [];
 
         $filter = Tools::publication_filter($param['publications_year'], $param['publications_start'], $param['publications_end'], $param['publications_type'], $param['publications_subtype'], $param['publications_fau'], $param['publications_peerreviewed'], $param['publications_language']);
@@ -609,6 +710,12 @@ class Publikationen
             $sortby = null;
             $orderby = __('O.A.', 'fau-cris');
         }
+        
+        if ($this->einheit == 'field_incl_proj') {
+          $sortby = 'relauthors';
+          $orderby = 'relauthors';
+        }
+
         $formatter = new Formatter(null, null, $sortby, SORT_ASC);
         $res = $formatter->execute($pubArray);
         $pubList = $res[$orderby] ?? [];
@@ -732,8 +839,8 @@ class Publikationen
             if ($this->einheit === "project") {
                 $pubArray = $ws->by_project($this->id, $filter, $notable);
             }
-            if ($this->einheit === "field" || $this->einheit === "field_proj") {
-                $pubArray = $ws->by_field($field, $filter, $fsp, $this->einheit);
+            if ($this->einheit === "field" || $this->einheit === "field_proj" || $this->einheit === "field_incl_proj") {
+                $pubArray = $ws->by_field($this->id, $filter, $fsp, $this->einheit);
             }
             if ($this->einheit === "publication") {
                 $pubArray = $ws->by_id($this->id);
@@ -860,7 +967,7 @@ class Publikationen
 
             if (!empty($publication['doi'])) {
 
-                $doilink=FAU_CRIS::doi . (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris'));
+                $doilink=FAU_CRIS::doi . (array_key_exists('doi', $publication) ? wp_strip_all_tags($publication['doi']) : __('O.A.', 'fau-cris'));
             }
             else{
                 $doilink='';
@@ -868,15 +975,15 @@ class Publikationen
 
             $pubTitlePrioLinks=array (
                 'doi_link'=>$doilink,
-                'OAlink'=>(array_key_exists('openaccesslink', $publication) ? strip_tags($publication['openaccesslink']) : ''),
-                'URI'=>(array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+                'OAlink'=>(array_key_exists('openaccesslink', $publication) ? wp_strip_all_tags($publication['openaccesslink']) : ''),
+                'URI'=>(array_key_exists('cfuri', $publication) ? wp_strip_all_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
                 );
 
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
-                $title = strip_tags($publication['originalauthors']) . ': ';
+                $title = wp_strip_all_tags($publication['originalauthors']) . ': ';
             }
-            $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
+            $title .= (array_key_exists('cftitle', $publication) ? wp_strip_all_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
             $link=Tools::get_first_available_link($this->cris_pub_title_link_order,$pubTitlePrioLinks,$title,$id,$post->ID,$lang);
             $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
@@ -892,34 +999,34 @@ class Publikationen
                 'id' => $id,
                 'authors' => $authors_html,
                 'title' => $title_html,
-                'city' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
-                'publisher' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
-                'year' => (array_key_exists('publyear', $publication) ? strip_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
-                'pubType' => (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? strip_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? strip_tags($publication['publication type']) : __('O.A.', 'fau-cris')),
-                'pubStatus' => (array_key_exists('publstatus', $publication) ? strip_tags($publication['publstatus']) : ''),
-                'pagesTotal' => (array_key_exists('cftotalpages', $publication) ? strip_tags($publication['cftotalpages']) : ''),
-                'pagesRange' => (array_key_exists('pagesrange', $publication) ? strip_tags($publication['pagesrange']) : ''),
-                'lexiconColumn' => (array_key_exists('lexiconcolumn', $publication) ? strip_tags($publication['lexiconcolumn']) : ''),
-                'volume' => (array_key_exists('cfvol', $publication) ? strip_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
-                'series' => (array_key_exists('cfseries', $publication) ? strip_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
-                'seriesNumber' => !empty($publication['book volume']) ? strip_tags($publication['book volume']) : '',
-                'ISBN' => (array_key_exists('cfisbn', $publication) ? strip_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
-                'ISSN' => (array_key_exists('cfissn', $publication) ? strip_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
-                'DOI' => (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris')),
-                'OA' => (array_key_exists('openaccess', $publication) ? strip_tags($publication['openaccess']) : false),
-                'OAlink' => (array_key_exists('openaccesslink', $publication) ? strip_tags($publication['openaccesslink']) : ''),
-                'URI' => (array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
-                'editiors' => (array_key_exists('editor', $publication) ? strip_tags($publication['editor']) : __('O.A.', 'fau-cris')),
-                'booktitle' => (array_key_exists('edited volumes', $publication) ? strip_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
-                'journaltitle' => (array_key_exists('journalname', $publication) ? strip_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
-                'eventtitle' => (array_key_exists('event title', $publication) ? strip_tags($publication['event title']) : ''),
-                'eventlocation' => (array_key_exists('event location', $publication) ? strip_tags($publication['event location']) : ''),
+                'city' => (array_key_exists('cfcitytown', $publication) ? wp_strip_all_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
+                'publisher' => (array_key_exists('publisher', $publication) ? wp_strip_all_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
+                'year' => (array_key_exists('publyear', $publication) ? wp_strip_all_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
+                'pubType' => (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? wp_strip_all_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? wp_strip_all_tags($publication['publication type']) : __('O.A.', 'fau-cris')),
+                'pubStatus' => (array_key_exists('publstatus', $publication) ? wp_strip_all_tags($publication['publstatus']) : ''),
+                'pagesTotal' => (array_key_exists('cftotalpages', $publication) ? wp_strip_all_tags($publication['cftotalpages']) : ''),
+                'pagesRange' => (array_key_exists('pagesrange', $publication) ? wp_strip_all_tags($publication['pagesrange']) : ''),
+                'lexiconColumn' => (array_key_exists('lexiconcolumn', $publication) ? wp_strip_all_tags($publication['lexiconcolumn']) : ''),
+                'volume' => (array_key_exists('cfvol', $publication) ? wp_strip_all_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
+                'series' => (array_key_exists('cfseries', $publication) ? wp_strip_all_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
+                'seriesNumber' => !empty($publication['book volume']) ? wp_strip_all_tags($publication['book volume']) : '',
+                'ISBN' => (array_key_exists('cfisbn', $publication) ? wp_strip_all_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
+                'ISSN' => (array_key_exists('cfissn', $publication) ? wp_strip_all_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
+                'DOI' => (array_key_exists('doi', $publication) ? wp_strip_all_tags($publication['doi']) : __('O.A.', 'fau-cris')),
+                'OA' => (array_key_exists('openaccess', $publication) ? wp_strip_all_tags($publication['openaccess']) : false),
+                'OAlink' => (array_key_exists('openaccesslink', $publication) ? wp_strip_all_tags($publication['openaccesslink']) : ''),
+                'URI' => (array_key_exists('cfuri', $publication) ? wp_strip_all_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+                'editiors' => (array_key_exists('editor', $publication) ? wp_strip_all_tags($publication['editor']) : __('O.A.', 'fau-cris')),
+                'booktitle' => (array_key_exists('edited volumes', $publication) ? wp_strip_all_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
+                'journaltitle' => (array_key_exists('journalname', $publication) ? wp_strip_all_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
+                'eventtitle' => (array_key_exists('event title', $publication) ? wp_strip_all_tags($publication['event title']) : ''),
+                'eventlocation' => (array_key_exists('event location', $publication) ? wp_strip_all_tags($publication['event location']) : ''),
                 'eventstart_raw' => !empty($publication['event start date']) ? $publication['event start date'] : (!empty($publication['publyear']) ? $publication['publyear'] : '-----'),
                 'eventend_raw' => (!empty($publication['event end date']) ? $publication['event end date'] : ''),
-                'eventstart' => !empty($publication['event start date']) ? date_i18n(get_option('date_format'), strtotime(strip_tags($publication['event start date']))) : '',
-                'eventend' => (!empty($publication['event end date']) ? date_i18n(get_option('date_format'), strtotime(strip_tags($publication['event end date']))) : ''),
-                'origTitle' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
-                'language' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
+                'eventstart' => !empty($publication['event start date']) ? date_i18n(get_option('date_format'), strtotime(wp_strip_all_tags($publication['event start date']))) : '',
+                'eventend' => (!empty($publication['event end date']) ? date_i18n(get_option('date_format'), strtotime(wp_strip_all_tags($publication['event end date']))) : ''),
+                'origTitle' => (array_key_exists('originaltitel', $publication) ? wp_strip_all_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
+                'language' => (array_key_exists('language', $publication) ? wp_strip_all_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 'bibtex_link' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
                 'otherSubtype' => (array_key_exists('type other subtype', $publication) ? $publication['type other subtype'] : ''),
                 'thesisSubtype' => (array_key_exists('publication thesis subtype', $publication) ? $publication['publication thesis subtype'] : ''),
@@ -1228,16 +1335,16 @@ class Publikationen
             // title (bei Rezensionen mit Original-Autor davor)
             $title = '';
             if (($publication['publication type'] == 'Translation' || $publication['subtype'] == 'Rezension') && $publication['originalauthors'] != '') {
-                $title = strip_tags($publication['originalauthors']) . ': ';
+                $title = wp_strip_all_tags($publication['originalauthors']) . ': ';
             }
-            $title .= (array_key_exists('cftitle', $publication) ? strip_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
+            $title .= (array_key_exists('cftitle', $publication) ? wp_strip_all_tags($publication['cftitle']) : __('O.T.', 'fau-cris'));
             global $post;
             $title_html = "<span class=\"title\" itemprop=\"name\"><strong>"
                 . "<a href=\"" . Tools::get_item_url("publications", $title, $id, $post->ID, $lang) . "\" title=\"Detailansicht in neuem Fenster &ouml;ffnen\">"
                 . $title
                 . "</a></strong></span>";
             //pubType
-            $pubTypeRaw = (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? strip_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? strip_tags($publication['publication type']) : __('O.A.', 'fau-cris'));
+            $pubTypeRaw = (array_key_exists('futurepublicationtype', $publication) && $publication['futurepublicationtype'] != '') ? wp_strip_all_tags($publication['futurepublicationtype']) : (array_key_exists('publication type', $publication) ? wp_strip_all_tags($publication['publication type']) : __('O.A.', 'fau-cris'));
 
             $pubType = Tools::getName('publications', $pubTypeRaw, $lang);
             // make array
@@ -1247,32 +1354,32 @@ class Publikationen
                 '#author#' => $authors_html,
                 '#title#' => $title,
                 '#url#' => Tools::get_item_url("publications", $title, $id, $post->ID, $lang),
-                '#city#' => (array_key_exists('cfcitytown', $publication) ? strip_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
-                '#publisher#' => (array_key_exists('publisher', $publication) ? strip_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
-                '#year#' => (array_key_exists('publyear', $publication) ? strip_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
+                '#city#' => (array_key_exists('cfcitytown', $publication) ? wp_strip_all_tags($publication['cfcitytown']) : __('O.O.', 'fau-cris')),
+                '#publisher#' => (array_key_exists('publisher', $publication) ? wp_strip_all_tags($publication['publisher']) : __('O.A.', 'fau-cris')),
+                '#year#' => (array_key_exists('publyear', $publication) ? wp_strip_all_tags($publication['publyear']) : __('O.J.', 'fau-cris')),
                 '#pubType#' => $pubType,
-                '#pubStatus#' => (array_key_exists('publstatus', $publication) ? strip_tags($publication['publstatus']) : ''),
-                '#pagesTotal#' => (array_key_exists('cftotalpages', $publication) ? strip_tags($publication['cftotalpages']) : ''),
-                '#pagesRange#' => (array_key_exists('pagesrange', $publication) ? strip_tags($publication['pagesrange']) : ''),
-                '#lexiconColumn#' => (array_key_exists('lexiconcolumn', $publication) ? strip_tags($publication['lexiconcolumn']) : ''),
-                '#volume#' => (array_key_exists('cfvol', $publication) ? strip_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
-                '#series#' => (array_key_exists('cfseries', $publication) ? strip_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
-                '#seriesNumber#' => !empty($publication['book volume']) ? strip_tags($publication['book volume']) : '',
-                '#ISBN#' => (array_key_exists('cfisbn', $publication) ? strip_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
-                '#ISSN#' => (array_key_exists('cfissn', $publication) ? strip_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
-                '#DOI#' => (array_key_exists('doi', $publication) ? strip_tags($publication['doi']) : __('O.A.', 'fau-cris')),
-                '#URI#' => (array_key_exists('cfuri', $publication) ? strip_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
-                '#editors#' => (array_key_exists('editor', $publication) ? strip_tags($publication['editor']) : __('O.A.', 'fau-cris')),
-                '#bookTitle#' => (array_key_exists('edited volumes', $publication) ? strip_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
-                '#journalTitle#' => (array_key_exists('journalname', $publication) ? strip_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
-                '#eventTitle#' => (array_key_exists('event title', $publication) ? strip_tags($publication['event title']) : ''),
-                '#eventLocation#' => (array_key_exists('event location', $publication) ? strip_tags($publication['event location']) : ''),
+                '#pubStatus#' => (array_key_exists('publstatus', $publication) ? wp_strip_all_tags($publication['publstatus']) : ''),
+                '#pagesTotal#' => (array_key_exists('cftotalpages', $publication) ? wp_strip_all_tags($publication['cftotalpages']) : ''),
+                '#pagesRange#' => (array_key_exists('pagesrange', $publication) ? wp_strip_all_tags($publication['pagesrange']) : ''),
+                '#lexiconColumn#' => (array_key_exists('lexiconcolumn', $publication) ? wp_strip_all_tags($publication['lexiconcolumn']) : ''),
+                '#volume#' => (array_key_exists('cfvol', $publication) ? wp_strip_all_tags($publication['cfvol']) : __('O.A.', 'fau-cris')),
+                '#series#' => (array_key_exists('cfseries', $publication) ? wp_strip_all_tags($publication['cfseries']) : __('O.A.', 'fau-cris')),
+                '#seriesNumber#' => !empty($publication['book volume']) ? wp_strip_all_tags($publication['book volume']) : '',
+                '#ISBN#' => (array_key_exists('cfisbn', $publication) ? wp_strip_all_tags($publication['cfisbn']) : __('O.A.', 'fau-cris')),
+                '#ISSN#' => (array_key_exists('cfissn', $publication) ? wp_strip_all_tags($publication['cfissn']) : __('O.A.', 'fau-cris')),
+                '#DOI#' => (array_key_exists('doi', $publication) ? wp_strip_all_tags($publication['doi']) : __('O.A.', 'fau-cris')),
+                '#URI#' => (array_key_exists('cfuri', $publication) ? wp_strip_all_tags($publication['cfuri']) : __('O.A.', 'fau-cris')),
+                '#editors#' => (array_key_exists('editor', $publication) ? wp_strip_all_tags($publication['editor']) : __('O.A.', 'fau-cris')),
+                '#bookTitle#' => (array_key_exists('edited volumes', $publication) ? wp_strip_all_tags($publication['edited volumes']) : __('O.A.', 'fau-cris')), // Titel des Sammelbands
+                '#journalTitle#' => (array_key_exists('journalname', $publication) ? wp_strip_all_tags($publication['journalname']) : __('O.A.', 'fau-cris')),
+                '#eventTitle#' => (array_key_exists('event title', $publication) ? wp_strip_all_tags($publication['event title']) : ''),
+                '#eventLocation#' => (array_key_exists('event location', $publication) ? wp_strip_all_tags($publication['event location']) : ''),
                 '#eventstart_raw#' => !empty($publication['event start date']) ? $publication['event start date'] : (!empty($publication['publyear']) ? $publication['publyear'] : '-----'),
                 '#eventend_raw#' => (!empty($publication['event end date']) ? $publication['event end date'] : ''),
-                '#eventStart#' => !empty($publication['event start date']) ? date_i18n(get_option('date_format'), strtotime(strip_tags($publication['event start date']))) : '',
-                '#eventEnd#' => (!empty($publication['event end date']) ? date_i18n(get_option('date_format'), strtotime(strip_tags($publication['event end date']))) : ''),
-                '#originalTitle#' => (array_key_exists('originaltitel', $publication) ? strip_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
-                '#language#' => (array_key_exists('language', $publication) ? strip_tags($publication['language']) : __('O.A.', 'fau-cris')),
+                '#eventStart#' => !empty($publication['event start date']) ? date_i18n(get_option('date_format'), strtotime(wp_strip_all_tags($publication['event start date']))) : '',
+                '#eventEnd#' => (!empty($publication['event end date']) ? date_i18n(get_option('date_format'), strtotime(wp_strip_all_tags($publication['event end date']))) : ''),
+                '#originalTitle#' => (array_key_exists('originaltitel', $publication) ? wp_strip_all_tags($publication['originaltitel']) : __('O.A.', 'fau-cris')),
+                '#language#' => (array_key_exists('language', $publication) ? wp_strip_all_tags($publication['language']) : __('O.A.', 'fau-cris')),
                 '#bibtexLink#' => '<a href="' . sprintf($this->bibtexlink, $id) . '">Download</a>',
                 '#subtype#' => (array_key_exists('subtype', $publication) ? $publication['subtype'] : ''),
                 '#articleNumber#' => (array_key_exists('article number', $publication) ? $publication['article number'] : ''),
@@ -1480,22 +1587,30 @@ class CRIS_publications extends Webservice
         }
 
         $requests = array();
+        $retaions = array();
         switch ($entity) {
             case 'field_proj':
-                $relation = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
+                $relations[] = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ';
                 break;
             case 'field_notable':
-                $relation = 'FOBE_has_cur_PUBL';
+                $relations[] = 'FOBE_has_cur_PUBL';
+                break;
+            case 'field_incl_proj':
+                $relations[] = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
+                $relations[] = $fsp ? 'fsp_proj_publ' : 'fobe_proj_publ'; 
                 break;
             case 'field':
             default:
-                $relation = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
-        }
-
+                $relations[] = $fsp ? 'FOBE_FSP_has_PUBL' : 'fobe_has_top_publ';
+        }   
         foreach ($fieldID as $_p) {
-            $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $relation;
-        }
-        return $this->retrieve($requests, $filter);
+            foreach ($relations as $_r) {
+                $requests[] =sprintf( 'getrelated/Forschungsbereich/%d/', $_p ) . $_r;
+            }
+    }
+    $publs=$this->retrieve($requests, $filter);
+    
+    return $publs;
     }
 
     public function by_equipment($equiID = null, &$filter = null): array
@@ -1638,16 +1753,21 @@ class CRIS_pub_image extends CRIS_Entity
 }
 
 # tests possible if called on command-line
-if (!debug_backtrace()) {
-    $p = new CRIS_Publications();
-    // default uses the cache automatically
-    // $p->disable_cache();
-    $f = new Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
-    $publs = $p->by_orga_id("142285", $f);
-    $order = "virtualdate";
-    $formatter = new Formatter(null, null, $order, SORT_DESC);
-    $res = $formatter->execute($publs);
-    foreach ($res[$order] as $key => $value) {
-        echo sprintf("%s: %s\n", $key, $value->attributes[$order]);
-    }
-}
+// if (!debug_backtrace()) {
+//     $p = new CRIS_Publications();
+//     // default uses the cache automatically
+//     // $p->disable_cache();
+//     $f = new Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
+//     $publs = $p->by_orga_id("142285", $f);
+//     $order = "virtualdate";
+//     $formatter = new Formatter(null, null, $order, SORT_DESC);
+//     $res = $formatter->execute($publs);
+//     foreach ($res[$order] as $key => $value) {
+//         // Escape the key and the value before printing them
+//             echo sprintf(
+//                 "%s: %s\n", 
+//                 esc_html($key), 
+//                 esc_html($value->attributes[$order])
+//             );
+//         }
+// }

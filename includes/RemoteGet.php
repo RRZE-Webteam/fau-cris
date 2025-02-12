@@ -21,6 +21,7 @@ class RemoteGet
         $content = Cache::get($url);
         if ($content === false) {
             $response = self::remoteGet($url, $args, $safe);
+
             if (is_wp_error($response)) {
                 do_action(
                     'rrze.log.error',
@@ -28,6 +29,7 @@ class RemoteGet
                     [
                         'plugin' => 'fau-cris',
                         'wp-error' => $response->get_error_message(),
+                        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
                         'method' => debug_backtrace()[1]['function'] ?? '',
                         'url' => $url
                     ]

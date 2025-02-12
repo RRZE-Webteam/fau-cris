@@ -26,7 +26,7 @@ class Projekte
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de')
     {
-        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+        if (isset($_SERVER['PHP_SELF']) && strpos(sanitize_text_field(wp_unslash($_SERVER['PHP_SELF'])), "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
@@ -554,7 +554,7 @@ class Projekte
                     break;
             }
             $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $proj_details['#description#'] = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $proj_details['#description#'] = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
 
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], $this->page_lang);
             $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
@@ -638,7 +638,7 @@ class Projekte
                     break;
             }
             $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $proj_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $proj_details['#description#'] = wp_strip_all_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], $this->page_lang);
             $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $start = $project['cfstartdate'];
@@ -711,7 +711,7 @@ class Projekte
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
             $imgs = self::get_project_images($project['ID']);
 
@@ -816,7 +816,7 @@ class Projekte
             if (!in_array('publications', $param['hide'])) {
                 $publications = $this->get_project_publications($id, $param);
                 if (!empty($publications) && $publications!='') {
-                    if (!empty($publications) && trim(strip_tags($publications)) !== '') {
+                    if (!empty($publications) && trim(wp_strip_all_tags($publications)) !== '') {
                         $projlist  .= "<h4>" . __('Publikationen', 'fau-cris') . ": </h4>" . $publications;
 
                     }
@@ -863,7 +863,7 @@ class Projekte
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
             $projlist .= "<li>";
@@ -976,7 +976,7 @@ class Projekte
             $title = htmlentities($title, ENT_QUOTES);
             $title = str_replace(['[', ']'], ['&#91;', '&#93;'], $title);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             if (mb_strlen($description) > 500) {
                 $pos = strpos($description, ' ', 500);
                 $description = mb_substr($description, 0, $pos) . '&hellip;';
@@ -1012,22 +1012,30 @@ class Projekte
             }
             }
 
-            if (!in_array('leader', $hide)) {
-            $leaderIDs = explode(",", $project['relpersidlead']);
+            if (!in_array('leader', $hide) || !in_array('card', $hide)) {
+                  $leaderIDs = explode(",", $project['relpersidlead']);
                   $leaderArray = $this->get_project_leaders($id, $leaderIDs);
                   $leaders = array();
+                //   $learde_kontakt_card=array();
+                  $learde_kontakt_card = '<div class="person-card">';
                   foreach ($leaderArray as $l_id => $l_names) {
                   $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
-                  $fcid = Tools::person_exists('wp', 'Manfred', 'Pirner');
-                //   print_r($fcid);
-                //   die();
-
+                  $fcid = Tools::person_exists($this->cms, $l_names['firstname'], $l_names['lastname'],$this->univis);
+                  if (!empty($fcid)) {
+                    $shortcode = '[kontakt id="'.$fcid.'"  format="card" class="card-xsmall shrink-contact"]';
+                    $learde_kontakt_card .= $shortcode;
                   }
+                
+                  }
+                  $learde_kontakt_card .= '</div>';
 
-                  if (isset($leaders) && !empty($leaders)) {
+                  if (isset($leaders) && !empty($leaders) && !in_array('leader', $hide)) {
                     $projlist .= "<strong>" . __('Projektleitung', 'fau-cris') . ': </strong>';
-                    $projlist .= implode(', ', $leaders) . '<br />';
+                    $projlist .= implode(', ', $leaders) . '<br />';   
                 }
+                if (isset($learde_kontakt_card) && !empty($learde_kontakt_card) && !in_array('card', $hide)) {
+                        $projlist .= $learde_kontakt_card. '<br />';
+                    }
             }
             
             if (!in_array('abstract', $hide) && !empty($description)) {
@@ -1044,6 +1052,13 @@ class Projekte
         return do_shortcode($projlist);
     }
 
+    function my_plugin_inline_css() {
+        echo '<style>
+        .person-card {
+            justify-content: flex-start !important;
+        }
+        </style>';
+    }
     public function fieldProj($field,$param=array(), $return = 'list', $seed = false)
     {
 
@@ -1092,7 +1107,7 @@ class Projekte
         return $output;
     }
 
-    public function fieldPersons($field)
+    public function fieldPersons($field,$param=array())
     {
         $ws = new CRIS_projects();
         try {
@@ -1103,6 +1118,11 @@ class Projekte
         if (!count($projArray)) {
             return;
         }
+
+        if ($param['projects_status'] !== '' || $param['projects_start'] !== ''){
+            $projArray=Tools::field_project_status_filter($projArray,$param['projects_status'],$param['projects_start']);
+        }
+
         $persList = array();
         foreach ($projArray as $project) {
             $project = (array) $project;

@@ -210,12 +210,26 @@ class Tools
                 $colarr[$col]['_' . $k] = strtolower($row[$col]);
             }
         }
-        $eval = 'array_multisort(';
-        foreach ($cols as $col => $order) {
-            $eval .= '$colarr[\'' . $col . '\'],' . $order . ',';
-        }
-        $eval = mb_substr($eval, 0, -1) . ');';
-        eval($eval);
+
+        // $eval = 'array_multisort(';
+        // foreach ($cols as $col => $order) {
+        //     $eval .= '$colarr[\'' . $col . '\'],' . $order . ',';
+        // }
+        // $eval = mb_substr($eval, 0, -1) . ');';
+        // eval($eval);
+        
+         // Prepare arguments for array_multisort
+            $args = [];
+            foreach ($cols as $col => $order) {
+                $args[] = $colarr[$col]; // Add column data
+                $args[] = $order;        // Add sort order (e.g., SORT_ASC, SORT_DESC)
+            }
+            $args[] = &$array;          // Add the original array (by reference)
+
+            // Perform the sort
+            array_multisort(...$args);
+
+
         $ret = array();
         foreach ($colarr as $col => $arr) {
             foreach ($arr as $k => $v) {
@@ -228,6 +242,8 @@ class Tools
         }
         return $ret;
     }
+
+
 
 
 // Function to sort by a specific key
@@ -383,8 +399,8 @@ public static function sortByKey(array &$array, string $key): void {
         $filter = array();
         if ($year !== '' && $year !== null) {
             if ($year == 'current') {
-                $filter['startyear__le'] = date('Y');
-                $filter['endyear__ge'] = date('Y');
+                $filter['startyear__le'] = gmdate('Y');
+                $filter['endyear__ge'] = gmdate('Y');
             } else {
                 $filter['endyear__ge'] = $year;
                 $filter['startyear__le'] = $year;
@@ -419,7 +435,7 @@ public static function sortByKey(array &$array, string $key): void {
             } else {
                 $arrStatus = (array) $status;
             }
-            $today = date('Y-m-d');
+            $today = gmdate('Y-m-d');
             $statusSet = ['completed', 'current', 'future'];
             if (array_intersect($arrStatus, $statusSet) == ['completed']) {
                 $filter['virtualenddate__lt'] = $today;
@@ -685,7 +701,7 @@ public static function sortByKey(array &$array, string $key): void {
         }
     }
 
-    public static function person_id($cms = '', $firstname = '', $lastname = '')
+    public static function person_id($cms = '', $firstname = '', $lastname = '',$nameorder = '')
     {
         if ($cms == 'wp') {
             global $wpdb;
@@ -735,8 +751,9 @@ public static function sortByKey(array &$array, string $key): void {
 
     public static function get_univis_id()
     {
-        $fpath = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/tools/univis/univis.conf';
-        $fpath_alternative = $_SERVER["DOCUMENT_ROOT"] . '/vkdaten/univis.conf';
+         if (isset($_SERVER['DOCUMENT_ROOT']) ) {   
+        $fpath = sanitize_text_field(wp_unslash($_SERVER["DOCUMENT_ROOT"])) . '/vkdaten/tools/univis/univis.conf';
+        $fpath_alternative = sanitize_text_field(wp_unslash($_SERVER["DOCUMENT_ROOT"])) . '/vkdaten/univis.conf';
         if (file_exists($fpath_alternative)) {
             $fpath = $fpath_alternative;
         }
@@ -751,6 +768,7 @@ public static function sortByKey(array &$array, string $key): void {
         }
         fclose($fh);
         return $univisID;
+      }
     }
 
     public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = ''): string
@@ -758,7 +776,7 @@ public static function sortByKey(array &$array, string $key): void {
         $person = '';
         switch ($target) {
             case 'cris':
-                if (is_numeric($id)) {
+                if (is_numeric($id) && strlen($id) > 2) {
                     $link_pre = "<a href=\"" . FAU_CRIS::cris_publicweb . "persons/" . $id . "\" class=\"extern\">";
                     $link_post = "</a>";
                 } else {

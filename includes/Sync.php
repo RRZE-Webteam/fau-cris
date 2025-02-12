@@ -5,13 +5,38 @@ defined('ABSPATH') || exit;
 require_once( "Projekte.php" );
 use  RRZE\Cris\Organisation;
 use  RRZE\Cris\Forschungsbereiche;
-
-
-
+    
 
 class Sync
 {
-
+    public $options;
+    public $orgNr;
+    public $page_lang;
+    public $menu_items;
+    public $menu_id;
+    public $portal_items;
+    public $portal_id;
+    public $message;
+    public $menu_position;
+    public $num_created_p;
+    public $num_updated_p;
+    public $num_ok_p;
+    public $num_created_m;
+    public $num_updated_m;
+    public $num_ok_m;
+    public $num_created_mp;
+    public $num_updated_mp;
+    public $num_ok_mp;
+    public $num_errors;
+    public $title_research;
+    public $menu_research;
+    public $title_noFieldsPage;
+    public $page_template_portal;
+    public $page_template_nav;
+    public $num_menu_items;
+    public $menu_count;
+    public $field_projects;
+    
     private int $menu_position_start = 2;
 
     public function __construct($page_lang = 'de')
@@ -64,7 +89,9 @@ class Sync
             $this->menu_id = wp_create_nav_menu($menu_name);
             $menu[$menu_slug] = $this->menu_id;
             set_theme_mod('nav_menu_locations', $menu);
-            $this->message .= '<li>' . sprintf(__('Menü "%s" neu erstellt.', 'fau-cris'), $menu_name) . '</li>';
+            $this->message .= '<li>' . sprintf(
+                    /* translators: 1: menu name */
+                __('Menü "%s" neu erstellt.', 'fau-cris'), $menu_name) . '</li>';
         } else {
             $this->menu_id = $menu_id;
             if (wp_get_nav_menu_items($this->menu_id)) {
@@ -83,7 +110,9 @@ class Sync
             }
         } else {
             $this->portal_id = wp_create_nav_menu($portal_name);
-            $this->message .= '<li>' . sprintf(__('Portalmenü "%s" neu erstellt.', 'fau-cris'), $portal_name) . '</li>';
+            $this->message .= '<li>' . sprintf(
+                /* translators: 1: portal name */
+                __('Portalmenü "%s" neu erstellt.', 'fau-cris'), $portal_name) . '</li>';
         }
 
         /*
@@ -134,7 +163,9 @@ class Sync
             $research_pid = wp_insert_post($args);
             if ($research_pid) {
                 $this->num_created_p ++;
-                $this->message .= '<li>' . sprintf(__('Seite "%s" wurde erstellt.', 'fau-cris'), $this->title_research) . '</li>';
+                $this->message .= '<li>' . sprintf(
+                        /* translators: 1: title research */
+                    __('Seite "%s" wurde erstellt.', 'fau-cris'), $this->title_research) . '</li>';
             }
         } else {
             // Seite Forschung existiert bereits
@@ -429,11 +460,19 @@ class Sync
          *  Admin-Notice: Synchronisation erfolgreich
          */
         if ($manual) {
-            $this->message .= '<li>' . __('Seiten', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf(__('%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris'), $this->num_ok_p, $this->num_updated_p, $this->num_created_p) . '</span></li>';
-            $this->message .= '<li>' . __('Menüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf(__('%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris'), $this->num_ok_m, $this->num_updated_m, $this->num_created_m) . '</span></li>';
-            $this->message .= '<li>' . __('Portalmenüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf(__('%1d vorhanden, %2d aktualisiert, %3d neu', 'fau-cris'), $this->num_ok_mp, $this->num_updated_mp, $this->num_created_mp) . '</span></li>';
+            $this->message .= '<li>' . __('Seiten', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf(
+                 /* translators: 1: number of items found, 2: number of items updated, 3: number of items created */
+                __('%1$d vorhanden, %2$d aktualisiert, %3$d neu', 'fau-cris'), $this->num_ok_p, $this->num_updated_p, $this->num_created_p) . '</span></li>';
+            $this->message .= '<li>' . __('Menüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf(
+                /* translators: 1: number ok m items found, 2: number of updated m, 3: number created m */
+                __('%1$d vorhanden, %2$d aktualisiert, %3$d neu', 'fau-cris'), $this->num_ok_m, $this->num_updated_m, $this->num_created_m) . '</span></li>';
+            $this->message .= '<li>' . __('Portalmenüeinträge', 'fau-cris') . ': <span style="font-weight:normal;">' . sprintf(
+                 /* translators: 1: number of items found, 2: number of items updated, 3: number of items created */
+                __('%1$d vorhanden, %2$d aktualisiert, %3$d neu', 'fau-cris'), $this->num_ok_mp, $this->num_updated_mp, $this->num_created_mp) . '</span></li>';
             if ($this->num_errors > 0) {
-                $this->message .= '<li>' . sprintf(__('%d Seite(n) konnten nicht erstellt werden.', 'fau-cris'), $this->num_errors) . '</li>';
+                $this->message .= '<li>' . sprintf(
+                        /* translators: 1: num errors */
+                    __('%d Seite(n) konnten nicht erstellt werden.', 'fau-cris'), $this->num_errors) . '</li>';
             }
             $this->message .= '</ul>';
             add_settings_error('AutoSyncComplete', 'autosynccomplete', $this->message, 'updated');
@@ -515,10 +554,14 @@ class Sync
             }
             $pid = wp_insert_post($args);
             if ($pid) {
-                $this->message .= '<li>' . sprintf(__('Seite "%s" wurde erstellt.', 'fau-cris'), $title) . '</li>';
+                $this->message .= '<li>' . sprintf(
+                    /* translators: 1: title */
+                    __('Seite "%s" wurde erstellt.', 'fau-cris'), $title) . '</li>';
                 $this->num_created_p ++;
             } else {
-                $this->message .= '<li>' . sprintf(__('Seite "%s" konnte nicht erstellt werden.', 'fau-cris'), $title) . '</li>';
+                $this->message .= '<li>' . sprintf(
+                    /* translators: 1: title */
+                    __('Seite "%s" konnte nicht erstellt werden.', 'fau-cris'), $title) . '</li>';
                 $this->num_errors ++;
             }
         } else {

@@ -116,7 +116,7 @@ class Filter
             case "gt":
                 return ($value > $reference);
             default:
-                throw new Exception('invalid compare operator: '. $operator);
+                throw new Exception('invalid compare operator: '. esc_html($operator));
         }
     }
 }

@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.23.2
+ * Version: 3.25.3
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.23.2';
+    const version = '3.25.3';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -133,23 +133,33 @@ class FAU_CRIS
         wp_clear_scheduled_hook('cris_auto_update');
     }
 
+
     private static function version_compare(): void
     {
-        $error = '';
+        $error = '';       
+            if (version_compare(PHP_VERSION, self::php_version, '<')) {
 
-        if (version_compare(PHP_VERSION, self::php_version, '<')) {
-            $error = sprintf(__('Ihre PHP-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die PHP-Version %s.', 'fau-cris'), PHP_VERSION, self::php_version);
-        }
+                $error = sprintf(
+                    /* translators: 1: current PHP version, 2: required PHP version */
+                    __('Ihre PHP-Version %1$s ist veraltet. Bitte aktualisieren Sie mindestens auf die PHP-Version %2$s.', 'fau-cris'),
+                    PHP_VERSION,
+                    self::php_version
+                );
+            }
+
+
 
         if (version_compare($GLOBALS['wp_version'], self::wp_version, '<')) {
-            $error = sprintf(__('Ihre Wordpress-Version %s ist veraltet. Bitte aktualisieren Sie mindestens auf die Wordpress-Version %s.', 'fau-cris'), $GLOBALS['wp_version'], self::wp_version);
+            $error = sprintf(
+                     /* translators: 1: current WordPress version, 2: required WordPress version */
+                __('Ihre Wordpress-Version %1$s ist veraltet. Bitte aktualisieren Sie mindestens auf die Wordpress-Version %2$s.', 'fau-cris'), $GLOBALS['wp_version'], self::wp_version);
         }
 
         if (!empty($error)) {
             deactivate_plugins(plugin_basename(__FILE__), false, true);
             wp_die(
-                $error,
-                __('Fehler bei der Aktivierung des Plugins', 'fau-cris'),
+                esc_html($error),
+                esc_html(__('Fehler bei der Aktivierung des Plugins', 'fau-cris')),
                 array(
                 'response' => 500,
                 'back_link' => true
@@ -272,38 +282,76 @@ class FAU_CRIS
     /**
      * Options page callback
      */
-    public static function options_fau_cris(): void
+public static function options_fau_cris(): void
     {
         $tabs = self::options_page_tabs();
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $current = self::current_tab($_GET);
-        if (isset($_GET['action']) && $_GET['action'] == 'cris_sync') {
-            global $post;
-            $page_lang = substr(get_locale(), 0, 2);
-            $sync = new Sync($page_lang);
-            $result = $sync->do_sync(true);
+
+        // Initialize WP_Error for handling errors
+        $error = new \WP_Error();
+        // Verify nonce before accessing $_GET['tab']
+        if (!isset($_GET['_wpnonce_tab']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce_tab'])), 'fau_cris_tab_nonce')) {
+        $error->add('nonce_failed', __('Security check failed!', 'fau-cris'));
+        $current = self::current_tab($_GET); // Fallback to the default tab
         }
+    
+        // Verify nonce and process action if valid
+            if (isset($_GET['action']) && $_GET['action'] === 'cris_sync') {
+                // Sanitize and verify the nonce
+                $nonce = isset($_GET['_wpnonce_tab']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce_tab'])) : '';
+                if (!wp_verify_nonce($nonce, 'fau_cris_tab_nonce')) {
+                    $error->add('nonce_failed', __('Security check failed for sync action!', 'fau-cris'));
+                } else {
+                    // Process sync action
+                    global $post;
+                    $page_lang = substr(get_locale(), 0, 2);
+                    $sync = new Sync($page_lang);
+                    $result = $sync->do_sync(true);
+                }
+            }
         $options = self::get_options();
         ?>
 
         <div class="wrap">
-            <h2><?php _e('Einstellungen', 'fau-cris'); ?> &rsaquo; CRIS</h2>
+            <h2><?php esc_html_e('Einstellungen', 'fau-cris'); ?> &rsaquo; CRIS</h2>
+            
+            <?php 
+            // Display errors if any
+        if (!empty($error->errors)) {
+            foreach ($error->get_error_messages() as $message) {
+                echo '<div class="notice notice-error"><p>' . esc_html($message) . '</p></div>';
+            }
+        }
+                if (isset($result)) {
+                print(esc_html($result));} ?>
+
             <h2 class="nav-tab-wrapper">
                 <?php foreach ($tabs as $tab => $name) {
                     $class = ($tab == $current) ? ' nav-tab-active' : '';
-                    echo "<a class='nav-tab$class' href='?page=options-fau-cris&tab=$tab'>$name</a>";
+                    echo "<a class='nav-tab" . esc_attr( $class ) . "' href='" . esc_url( wp_nonce_url("?page=options-fau-cris&tab=$tab", 'fau_cris_tab_nonce', '_wpnonce_tab')) . "'>" . esc_html( $name ) . "</a>";
                 } ?>
             </h2>
-            <?php if (isset($result)) {
-                print $result;
-            } ?>
+
             <form method="post" action="options.php">
                 <?php
+                // Add the nonce field
+                wp_nonce_field('fau_cris_form_nonce', '_wpnonce_form');
                 settings_fields('fau_cris_options');
                 do_settings_sections('fau_cris_options');
                 if (isset($current) && $current == 'sync'
                 && (isset($options['cris_sync_check']) && $options['cris_sync_check'] == 1)) {
-                    echo '<a href="?page=options-fau-cris&tab=sync&action=cris_sync" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;" ><span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . __('Jetzt synchronisieren', 'fau-cris') . '</a>';
-                }
+                    $sync_url = wp_nonce_url(
+                    '?page=options-fau-cris&tab=sync&action=cris_sync',
+                    'fau_cris_tab_nonce',
+                    '_wpnonce_tab'
+                );
+                echo '<a href="' . esc_url($sync_url) . '" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;">
+                    <span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' .
+                    esc_html(__('Jetzt synchronisieren', 'fau-cris')) . '</a>';
+            }
+                    // echo '<a href="' . esc_url( '?page=options-fau-cris&tab=sync&action=cris_sync' ) . '" name="sync-now" id="sync-now" class="button button-secondary" style="margin-bottom: 10px;"> <span class="dashicons dashicons-image-rotate" style="margin: 3px 5px 0 0;"></span>' . esc_html( __('Jetzt synchronisieren', 'fau-cris') ) . '</a>'; }
                 submit_button();
                 ?>
             </form>
@@ -322,8 +370,9 @@ class FAU_CRIS
             self::option_name, // Option name
             array(__CLASS__, 'sanitize') // Sanitize Callback
         );
-
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if (isset($_GET)) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $tab = self::current_tab($_GET);
         }
         switch ($tab) {
@@ -705,53 +754,76 @@ class FAU_CRIS
      */
     public static function sanitize()
     {
+        $error = new \WP_Error();
+         // Verify nonce
+        
+        if (!isset($_POST['_wpnonce_form']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce_form'], 'fau_cris_form_nonce')))) {
+             $error->add('nonce_failed', __('Security check failed!', 'fau-cris'));
+        }
 
+    //     // Display error messages if any
+    // if (!empty($error->errors)) {
+    //     foreach ($error->get_error_messages() as $message) {
+    //         add_settings_error(
+    //             'fau_cris_options', // Settings page slug
+    //             'nonce_failed', // Error code
+    //             $message, // Error message
+    //             'error' // Message type (error, success, warning, info)
+    //         );
+    //     }
+    // }
+            
         $new_input = self::get_options();
         $default_options = self::default_options();
-        $parts = parse_url($_POST['_wp_http_referer']);
+         if (!isset($_POST['_wp_http_referer'])) {
+            return $new_input; // Return early if the referer is missing
+        }
+        $parts = wp_parse_url(sanitize_text_field(wp_unslash($_POST['_wp_http_referer'])));
         parse_str($parts['query'], $query);
         $tab = (array_key_exists('tab', $query)) ? $query['tab'] : 'general';
+
+
 
         switch ($tab) {
             case 'general':
             default:
-                $new_input['cris_org_nr'] = isset($_POST[self::option_name]['cris_org_nr']) ? sanitize_text_field($_POST[self::option_name]['cris_org_nr']) : 0;
+                $new_input['cris_org_nr'] = isset($_POST[self::option_name]['cris_org_nr']) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_org_nr'])) : 0;
                 break;
 
             case 'layout':
-                $new_input['cris_pub_order'] = isset($_POST[self::option_name]['cris_pub_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_order'])) : $default_options['cris_pub_order'];
-                $new_input['cris_pub_subtypes_order'] = isset($_POST[self::option_name]['cris_pub_subtypes_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_subtypes_order'])) : $default_options['cris_pub_subtypes_order'];
-                $new_input['cris_univis'] = in_array($_POST[self::option_name]['cris_univis'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_univis'] : $default_options['cris_univis'];
+                $new_input['cris_pub_order'] = isset($_POST[self::option_name]['cris_pub_order']) ? explode("\n", str_replace("\r", "", sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_pub_order'])))) : $default_options['cris_pub_order'];
+                $new_input['cris_pub_subtypes_order'] = isset($_POST[self::option_name]['cris_pub_subtypes_order']) ? explode("\n", str_replace("\r", "", sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_pub_subtypes_order'])))) : $default_options['cris_pub_subtypes_order'];
+                $new_input['cris_univis'] = isset($_POST[self::option_name]['cris_univis']) && in_array(sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_univis'])), array('person', 'cris', 'none')) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_univis'])) : $default_options['cris_univis'];
                 $new_input['cris_bibtex'] = isset($_POST[self::option_name]['cris_bibtex']) ? 1 : 0;
                 $new_input['cris_url'] = isset($_POST[self::option_name]['cris_url']) ? 1 : 0;
                 $new_input['cris_doi'] = isset($_POST[self::option_name]['cris_doi']) ? 1 : 0;
                 $new_input['cris_oa'] = isset($_POST[self::option_name]['cris_oa']) ? 1 : 0;
                 $new_input['cris_name_order_plugin'] = (isset($_POST[self::option_name]['cris_name_order_plugin'])
                         && $_POST[self::option_name]['cris_name_order_plugin'] == 'lastname-firstname') ? 'lastname-firstname' : 'firstname-lastname';
-                $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_award_order'])) : $default_options['cris_award_order'];
-                $new_input['cris_award_link'] = in_array($_POST[self::option_name]['cris_award_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_award_link'] : $default_options['cris_award_link'];
-                $new_input['cris_fields_num_pub'] = isset($_POST[self::option_name]['cris_fields_num_pub']) ? sanitize_text_field($_POST[self::option_name]['cris_fields_num_pub']) : 0;
-                $new_input['cris_project_num_pub'] = isset($_POST[self::option_name]['cris_project_num_pub']) ? sanitize_text_field($_POST[self::option_name]['cris_project_num_pub']) : 0;
-                $new_input['cris_field_link'] = in_array($_POST[self::option_name]['cris_field_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_field_link'] : $default_options['cris_field_link'];
-                $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_project_order'])) : $default_options['cris_project_order'];
-                $new_input['cris_project_link'] = in_array($_POST[self::option_name]['cris_project_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_project_link'] : $default_options['cris_project_link'];
-                $new_input['cris_patent_order'] = isset($_POST[self::option_name]['cris_patent_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_patent_order'])) : $default_options['cris_patent_order'];
-                $new_input['cris_patent_link'] = in_array($_POST[self::option_name]['cris_patent_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_patent_link'] : $default_options['cris_patent_link'];
-                $new_input['cris_activities_order'] = isset($_POST[self::option_name]['cris_activities_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_activities_order'])) : $default_options['cris_activities_order'];
-                $new_input['cris_activities_link'] = in_array($_POST[self::option_name]['cris_activities_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_activities_link'] : $default_options['cris_activities_link'];
-                $new_input['cris_standardizations_order'] = isset($_POST[self::option_name]['cris_standardizations_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_standardizations_order'])) : $default_options['cris_standardizations_order'];
-                $new_input['cris_standardizations_link'] = in_array($_POST[self::option_name]['cris_standardizations_link'], array('person', 'cris', 'none')) ? $_POST[self::option_name]['cris_standardizations_link'] : $default_options['cris_standardizations_link'];
-                $new_input['cris_pub_title_link_order'] = isset($_POST[self::option_name]['cris_pub_title_link_order']) ? explode("\n", str_replace("\r", "", $_POST[self::option_name]['cris_pub_title_link_order'])) : $default_options['cris_pub_title_link_order'];
+                $new_input['cris_award_order'] = isset($_POST[self::option_name]['cris_award_order']) ? explode("\n", str_replace("\r", "", sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_award_order'])))) : $default_options['cris_award_order'];
+                $new_input['cris_award_link'] = isset($_POST[self::option_name]['cris_award_link']) && in_array(sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_award_link'])), array('person', 'cris', 'none')) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_award_link'])) : $default_options['cris_award_link'];
+                $new_input['cris_fields_num_pub'] = isset($_POST[self::option_name]['cris_fields_num_pub']) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_fields_num_pub'])) : 0;
+                $new_input['cris_project_num_pub'] = isset($_POST[self::option_name]['cris_project_num_pub']) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_project_num_pub'])) : 0;
+                $new_input['cris_field_link'] = isset($_POST[self::option_name]['cris_field_link']) && in_array(sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_field_link'])), array('person', 'cris', 'none')) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_field_link'])) : $default_options['cris_field_link'];
+                $new_input['cris_project_order'] = isset($_POST[self::option_name]['cris_project_order']) ? explode("\n", str_replace("\r", "", sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_project_order'])))) : $default_options['cris_project_order'];
+                $new_input['cris_project_link'] = isset($_POST[self::option_name]['cris_project_link']) && in_array(sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_project_link'])), array('person', 'cris', 'none')) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_project_link'])) : $default_options['cris_project_link'];
+                $new_input['cris_patent_order'] = isset($_POST[self::option_name]['cris_patent_order']) ? explode("\n", str_replace("\r", "", sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_patent_order'])))) : $default_options['cris_patent_order'];
+                $new_input['cris_patent_link'] = isset($_POST[self::option_name]['cris_patent_link']) && in_array(sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_patent_link'])), array('person', 'cris', 'none')) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_patent_link'])) : $default_options['cris_patent_link'];
+                $new_input['cris_activities_order'] = isset($_POST[self::option_name]['cris_activities_order']) ? explode("\n", str_replace("\r", "", sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_activities_order'])))) : $default_options['cris_activities_order'];
+                $new_input['cris_activities_link'] = isset($_POST[self::option_name]['cris_activities_link']) && in_array(sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_activities_link'])), array('person', 'cris', 'none')) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_activities_link'])) : $default_options['cris_activities_link'];
+                $new_input['cris_standardizations_order'] = isset($_POST[self::option_name]['cris_standardizations_order']) ? explode("\n", str_replace("\r", "", sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_standardizations_order'])))) : $default_options['cris_standardizations_order'];
+                $new_input['cris_standardizations_link'] = isset($_POST[self::option_name]['cris_standardizations_link']) && in_array(sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_standardizations_link'])), array('person', 'cris', 'none')) ? sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_standardizations_link'])) : $default_options['cris_standardizations_link'];
+                $new_input['cris_pub_title_link_order'] = isset($_POST[self::option_name]['cris_pub_title_link_order']) ? explode("\n", str_replace("\r", "", sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_pub_title_link_order'])))) : $default_options['cris_pub_title_link_order'];
                 break;
             case 'sync':
                 $new_input['cris_sync_check'] = isset($_POST[self::option_name]['cris_sync_check']) ? 1 : 0;
-                if (is_array($_POST[self::option_name]['cris_sync_shortcode_format'])) {
+                if (isset($_POST[self::option_name]['cris_sync_shortcode_format']) && is_array($_POST[self::option_name]['cris_sync_shortcode_format'])) {
                     /*foreach ($_POST[self::option_name]['cris_sync_shortcode_format'] as $_check){
                         foreach ($_check as $_k => $_v) {
                             $new_input['cris_sync_shortcode_format'][$_k] = $_v;
                         }
                     }*/
-                    $new_input['cris_sync_shortcode_format'] = $_POST[self::option_name]['cris_sync_shortcode_format'];
+                    $new_input['cris_sync_shortcode_format'] = sanitize_text_field(wp_unslash($_POST[self::option_name]['cris_sync_shortcode_format']));
                 }
                 break;
         }
@@ -773,34 +845,48 @@ class FAU_CRIS
         }
         if ($name == 'cris_sync_check') {
             print "<p>";
-            printf(__('%1s Wichtig! %2s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3s Benutzerhandbuch! %3s', 'fau-cris'), '<strong>', '</strong>', '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/">', '</a>');
+            printf(
+                /* translators: 1: strong tag, 2: strong tag, 3: link to user manual, 4: closing link tag */
+            esc_html__( '%1$s Wichtig! %2$s Lesen Sie vor der Aktivierung unbedingt die Hinweise in unserem %3$s Benutzerhandbuch! %4$s', 'fau-cris' ),
+            '<strong>',
+            '</strong>',
+            '<a href="' . esc_url( 'https://www.wordpress.rrze.fau.de/plugins/fau-cris/erweiterte-optionen/' ) . '">',
+            '</a>'
+                );
             print "<p>";
         }
         if (array_key_exists('options', $args)) {
             $checks = $args['options'];
             foreach ($checks as $_k => $_v) { ?>
                 <label>
-                    <input name="<?php printf('%s[' . $name . '][' . $_k . ']', self::option_name); ?>"
-                        type='checkbox'
-                        value='1'
-                        <?php
-                        if (array_key_exists($name, $options) && array_key_exists($_k, $options[$name])) {
-                            print checked($options[$name][ $_k], 1, false);
-                        }
+                    <input 
+                        name="<?php echo esc_attr( sprintf('%s[%s][%s]', self::option_name, $name, $_k ) ); ?>" 
+                        type="checkbox" 
+                        value="1"
+                        <?php 
+                        if (isset($options[$name][$_k])) { 
+                            echo checked($options[$name][$_k], 1, false); 
+                        } 
                         ?>
                     >
-                    <?php print $_v; ?>
+                    <?php echo esc_html( $_v ); ?>
                 </label><br />
             <?php }
         } else { ?>
-            <label><input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='checkbox' value='1'         <?php
-            if (array_key_exists($name, $options)) {
-                print checked($options[$name], 1, false);
-            }
-            ?> >
-            <?php if (isset($description)) { ?>
-                <span class="description"><?php echo $description; ?></span></label>
-            <?php }
+            <label>
+                <input 
+                    name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>" 
+                    type="checkbox" 
+                    value="1" 
+                    <?php
+                    if (isset($options[$name])) {
+                        echo checked($options[$name], 1, false);
+                    }
+                    ?> >
+                <?php if (isset($description)) { ?>
+                    <span class="description"><?php echo esc_html( $description ); ?></span></label>
+                <?php }
+            
         }
     }
 
@@ -819,20 +905,21 @@ class FAU_CRIS
         }
         foreach ($radios as $_k => $_v) { ?>
             <label>
-                <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>"
-                   type='radio'
-                   value='<?php print $_k; ?>'
-                   <?php
-                    if (array_key_exists($name, $options)) {
-                        checked($options[$name], $_k);
-                    } ?>
-                >
-                <?php print $_v; ?>
+                <input 
+                    name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>" 
+                    type="radio" 
+                    value="<?php echo esc_attr( $_k ); ?>" 
+                    <?php 
+                    if (isset($options[$name])) { 
+                        checked($options[$name], $_k); 
+                    } 
+                    ?> >
+                <?php echo esc_html( $_v ); ?>
             </label><br />
         <?php }
 
         if (isset($description)) { ?>
-            <p class="description"><?php echo $description; ?></p>
+            <p class="description"><?php echo esc_html($description); ?></p>
         <?php }
     }
 
@@ -849,19 +936,19 @@ class FAU_CRIS
         if (array_key_exists('options', $args)) {
             $limit = $args['options'];
         } ?>
-        <select name="<?php printf('%s[' . $name . ']', self::option_name); ?>">
-        <?php foreach ($limit as $_k => $_v) { ?>
-            <option value='<?php print $_k; ?>'
-                <?php if (array_key_exists($name, $options)) {
-                    selected($options[$name], $_k);
-                } ?>>
-                    <?php print $_v; ?>
-            </option>
-        <?php } ?>
+        <select name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name ) ); ?>">
+            <?php foreach ($limit as $_k => $_v) { ?>
+                <option value="<?php echo esc_attr( $_k ); ?>" 
+                    <?php if (isset($options[$name])) { 
+                        selected($options[$name], $_k); 
+                    } ?>>
+                    <?php echo esc_html( $_v ); ?>
+                </option>
+            <?php } ?>
         </select>
         <?php
         if (isset($description)) { ?>
-            <p class="description"><?php echo $description; ?></p>
+            <p class="description"><?php echo esc_html($description); ?></p>
         <?php }
     }
 
@@ -876,13 +963,13 @@ class FAU_CRIS
             $description = esc_attr($args['description']);
         }
         ?>
-        <input name="<?php printf('%s[' . $name . ']', self::option_name); ?>" type='text' value="<?php
+        <input name="<?php echo esc_attr( sprintf('%s[%s]', self::option_name, $name )); ?>" type='text' value="<?php
         if (array_key_exists($name, $options)) {
-            echo $options[$name];
+            echo esc_attr($options[$name]);
         }
         ?>" ><br />
                <?php if (isset($description)) { ?>
-            <span class="description"><?php echo $description; ?></span>
+            <span class="description"><?php echo esc_attr($description); ?></span>
                     <?php
                }
     }
@@ -899,20 +986,21 @@ class FAU_CRIS
             $description = esc_attr($args['description']);
         }
         ?>
-        <textarea name="<?php printf('%s[' . $name . ']', self::option_name); ?>" cols="30" rows="8"><?php
+        <textarea name="<?php esc_attr(sprintf('%s[%s]', self::option_name, $name )); ?>" cols="30" rows="8"><?php
         if (array_key_exists($name, $options)) {
             if (is_array($options[$name]) && count($options[$name])>0 && $options[$name][0] !='') {
-                echo implode("\n", $options[$name]);
+                echo esc_attr(implode("\n", $options[$name]));
             } else {
-                echo implode("\n", $default_options[$name]);
+                echo esc_attr(implode("\n", $default_options[$name]));
             }
         }
         ?></textarea><br />
         <?php if (isset($description)) { ?>
-            <span class="description"><?php echo $description; ?></span>
+            <span class="description"><?php echo esc_attr($description); ?></span>
             <?php
         }
     }
+
 
     /**
      * Add Shortcodes
@@ -1222,7 +1310,9 @@ class FAU_CRIS
             'standardization' => '',
             'projects_status'=>'',
             'projects_start'=>'',
-            'author_position'=>''
+            'author_position'=>'',
+            'publicationsum'=>'',
+            'useprojpubls'=>'false'
         ];
 
         // Attributes
@@ -1291,6 +1381,8 @@ class FAU_CRIS
         $sc_param['projects_status'] = sanitize_text_field($projects_status);
         $sc_param['projects_start'] = sanitize_text_field($projects_start);
         $sc_param['author_position'] = sanitize_text_field($author_position);
+        $sc_param['publicationsum'] = sanitize_text_field($publicationsum);
+        $sc_param['useprojpubls'] = strtolower(sanitize_text_field($useprojpubls));
 
         switch ($sortby) {
             case 'created':
@@ -1355,14 +1447,22 @@ class FAU_CRIS
                 $sc_param['equipment'] = explode(',', $sc_param['equipment']);
             }
             $sc_param['entity_id'] = $sc_param['equipment'];
-        } elseif ($sc_param['field'] != '') {
+        } elseif ($sc_param['field'] != '' && $sc_param['useprojpubls'] == 'false') {
             $sc_param['entity'] = 'field';
             if (strpos($sc_param['field'], ',') !== false) {
                 $sc_param['field'] = str_replace(' ', '', $sc_param['field']);
                 $sc_param['field'] = explode(',', $sc_param['field']);
             }
-            $sc_param['entity_id'] = $sc_param['field'];
-        } elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
+            $sc_param['entity_id'] = $sc_param['field']; } 
+            elseif ($sc_param['field'] != '' && $sc_param['useprojpubls'] == 'true') {  
+            $sc_param['entity'] = 'field_incl_proj';
+            if (strpos($sc_param['field'], ',') !== false) {
+                $sc_param['field'] = str_replace(' ', '', $sc_param['field']);
+                $sc_param['field'] = explode(',', $sc_param['field']);
+            }
+            $sc_param['entity_id'] = $sc_param['field'];    
+        }
+        elseif (isset($sc_param['activity']) && $sc_param['activity'] != '') {
             $sc_param['entity'] = 'activity';
             $sc_param['entity_id'] = $sc_param['activity'];
         } elseif (isset($sc_param['patent']) && $sc_param['patent'] != '') {
@@ -1417,6 +1517,14 @@ class FAU_CRIS
         $sc_param['order1'] = '';
         $sc_param['order2'] = '';
 
+        if (isset($sc_param['publicationsum']) && $sc_param['publicationsum'] != '') {
+            if (strpos($sc_param['publicationsum'], ',') !== false) {
+                $sc_param['publicationsum'] = str_replace(' ', '', $sc_param['publicationsum']);
+                $sc_param['publicationsum'] = explode(',', $sc_param['publicationsum']);
+            }
+            
+        }
+
         if (!empty($orderby)) {
             if (strpos($orderby, ',') !== false) {
                 $orderby = str_replace(' ', '', $orderby);
@@ -1443,7 +1551,7 @@ class FAU_CRIS
         if ($post && has_shortcode($post->post_content, 'cris')
                 || $post && has_shortcode($post->post_content, 'cris-custom')) {
             wp_enqueue_style('cris', plugins_url('css/cris.css', __FILE__), array(), self::version);
-            wp_enqueue_script('cris', plugins_url('js/cris.js', __FILE__), array('jquery'), self::version);
+            wp_enqueue_script('cris', plugins_url('js/cris.js', __FILE__), array('jquery'), self::version,false);
         }
     }
 
@@ -1485,7 +1593,7 @@ class FAU_CRIS
                         . '<br />'
                         . __('Nächste automatische Synchronisierung:', 'fau-cris') . ' '
                         //. date ('d.m.Y - h:i', $timestamp)
-                        . get_date_from_gmt(date('Y-m-d H:i:s', $timestamp), 'd.m.Y - H:i');
+                        . get_date_from_gmt(gmdate('Y-m-d H:i:s', $timestamp), 'd.m.Y - H:i');
                 add_settings_error('AutoSyncComplete', 'autosynccomplete', $message, 'updated');
                 settings_errors();
             }
@@ -1513,18 +1621,17 @@ class FAU_CRIS
         $content_shortcode_publikationen = array(
             '<h1>Shortcodes</h1>'
             . '<ul>'
-            . '<li><code>[cris show="publications"]</code>: ' . __('Publikationsliste (automatisch nach Jahren gegliedert)') . '</li>'
-            . '<li><code>[cris show="awards"]</code>: ' . __('Auszeichnungen (automatisch nach Jahren sortiert)') . '</li>'
+            . '<li><code>[cris show="publications"]</code>: ' . __('Publikationsliste (automatisch nach Jahren gegliedert)','fau-cris') . '</li>'
+            . '<li><code>[cris show="awards"]</code>: ' . __('Auszeichnungen (automatisch nach Jahren sortiert)','fau-cris') . '</li>'
             . '</ul>'
             . '<h2>' . __('Mögliche Zusatzoptionen', 'fau-cris') . '</h2>'
-            . '<p>' . __('Ausgabe lässt sich beliebig anpassen. Eine Übersicht der verschiedenen Shortcode-Parameter zum Filtern, Sortieren und Ändern der Darstellung finden Sie unter: ') . '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/" target="_blank">https://www.wordpress.rrze.fau.de/plugins/fau-cris/</a>'
+            . '<p>' . __('Ausgabe lässt sich beliebig anpassen. Eine Übersicht der verschiedenen Shortcode-Parameter zum Filtern, Sortieren und Ändern der Darstellung finden Sie unter: ','fau-cris') . '<a href="https://www.wordpress.rrze.fau.de/plugins/fau-cris/" target="_blank">https://www.wordpress.rrze.fau.de/plugins/fau-cris/</a>'
 
         );
 
         $content_fauperson = array(
             '<p>' . __('Wenn Sie das <strong>FAU-Person</strong>-Plugin verwenden, können Autoren mit ihrer FAU-Person-Kontaktseite verlinkt werden.', 'fau-cris') . '</p>',
-            '<p>' . __('Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.', 'fau-cris') . '</p>',
-            '<p>' . __('', 'fau-cris') . '</p>'
+            '<p>' . __('Wenn diese Option in den Einstellungen des CRIS-Plugins aktiviert ist, überprüft das Plugin selbstständig, welche Personen vorhanden sind und setzt die entsprechenden Links.', 'fau-cris') . '</p>'
         );
 
         $helptexts = array(
