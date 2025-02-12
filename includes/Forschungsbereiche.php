@@ -29,7 +29,7 @@ class Forschungsbereiche
 
     public function __construct($einheit = '', $id = '', $page_lang = 'de', $sc_lang = 'de')
     {
-        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+        if (isset($_SERVER['PHP_SELF']) && strpos(sanitize_text_field(wp_unslash($_SERVER['PHP_SELF'])), "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
             $this->pathPersonenseiteUnivis = $this->options['Pfad_Personenseite_Univis'] . '/';
@@ -253,7 +253,7 @@ class Forschungsbereiche
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
             $param['fsp'] = ($field['selektion'] == 'Forschungsschwerpunkt') ? true : false;
             
             if (!in_array('title', $hide)) {
@@ -285,7 +285,7 @@ class Forschungsbereiche
                 && !is_array($param['field'])) {
                 $projects = $this->get_field_projects($id,$param);
 
-                if (!empty($projects) && trim(strip_tags($projects)) !== '') {
+                if (!empty($projects) && trim(wp_strip_all_tags($projects)) !== '') {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
                     $singlefield .= $projects;
                 }
@@ -376,7 +376,7 @@ class Forschungsbereiche
             $param['field'] = $id;
             
             $field_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $field_details['#description#'] = strip_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $field_details['#description#'] = wp_strip_all_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
             $field_details['#projects#'] = '';
             if (strpos($content, '#projects#') !== false) {
                 $field_details['#projects#'] = $this->get_field_projects($id,$param);
@@ -532,6 +532,7 @@ class Forschungsbereiche
         $args['order2']=$param['order2'];
         $args['sortby']=$param['sortby'];
         $args['author_position']=$param['author_position'];
+        $args['publicationsum']=$param['publicationsum'];
         if ($param['publications_orderby'] == 'year') {
             return $liste->pubNachJahr($args, $param['field'], '', $param['fsp']);
         }
@@ -705,14 +706,20 @@ class CRIS_field_image extends CRIS_Entity
 }
 
 # tests possible if called on command-line
-if (!debug_backtrace()) {
-    $p = new CRIS_Publications();
-    $f = new Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
-    $publs = $p->by_orga_id("142285", $f);
-    $order = "virtualdate";
-    $formatter = new Formatter(null, null, $order, SORT_DESC);
-    $res = $formatter->execute($publs);
-    foreach ($res[$order] as $key => $value) {
-        echo sprintf("%s: %s\n", $key, $value->attributes[$order]);
-    }
-}
+// if (!debug_backtrace()) {
+//     $p = new CRIS_Publications();
+//     $f = new Filter(array("publyear__le" => 2016, "publyear__gt" => 2014, "peerreviewed__eq" => "Yes"));
+//     $publs = $p->by_orga_id("142285", $f);
+//     $order = "virtualdate";
+//     $formatter = new Formatter(null, null, $order, SORT_DESC);
+//     $res = $formatter->execute($publs);
+//     foreach ($res[$order] as $key => $value) {
+//     // Escape the key and value before printing them
+//         echo sprintf(
+//             "%s: %s\n",
+//             esc_html($key),
+//             esc_html($value->attributes[$order])
+//         );
+//     }
+
+// }

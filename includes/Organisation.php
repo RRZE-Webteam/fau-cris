@@ -25,7 +25,7 @@ class Organisation
     public function __construct($einheit = 'orga', $id = '', $page_lang = 'de', $sc_lang = 'de')
     {
 
-        if (strpos($_SERVER['PHP_SELF'], "vkdaten/tools/")) {
+        if ( isset($_SERVER['PHP_SELF']) && strpos(sanitize_text_field(wp_unslash($_SERVER['PHP_SELF'])), "vkdaten/tools/")) {
             $this->cms = 'wbk';
             $this->options = CRIS::ladeConf();
         } else {

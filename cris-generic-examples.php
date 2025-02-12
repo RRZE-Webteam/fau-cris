@@ -68,31 +68,34 @@ $data = $formatter->execute($res);
 
 // just displaying formatted data
 foreach ($data as $group => $publs) {
-    printf("%s\n", $group);
+    // Escape the group name before printing it
+    printf("%s\n", esc_html($group));
 
     foreach ($publs as $p) {
+        // Escape attributes before printing them
         printf(
             "%7d - %s %s\n",
-            $p->ID,
-            $p->attributes["publyear"],
-            $p->attributes["cftitle"]
+            esc_html($p->ID),
+            esc_html($p->attributes["publyear"]),
+            esc_html($p->attributes["cftitle"])
         );
     }
 }
+
 
 // quotion link example
 $publ = new CRIS_publications();
 $res = $publ->by_id(array(36722, 1036431));
 $p = $res[36722];
 $p->insert_quotation_links();
-print_r(array(
-    $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
-    $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
-));
+// print_r(array(
+//     $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
+//     $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
+// ));
 
 $p = $res[1036431];
 $p->insert_quotation_links();
-print_r(array(
-    $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
-    $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
-));
+// print_r(array(
+//     $p->attributes["quotationapa"], $p->attributes["quotationapalink"],
+//     $p->attributes["quotationmla"], $p->attributes["quotationmlalink"]
+// ));
