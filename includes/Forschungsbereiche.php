@@ -352,8 +352,7 @@ class Forschungsbereiche
     {
         $field_details = array();
         $output = "<div class=\"cris-fields\">";
-        ;
-
+        $content = wp_strip_all_tags($content, '<b><i><a>');
         foreach ($fields as $field) {
             $field = (array) $field;
             foreach ($field['attributes'] as $attribut => $v) {
@@ -383,7 +382,7 @@ class Forschungsbereiche
             }
             $field_details['#persons#'] = '';
             if (strpos($content, '#persons#') !== false) {
-                $persons = $this->get_field_persons($id);
+                $persons = $this->get_field_persons($id,$param);
                 if (!is_wp_error($persons)) {
                     $field_details['#persons#'] .= "<ul>";
                     foreach ($persons as $p_id => $person) {
