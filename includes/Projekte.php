@@ -120,6 +120,7 @@ class Projekte
         $hide = $param['hide'] ?: [];
         $role = $param['role'] ?: 'all';
         $status = $param['status'] ?: '';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $status);
         if (empty($projArray)) {
@@ -143,7 +144,13 @@ class Projekte
         
         $output = '';
 
-        $output .= $this->make_list($projList, $hide);
+        if (shortcode_exists('collapsibles') && $format == 'accordion') {
+            $output .= $this->make_accordion($projList,$hide=$param['projects_hide']);
+       }else{
+            $output .= $this->make_list($projList, $hide);
+        }
+
+        
 
         return $output;
     }
@@ -168,6 +175,7 @@ class Projekte
         $hide = (isset($param['hide']) && !empty($param['hide'])) ? $param['hide'] : array();
         $role = (isset($param['role']) && $param['role'] != '') ? $param['role'] : 'all';
         $status = (isset($param['status']) && $param['status'] != '') ? $param['status'] : '';
+        $format = (isset($param['format']) && $param['format'] != '') ? $param['format'] : '';
 
         $projArray = $this->fetch_projects($year, $start, $end, $type, $role, $status);
 
@@ -1098,7 +1106,7 @@ class Projekte
             $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
         }
 
-
+    
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
             $output = $this->make_accordion($projList,$hide=$param['projects_hide']);
         } else {
