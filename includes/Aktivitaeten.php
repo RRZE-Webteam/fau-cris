@@ -145,7 +145,7 @@ class Aktivitaeten
         if ($order2 == 'author') {
             $formatter = new Formatter("year", SORT_DESC, "exportnames", SORT_ASC);
         } else {
-            $formatter = new Formatter("year", SORT_DESC, "sortdate", SORT_ASC);
+            $formatter = new Formatter("year", SORT_DESC, "sortdate", SORT_DESC);
         }
         $activityList = $formatter->execute($activityArray);
 
