@@ -737,6 +737,14 @@ msgstr "No activities found."
 msgid "Veranstaltung"
 msgstr "Event"
 
+#: class_Aktivitaeten.php:536
+msgid "Funktion"
+msgstr "Function"
+
+#: class_Aktivitaeten.php:539
+msgid "Weitere Angaben"
+msgstr "Additional Information"
+
 #: class_Aktivitaeten.php:438
 msgid "In"
 msgstr "In"
