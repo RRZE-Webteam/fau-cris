@@ -530,7 +530,7 @@ class Aktivitaeten
                 $activitylist .= ", " . $activity_location ."<br />";
             }
             if (!empty($activity_url)) {
-                $activitylist .= ", URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>" .'<br />';
+                $activitylist .= "URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>" .'<br />';
             }
             if (!empty($activity_description_function)) {
                $activitylist .=  __('Funktion', 'fau-cris') . ": " . $activity_description_function . '<br />';
