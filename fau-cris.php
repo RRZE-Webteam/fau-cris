@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.25.6
+ * Version: 3.26.2
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.25.6';
+    const version = '3.26.2';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -1223,9 +1223,12 @@ public static function options_fau_cris(): void
             $liste = new Publikationen($parameter['entity'], $parameter['entity_id'], '', $page_lang);
             if (isset($liste->error) && is_wp_error($liste->error)) {
                 return $liste->error->get_error_message();
+
             }
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
+
                 return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type'], 1, $parameter['image_align'], $parameter['image_position']);
+
             }
             if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
                 return $liste->pubListe($parameter, $content);
@@ -1312,7 +1315,8 @@ public static function options_fau_cris(): void
             'projects_start'=>'',
             'author_position'=>'',
             'publicationsum'=>'',
-            'useprojpubls'=>'false'
+            'useprojpubls'=>'false',
+            'listtype'=>'ul'
         ];
 
         // Attributes
@@ -1383,7 +1387,7 @@ public static function options_fau_cris(): void
         $sc_param['author_position'] = sanitize_text_field($author_position);
         $sc_param['publicationsum'] = sanitize_text_field($publicationsum);
         $sc_param['useprojpubls'] = strtolower(sanitize_text_field($useprojpubls));
-
+        $sc_param['listtype'] = strtolower(sanitize_text_field($listtype));
         switch ($sortby) {
             case 'created':
                 $sc_param['sortby'] = 'updatedon';
