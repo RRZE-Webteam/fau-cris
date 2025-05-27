@@ -253,7 +253,7 @@ class Forschungsbereiche
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = strip_tags($description, Tools::$whitelist_tags);
             $param['fsp'] = ($field['selektion'] == 'Forschungsschwerpunkt') ? true : false;
             
             if (!in_array('title', $hide)) {
@@ -285,7 +285,7 @@ class Forschungsbereiche
                 && !is_array($param['field'])) {
                 $projects = $this->get_field_projects($id,$param);
 
-                if (!empty($projects) && trim(wp_strip_all_tags($projects)) !== '') {
+                if (!empty($projects) && (trim($projects) !== '')) {
                     $singlefield .= "<h3>" . __('Projekte', 'fau-cris') . ": </h3>";
                     $singlefield .= $projects;
                 }
@@ -352,7 +352,7 @@ class Forschungsbereiche
     {
         $field_details = array();
         $output = "<div class=\"cris-fields\">";
-        $content = wp_strip_all_tags($content, '<b><i><a>');
+        $content = strip_tags($content, Tools::$whitelist_tags);
         foreach ($fields as $field) {
             $field = (array) $field;
             foreach ($field['attributes'] as $attribut => $v) {
@@ -375,7 +375,7 @@ class Forschungsbereiche
             $param['field'] = $id;
             
             $field_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $field_details['#description#'] = wp_strip_all_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $field_details['#description#'] = strip_tags($description, Tools::$whitelist_tags);
             $field_details['#projects#'] = '';
             if (strpos($content, '#projects#') !== false) {
                 $field_details['#projects#'] = $this->get_field_projects($id,$param);
@@ -532,6 +532,7 @@ class Forschungsbereiche
         $args['sortby']=$param['sortby'];
         $args['author_position']=$param['author_position'];
         $args['publicationsum']=$param['publicationsum'];
+        $args['listtype']=$param['listtype'];
         if ($param['publications_orderby'] == 'year') {
             return $liste->pubNachJahr($args, $param['field'], '', $param['fsp']);
         }
