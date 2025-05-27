@@ -562,7 +562,7 @@ class Projekte
                     break;
             }
             $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $proj_details['#description#'] = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $proj_details['#description#'] = strip_tags($description,Tools::$whitelist_tags);
 
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], $this->page_lang);
             $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
@@ -646,7 +646,7 @@ class Projekte
                     break;
             }
             $proj_details['#title#'] = htmlentities($title, ENT_QUOTES);
-            $proj_details['#description#'] = wp_strip_all_tags($description, '<br><br/><a><sup><sub><ul><ol><li>');
+            $proj_details['#description#'] = strip_tags($description,Tools::$whitelist_tags);
             $proj_details['#type#'] = Tools::getName('projects', $project['project type'], $this->page_lang);
             $proj_details['#parentprojecttitle#'] = ($this->page_lang == 'en' && !empty($project['parentprojecttitle_en'])) ? $project['parentprojecttitle_en'] : $project['parentprojecttitle'];
             $start = $project['cfstartdate'];
@@ -719,7 +719,7 @@ class Projekte
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = strip_tags($description,Tools::$whitelist_tags);
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
             $imgs = self::get_project_images($project['ID']);
 
@@ -871,7 +871,7 @@ class Projekte
             }
             $title = htmlentities($title, ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = strip_tags($description,Tools::$whitelist_tags);
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
             $projlist .= "<li>";
@@ -984,7 +984,7 @@ class Projekte
             $title = htmlentities($title, ENT_QUOTES);
             $title = str_replace(['[', ']'], ['&#91;', '&#93;'], $title);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = wp_strip_all_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = strip_tags($description,Tools::$whitelist_tags);
             if (mb_strlen($description) > 500) {
                 $pos = strpos($description, ' ', 500);
                 $description = mb_substr($description, 0, $pos) . '&hellip;';
