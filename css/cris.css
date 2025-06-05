@@ -162,9 +162,10 @@ div.cris-standardization {
     flex-wrap: wrap;
 }
 
-div p{
+/*div p{
     text-align: justify;
 }
+*/
 
 @media print {
     .cris-activities a[href]::after,
