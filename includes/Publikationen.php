@@ -387,7 +387,6 @@ class Publikationen
         }else{
             $publicationSumArray=$param['publicationsum'];
         }
-
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray);
         
 
@@ -1220,29 +1219,30 @@ class Publikationen
                     if ($image_position == 'top') {
                         $publist .= $publication['image'];
                     }
-                    $publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
+                    $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= $pubDetails['volume'] != '' ? "<br /><span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. " : '';
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], $lang, $pubDetails['pubType']) . ')' : '';
+                    $publist .= (($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '';
+                    $publist .= $pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '';
+
+
                     if (!empty($pubDetails['publisher'])) {
-                        $publist .= "<br /><span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">";
+                        $publist .= "<span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">";
+                        $publist .= $pubDetails['city'] != '' ? "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">"
+                            . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: " : '';
+                        $publist .= "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span></span>, ";
+                    } else {
+                        $publist .= $pubDetails['city'] != '' ? $pubDetails['city'] . ", " : '';
                     }
-                    if (!empty($pubDetails['city'])) {
-                        if (empty($pubDetails['publisher'])) {
-                            $publist .= "<br />";
-                        }
-                        $publist .= "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">" . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: ";
-                    }
-                    if ($pubDetails['year'] != '') {
-                        if (empty($pubDetails['publisher']) && empty($pubDetails['city'])) {
-                            $publist .= "<br />";
-                        }
-                        $publist .= "<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>";
-                    }
+
+                    $publist .= $pubDetails['year'] != '' ? "<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
+
                     if (!empty($pubDetails['series'])) {
                         $publist .= $pubDetails['series'] != '' ? "<br />(" . $pubDetails['series'] : '';
-                        $publist .= $pubDetails['seriesNumber'] != '' ? ", " . _x('Bd.', 'Abkürzung für "Band" bei Publikationen', 'fau-cris') . " " . $pubDetails['seriesNumber'] : '';
+                        $publist .= $pubDetails['seriesNumber'] != '' ? ", " . _x('Bd.', 'Abkürzung für "Band" bei Publikationen', 'fau-cris') . $pubDetails['seriesNumber'] : '';
                         $publist .= ")";
                     }
+
                     $publist .= $pubDetails['pagesTotal'] != '' ? "<br /><span itemprop=\"numberOfPages\">" . $pubDetails['pagesTotal'] . "</span> " . __('Seiten', 'fau-cris') : '';
                     $publist .= $pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '';
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . FAU_CRIS::doi . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
@@ -1269,6 +1269,7 @@ class Publikationen
                     }
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= $pubDetails['title'];
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], $lang, $pubDetails['pubType']) . ')' : '';
                     $publist .= (($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '';
                     $publist .= $pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '';
                     if (!empty($pubDetails['publisher'])) {
