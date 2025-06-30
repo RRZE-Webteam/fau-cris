@@ -64,12 +64,15 @@ class Formatter
         $final = array();
         foreach ($data as $single_dataset) {
             if ($this->group != null) {
-                if (!array_key_exists($this->group, $single_dataset->attributes)) {
-                    trigger_error('Attribute not found: '. $this->group);
+               if (!array_key_exists($this->group, $single_dataset->attributes)) {
+                    // Escape the group name for security purposes in error messages
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                     error_log('Attribute not found: ' . esc_html($this->group));
                     $group_key = $this->sort;
                 } else {
                     $group_key = $this->group;
                 }
+
             } else {
                 # no grouping requested, we assume that sort is set in this case
                 # also the case if a maximum limit is set
@@ -105,7 +108,8 @@ class Formatter
         } elseif ($this->group_order === SORT_DESC) {
             krsort($final);
         } elseif ($this->group_order !== null) {
-            trigger_error('Unknown sorting');
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+            error_log('Unknown sorting');
         }
 
         # sort data inside groups

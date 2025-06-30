@@ -284,7 +284,7 @@ class Equipment
             }
             $name = htmlentities($name, ENT_QUOTES);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
-            $description = strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>');
+            $description = strip_tags($description, Tools::$whitelist_tags);
             $manufacturer  = $equipment['hersteller'];
             $model = $equipment['modell'];
             $constructionYear = $equipment['baujahr'];
@@ -464,7 +464,7 @@ class Equipment
             }
             $description = str_replace(["\n", "\t", "\r"], '', $description);
             $equipment_details['#name#'] =  htmlentities($name, ENT_QUOTES);
-            $equipment_details['#description#'] = "<div class=\"equipment-description\">" . strip_tags($description, '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em>') . "</div>";
+            $equipment_details['#description#'] = "<div class=\"equipment-description\">" . strip_tags($description, Tools::$whitelist_tags) . "</div>";
             $equipment_details['#manufacturer#']  = $equipment['hersteller'];
             $equipment_details['#model#'] = $equipment['modell'];
             $equipment_details['#constructionYear#'] = $equipment['baujahr'];

@@ -1,6 +1,8 @@
 ul.cris-publications li {
     margin-bottom: 15px;
     line-height: 150%;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
 }
 ul.cris-publications p {
     margin-bottom: 0;
@@ -53,6 +55,8 @@ ul.cris-gallery li .noimage {
 ul.cris-projects li {
     margin-bottom: 15px;
     line-height: 150%;
+     word-wrap: break-word; 
+    overflow-wrap: break-word;
 }
 
 ul.cris-projects .project-type,
@@ -90,6 +94,8 @@ div.cris-activities {
 ul.cris-activities li {
     margin-bottom: .3em;
     list-style-type: circle;
+     word-wrap: break-word; 
+    overflow-wrap: break-word;
 }
 
 ul.cris-equipment .equipment-name {
@@ -152,26 +158,17 @@ div.cris-standardization {
     font-weight: bold;
 }
 
-.cris-activities a,
-.cris-awards a,
-.cris-equipment a,
-.cris-fields a,
-.cris-organisation a,
-.cris-patents a,
-.cris-projects a,
-.cris-publications a,
-.cris-standardization a {
-    word-break: break-all;
-}
+
 
 .cris-fields .cris-image{
     display: flex;
     flex-wrap: wrap;
 }
 
-div p{
+/*div p{
     text-align: justify;
 }
+*/
 
 @media print {
     .cris-activities a[href]::after,
@@ -186,4 +183,8 @@ div p{
     .wpel-icon {
         display: none !important;
     }
+}
+.person-card {
+    justify-content: flex-start !important; /* Overriding justify-content to left (flex-start) */
+    padding: 20px;
 }
