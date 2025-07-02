@@ -1051,8 +1051,9 @@ class Projekte
             }
             if (!in_array('link', $hide) && !empty($id)) {
                 $link = Tools::get_item_url("projects", $title, $id, $post->ID, $this->page_lang);
+                $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
             }
-            $projlist .= "<p>" . "&#8594; <a href=\"" . $link . "\">" . __('Mehr Informationen', 'fau-cris') . "</a> </p>";
+            
             $projlist .= "[/collapse]";
         }
         $projlist .= "[/collapsibles]";
