@@ -239,6 +239,12 @@ class Forschungsbereiche
             }
             unset($field['attributes']);
             $imgs = self::get_field_images($field['ID']);
+            
+            //sorting array using relation right seq
+            $sortby = 'relation right seq';
+            $formatter = new Formatter(null, null, $sortby, SORT_ASC);
+            $imgs = $formatter->execute($imgs);
+
             $id = $field['ID'];
             switch ($this->sc_lang) {
                 case 'en':
@@ -260,9 +266,9 @@ class Forschungsbereiche
                 $singlefield .= "<h2>" . $title . "</h2>";
             }
 
-            if (count($imgs)) {
+            if (count($imgs['relation right seq'])) {
                 $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
-                foreach ($imgs as $img) {
+                foreach ($imgs['relation right seq'] as $img) {
                     // foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
                         $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";

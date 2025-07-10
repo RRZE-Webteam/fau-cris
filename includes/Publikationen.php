@@ -258,12 +258,13 @@ class Publikationen
                 $shortcode_data_inner = '';
                 $number_of_pub_in_accordion=count($publications);
                 $pubSubList = $subformatter->execute($publications);
+                
+                if (in_array('subtotal', $publicationSumArray) ||
+                (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $suffix = ($number_of_pub_in_accordion == 1) ? 'Publication' : 'Publications';
+                $subtotal_publication_html_in_accordion = ' (' . $number_of_pub_in_accordion . ' ' . $suffix . ')';
+            }
 
-
-
-                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $subtotal_publication_html_in_accordion = '  '.'('. $number_of_pub_in_accordion .' '.'Publications'. ')';
-                }
                 else{
                     $subtotal_publication_html_in_accordion='';
                 }
@@ -303,8 +304,11 @@ class Publikationen
             foreach ($pubList as $array_year => $publications) {
                 $number_of_pub=count($publications);
 
-                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
+               if (in_array('subtotal', $publicationSumArray) ||
+                        (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                        $suffix = ($number_of_pub == 1) ? 'Publication' : 'Publications';
+                                    $subtotal_publication_html = ' (' . $number_of_pub . ' ' . $suffix . ')';
+                                    
                 }
                 else{
                     $subtotal_publication_html='';
@@ -435,9 +439,12 @@ class Publikationen
                 //count total number of publication in pub type
                 $number_of_pub_in_accordion=count($publications);
 
-                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $subtotal_publication_html_in_accordion = '  '.'('. $number_of_pub_in_accordion .' '.'Publications'. ')';
+               if (in_array('subtotal', $publicationSumArray) ||
+                    (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $suffix = ($number_of_pub_in_accordion == 1) ? 'Publication' : 'Publications';
+                    $subtotal_publication_html_in_accordion = ' (' . $number_of_pub_in_accordion . ' ' . $suffix . ')';
                 }
+
                 else{
                     $subtotal_publication_html_in_accordion='';
                 }
@@ -498,9 +505,12 @@ class Publikationen
             foreach ($pubList as $array_type => $publications) {
                 $total_number_publication=0;
                  $number_of_pub=count($publications);
-                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
-                }
+                if (in_array('subtotal', $publicationSumArray) ||
+                (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $suffix = ($number_of_pub == 1) ? 'Publication' : 'Publications';
+                $subtotal_publication_html = ' (' . $number_of_pub . ' ' . $suffix . ')';
+            }
+
                 else{
                     $subtotal_publication_html='';
                 }

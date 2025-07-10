@@ -1,7 +1,8 @@
 ul.cris-publications li {
     margin-bottom: 15px;
     line-height: 150%;
-    text-align: justify;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
 }
 ul.cris-publications p {
     margin-bottom: 0;
@@ -54,7 +55,8 @@ ul.cris-gallery li .noimage {
 ul.cris-projects li {
     margin-bottom: 15px;
     line-height: 150%;
-    text-align: justify;
+     word-wrap: break-word; 
+    overflow-wrap: break-word;
 }
 
 ul.cris-projects .project-type,
@@ -92,7 +94,8 @@ div.cris-activities {
 ul.cris-activities li {
     margin-bottom: .3em;
     list-style-type: circle;
-    text-align: justify;
+     word-wrap: break-word; 
+    overflow-wrap: break-word;
 }
 
 ul.cris-equipment .equipment-name {
@@ -162,9 +165,10 @@ div.cris-standardization {
     flex-wrap: wrap;
 }
 
-div p{
+/*div p{
     text-align: justify;
 }
+*/
 
 @media print {
     .cris-activities a[href]::after,

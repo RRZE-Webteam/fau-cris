@@ -11,7 +11,8 @@ use RRZE\Cris\Dicts;
 class Tools
 {
     //This is an whitelist variable for strip_tags function 
-    public static string $whitelist_tags = '<br><a><sup><sub><ul><ol><li><b><p><i><strong><em><style><u><font>';
+
+    public static string $whitelist_tags = '<div><br><a><sup><sub><ul><ol><li><h3><h1><h2><i><strong><em><style><u><font>';
 
     public static function getAcronym($acadTitle): string
     {
