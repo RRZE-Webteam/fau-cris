@@ -851,3 +851,7 @@ msgstr "http://blogs.fau.de/webworking/"
 #: Projekte.php:805
 msgid "Externe Partner"
 msgstr "External Partners"
+
+#: class_Publikationen.php:264
+msgid "Publikation"
+msgstr "Publication"
