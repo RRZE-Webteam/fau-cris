@@ -266,7 +266,7 @@ class Forschungsbereiche
                 $singlefield .= "<h2>" . $title . "</h2>";
             }
 
-            if (count($imgs['relation right seq'])) {
+            if (isset($imgs['relation right seq']) && count($imgs['relation right seq'])) {
                 $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
                 foreach ($imgs['relation right seq'] as $img) {
                     // foreach ($imgs as $img) {
