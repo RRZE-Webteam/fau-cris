@@ -145,7 +145,7 @@ class Aktivitaeten
         if ($order2 == 'author') {
             $formatter = new Formatter("year", SORT_DESC, "exportnames", SORT_ASC);
         } else {
-            $formatter = new Formatter("year", SORT_DESC, "sortdate", SORT_ASC);
+            $formatter = new Formatter("year", SORT_DESC, "sortdate", SORT_DESC);
         }
         $activityList = $formatter->execute($activityArray);
 
@@ -197,6 +197,8 @@ class Aktivitaeten
 
         $activityArray = $this->fetch_activities($year, $start, $end, $type);
 
+
+
         if (is_wp_error($activityArray)) {
             $output = '<div class="error">' . $activityArray->get_error_message() . '</div>';
             return $output;
@@ -224,6 +226,7 @@ class Aktivitaeten
         }
         $activityList = $formatter->execute($activityArray);
         $output = '';
+
 
         if (shortcode_exists('collapsibles') && $format == 'accordion') {
             $shortcode_data = '';
@@ -360,6 +363,8 @@ class Aktivitaeten
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_orga'];
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "organisation einer tagung / konferenz":
                     $activity_name = $activity['nameconference'];
@@ -371,6 +376,8 @@ class Aktivitaeten
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['city'];
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "herausgeberschaft":
                     $activity_name = $activity['namejournal'];
@@ -382,6 +389,8 @@ class Aktivitaeten
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "gutachtertätigkeit für wissenschaftliche zeitschrift":
                     $activity_name = $activity['namejournal'];
@@ -393,6 +402,8 @@ class Aktivitaeten
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "gutachtertätigkeit für förderorganisation":
                     $activity_name = $activity['mirror_fund'];
@@ -404,6 +415,8 @@ class Aktivitaeten
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "sonstige fau-externe gutachtertätigkeit":
                     $activity_name = $activity['type of expert activity'];
@@ -415,6 +428,8 @@ class Aktivitaeten
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "dfg-fachkollegiat/in":
                     $activity_name = $activity['mirror_dfgfach'];
@@ -426,6 +441,8 @@ class Aktivitaeten
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = '';
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "gremiumsmitglied wissenschaftsrat":
                     $activity_name = $activity['description function'];
@@ -437,6 +454,8 @@ class Aktivitaeten
                     $activity_date = $activity_startdate . " - " . $activity_enddate;
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_orga'];
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "vortrag":
                     $activity_name = $activity['name'];
@@ -449,6 +468,8 @@ class Aktivitaeten
                     }
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "radio- / fernsehbeitrag / podcast":
                     $activity_name = $activity['name of contribution'];
@@ -461,6 +482,8 @@ class Aktivitaeten
                     }
                     $activity_url = $activity['url'];
                     $activity_location = '';
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
                 case "sonstige fau-externe aktivitäten":
                     $activity_name = $activity['type of extern expert activity'];
@@ -472,6 +495,8 @@ class Aktivitaeten
                     $activity_date = Tools::make_date($activity_startdate, $activity_enddate);
                     $activity_url = $activity['url'];
                     $activity_location = $activity['mirror_eorg'];
+                    $activity_description_function=$activity["description function"];
+                    $activity_additionalinfo=$activity["additionalinfo"];
                     break;
             }
 
@@ -502,10 +527,16 @@ class Aktivitaeten
                 $activitylist .= ", " . __('In', 'fau-cris') . ": \"" . $activity_nameofshow . "\"";
             }
             if (!empty($activity_location)) {
-                $activitylist .= ", " . $activity_location;
+                $activitylist .= ", " . $activity_location ."<br />";
             }
             if (!empty($activity_url)) {
-                $activitylist .= ", URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>";
+                $activitylist .= "URL: <a href=\"" . $activity_url . "\" target=\"blank\" title=\"" . __('Link in neuem Fenster &ouml;ffnen', 'fau-cris') . "\">" . $activity_url . "</a>" .'<br />';
+            }
+            if (!empty($activity_description_function)) {
+               $activitylist .=  __('Funktion', 'fau-cris') . ": " . $activity_description_function . '<br />';
+            }
+             if (!empty($activity_additionalinfo)) {
+               $activitylist .= __('Weitere Angaben', 'fau-cris') . ": " . $activity_additionalinfo . '<br />' ;
             }
 
             if ($this->einheit != "activity") {

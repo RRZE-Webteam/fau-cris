@@ -704,6 +704,15 @@ msgstr ""
 msgid "Veranstaltung"
 msgstr ""
 
+#: class_Aktivitaeten.php:536
+msgid "Funktion"
+msgstr ""
+
+#: class_Aktivitaeten.php:539
+msgid "Weitere Angaben"
+msgstr ""
+
+
 #: class_Aktivitaeten.php:438
 msgid "In"
 msgstr ""
