@@ -261,7 +261,7 @@ class Publikationen
                 
                 if (in_array('subtotal', $publicationSumArray) ||
                 (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $suffix = ($number_of_pub_in_accordion == 1) ? 'Publication' : 'Publications';
+                $suffix = ($number_of_pub_in_accordion == 1) ? __('Publikation','fau-cris') : __('Publikationen','fau-cris') ;
                 $subtotal_publication_html_in_accordion = ' (' . $number_of_pub_in_accordion . ' ' . $suffix . ')';
             }
 
@@ -294,7 +294,7 @@ class Publikationen
 
             // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
+                $total_publication_html = '<h2>' . __('Publikationen','fau-cris') . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
             }
 
         } else {
@@ -306,7 +306,7 @@ class Publikationen
 
                if (in_array('subtotal', $publicationSumArray) ||
                         (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                        $suffix = ($number_of_pub == 1) ? 'Publication' : 'Publications';
+                                    $suffix = ($number_of_pub == 1) ? __('Publikation','fau-cris') : __('Publikationen','fau-cris');
                                     $subtotal_publication_html = ' (' . $number_of_pub . ' ' . $suffix . ')';
                                     
                 }
@@ -340,8 +340,7 @@ class Publikationen
             }
             // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
-            }
+            $total_publication_html = '<h2>' . __('Publikationen','fau-cris') . '  '.'('. $total_number_publication .')'.'</h2>';            }
 
         }
         return $this->langdiv_open . $total_publication_html .$output . $this->langdiv_close;
@@ -441,8 +440,7 @@ class Publikationen
 
                if (in_array('subtotal', $publicationSumArray) ||
                     (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $suffix = ($number_of_pub_in_accordion == 1) ? 'Publication' : 'Publications';
-                    $subtotal_publication_html_in_accordion = ' (' . $number_of_pub_in_accordion . ' ' . $suffix . ')';
+                    $suffix = ($number_of_pub_in_accordion == 1) ? __('Publikation','fau-cris') : __('Publikationen','fau-cris') ;                    $subtotal_publication_html_in_accordion = ' (' . $number_of_pub_in_accordion . ' ' . $suffix . ')';
                 }
 
                 else{
@@ -498,7 +496,7 @@ class Publikationen
 
             // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
+                $total_publication_html = '<h2>' . __('Publikationen','fau-cris') . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
             }
 
         } else {
@@ -507,7 +505,7 @@ class Publikationen
                  $number_of_pub=count($publications);
                 if (in_array('subtotal', $publicationSumArray) ||
                 (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $suffix = ($number_of_pub == 1) ? 'Publication' : 'Publications';
+                $suffix = ($number_of_pub == 1) ? __('Publikation','fau-cris') : __('Publikationen','fau-cris');
                 $subtotal_publication_html = ' (' . $number_of_pub . ' ' . $suffix . ')';
             }
 
@@ -576,7 +574,7 @@ class Publikationen
             }
              // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
+                $total_publication_html = '<h2>' . __('Publikationen','fau-cris') . '  '.'('. $total_number_publication .')'.'</h2>';
             }
         }
         return $this->langdiv_open . $total_publication_html . $output . $this->langdiv_close;
