@@ -239,6 +239,12 @@ class Forschungsbereiche
             }
             unset($field['attributes']);
             $imgs = self::get_field_images($field['ID']);
+            
+            //sorting array using relation right seq
+            $sortby = 'relation right seq';
+            $formatter = new Formatter(null, null, $sortby, SORT_ASC);
+            $imgs = $formatter->execute($imgs);
+
             $id = $field['ID'];
             switch ($this->sc_lang) {
                 case 'en':
@@ -260,9 +266,9 @@ class Forschungsbereiche
                 $singlefield .= "<h2>" . $title . "</h2>";
             }
 
-            if (count($imgs)) {
-                $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
-                foreach ($imgs as $img) {
+         if (isset($imgs['relation right seq']) && is_countable($imgs['relation right seq']) && count($imgs['relation right seq'])) {                
+            $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align'] .  "\">";
+                foreach ($imgs['relation right seq'] as $img) {
                     // foreach ($imgs as $img) {
                         $img_size = getimagesizefromstring(base64_decode($img->attributes['png180']));
                         $singlefield .= "<div class=\"cris-image wp-caption " . $param['image_align']  . "\" style=\"width: " . $img_size[0] . "px;\">";
@@ -318,7 +324,7 @@ class Forschungsbereiche
             if (!in_array('persons', $hide)
                 && !is_array($param['field'])) {
                 $persons = $this->get_field_persons($id,$param);
-                if (!is_wp_error($persons) && count($persons) > 0) {
+            if (!is_wp_error($persons) && isset($persons) && is_countable($persons) && count($persons) > 0 ){
                     $singlefield .= "<h3>" . __('Beteiligte Wissenschaftler', 'fau-cris') . ": </h3>";
                     $singlefield .= "<ul>";
                     foreach ($persons ?? [] as $p_id => $person) {
@@ -532,7 +538,9 @@ class Forschungsbereiche
         $args['sortby']=$param['sortby'];
         $args['author_position']=$param['author_position'];
         $args['publicationsum']=$param['publicationsum'];
-        $args['listtype']=$param['listtype'];
+        if (isset($args['listtype']) && $empty($args['listtype'])) {
+            $args['listtype']=$param['listtype'];
+        }
         if ($param['publications_orderby'] == 'year') {
             return $liste->pubNachJahr($args, $param['field'], '', $param['fsp']);
         }

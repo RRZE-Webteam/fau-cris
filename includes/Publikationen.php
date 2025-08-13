@@ -258,12 +258,13 @@ class Publikationen
                 $shortcode_data_inner = '';
                 $number_of_pub_in_accordion=count($publications);
                 $pubSubList = $subformatter->execute($publications);
+                
+                if (in_array('subtotal', $publicationSumArray) ||
+                (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $suffix = ($number_of_pub_in_accordion == 1) ? __('Publikation','fau-cris') : __('Publikationen','fau-cris') ;
+                $subtotal_publication_html_in_accordion = ' (' . $number_of_pub_in_accordion . ' ' . $suffix . ')';
+            }
 
-
-
-                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $subtotal_publication_html_in_accordion = '  '.'('. $number_of_pub_in_accordion .' '.'Publications'. ')';
-                }
                 else{
                     $subtotal_publication_html_in_accordion='';
                 }
@@ -293,7 +294,7 @@ class Publikationen
 
             // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
+                $total_publication_html = '<h2>' . __('Publikationen','fau-cris') . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
             }
 
         } else {
@@ -303,8 +304,11 @@ class Publikationen
             foreach ($pubList as $array_year => $publications) {
                 $number_of_pub=count($publications);
 
-                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
+               if (in_array('subtotal', $publicationSumArray) ||
+                        (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                                    $suffix = ($number_of_pub == 1) ? __('Publikation','fau-cris') : __('Publikationen','fau-cris');
+                                    $subtotal_publication_html = ' (' . $number_of_pub . ' ' . $suffix . ')';
+                                    
                 }
                 else{
                     $subtotal_publication_html='';
@@ -336,8 +340,7 @@ class Publikationen
             }
             // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
-            }
+            $total_publication_html = '<h2>' . __('Publikationen','fau-cris') . '  '.'('. $total_number_publication .')'.'</h2>';            }
 
         }
         return $this->langdiv_open . $total_publication_html .$output . $this->langdiv_close;
@@ -387,7 +390,6 @@ class Publikationen
         }else{
             $publicationSumArray=$param['publicationsum'];
         }
-
         $pubArray = $this->fetch_publications($year, $start, $end, $type, $subtype, $fau, $peerreviewed, $notable, $field, $language, $fsp, $project,$authorPositionArray);
         
 
@@ -436,9 +438,11 @@ class Publikationen
                 //count total number of publication in pub type
                 $number_of_pub_in_accordion=count($publications);
 
-                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $subtotal_publication_html_in_accordion = '  '.'('. $number_of_pub_in_accordion .' '.'Publications'. ')';
+               if (in_array('subtotal', $publicationSumArray) ||
+                    (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                    $suffix = ($number_of_pub_in_accordion == 1) ? __('Publikation','fau-cris') : __('Publikationen','fau-cris') ;                    $subtotal_publication_html_in_accordion = ' (' . $number_of_pub_in_accordion . ' ' . $suffix . ')';
                 }
+
                 else{
                     $subtotal_publication_html_in_accordion='';
                 }
@@ -492,16 +496,19 @@ class Publikationen
 
             // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
+                $total_publication_html = '<h2>' . __('Publikationen','fau-cris') . '  '.'('. $total_number_publication_in_accordion .')'.'</h2>';
             }
 
         } else {
             foreach ($pubList as $array_type => $publications) {
                 $total_number_publication=0;
                  $number_of_pub=count($publications);
-                if (in_array('subtotal', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                    $subtotal_publication_html = '  '.'('. $number_of_pub .' '.'Publications'. ')';
-                }
+                if (in_array('subtotal', $publicationSumArray) ||
+                (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
+                $suffix = ($number_of_pub == 1) ? __('Publikation','fau-cris') : __('Publikationen','fau-cris');
+                $subtotal_publication_html = ' (' . $number_of_pub . ' ' . $suffix . ')';
+            }
+
                 else{
                     $subtotal_publication_html='';
                 }
@@ -567,7 +574,7 @@ class Publikationen
             }
              // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
-                $total_publication_html = '<h2>' . "Publications" . '  '.'('. $total_number_publication .')'.'</h2>';
+                $total_publication_html = '<h2>' . __('Publikationen','fau-cris') . '  '.'('. $total_number_publication .')'.'</h2>';
             }
         }
         return $this->langdiv_open . $total_publication_html . $output . $this->langdiv_close;
@@ -1220,29 +1227,30 @@ class Publikationen
                     if ($image_position == 'top') {
                         $publist .= $publication['image'];
                     }
-                    $publist .= $pubDetails['authors'] . ' (' . __('Hrsg.', 'fau-cris') . '):';
+                    $publist .= $pubDetails['authors'] . ':';
                     $publist .= "<br />" . $pubDetails['title'];
-                    $publist .= $pubDetails['volume'] != '' ? "<br /><span itemprop=\"volumeNumber\">" . $pubDetails['volume'] . "</span>. " : '';
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], $lang, $pubDetails['pubType']) . ')' : '';
+                    $publist .= (($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '';
+                    $publist .= $pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '';
+
+
                     if (!empty($pubDetails['publisher'])) {
-                        $publist .= "<br /><span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">";
+                        $publist .= "<span itemprop=\"publisher\" itemscope itemtype=\"http://schema.org/Organization\">";
+                        $publist .= $pubDetails['city'] != '' ? "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">"
+                            . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: " : '';
+                        $publist .= "<span itemprop=\"name\">" . $pubDetails['publisher'] . "</span></span>, ";
+                    } else {
+                        $publist .= $pubDetails['city'] != '' ? $pubDetails['city'] . ", " : '';
                     }
-                    if (!empty($pubDetails['city'])) {
-                        if (empty($pubDetails['publisher'])) {
-                            $publist .= "<br />";
-                        }
-                        $publist .= "<span class=\"city\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">" . "<span itemprop=\"addressLocality\">" . $pubDetails['city'] . "</span></span>: ";
-                    }
-                    if ($pubDetails['year'] != '') {
-                        if (empty($pubDetails['publisher']) && empty($pubDetails['city'])) {
-                            $publist .= "<br />";
-                        }
-                        $publist .= "<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>";
-                    }
+
+                    $publist .= $pubDetails['year'] != '' ? "<span itemprop=\"datePublished\">" . $pubDetails['year'] . "</span>" : '';
+
                     if (!empty($pubDetails['series'])) {
                         $publist .= $pubDetails['series'] != '' ? "<br />(" . $pubDetails['series'] : '';
-                        $publist .= $pubDetails['seriesNumber'] != '' ? ", " . _x('Bd.', 'Abkürzung für "Band" bei Publikationen', 'fau-cris') . " " . $pubDetails['seriesNumber'] : '';
+                        $publist .= $pubDetails['seriesNumber'] != '' ? ", " . _x('Bd.', 'Abkürzung für "Band" bei Publikationen', 'fau-cris') . $pubDetails['seriesNumber'] : '';
                         $publist .= ")";
                     }
+
                     $publist .= $pubDetails['pagesTotal'] != '' ? "<br /><span itemprop=\"numberOfPages\">" . $pubDetails['pagesTotal'] . "</span> " . __('Seiten', 'fau-cris') : '';
                     $publist .= $pubDetails['ISBN'] != '' ? "<br /><span itemprop=\"isbn\">ISBN: " . $pubDetails['ISBN'] . "</span>" : '';
                     $publist .= $pubDetails['DOI'] != '' ? "<br />DOI: <a href='" . FAU_CRIS::doi . $pubDetails['DOI'] . "' target='blank' itemprop=\"sameAs\">" . $pubDetails['DOI'] . "</a>" : '';
@@ -1269,6 +1277,7 @@ class Publikationen
                     }
                     $publist .= $pubDetails['authors'] . ':';
                     $publist .= $pubDetails['title'];
+                    $publist .= $publication['publication type'] == 'Unpublished' ? ' (' . Tools::getName('publications', $publication['publication type'], $lang, $pubDetails['pubType']) . ')' : '';
                     $publist .= (($pubDetails['city'] != '') || ($pubDetails['publisher'] != '') || ($pubDetails['year'] != '')) ? "<br />" : '';
                     $publist .= $pubDetails['volume'] != '' ? $pubDetails['volume'] . ". " : '';
                     if (!empty($pubDetails['publisher'])) {
