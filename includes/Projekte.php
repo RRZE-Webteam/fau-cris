@@ -221,6 +221,7 @@ class Projekte
 
     public function projNachJahr($param = array(), $content = ''): string
     {
+
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -255,9 +256,10 @@ class Projekte
                 if (!empty($param['order2']) && $param['order2']==='title') {
                     uasort($projects, [$this,'project_title_filter']);
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_accordion($projects,$hide=$param['projects_hide']) . '[/collapse]');
                 $openfirst = '';
             }
+
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_year => $projects) {
@@ -334,7 +336,7 @@ class Projekte
                 if (!empty($param['order2']) && $param['order2']==='title') {
                     uasort($projects, [$this,'project_title_filter']);
                  }
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_accordion($projects,$hide=$param['projects_hide']) . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
@@ -386,11 +388,10 @@ class Projekte
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-
         $externalPartnerArray=$ws->by_proj_has_eorg($this->id);
 
         if (is_array($this->id)) {
-            $output = $this->make_list($projArray, $param['hide']);
+            $output = $this->make_list($projArray, $hide=$param['projects_hide']);
         } else {
             $output = $this->make_single($projArray, $param,$externalPartnerArray);
         }
