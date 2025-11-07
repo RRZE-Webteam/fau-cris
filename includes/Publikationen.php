@@ -148,12 +148,12 @@ class Publikationen
         $output = '';
 
         if ($quotation == 'apa' || $quotation == 'mla') {
-            $output .= $this->make_quotation_list($pubList, $quotation, $param['showimage'], $param['display']);
+            $output .= $this->make_quotation_list($pubList, $quotation, $param['showimage'], $param['display'],$listType,$startCount='1');
         } else {
             if ($param['sc_type'] == 'custom') {
-                $output .= $this->make_custom_list($pubList, $content, '', $param['display_language'], $param['image_align'],$listType);
+                $output .= $this->make_custom_list($pubList, $content, '', $param['display_language'], $param['image_align'],$listType,$param['display'],$startCount='1');
             } else {
-                $output .= $this->make_list($pubList, 1, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType);
+                $output .= $this->make_list($pubList, 1, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType,$startCount='1');
             }
         }
 
@@ -196,6 +196,9 @@ class Publikationen
         $muteheadings = $param['muteheadings'] ?? 0; 
         // it will use for showing number of publication by year or in total
         $total_publication_html='';
+
+        $startCount=1;
+        
         if (!is_array($param['publicationsum'])) {
             $publicationSumArray=array($param['publicationsum']);
         }else{
@@ -277,14 +280,15 @@ class Publikationen
                         $shortcode_data_inner .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $shortcode_data_inner .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display']);
+                        $shortcode_data_inner .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display'],$listType,$startCount);
                     } else {
                         if ($param['sc_type'] == 'custom') {
-                            $shortcode_data_inner .= $this->make_custom_list($publications_sub, $content, '', $param['display_language'],$listType);
+                            $shortcode_data_inner .= $this->make_custom_list($publications_sub, $content, '', $param['display_language'], $param['image_align'],$listType,$param['display'],$startCount);
                         } else {
-                            $shortcode_data_inner .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType);
+                            $shortcode_data_inner .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType,$startCount);
                         }
                     }
+                    $startCount += count($publications_sub);
                 }
                 $shortcode_data .= do_shortcode('[collapse title="' . $array_year.$subtotal_publication_html_in_accordion . '"' . $openfirst . ']' . $shortcode_data_inner . '[/collapse]');
                 $openfirst = '';
@@ -327,14 +331,15 @@ class Publikationen
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $output .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display']);
+                        $output .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display'],$listType,$startCount);
                     } else {
                         if ($param['sc_type'] == 'custom') {
-                            $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language'],$listType);
+                            $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language'], $param['image_align'], $listType, $param['display'],$startCount);
                         } else {
-                            $output .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType);
+                            $output .= $this->make_list($publications_sub, $showsubtype, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType,$startCount);
                         }
                     }
+                    $startCount += count($publications_sub);
                 }
                 $total_number_publication += $number_of_pub;
             }
@@ -384,6 +389,7 @@ class Publikationen
 
          // it will use for showing number of publication by year or in total
         $total_publication_html='';
+        $startCount=1;
         
         if (!is_array($param['publicationsum'])) {
             $publicationSumArray=array($param['publicationsum']);
@@ -482,10 +488,11 @@ class Publikationen
                         $shortcode_data_other .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display']);
+                        $shortcode_data_other .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display'],$listType,$startCount);
                     } else {
-                        $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType);
+                        $shortcode_data_other .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType,$startCount);
                     }
+                     $startCount += count($publications_sub);
                 }
                 $shortcode_data .= do_shortcode('[collapse title="' . $title. $subtotal_publication_html_in_accordion .  '"' . $openfirst . ']' . $shortcode_data_other . '[/collapse]');
                 $openfirst = '';
@@ -561,16 +568,17 @@ class Publikationen
                         $output .= "</h4>";
                     }
                     if ($quotation == 'apa' || $quotation == 'mla') {
-                        $output .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display']);
+                        $output .= $this->make_quotation_list($publications_sub, $quotation, $param['showimage'], $param['display'],$listType,$startCount);
                     } else {
                         if ($param['sc_type'] == 'custom') {
-                            $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language'], $param['image_align'], $param['display'],$listType);
+                            $output .= $this->make_custom_list($publications_sub, $content, '', $param['display_language'], $param['image_align'],$listType, $param['display'],$startCount);
                         } else {
-                            $output .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType);
+                            $output .= $this->make_list($publications_sub, 0, $this->nameorder, $param['display_language'], $param['showimage'], $param['image_align'], $param['image_position'], $param['display'],$listType,$startCount);
                         }
                     }
                 }
                 $total_number_publication += $number_of_pub;
+                $startCount += count($publications);
             }
              // To show total number of publication
             if (in_array('total', $publicationSumArray) || (in_array('total', $publicationSumArray) && in_array('subtotal', $publicationSumArray))) {
@@ -599,7 +607,8 @@ class Publikationen
         $showimage = 0,
         $image_align = 'right',
         $image_position = "top",
-        $display = 'no-list'
+        $display = 'no-list',
+        $listType='ol'
     ) {
         $ws = new CRIS_publications();
 
@@ -616,12 +625,12 @@ class Publikationen
         $display = (count($pubArray) < 2 ? 'no-list' : $display);
 
         if ($quotation == 'apa' || $quotation == 'mla') {
-            $output = $this->make_quotation_list($pubArray, $quotation, $showimage, $display);
+            $output = $this->make_quotation_list($pubArray, $quotation, $showimage, $display,$listType,$startCount='1');
         } else {
             if ($sc_type == 'custom') {
-                $output = $this->make_custom_list($pubArray, $content, '', $this->sc_lang, $image_align, $display);
+                $output = $this->make_custom_list($pubArray, $content, '', $this->sc_lang, $image_align,$listType,$display,$startCount='1');
             } else {
-                $output = $this->make_list($pubArray, 0, $this->nameorder, $this->sc_lang, $showimage, $image_align, $image_position, $display);
+                $output = $this->make_list($pubArray, 0, $this->nameorder, $this->sc_lang, $showimage, $image_align, $image_position, $display,$listType,$startCount='1');
             }
         }
         return $this->langdiv_open . $output . $this->langdiv_close;
@@ -673,9 +682,9 @@ class Publikationen
             $pubList = array_slice($pubList, 0, $param['project_publications_limit'], true);
         }
         if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
-            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_format']);
+            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_format'],$param['listtype'],$startCount='1');
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'], 0, '', '', $param['publications_format']);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'], 0, '', '', $param['publications_format'],$param['listtype'],$startCount='1');
         }
 
         return $output;
@@ -740,9 +749,9 @@ class Publikationen
 
         $output = '';
         if ($param['quotation'] == 'apa' || $param['quotation'] == 'mla') {
-            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_format']);
+            $output = $this->make_quotation_list($pubList, $param['quotation'], 0, $param['publications_format'],$param['listtype'],$startCount='1');
         } else {
-            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'], 0, '', '', $param['publications_format']);
+            $output = $this->make_list($pubList, 0, $this->nameorder, $param['display_language'], 0, '', '', $param['publications_format'],$param['listtype'],$startCount='1');
         }
 
         return $output;
@@ -873,13 +882,23 @@ class Publikationen
      *
      * Start::make_quotation_list
      */
-    private function make_quotation_list($publications, $quotation, $showimage = 0, $display = 'list'): string
+    private function make_quotation_list($publications, $quotation, $showimage = 0, $display = 'list',$listType='ul',$startCount=''): string
     {
 
         $quotation = strtolower($quotation);
         $list_class = ($display == 'no-list' ? 'no-list' : '');
         $image_align = 'alignright';
-        $publist = "<ul class=\"cris-publications $list_class\">";
+        $startCount = (int) $startCount;
+        $publist = '';
+        $listTag  = (strtolower($listType) === 'ol') ? 'ol' : 'ul';
+
+           if ($listTag=='ol' && $list_class !== 'no-list') {
+                $publist .= "<ol class=\"cris-publications $list_class\"  start=\"$startCount\">";
+            }
+            else{
+            // Open list wrapper
+            $publist .= "<ul class=\"cris-publications $list_class\"  >";
+            }
 
         foreach ($publications as $publication) {
             $id = $publication->ID;
@@ -922,7 +941,7 @@ class Publikationen
             $publist .= $cleardiv . "</li>";
         }
 
-        $publist .= "</ul>";
+        $publist .= "</$listTag>";
 
         return $publist;
     }
@@ -939,16 +958,16 @@ class Publikationen
      * Start::make_list
      */
 
-    private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top', $display = 'list',$listType ='ul'): string
+    private function make_list($publications, $showsubtype = 0, $nameorder = '', $lang = 'de', $showimage = 0, $image_align = 'alignright', $image_position = 'top', $display = 'list',$listType ='ul',$startCount='1'): string
     {
         $listTag    = (strtolower($listType) === 'ol') ? 'ol' : 'ul';
         $list_class = ($display == 'no-list' ? 'no-list' : '');
         // $publist = "<ol class=\"cris-publications $list_class\" lang=\"" . $lang . "\">";
         $langAttr   = 'lang="' . esc_attr($lang) . '"';
-         $publist    = '';
+        $publist    = '';
         $currentYear= null;
         $listOpen   = false;
-
+        $startCount = (int) $startCount;
         foreach ($publications as $publicationObject) {
             $publication = $publicationObject->attributes;
               // id
@@ -1073,25 +1092,27 @@ class Publikationen
             }
 
              $year = $pubDetails['year'];
-            if ($listTag === 'ol') {
+            if ($listTag === 'ol' && $list_class !== 'no-list') {
                 // Restart numbering when year changes
                 if ($year !== $currentYear) {
                     if ($listOpen) {
                         $publist .= "</ol>";
+                        
                     }
-                    $publist .= "<ol class=\"cris-publications $list_class\" $langAttr>";
+                    // Use the start attribute for continuous numbering
+                    $publist .= "<ol class=\"cris-publications $list_class\" $langAttr start=\"$startCount\">";
                     $currentYear = $year;
                     $listOpen    = true;
+                    
                 }
             } else {
                 // For unordered, open once
-                if (! $listOpen) {
+                if (!$listOpen) {
+                    
                     $publist .= "<ul class=\"cris-publications $list_class\" $langAttr>";
                     $listOpen = true;
                 }
-            }
-
-
+            }           
             switch (strtolower($pubDetails['pubType'])) {
                 case "book": // OK
                     $publist .= "<li itemscope itemtype=\"http://schema.org/Book\">";
@@ -1312,9 +1333,11 @@ class Publikationen
             }
             $publist .= $cleardiv . "</li>";
         }
+        
         // Close any open list
         if ($listOpen) {
             $publist .= "</{$listTag}>";
+            
         }
         
         return $publist;
@@ -1331,20 +1354,31 @@ class Publikationen
      * Start::make_custom_list
      */
 
-    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright', $listType='ol'): string
+    private function make_custom_list($publications, $custom_text, $nameorder = '', $lang = 'de', $image_align = 'alignright', $listType='',$display = 'list',$startCount=''): string
     {
+        
         // Determine list tag and language attribute
             $langAttr = 'lang="' . esc_attr($lang) . '"';
             $listTag  = (strtolower($listType) === 'ol') ? 'ol' : 'ul';
             $publist  = '';
             $hasItems = !empty($publications);
+            $list_class = ($display == 'no-list' ? 'no-list' : '');
+            $startCount = (int) $startCount;
+           
+
         // Wrap in div if no items
             if (! $hasItems) {
                 $publist .= "<div class=\"cris-publications\" $langAttr>";
-            } else {
-                // Open list wrapper
-                $publist .= "<{$listTag} class=\"cris-publications\" $langAttr>";
+            }  
+            if ($listTag=='ol' && $list_class !== 'no-list') {
+                $publist .= "<ol class=\"cris-publications $list_class\" $langAttr start=\"$startCount\">";
             }
+            else{
+            // Open list wrapper
+            $publist .= "<ul class=\"cris-publications $list_class\" $langAttr >";
+            }
+
+        // Loop through publications
         foreach ($publications as $publObject) {
             $publication = (array) $publObject;
             foreach ($publication['attributes'] as $attribut => $v) {

@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.26.6
+ * Version: 3.26.7
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.26.6';
+    const version = '3.26.7';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -1150,7 +1150,7 @@ public static function options_fau_cris(): void
             }
 
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
-                return $liste->singlePub($parameter['quotation'], '', 'default', $parameter['showimage'], $parameter['image_align'], $parameter['image_position'], $parameter['display']);
+                return $liste->singlePub($parameter['quotation'], '', 'default', $parameter['showimage'], $parameter['image_align'], $parameter['image_position'], $parameter['display'],$parameter['listtype']);
             }
             if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['notable'] != 0)) {
                 return $liste->pubListe($parameter);
@@ -1229,7 +1229,7 @@ public static function options_fau_cris(): void
             }
             if ($parameter['publication'] != '' && $parameter['order1'] == '') {
 
-                return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type'], 1, $parameter['image_align'], $parameter['image_position']);
+                return $liste->singlePub($parameter['quotation'], $content, $parameter['sc_type'], 1, $parameter['image_align'], $parameter['image_position'],$parameter['display'],$parameter['listtype']);
 
             }
             if ($parameter['order1'] == '' && ($parameter['limit'] != '' || $parameter['sortby'] != '' || $parameter['notable'] != '')) {
