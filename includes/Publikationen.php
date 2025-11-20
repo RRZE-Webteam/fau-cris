@@ -196,7 +196,6 @@ class Publikationen
         $muteheadings = $param['muteheadings'] ?? 0; 
         // it will use for showing number of publication by year or in total
         $total_publication_html='';
-
         $startCount=1;
         
         if (!is_array($param['publicationsum'])) {
@@ -1498,11 +1497,7 @@ class Publikationen
                     $publist .= "</li>";
                 }
         }
-        if ($hasItems) {
-            $publist .= "</div>";
-        } else {
-            $publist .= "</{$listTag}>";
-        }
+        $publist .= "</{$listTag}>";
         return $publist;
     }
     //  End::make_custom_list
