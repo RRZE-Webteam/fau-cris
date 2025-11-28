@@ -53,7 +53,7 @@ class Forschungsbereiche
                 __('Bitte geben Sie die CRIS-ID der Organisation oder des Forschungsbereichs an.', 'fau-cris')
             );
         }
-        if (in_array($einheit, array("orga", "field"))) {
+        if (in_array($einheit, array("orga", "field","field_incl_proj"))) {
             $this->id = $id;
             $this->einheit = $einheit;
         } else {
@@ -112,6 +112,7 @@ class Forschungsbereiche
 
     public function singleField($param = array())
     {
+        
         $ws = new CRIS_fields();
         try {
             $fieldsArray = $ws->by_id($this->id);
@@ -228,8 +229,6 @@ class Forschungsbereiche
     private function make_single($fields, $param): string
     {
         $hide = $param['hide'];
-
-
         $singlefield = "<div class=\"cris-fields\">";
 
         foreach ($fields as $field) {
@@ -338,7 +337,7 @@ class Forschungsbereiche
 
             if (!in_array('publications', $hide)
                 && !is_array($param['field'])) {
-                $publications = $this->get_field_publications($param);
+                $publications = $this->get_field_publications($param,$this->einheit);
                 if ($publications) {
                     $singlefield .= "<h3>" . __('Publikationen', 'fau-cris') . ": </h3>";
                     $singlefield .= $publications;
@@ -434,13 +433,13 @@ class Forschungsbereiche
                     $field_details['#project_publications#'] = $project_publications;
                 }
             }
-            // $field_details['#publications_incl_projects#'] = '';
-            // if (strpos($content, '#publications_incl_projects#') !== false) {
-            //     $project_publications = $this->get_field_publications($param, 'field_incl_proj');
-            //     if ($project_publications) {
-            //         $field_details['#publications_incl_projects#'] = $project_publications;
-            //     }
-            // }
+             $field_details['#publications_incl_projects#'] = '';
+             if (strpos($content, '#publications_incl_projects#') !== false) {
+                $project_publications = $this->get_field_publications($param);
+                 if ($project_publications) {
+                     $field_details['#publications_incl_projects#'] = $project_publications;
+                  }
+             }
             $field_details['#image1#'] = '';
             $field_details['#images#'] = '';
             if (strpos($content, '#image') !== false) {
@@ -522,30 +521,14 @@ class Forschungsbereiche
             $entity = 'field_notable';
         }
         $liste = new Publikationen($entity, $param['field'], '', $this->page_lang, $this->sc_lang);
-        foreach ($param as $_k => $_v) {
-            if (substr($_k, 0, 13) == 'publications_') {
-                $args[substr($_k, 13)] = $_v;
-            }
-        }
-        $args['sc_type'] = 'default';
-        $args['quotation'] = $param['quotation'];
-        $args['display_language'] = $this->sc_lang;
-        $args['showimage'] = $param['showimage'];
-        $args['image_align'] = $param['image_align'];
-        $args['image_position'] = $param['image_position'];
-        $args['format'] = $param['publications_format'];
-        $args['order2']=$param['order2'];
-        $args['sortby']=$param['sortby'];
-        $args['author_position']=$param['author_position'];
-        $args['publicationsum']=$param['publicationsum'];
-        if (isset($args['listtype']) && $empty($args['listtype'])) {
-            $args['listtype']=$param['listtype'];
+        if (isset($liste->error) && is_wp_error($liste->error)) {
+            return $liste->error->get_error_message();
         }
         if ($param['publications_orderby'] == 'year') {
-            return $liste->pubNachJahr($args, $param['field'], '', $param['fsp']);
+            return $liste->pubNachJahr($param, $param['field'], '', $param['fsp']);
         }
         if ($param['publications_orderby'] == 'type') {
-            return $liste->pubNachTyp($args, $param['field'], '', $param['fsp']);
+            return $liste->pubNachTyp($param, $param['field'], '', $param['fsp']);
         }
         return $liste->fieldPub($param, false);
     }
