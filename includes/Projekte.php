@@ -894,17 +894,14 @@ class Projekte
                 $date = Tools::make_date($start, $end);
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
-                /*
-                 * Erst umsetzen wenn Datendrehscheibe läuft
-                 *
+
                   $leaderIDs = explode(",", $project['relpersidlead']);
                   $leaderArray = $this->get_project_leaders($id, $leaderIDs);
                   $leaders = array();
                   foreach ($leaderArray as $l_id => $l_names) {
                   $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                   }
-                 */
-
+                
                 $projlist .= "<div class=\"project-details\">";
                 if (!empty($parentprojecttitle)) {
                     $projlist .= "<strong>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </strong>' . $parentprojecttitle . '<br />';
@@ -915,6 +912,9 @@ class Projekte
                 }
                 if (!empty($date)) {
                     $projlist .= "<strong>" . __('Laufzeit', 'fau-cris') . ': </strong>' . $date . '<br />';
+                }
+                if (!empty($acronym)) {
+                    $projlist .= "<strong>" . __('Akronym', 'fau-cris') . ": </strong>" . $acronym . '<br />';
                 }
                 if (!empty($funding)) {
                     $projlist .= "<strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
@@ -985,6 +985,7 @@ class Projekte
             $title = htmlentities($title, ENT_QUOTES);
             $title = str_replace(['[', ']'], ['&#91;', '&#93;'], $title);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
+            // @codingStandardsIgnoreLine
             $description = strip_tags($description,Tools::$whitelist_tags);
             if (mb_strlen($description) > 500) {
                 $pos = strpos($description, ' ', 500);
