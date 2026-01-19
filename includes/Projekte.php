@@ -221,6 +221,7 @@ class Projekte
 
     public function projNachJahr($param = array(), $content = ''): string
     {
+
         $year = (isset($param['year']) && $param['year'] != '') ? $param['year'] : '';
         $start = (isset($param['start']) && $param['start'] != '') ? $param['start'] : '';
         $end = (isset($param['end']) && $param['end'] != '') ? $param['end'] : '';
@@ -255,9 +256,10 @@ class Projekte
                 if (!empty($param['order2']) && $param['order2']==='title') {
                     uasort($projects, [$this,'project_title_filter']);
                 }
-                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $array_year . '"' . $openfirst . ']' . $this->make_accordion($projects,$hide=$param['projects_hide']) . '[/collapse]');
                 $openfirst = '';
             }
+
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
         } else {
             foreach ($projList as $array_year => $projects) {
@@ -334,7 +336,7 @@ class Projekte
                 if (!empty($param['order2']) && $param['order2']==='title') {
                     uasort($projects, [$this,'project_title_filter']);
                  }
-                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_list($projects, $hide) . '[/collapse]');
+                $shortcode_data .= do_shortcode('[collapse title="' . $title . '"' . $openfirst . ']' . $this->make_accordion($projects,$hide=$param['projects_hide']) . '[/collapse]');
                 $openfirst = '';
             }
             $output .= do_shortcode('[collapsibles ' . $expandall . ']' . $shortcode_data . '[/collapsibles]');
@@ -386,11 +388,10 @@ class Projekte
             $output = '<p>' . __('Es wurden leider keine Projekte gefunden.', 'fau-cris') . '</p>';
             return $output;
         }
-
         $externalPartnerArray=$ws->by_proj_has_eorg($this->id);
 
         if (is_array($this->id)) {
-            $output = $this->make_list($projArray, $param['hide']);
+            $output = $this->make_list($projArray, $hide=$param['projects_hide']);
         } else {
             $output = $this->make_single($projArray, $param,$externalPartnerArray);
         }
@@ -893,17 +894,14 @@ class Projekte
                 $date = Tools::make_date($start, $end);
                 $funding = $this->get_project_funding($id);
                 $url = $project['cfuri'];
-                /*
-                 * Erst umsetzen wenn Datendrehscheibe läuft
-                 *
+
                   $leaderIDs = explode(",", $project['relpersidlead']);
                   $leaderArray = $this->get_project_leaders($id, $leaderIDs);
                   $leaders = array();
                   foreach ($leaderArray as $l_id => $l_names) {
                   $leaders[] = Tools::get_person_link($l_id, $l_names['firstname'], $l_names['lastname'], $this->cris_project_link, $this->cms, $this->pathPersonenseiteUnivis, $this->univis);
                   }
-                 */
-
+                
                 $projlist .= "<div class=\"project-details\">";
                 if (!empty($parentprojecttitle)) {
                     $projlist .= "<strong>" . __('Titel des Gesamtprojektes', 'fau-cris') . ': </strong>' . $parentprojecttitle . '<br />';
@@ -914,6 +912,9 @@ class Projekte
                 }
                 if (!empty($date)) {
                     $projlist .= "<strong>" . __('Laufzeit', 'fau-cris') . ': </strong>' . $date . '<br />';
+                }
+                if (!empty($acronym)) {
+                    $projlist .= "<strong>" . __('Akronym', 'fau-cris') . ": </strong>" . $acronym . '<br />';
                 }
                 if (!empty($funding)) {
                     $projlist .= "<strong>" . __('Mittelgeber', 'fau-cris') . ': </strong>';
@@ -984,6 +985,7 @@ class Projekte
             $title = htmlentities($title, ENT_QUOTES);
             $title = str_replace(['[', ']'], ['&#91;', '&#93;'], $title);
             $description = str_replace(["\n", "\t", "\r"], '', $description);
+            // @codingStandardsIgnoreLine
             $description = strip_tags($description,Tools::$whitelist_tags);
             if (mb_strlen($description) > 500) {
                 $pos = strpos($description, ' ', 500);
