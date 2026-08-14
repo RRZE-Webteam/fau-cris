@@ -128,7 +128,11 @@ class FAU_CRIS
     public static function activate(): void
     {
         self::version_compare();
-        update_option(self::version_option_name, self::version);
+        // update_version() also runs the transient cleanup on a fresh install /
+        // manual (re)activation before storing the version. Note: this does NOT
+        // fire on plugin updates — WordPress suppresses the activation hook then
+        // — which is why cleanup also runs via update_version() on load.
+        self::update_version();
     }
 
     public static function deactivate(): void
@@ -181,31 +185,13 @@ class FAU_CRIS
 
     /**
      * One-time cleanup of accumulated CRIS transients, run once per version
-     * bump. Removes index-tracked keys (object-cache safe) and sweeps legacy
-     * cris_* transients created before the key index existed. On multisite this
-     * runs per site as each site is first loaded after the update. Legacy
-     * entries on installs with a persistent object cache are not enumerable and
-     * will simply expire on their own (max 6h); new code prevents recurrence.
+     * bump. Cache::flush() rotates the cache generation (object-cache safe) and
+     * sweeps leftover cris_* data/timeout rows, including orphans. On multisite
+     * this runs per site as each site is first loaded after the update.
      */
     private static function cleanup_transients(): void
     {
         \RRZE\Cris\Cache::flush();
-
-        global $wpdb;
-        $like = $wpdb->esc_like('_transient_cris_') . '%';
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        $names = $wpdb->get_col(
-            $wpdb->prepare(
-                "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s",
-                $like
-            )
-        );
-        foreach ((array) $names as $optionName) {
-            $transient = substr($optionName, strlen('_transient_'));
-            // delete_transient() removes both the data and the timeout row and
-            // invalidates any object-cache entry.
-            delete_transient($transient);
-        }
     }
 
     /**

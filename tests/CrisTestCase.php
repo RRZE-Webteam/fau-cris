@@ -61,6 +61,16 @@ abstract class CrisTestCase extends TestCase
         Functions\when('wp_parse_url')->alias(function ($url, $component = -1) {
             return $component === -1 ? parse_url($url) : parse_url($url, $component);
         });
+
+        // Default generation token; individual tests can override with a
+        // sequence to exercise generation rotation.
+        Functions\when('wp_generate_uuid4')->justReturn('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
+
+        // Reset the Cache class's per-request generation memo so static state
+        // does not leak between tests.
+        $memo = new \ReflectionProperty(\RRZE\Cris\Cache::class, 'generation');
+        $memo->setAccessible(true);
+        $memo->setValue(null, null);
     }
 
     protected function tearDown(): void
