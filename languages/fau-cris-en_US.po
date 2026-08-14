@@ -871,3 +871,7 @@ msgstr "Data is currently unavailable. Please try again later."
 #: includes/Forschungsbereiche.php
 msgid "Bitte geben Sie eine gültige Forschungsfeld-ID an."
 msgstr "Please provide a valid field-of-research ID."
+
+#: includes/Sustainability.php
+msgid "Beitragende Wissenschaftler/-innen"
+msgstr "Participating Researchers"

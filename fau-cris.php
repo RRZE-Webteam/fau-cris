@@ -12,6 +12,7 @@ use RRZE\Cris\Auszeichnungen;
 use RRZE\Cris\Publikationen;
 use RRZE\Cris\Aktivitaeten;
 use RRZE\Cris\Patente;
+use RRZE\Cris\Sustainability;
 use RRZE\Cris\Sync;
 
 
@@ -19,7 +20,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.29.13
+ * Version: 3.29.14
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +81,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.29.13';
+    const version = '3.29.14';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -1045,7 +1046,14 @@ public static function options_fau_cris(): void
         $parameter = self::cris_shortcode_parameter($atts, $content = null, $tag);
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
-        if (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
+        if (isset($parameter['show']) && $parameter['show'] == 'sdg') {
+            // Nachhaltigkeit / UN Sustainable Development Goals
+            $liste = new Sustainability($parameter['entity'], $parameter['sdg'], $page_lang, $parameter['display_language']);
+            if (isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
+            return $liste->singleSDG($parameter['hide']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
             // Standardisierung
             $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
@@ -1353,6 +1361,7 @@ public static function options_fau_cris(): void
             'display_language' => Tools::getPageLanguage($post->ID),
             'organisation' => $options['cris_org_nr'],
             'standardization' => '',
+            'sdg' => '',
             'projects_status'=>'',
             'projects_start'=>'',
             'author_position'=>'',
@@ -1382,6 +1391,7 @@ public static function options_fau_cris(): void
         $sc_param['patent'] = sanitize_text_field($patent);
         $sc_param['activity'] = sanitize_text_field($activity);
         $sc_param['field'] = sanitize_text_field($field);
+        $sc_param['sdg'] = sanitize_text_field($sdg);
         $sc_param['show'] = sanitize_text_field($show);
         if ($type == 'weitere') {
             $type = 'andere';
