@@ -19,7 +19,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.29.12
+ * Version: 3.29.13
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -80,7 +80,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.29.12';
+    const version = '3.29.13';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -118,6 +118,8 @@ class FAU_CRIS
 
         add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2);
         add_action('cris_auto_update', array(__CLASS__, 'cris_auto_sync'));
+
+        self::update_version();
     }
 
     /**
@@ -126,7 +128,11 @@ class FAU_CRIS
     public static function activate(): void
     {
         self::version_compare();
-        update_option(self::version_option_name, self::version);
+        // update_version() also runs the transient cleanup on a fresh install /
+        // manual (re)activation before storing the version. Note: this does NOT
+        // fire on plugin updates — WordPress suppresses the activation hook then
+        // — which is why cleanup also runs via update_version() on load.
+        self::update_version();
     }
 
     public static function deactivate(): void
@@ -172,8 +178,20 @@ class FAU_CRIS
     public static function update_version(): void
     {
         if (get_option(self::version_option_name, null) != self::version) {
+            self::cleanup_transients();
             update_option(self::version_option_name, self::version);
         }
+    }
+
+    /**
+     * One-time cleanup of accumulated CRIS transients, run once per version
+     * bump. Cache::flush() rotates the cache generation (object-cache safe) and
+     * sweeps leftover cris_* data/timeout rows, including orphans. On multisite
+     * this runs per site as each site is first loaded after the update.
+     */
+    private static function cleanup_transients(): void
+    {
+        \RRZE\Cris\Cache::flush();
     }
 
     /**
@@ -1591,6 +1609,10 @@ public static function options_fau_cris(): void
 
     public static function cris_cron(): void
     {
+        // A settings change may alter which CRIS data is shown; invalidate the
+        // plugin cache so stale responses are not served after reconfiguration.
+        \RRZE\Cris\Cache::flush();
+
         $options = get_option('_fau_cris');
         if (isset($options['cris_sync_check'])
                 && $options['cris_sync_check'] != 1) {
