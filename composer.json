@@ -1,0 +1,26 @@
+{
+    "name": "rrze/fau-cris",
+    "description": "Dev tooling and tests for the FAU CRIS plugin.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require-dev": {
+        "phpunit/phpunit": "^9.6 || ^10.5",
+        "brain/monkey": "^2.6",
+        "mockery/mockery": "^1.6"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "RRZE\\Cris\\": "includes/",
+            "RRZE\\Cris\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "*": false
+        }
+    }
+}
