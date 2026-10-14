@@ -230,7 +230,9 @@ class Sustainability
 
             $output .= "<div class=\"cris-sdg-person-card\">";
             // Card from a local person page when one exists, CRIS link otherwise.
-            $output .= Tools::get_person_card($person->ID, $firstname, $lastname, $this->cms, $this->name_order_plugin, 'card');
+            // The SDG list names contributors, it is not a contact directory,
+            // so the card drops the contact details and the job title.
+            $output .= Tools::get_person_card($person->ID, $firstname, $lastname, $this->cms, $this->name_order_plugin, 'card', 'email,phone,jobTitle');
             $output .= "</div>";
         }
 

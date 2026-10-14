@@ -828,14 +828,16 @@ public static function sortByKey(array &$array, string $key): void {
      * migrated yet, and a plain CRIS link is the last resort. Both plugins may
      * be active at the same time, so neither is assumed to be present.
      */
-    public static function get_person_card($id, $firstname, $lastname, $cms, $nameorder = '', $faudir_format = 'compact'): string
+    public static function get_person_card($id, $firstname, $lastname, $cms, $nameorder = '', $faudir_format = 'compact', $faudir_hide = ''): string
     {
         if ($cms == 'wp') {
             // The format is per source: FAU Person has no compact format, so
-            // its nearest equivalent is used there.
+            // its nearest equivalent is used there. $faudir_hide drops single
+            // fields from the FAUdir card; its field names are case sensitive,
+            // e.g. "email,phone,jobTitle".
             $sources = array(
-                'faudir' => array('post_type' => self::faudir_post_type(), 'format' => $faudir_format),
-                'person' => array('post_type' => 'person', 'format' => 'card'),
+                'faudir' => array('post_type' => self::faudir_post_type(), 'format' => $faudir_format, 'hide' => $faudir_hide),
+                'person' => array('post_type' => 'person', 'format' => 'card', 'hide' => ''),
             );
 
             foreach ($sources as $shortcode => $source) {
@@ -846,10 +848,14 @@ public static function sortByKey(array &$array, string $key): void {
                 if (!$pid) {
                     continue;
                 }
+                $attributes = ' id="' . intval($pid) . '" format="' . esc_attr($source['format']) . '"';
+                if ($source['hide'] !== '') {
+                    $attributes .= ' hide="' . esc_attr($source['hide']) . '"';
+                }
                 // A person page without usable directory data renders nothing.
                 // The next source is tried in that case, so a half-migrated
                 // entry cannot swallow the card.
-                $card = do_shortcode('[' . $shortcode . ' id="' . intval($pid) . '" format="' . $source['format'] . '"]');
+                $card = do_shortcode('[' . $shortcode . $attributes . ']');
                 if (trim($card) !== '') {
                     return $card;
                 }
