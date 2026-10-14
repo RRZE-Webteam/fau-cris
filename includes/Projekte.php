@@ -976,7 +976,20 @@ class Projekte
 
     //  End::make_list
 
-    private function make_accordion($projects, $hide = array(), $showtype = 1)
+    /*
+     * Render a project accordion for a caller outside this class, optionally
+     * annotated with SDG tags. Keeps the accordion markup in one place instead
+     * of duplicating it per consumer.
+     *
+     * $sdgTags is keyed by project ID; each entry is a list of
+     * ['code' => ..., 'name' => ..., 'url' => ...].
+     */
+    public function projectAccordion($projects, $hide = array(), $sdgTags = array()): string
+    {
+        return $this->make_accordion($projects, $hide, 1, $sdgTags);
+    }
+
+    private function make_accordion($projects, $hide = array(), $showtype = 1, $sdgTags = array())
     {
         global $post;
         $lang_key = ($this->page_lang == 'en') ? '_en' : '';
@@ -1022,11 +1035,14 @@ class Projekte
             $type = Tools::getName('projects', $project['project type'], $this->page_lang);
 
 
-            $projlist .= "[accordion-item title='" . 
-                ((!empty($acronym) && !in_array('acrotitle', $hide)) ? $acronym . ": " : "") 
+            $projlist .= "[accordion-item title='" .
+                ((!empty($acronym) && !in_array('acrotitle', $hide)) ? $acronym . ": " : "")
                 . $title_shortcode . "']";
-            
-            
+
+            if (!empty($sdgTags[$id])) {
+                $projlist .= $this->render_sdg_tags($sdgTags[$id]);
+            }
+
             if (!in_array('date', $hide)) {            
             $start = $project['cfstartdate'];
             if (!in_array('end', $hide)) {
@@ -1095,6 +1111,36 @@ class Projekte
         }
         $projlist .= "[/accordion]";
         return do_shortcode($projlist);
+    }
+
+    /*
+     * SDG tags for a single project. Code and name form the visible label, as
+     * in the heading of the sustainability component, and link to the goal's
+     * page on the central FAU site. Several tags are separated by commas, which
+     * keeps them apart once the names wrap across lines.
+     */
+    private function render_sdg_tags($tags): string
+    {
+        $items = array();
+        foreach ($tags as $tag) {
+            $code = isset($tag['code']) ? trim((string) $tag['code']) : '';
+            if ($code === '') {
+                continue;
+            }
+            $name = isset($tag['name']) ? trim((string) $tag['name']) : '';
+            $url = isset($tag['url']) ? (string) $tag['url'] : '';
+
+            $label = esc_html($code) . ($name !== '' ? ' &ndash; ' . esc_html($name) : '');
+            $items[] = $url !== ''
+                ? '<a class="cris-sdg-tag" href="' . esc_url($url) . '">' . $label . '</a>'
+                : '<span class="cris-sdg-tag">' . $label . '</span>';
+        }
+
+        if (!count($items)) {
+            return '';
+        }
+
+        return '<p class="cris-sdg-tags">' . implode(', ', $items) . '</p>';
     }
 
     function my_plugin_inline_css() {

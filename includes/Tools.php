@@ -10,9 +10,17 @@ use RRZE\Cris\Dicts;
 
 class Tools
 {
-    //This is an whitelist variable for strip_tags function 
+    //This is an whitelist variable for strip_tags function
 
     public static string $whitelist_tags = '<div><br><a><sup><sub><p><ul><ol><li><h3><h1><h2><i><strong><em><style><u><font>';
+
+    /*
+     * Pages of the UN sustainable development goals on the central FAU
+     * sustainability site, one per language, with the goal number filled in.
+     */
+    public const sdg_url_de = 'https://www.sustainability.fau.de/ziele/ziel-%d/';
+    public const sdg_url_en = 'https://www.sustainability.fau.de/en/sdgs/sdg-%d/';
+    public const sdg_count = 17;
 
     public static function getAcronym($acadTitle): string
     {
@@ -685,7 +693,12 @@ public static function sortByKey(array &$array, string $key): void {
         return $univis;
     }
 
-    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array(), $nameorder = '')
+    /*
+     * $post_type selects which person custom post type is searched. It defaults
+     * to the FAU Person post type, so existing callers are unaffected; the
+     * FAUdir post type is passed in by get_person_card().
+     */
+    public static function person_exists($cms = '', $firstname = '', $lastname = '', $univis = array(), $nameorder = '', $post_type = 'person')
     {
         if ($cms == 'wp') {
             // WordPress
@@ -701,9 +714,9 @@ public static function sortByKey(array &$array, string $key): void {
                 $person = '%' . $wpdb->esc_like($firstname) . '%' . $wpdb->esc_like($lastname) . '%';
             }
             // @codingStandardsIgnoreLine
-            $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = 'person' AND post_status = 'publish'";
+            $sql = "SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s AND post_type = %s AND post_status = 'publish'";
             // @codingStandardsIgnoreLine
-            $sql = $wpdb->prepare($sql, $person);
+            $sql = $wpdb->prepare($sql, $person, $post_type);
             // @codingStandardsIgnoreLine
             $persons = $wpdb->get_results($sql);
             if (count($persons) == 1) {
@@ -809,6 +822,69 @@ public static function sortByKey(array &$array, string $key): void {
       }
     }
 
+    /*
+     * Person card for a CRIS person, resolved by name against the local person
+     * pages. FAUdir is preferred, FAU Person is used while a person has not been
+     * migrated yet, and a plain CRIS link is the last resort. Both plugins may
+     * be active at the same time, so neither is assumed to be present.
+     */
+    public static function get_person_card($id, $firstname, $lastname, $cms, $nameorder = '', $faudir_format = 'compact', $faudir_hide = ''): string
+    {
+        if ($cms == 'wp') {
+            // The format is per source: FAU Person has no compact format, so
+            // its nearest equivalent is used there. $faudir_hide drops single
+            // fields from the FAUdir card; its field names are case sensitive,
+            // e.g. "email,phone,jobTitle".
+            $sources = array(
+                'faudir' => array('post_type' => self::faudir_post_type(), 'format' => $faudir_format, 'hide' => $faudir_hide),
+                'person' => array('post_type' => 'person', 'format' => 'card', 'hide' => ''),
+            );
+
+            foreach ($sources as $shortcode => $source) {
+                if (!shortcode_exists($shortcode)) {
+                    continue;
+                }
+                $pid = self::person_exists($cms, $firstname, $lastname, array(), $nameorder, $source['post_type']);
+                if (!$pid) {
+                    continue;
+                }
+                $attributes = ' id="' . intval($pid) . '" format="' . esc_attr($source['format']) . '"';
+                if ($source['hide'] !== '') {
+                    $attributes .= ' hide="' . esc_attr($source['hide']) . '"';
+                }
+                // A person page without usable directory data renders nothing.
+                // The next source is tried in that case, so a half-migrated
+                // entry cannot swallow the card.
+                $card = do_shortcode('[' . $shortcode . $attributes . ']');
+                if (trim($card) !== '') {
+                    return $card;
+                }
+            }
+        }
+
+        return self::get_person_link($id, $firstname, $lastname, 'cris', $cms, '', array(), 0);
+    }
+
+    /*
+     * Post type holding the FAUdir person pages. FAUdir makes this configurable,
+     * so its own setting is asked first and the packaged default is the fallback.
+     */
+    private static function faudir_post_type(): string
+    {
+        if (class_exists('\RRZE\FAUdir\Config')) {
+            try {
+                $post_type = (new \RRZE\FAUdir\Config())->get('person_post_type');
+                if (is_string($post_type) && $post_type !== '') {
+                    return $post_type;
+                }
+            } catch (\Throwable $e) {
+                // Fall through to the packaged default below.
+            }
+        }
+
+        return 'custom_person';
+    }
+
     public static function get_person_link($id, $firstname, $lastname, $target, $cms, $path, $univis, $inv = 0, $shortfirst = 0, $nameorder = ''): string
     {
         $person = '';
@@ -892,6 +968,28 @@ public static function sortByKey(array &$array, string $key): void {
         } else {
             return FAU_CRIS::cris_publicweb . $item . "/" . $cris_id . ($lang == 'de' ? '?lang=de_DE' : '?lang=en_GB');
         }
+    }
+
+    /*
+     * Central FAU page of a UN sustainable development goal, derived from its
+     * CRIS code ("SDG 3"). The goals are numbered 1 to 17 and anything outside
+     * that range has no page, so an unusable code yields no link rather than
+     * one that 404s; the callers render the code as plain text then.
+     */
+    public static function get_sdg_url($code, $lang = 'de'): string
+    {
+        if (!preg_match('/(\d{1,2})/', (string) $code, $matches)) {
+            return '';
+        }
+
+        $number = (int) $matches[1];
+        if ($number < 1 || $number > self::sdg_count) {
+            return '';
+        }
+
+        return $lang == 'en'
+            ? sprintf(self::sdg_url_en, $number)
+            : sprintf(self::sdg_url_de, $number);
     }
 
     public static function numeric_xml_encode($text, $double_encode = true): string
