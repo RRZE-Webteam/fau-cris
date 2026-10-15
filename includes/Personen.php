@@ -84,6 +84,7 @@ class Personen
             // fall through to the regular error message below, so that editors
             // can see what happened.
             do_action(
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook owned by the RRZE logging plugin; renaming it would break logging.
                 'rrze.log.error',
                 'Plugin: {plugin} Exception: {exception}',
                 [
@@ -299,6 +300,7 @@ class Personen
             $projects = $ws->by_pers_id($this->id, $filter, 'all');
         } catch (\Throwable $ex) {
             do_action(
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook owned by the RRZE logging plugin; renaming it would break logging.
                 'rrze.log.error',
                 'Plugin: {plugin} Exception: {exception}',
                 [

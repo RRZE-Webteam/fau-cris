@@ -59,6 +59,7 @@ abstract class CrisTestCase extends TestCase
         });
 
         Functions\when('wp_parse_url')->alias(function ($url, $component = -1) {
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- This closure is the wp_parse_url() stub itself; calling wp_parse_url() here would recurse.
             return $component === -1 ? parse_url($url) : parse_url($url, $component);
         });
 
