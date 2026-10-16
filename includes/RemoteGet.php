@@ -13,17 +13,21 @@ class RemoteGet
         'validate' => 'xml'
     ];
 
-    public static function retrieveContent(string $url, array $args = [], int $code = 200, bool $safe = true)
+    public static function retrieveContent(string $url, array $args = [], int $code = 200, bool $safe = true, bool $forceRefresh = false)
     {
         $args = wp_parse_args($args, self::$defaultArgs);
         $args = array_intersect_key($args, self::$defaultArgs);
 
-        $content = Cache::get($url);
+        // On a forced refresh, skip the local cache entirely and perform a real
+        // request. A successful response is still written back below, which
+        // refreshes the normal cache key in place (no separate stale entry).
+        $content = $forceRefresh ? false : Cache::get($url);
         if ($content === false) {
             $response = self::remoteGet($url, $args, $safe);
 
             if (is_wp_error($response)) {
                 do_action(
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook owned by the RRZE logging plugin; renaming it would break logging.
                     'rrze.log.error',
                     'Plugin: {plugin} WP-Error: {wp-error}',
                     [

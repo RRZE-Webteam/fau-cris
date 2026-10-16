@@ -12,6 +12,8 @@ use RRZE\Cris\Auszeichnungen;
 use RRZE\Cris\Publikationen;
 use RRZE\Cris\Aktivitaeten;
 use RRZE\Cris\Patente;
+use RRZE\Cris\Sustainability;
+use RRZE\Cris\Personen;
 use RRZE\Cris\Sync;
 
 
@@ -19,13 +21,13 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.29.12
+ * Version: 3.29.24
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
  * Domain Path: /languages
  * Requires at least: 6.2
- * Tested up to: 6.3
+ * Tested up to: 7.1
  * License: GPLv2 or later
  * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris
  * GitHub Branch: master
@@ -80,7 +82,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.29.12';
+    const version = '3.29.24';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -112,12 +114,17 @@ class FAU_CRIS
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array(__CLASS__, 'add_action_links'));
 
         add_action('wp_enqueue_scripts', array(__CLASS__, 'cris_enqueue_styles'));
+        // Registered here rather than in cris_enqueue_styles(), because FAUdir
+        // decides at priority 5 and this plugin enqueues at the default 10.
+        add_filter('rrze_faudir/enqueue_frontend_on_demand', array(__CLASS__, 'faudir_needs_frontend'), 10, 2);
 
         add_shortcode('cris', array(__CLASS__, 'cris_shortcode'));
         add_shortcode('cris-custom', array(__CLASS__, 'cris_custom_shortcode'));
 
         add_action('update_option_' . self::option_name, array(__CLASS__, 'cris_cron'), 10, 2);
         add_action('cris_auto_update', array(__CLASS__, 'cris_auto_sync'));
+
+        self::update_version();
     }
 
     /**
@@ -126,7 +133,11 @@ class FAU_CRIS
     public static function activate(): void
     {
         self::version_compare();
-        update_option(self::version_option_name, self::version);
+        // update_version() also runs the transient cleanup on a fresh install /
+        // manual (re)activation before storing the version. Note: this does NOT
+        // fire on plugin updates — WordPress suppresses the activation hook then
+        // — which is why cleanup also runs via update_version() on load.
+        self::update_version();
     }
 
     public static function deactivate(): void
@@ -172,8 +183,20 @@ class FAU_CRIS
     public static function update_version(): void
     {
         if (get_option(self::version_option_name, null) != self::version) {
+            self::cleanup_transients();
             update_option(self::version_option_name, self::version);
         }
+    }
+
+    /**
+     * One-time cleanup of accumulated CRIS transients, run once per version
+     * bump. Cache::flush() rotates the cache generation (object-cache safe) and
+     * sweeps leftover cris_* data/timeout rows, including orphans. On multisite
+     * this runs per site as each site is first loaded after the update.
+     */
+    private static function cleanup_transients(): void
+    {
+        \RRZE\Cris\Cache::flush();
     }
 
     /**
@@ -1013,7 +1036,23 @@ public static function options_fau_cris(): void
         $parameter = self::cris_shortcode_parameter($atts, $content = null, $tag);
         global $post;
         $page_lang = Tools::getPageLanguage($post->ID);
-        if (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
+        if (isset($parameter['show']) && $parameter['show'] == 'sdg') {
+            // Nachhaltigkeit / UN Sustainable Development Goals
+            $liste = new Sustainability($parameter['sdg'], $page_lang, $parameter['display_language']);
+            if (isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
+            return $liste->singleSDG($parameter['hide'], $parameter['hstart']);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'person') {
+            // Single person with their projects. Uses persid rather than the
+            // resolved entity_id, which falls back to the configured org number
+            // when no person was given and would query that as a person.
+            $liste = new Personen($parameter['persid'], $page_lang, $parameter['display_language']);
+            if (isset($liste->error) && is_wp_error($liste->error)) {
+                return $liste->error->get_error_message();
+            }
+            return $liste->singlePerson($parameter);
+        } elseif (isset($parameter['show']) && $parameter['show'] == 'standardizations') {
             // Standardisierung
             $liste = new Standardisierungen($parameter['entity'], $parameter['entity_id'], $page_lang, $parameter['display_language']);
             if (isset($liste->error) && is_wp_error($liste->error)) {
@@ -1321,6 +1360,10 @@ public static function options_fau_cris(): void
             'display_language' => Tools::getPageLanguage($post->ID),
             'organisation' => $options['cris_org_nr'],
             'standardization' => '',
+            'sdg' => '',
+            'person' => '',
+            'filter' => '',
+            'hstart' => 2,
             'projects_status'=>'',
             'projects_start'=>'',
             'author_position'=>'',
@@ -1342,7 +1385,10 @@ public static function options_fau_cris(): void
 
         $sc_param['orderby'] = sanitize_text_field($orderby);
         $sc_param['orgid'] = $orgid;
-        $sc_param['persid'] = sanitize_text_field($persid);
+        // "person" is an alias for the established "persid" attribute, so the
+        // syntax used in the CRIS issue examples works as well.
+        $sc_param['persid'] = sanitize_text_field($persid) ?: sanitize_text_field($person);
+        $sc_param['filter'] = sanitize_text_field($filter);
         $sc_param['publication'] = sanitize_text_field($publication);
         $sc_param['award'] = sanitize_text_field($award);
         $sc_param['awardnameid'] = sanitize_text_field($awardnameid);
@@ -1350,6 +1396,8 @@ public static function options_fau_cris(): void
         $sc_param['patent'] = sanitize_text_field($patent);
         $sc_param['activity'] = sanitize_text_field($activity);
         $sc_param['field'] = sanitize_text_field($field);
+        $sc_param['sdg'] = sanitize_text_field($sdg);
+        $sc_param['hstart'] = absint($hstart);
         $sc_param['show'] = sanitize_text_field($show);
         if ($type == 'weitere') {
             $type = 'andere';
@@ -1578,6 +1626,25 @@ public static function options_fau_cris(): void
     }
 
     /*
+     * FAUdir loads its stylesheet only when it finds its own shortcode in the
+     * post content. Person cards rendered by this plugin are produced while the
+     * content is filtered, long after that check, so the cards would come out
+     * unstyled. Answering FAUdir's own filter marks the page as needing the
+     * stylesheet in time for it to land in the head.
+     */
+    public static function faudir_needs_frontend($needs, $post = null)
+    {
+        if ($needs) {
+            return $needs;
+        }
+        if (!$post instanceof \WP_Post || empty($post->post_content)) {
+            return $needs;
+        }
+        return has_shortcode($post->post_content, 'cris')
+            || has_shortcode($post->post_content, 'cris-custom');
+    }
+
+    /*
      * WP-Cron
      */
 
@@ -1591,6 +1658,10 @@ public static function options_fau_cris(): void
 
     public static function cris_cron(): void
     {
+        // A settings change may alter which CRIS data is shown; invalidate the
+        // plugin cache so stale responses are not served after reconfiguration.
+        \RRZE\Cris\Cache::flush();
+
         $options = get_option('_fau_cris');
         if (isset($options['cris_sync_check'])
                 && $options['cris_sync_check'] != 1) {

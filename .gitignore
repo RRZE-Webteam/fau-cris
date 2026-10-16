@@ -3,3 +3,8 @@ nbproject*
 *.pot~
 *.po~
 *.DS_Store
+issue399.txt
+/vendor/
+composer.lock
+composer.phar
+composer-setup.php

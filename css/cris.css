@@ -188,3 +188,83 @@ div.cris-standardization {
     justify-content: flex-start !important; /* Overriding justify-content to left (flex-start) */
     padding: 20px;
 }
+
+.cris-sdg-persons-cards {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.cris-sdg-person-card {
+    min-width: 0;
+}
+
+/* The person's UN SDG statement. Justified with hyphenation, which needs the
+   lang attribute the markup carries, otherwise justification tears gaps into
+   long German compounds. */
+.cris-person-sdgdescription p {
+    text-align: justify;
+    hyphens: auto;
+}
+
+/* Expanding must continue the same block of text rather than open a second
+   one, so the teaser and the full statement occupy the same place: the teaser
+   shows while the disclosure is closed and is swapped for the full text once
+   it opens. Flexbox restores reading order, because the markup has to put the
+   disclosure first for the sibling selector below to reach the teaser. */
+.cris-person-sdgdescription {
+    display: flex;
+    flex-direction: column;
+}
+
+.cris-person-sdgdescription-teaser {
+    order: 1;
+}
+
+.cris-person-sdgdescription-more {
+    display: flex;
+    flex-direction: column;
+    order: 2;
+}
+
+.cris-person-sdgdescription-full {
+    order: 1;
+}
+
+/* Making the disclosure a flex container stops the browser hiding its own
+   contents while it is closed, so the collapsed state is spelled out here. */
+.cris-person-sdgdescription-more:not([open]) > .cris-person-sdgdescription-full {
+    display: none;
+}
+
+.cris-person-sdgdescription-more[open] ~ .cris-person-sdgdescription-teaser {
+    display: none;
+}
+
+/* A link-like toggle underneath the text rather than the browser's default
+   triangle-and-bold-text disclosure. */
+.cris-person-sdgdescription-more > summary {
+    cursor: pointer;
+    list-style: none;
+    order: 2;
+    text-decoration: underline;
+    width: fit-content;
+}
+
+.cris-person-sdgdescription-more > summary::-webkit-details-marker {
+    display: none;
+}
+
+.cris-person-sdgdescription-more > summary:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.cris-person-sdgdescription-less-label,
+.cris-person-sdgdescription-more[open] .cris-person-sdgdescription-more-label {
+    display: none;
+}
+
+.cris-person-sdgdescription-more[open] .cris-person-sdgdescription-less-label {
+    display: inline;
+}

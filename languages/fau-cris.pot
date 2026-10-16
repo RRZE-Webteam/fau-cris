@@ -1072,3 +1072,15 @@ msgstr ""
 #: includes/XML.php:27
 msgid "Empty XML payload."
 msgstr ""
+
+#: includes/Sustainability.php
+msgid "Beitragende Wissenschaftler/-innen"
+msgstr ""
+
+#: includes/Personen.php
+msgid "Weiterlesen"
+msgstr ""
+
+#: includes/Personen.php
+msgid "Weniger anzeigen"
+msgstr ""

@@ -32,7 +32,9 @@ class Webservice
 
     private function fetch($url)
     {
-        return RemoteGet::retrieveContent($url);
+        // When caching is disabled (force refresh), pass the bypass flag down so
+        // RemoteGet performs a real request instead of reading a local transient.
+        return RemoteGet::retrieveContent($url, [], 200, true, !$this->cache);
     }
 
     public function disable_cache(): void

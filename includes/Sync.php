@@ -58,6 +58,11 @@ class Sync
             settings_errors();
             return;
         }
+        if ($manual) {
+            // Start a manual sync from a clean slate: purge accumulated plugin
+            // transients. Fresh data is fetched via disable_cache() below.
+            Cache::flush();
+        }
         $this->message = __('Synchronisierung abgeschlossen:', 'fau-cris') . '<ul style="list-style-type: disc; padding-left: 40px;">';
         $lang = ($this->page_lang == 'en') ? 'en' : '';
         $pages = array();
