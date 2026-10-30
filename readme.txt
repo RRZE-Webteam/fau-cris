@@ -4,7 +4,7 @@ Tags: research, cris, fau, publications, projects
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.29.24
+Stable tag: 3.29.25
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,11 @@ From the public CRIS webservice at cris.fau.de. Responses are cached as
 transients, so repeated page views do not query the webservice again.
 
 == Changelog ==
+
+= 3.29.25 =
+* Removed three sort helpers that were unreachable since 2016 and would
+  fatal on PHP 8 because of an unqualified callback in a namespaced file
+* Dropped a ReflectionProperty::setAccessible() call deprecated in PHP 8.5
 
 = 3.29.24 =
 * Plugin Check: added this readme, a translators comment, and documented

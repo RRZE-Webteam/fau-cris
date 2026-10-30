@@ -158,52 +158,6 @@ class Tools
         return '<p>' . $emptyMessage . '</p>';
     }
 
-    /*
-     * Array sortieren
-     */
-
-    public static function record_sortByName($results)
-    {
-
-        // Define the custom sort function
-        function custom_sort($a, $b): int
-        {
-            return (strcasecmp($a['lastName'], $b['lastName']));
-        }
-
-        // Sort the multidimensional array
-        uasort($results, "custom_sort");
-        return $results;
-    }
-
-    public static function record_sortByYear($results)
-    {
-
-        // Define the custom sort function
-        function custom_sort_year($a, $b): bool
-        {
-            return $a['publYear'] < $b['publYear'];
-        }
-
-        // Sort the multidimensional array
-        uasort($results, "custom_sort_year");
-        return $results;
-    }
-
-    public static function record_sortByVirtualdate($results)
-    {
-
-        // Define the custom sort function
-        function custom_sort_virtualdate($a, $b): bool
-        {
-            return $a['virtualdate'] < $b['virtualdate'];
-        }
-
-        // Sort the multidimensional array
-        uasort($results, "custom_sort_virtualdate");
-        return $results;
-    }
-
     public static function sort_key(&$sort_array, $keys_array)
     {
         if (empty($sort_array) || !is_array($sort_array) || empty($keys_array)) {

@@ -69,8 +69,9 @@ abstract class CrisTestCase extends TestCase
 
         // Reset the Cache class's per-request generation memo so static state
         // does not leak between tests.
+        // No setAccessible() call: private members have been reachable through
+        // reflection since PHP 8.1, and the method is deprecated as of 8.5.
         $memo = new \ReflectionProperty(\RRZE\Cris\Cache::class, 'generation');
-        $memo->setAccessible(true);
         $memo->setValue(null, null);
     }
 
