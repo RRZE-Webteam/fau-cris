@@ -4,7 +4,7 @@ Tags: research, cris, fau, publications, projects
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.29.25
+Stable tag: 3.29.26
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,11 @@ From the public CRIS webservice at cris.fau.de. Responses are cached as
 transients, so repeated page views do not query the webservice again.
 
 == Changelog ==
+
+= 3.29.26 =
+* Project lists can be ordered by acronym: orderby=acro_asc and
+  orderby=acro_desc for show=projects, projects_orderby=acro_asc and
+  projects_orderby=acro_desc for show=fields
 
 = 3.29.25 =
 * Removed three sort helpers that were unreachable since 2016 and would

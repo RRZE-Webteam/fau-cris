@@ -148,7 +148,11 @@ class Projekte
         if (!empty($param['orderby']) && $param['orderby']==='title') {
             uasort($projList, [$this,'project_title_filter']);
          }
-        
+
+        if (in_array($param['orderby'] ?? '', ['acro_asc', 'acro_desc'], true)) {
+            $projList = Tools::sort_projects_by_acronym($projList, $param['orderby']);
+        }
+
         $output = '';
        
 
@@ -1189,7 +1193,10 @@ class Projekte
             $projList=Tools::field_project_status_filter($projList,$param['projects_status'],$param['projects_start']);
         }
 
-    
+        if (in_array($param['projects_orderby'] ?? '', ['acro_asc', 'acro_desc'], true)) {
+            $projList = Tools::sort_projects_by_acronym($projList, $param['projects_orderby']);
+        }
+
         if ($this->cms == 'wp' && shortcode_exists('collapsibles')) {
             $output = $this->make_accordion($projList,$hide=$param['projects_hide']);
         } else {

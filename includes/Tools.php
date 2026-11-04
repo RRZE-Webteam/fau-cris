@@ -1154,6 +1154,39 @@ public static function sortByKey(array &$array, string $key): void {
     return $filteredProjects;
     }
 
+    /**
+     * Name : sort_projects_by_acronym
+     *
+     * Use: it will sort the project array by its CRIS acronym (cfacro),
+     * A to Z for 'acro_asc' and Z to A for 'acro_desc'. Digits inside the
+     * acronym are compared as numbers, so SFB2 comes before SFB10. Projects
+     * without an acronym are always moved to the end of the list, in both
+     * directions, so the named ones stay where the sort is useful; among
+     * themselves they keep the order they arrived in.
+     *
+     * Returns: $projects in the requested order, keys preserved
+     *
+     */
+    public static function sort_projects_by_acronym($projects = array(), $direction = 'acro_asc')
+    {
+        $descending = ($direction === 'acro_desc');
+
+        uasort($projects, function ($a, $b) use ($descending) {
+            $aAcronym = trim((string) ($a->attributes['cfacro'] ?? ''));
+            $bAcronym = trim((string) ($b->attributes['cfacro'] ?? ''));
+
+            if ($aAcronym === '' || $bAcronym === '') {
+                return ($aAcronym === '' ? 1 : 0) <=> ($bAcronym === '' ? 1 : 0);
+            }
+
+            $comparison = strnatcasecmp($aAcronym, $bAcronym);
+
+            return $descending ? -$comparison : $comparison;
+        });
+
+        return $projects;
+    }
+
     public static function filter_publication_bypersonid_postion($pubArray, $persIdArray, $authorPositionArray)
     {
         // Filter publications

@@ -21,7 +21,7 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.29.25
+ * Version: 3.29.26
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
@@ -82,7 +82,7 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.29.25';
+    const version = '3.29.26';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
@@ -1350,6 +1350,7 @@ public static function options_fau_cris(): void
             'publications_fau' => '',
             'publications_peerreviewed' => '',
             'publications_orderby' => '',
+            'projects_orderby' => '',
             'publications_notable' => '',
             'publications_language' => '',
             'publications_display' => 'list',
@@ -1442,6 +1443,7 @@ public static function options_fau_cris(): void
         $sc_param['publications_fau'] = sanitize_text_field($publications_fau);
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
+        $sc_param['projects_orderby'] = sanitize_text_field($projects_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
         $sc_param['standardization'] = sanitize_text_field($standardization);
         $sc_param['projects_status'] = sanitize_text_field($projects_status);
