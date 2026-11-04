@@ -4,7 +4,7 @@ Tags: research, cris, fau, publications, projects
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 3.29.27
+Stable tag: 3.29.28
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,10 @@ From the public CRIS webservice at cris.fau.de. Responses are cached as
 transients, so repeated page views do not query the webservice again.
 
 == Changelog ==
+
+= 3.29.28 =
+* Fixed the project sync passing its arguments to the wrong parameters, which
+  silently disabled the cache bypass it asks for
 
 = 3.29.27 =
 * Corrected the declared PHP and WordPress minimums, which were years out of
