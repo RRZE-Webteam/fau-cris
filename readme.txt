@@ -1,10 +1,10 @@
 === FAU CRIS ===
 Contributors: rrze-webteam
 Tags: research, cris, fau, publications, projects
-Requires at least: 6.2
+Requires at least: 6.8
 Tested up to: 7.1
-Requires PHP: 7.4
-Stable tag: 3.29.26
+Requires PHP: 8.2
+Stable tag: 3.29.27
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,10 @@ From the public CRIS webservice at cris.fau.de. Responses are cached as
 transients, so repeated page views do not query the webservice again.
 
 == Changelog ==
+
+= 3.29.27 =
+* Corrected the declared PHP and WordPress minimums, which were years out of
+  date and below what the code actually needs
 
 = 3.29.26 =
 * Project lists can be ordered by acronym: orderby=acro_asc and

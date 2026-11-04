@@ -21,13 +21,14 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.29.26
+ * Version: 3.29.27
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
  * Domain Path: /languages
- * Requires at least: 6.2
+ * Requires at least: 6.8
  * Tested up to: 7.1
+ * Requires PHP: 8.2
  * License: GPLv2 or later
  * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris
  * GitHub Branch: master
@@ -82,12 +83,12 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.29.26';
+    const version = '3.29.27';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
-    const php_version = '7.1'; // Minimal erforderliche PHP-Version
-    const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
+    const php_version = '8.2'; // Minimum required PHP version
+    const wp_version = '6.8'; // Minimum required WordPress version
     const cris_publicweb = 'https://cris.fau.de/';
     const doi = 'https://doi.org/';
 
