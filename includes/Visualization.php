@@ -124,6 +124,7 @@ class Visualization
         } catch (\Exception $e) {
             $this->error = new \WP_Error(
                 'cris-vis-fetch-error',
+                /* translators: %s: error message returned by the CRIS webservice */
                 sprintf(__('Error fetching visualization data: %s', 'fau-cris'), $e->getMessage())
             );
         }

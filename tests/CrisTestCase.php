@@ -59,6 +59,7 @@ abstract class CrisTestCase extends TestCase
         });
 
         Functions\when('wp_parse_url')->alias(function ($url, $component = -1) {
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- This closure is the wp_parse_url() stub itself; calling wp_parse_url() here would recurse.
             return $component === -1 ? parse_url($url) : parse_url($url, $component);
         });
 
@@ -68,8 +69,9 @@ abstract class CrisTestCase extends TestCase
 
         // Reset the Cache class's per-request generation memo so static state
         // does not leak between tests.
+        // No setAccessible() call: private members have been reachable through
+        // reflection since PHP 8.1, and the method is deprecated as of 8.5.
         $memo = new \ReflectionProperty(\RRZE\Cris\Cache::class, 'generation');
-        $memo->setAccessible(true);
         $memo->setValue(null, null);
     }
 

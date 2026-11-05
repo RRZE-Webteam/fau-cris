@@ -27,6 +27,7 @@ class RemoteGet
 
             if (is_wp_error($response)) {
                 do_action(
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook owned by the RRZE logging plugin; renaming it would break logging.
                     'rrze.log.error',
                     'Plugin: {plugin} WP-Error: {wp-error}',
                     [

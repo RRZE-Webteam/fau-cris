@@ -247,7 +247,7 @@ class Sync
                 if (is_wp_error($_p)) {
                     continue;
                 }
-                $projects = $_p->fieldProj($field->ID, 'array', true);
+                $projects = $_p->fieldProj($field->ID, [], 'array', true);
                 $field_contacts = array();
                 $fcids = array();
                 $field_contacts = explode('|', $field->attributes['contact_names']);

@@ -21,13 +21,14 @@ use RRZE\Cris\Sync;
 /**
  * Plugin Name: FAU CRIS
  * Description: Anzeige von Daten aus dem FAU-Forschungsportal CRIS in WP-Seiten
- * Version: 3.29.23
+ * Version: 3.29.28
  * Author: RRZE-Webteam
  * Author URI: http://blogs.fau.de/webworking/
  * Text Domain: fau-cris
  * Domain Path: /languages
- * Requires at least: 6.2
- * Tested up to: 6.3
+ * Requires at least: 6.8
+ * Tested up to: 7.1
+ * Requires PHP: 8.2
  * License: GPLv2 or later
  * GitHub Plugin URI: https://github.com/RRZE-Webteam/fau-cris
  * GitHub Branch: master
@@ -82,12 +83,12 @@ class FAU_CRIS
     /**
      * Get Started
      */
-    const version = '3.29.23';
+    const version = '3.29.28';
     const option_name = '_fau_cris';
     const version_option_name = '_fau_cris_version';
     const textdomain = 'fau-cris';
-    const php_version = '7.1'; // Minimal erforderliche PHP-Version
-    const wp_version = '3.9.2'; // Minimal erforderliche WordPress-Version
+    const php_version = '8.2'; // Minimum required PHP version
+    const wp_version = '6.8'; // Minimum required WordPress version
     const cris_publicweb = 'https://cris.fau.de/';
     const doi = 'https://doi.org/';
 
@@ -1350,6 +1351,7 @@ public static function options_fau_cris(): void
             'publications_fau' => '',
             'publications_peerreviewed' => '',
             'publications_orderby' => '',
+            'projects_orderby' => '',
             'publications_notable' => '',
             'publications_language' => '',
             'publications_display' => 'list',
@@ -1442,6 +1444,7 @@ public static function options_fau_cris(): void
         $sc_param['publications_fau'] = sanitize_text_field($publications_fau);
         $sc_param['publications_peerreviewed'] = sanitize_text_field($publications_peerreviewed);
         $sc_param['publications_orderby'] = sanitize_text_field($publications_orderby);
+        $sc_param['projects_orderby'] = sanitize_text_field($projects_orderby);
         $sc_param['publications_notable'] = $publications_notable == 1 ? 1 : 0;
         $sc_param['standardization'] = sanitize_text_field($standardization);
         $sc_param['projects_status'] = sanitize_text_field($projects_status);
